@@ -8,6 +8,7 @@ type ButtonProps = {
   variant?: "primary" | "secondary";
   textVariant?: "label" | "body" | "title" | "display" | "headline" | "subtitle";
   color?: "primary" | "secondary" | "default" | "success" | "warning" | "danger";
+  className?: string;
 };
 
 const getTextColor = (color: string) => {
@@ -25,9 +26,9 @@ const getTextColor = (color: string) => {
   }
 }
 
-const Button = ({ onClick, label, color="primary", textVariant="label", variant="primary" }: ButtonProps) => {
+const Button = ({ onClick, label, color="primary", textVariant="label", variant="primary", className="" }: ButtonProps) => {
   return (
-    <ButtonHeroUI color={color} onPress={onClick} className="py-2 px-2" variant={ variant==="primary" ? "solid" : "bordered"}>
+    <ButtonHeroUI color={color} onPress={onClick} className={`py-2 px-2 ${className}`} variant={ variant==="primary" ? "solid" : "bordered"}>
       <Text variant={textVariant} color={getTextColor(color)}>
         {label}
       </Text>
