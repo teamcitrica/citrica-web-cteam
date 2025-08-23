@@ -5,4 +5,5 @@ export interface TextProps {
   color?: string;
   // size?: string;
   textColor?: string;
+  className?: string;
 }

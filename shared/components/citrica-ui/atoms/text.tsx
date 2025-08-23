@@ -1,7 +1,7 @@
 import React from 'react';
 import { TextProps } from '@/shared/types/components/text.type';
 
-const Text: React.FC<TextProps> = ({ children, variant, color, weight = 'normal', textColor='color-text-black'}) => {
+const Text: React.FC<TextProps> = ({ children, variant, color, weight = 'normal', textColor='color-text-black', className=''}) => {
 
   const colorStyle = color ? { color } : { color: `var(--${textColor})`  };
 
@@ -21,7 +21,7 @@ const Text: React.FC<TextProps> = ({ children, variant, color, weight = 'normal'
   } 
   return (
     <span 
-      className={`text-${variant}${classWeight}`}
+      className={`text-${variant}${classWeight} ${className}`}
       style={{
         ...colorStyle,
       }}
