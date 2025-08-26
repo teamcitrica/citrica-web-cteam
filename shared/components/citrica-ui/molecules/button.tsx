@@ -1,6 +1,6 @@
 'use client'
 import Text from "../atoms/text";
-import {Button as ButtonHeroUI} from "@heroui/react";
+import { Button as ButtonHeroUI } from "@heroui/react";
 
 type ButtonProps = {
   onClick: () => void;
@@ -9,31 +9,48 @@ type ButtonProps = {
   textVariant?: "label" | "body" | "title" | "display" | "headline" | "subtitle";
   color?: "primary" | "secondary" | "default" | "success" | "warning" | "danger";
   className?: string;
+  textClassName?: string; // <-- para controlar el color del texto
 };
 
 const getTextColor = (color: string) => {
   switch (color) {
     case "primary":
-      return "black";
+      return "text-black";
     case "secondary":
-      return "white";
+      return "text-white";
     case "default":
-      return "white";
+      return "text-white";
     case "success":
-      return "white";
+      return "text-white";
     default:
-      return "black";
+      return "text-black";
   }
-}
+};
 
-const Button = ({ onClick, label, color="primary", textVariant="label", variant="primary", className="" }: ButtonProps) => {
+const Button = ({
+  onClick,
+  label,
+  color = "primary",
+  textVariant = "label",
+  variant = "primary",
+  className = "",
+  textClassName = "", // <-- nuevo prop
+}: ButtonProps) => {
   return (
-    <ButtonHeroUI color={color} onPress={onClick} className={`py-2 px-2 ${className}`} variant={ variant==="primary" ? "solid" : "bordered"}>
-      <Text variant={textVariant} color={getTextColor(color)}>
+    <ButtonHeroUI
+      color={color}
+      onPress={onClick}
+      className={`py-2 px-2 ${className}`}
+      variant={variant === "primary" ? "solid" : "bordered"}
+    >
+      <Text
+        variant={textVariant}
+        className={`${getTextColor(color)} ${textClassName}`}
+      >
         {label}
       </Text>
     </ButtonHeroUI>
-  )
-}
+  );
+};
 
-export default Button
+export default Button;
