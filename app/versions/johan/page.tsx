@@ -181,6 +181,7 @@ const NeuralPlexus: React.FC<NeuralPlexusProps> = ({ className = "" }) => {
     />
   );
 };
+
 interface ShinyTextProps {
   text: string;
   className?: string;
@@ -329,6 +330,7 @@ const TypewriterText: React.FC<TypewriterTextProps> = ({ text, delay = 0, speed 
 
 const CitricaLanding = () => {
   const [currentProject, setCurrentProject] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const projects = [
     {
@@ -417,6 +419,11 @@ const CitricaLanding = () => {
     return () => clearInterval(interval);
   }, [projects.length]);
 
+  // Cerrar menú móvil cuando se hace click en un enlace
+  const handleMobileMenuClick = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#16141F]">
       {/* Navbar */}
@@ -435,16 +442,17 @@ const CitricaLanding = () => {
               </div>
 
               {/* Navegación Desktop */}
-              <GooeyNav
-                items={[
-                  { label: "Inicio", href: "#inicio" },
-                  { label: "Proyectos", href: "#proyectos" },
-                  { label: "Contacto", href: "#contacto" },
-                ]}
-              />
+              <div className="hidden md:block">
+                <GooeyNav
+                  items={[
+                    { label: "Inicio", href: "#inicio" },
+                    { label: "Proyectos", href: "#proyectos" },
+                    { label: "Contacto", href: "#contacto" },
+                  ]}
+                />
+              </div>
 
-
-              {/* CTA Button */}
+              {/* CTA Button Desktop */}
               <div className="hidden md:block">
                 <Button
                   onClick={() => { }}
@@ -455,9 +463,49 @@ const CitricaLanding = () => {
               </div>
 
               {/* Mobile Menu Button */}
-              <button className="md:hidden p-2 hover:bg-[#E1FF00]/10 rounded-full transition-colors">
-                <Icon name="Menu" size={24} color="#E1FF00" />
+              <button 
+                className="md:hidden p-2 hover:bg-[#E1FF00]/10 rounded-full transition-colors"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                <Icon name={isMobileMenuOpen ? "X" : "Menu"} size={24} color="#E1FF00" />
               </button>
+            </div>
+
+            {/* Mobile Menu */}
+            <div className={`md:hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
+              <div className="pb-4 space-y-4">
+                <div className="flex flex-col space-y-3">
+                  <a 
+                    href="#inicio" 
+                    className="text-white hover:text-[#E1FF00] transition-colors py-2 px-4 rounded-lg hover:bg-[#E1FF00]/10"
+                    onClick={handleMobileMenuClick}
+                  >
+                    <Text variant="body" color="#E1FF00">Inicio</Text>
+                  </a>
+                  <a 
+                    href="#proyectos" 
+                    className="text-white hover:text-[#E1FF00] transition-colors py-2 px-4 rounded-lg hover:bg-[#E1FF00]/10"
+                    onClick={handleMobileMenuClick}
+                  >
+                    <Text variant="body" color="#E1FF00">Proyectos</Text>
+                  </a>
+                  <a 
+                    href="#contacto" 
+                    className="text-white hover:text-[#E1FF00] transition-colors py-2 px-4 rounded-lg hover:bg-[#E1FF00]/10"
+                    onClick={handleMobileMenuClick}
+                  >
+                    <Text variant="body" color="#E1FF00">Contacto</Text>
+                  </a>
+                </div>
+                <div className="pt-4 border-t border-[#E1FF00]/20">
+                  <Button
+                    onClick={() => { handleMobileMenuClick(); }}
+                    label="Comenzar"
+                    variant="primary"
+                    className="w-full bg-gradient-to-r from-[#E1FF00] to-[#FF5B00] text-[#16141F] font-bold px-6 py-2 rounded-full hover:scale-105 transition-all"
+                  />
+                </div>
+              </div>
             </div>
           </Col>
         </Container>
@@ -664,17 +712,17 @@ const CitricaLanding = () => {
 
           {/* Project Cards Carousel */}
           <div className="relative max-w-6xl mx-auto flex justify-center">
-            {/* Navigation Buttons */}
+            {/* Navigation Buttons - Hidden on mobile */}
             <button
               onClick={() => setCurrentProject(currentProject === 0 ? projects.length - 1 : currentProject - 1)}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-[#E1FF00]/20 hover:bg-[#E1FF00]/30 rounded-full transition-all"
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-[#E1FF00]/20 hover:bg-[#E1FF00]/30 rounded-full transition-all hidden sm:block"
             >
               <Icon name="ChevronLeft" size={24} color="#E1FF00" />
             </button>
 
             <button
               onClick={() => setCurrentProject((currentProject + 1) % projects.length)}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-[#E1FF00]/20 hover:bg-[#E1FF00]/30 rounded-full transition-all"
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-[#E1FF00]/20 hover:bg-[#E1FF00]/30 rounded-full transition-all hidden sm:block"
             >
               <Icon name="ChevronRight" size={24} color="#E1FF00" />
             </button>
@@ -683,12 +731,14 @@ const CitricaLanding = () => {
             <div className="overflow-hidden w-full max-w-5xl">
               <div
                 className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentProject * (100 / 3)}%)` }}
+                style={{ 
+                  transform: `translateX(-${currentProject * (window.innerWidth < 640 ? 100 : 100 / 3)}%)` 
+                }}
               >
                 {projects.concat(projects).map((project, index) => (
                   <div
                     key={`${project.id}-${index}`}
-                    className="w-1/3 px-4 flex-shrink-0"
+                    className="w-full sm:w-1/3 px-4 flex-shrink-0"
                   >
                     {/* Glow Effect */}
                     <div className="relative group cursor-pointer h-[500px]">
@@ -737,6 +787,23 @@ const CitricaLanding = () => {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Mobile Navigation Buttons */}
+            <div className="sm:hidden flex justify-between w-full absolute top-1/2 transform -translate-y-1/2 px-4 z-10">
+              <button
+                onClick={() => setCurrentProject(currentProject === 0 ? projects.length - 1 : currentProject - 1)}
+                className="p-3 bg-[#E1FF00]/20 hover:bg-[#E1FF00]/30 rounded-full transition-all"
+              >
+                <Icon name="ChevronLeft" size={20} color="#E1FF00" />
+              </button>
+
+              <button
+                onClick={() => setCurrentProject((currentProject + 1) % projects.length)}
+                className="p-3 bg-[#E1FF00]/20 hover:bg-[#E1FF00]/30 rounded-full transition-all"
+              >
+                <Icon name="ChevronRight" size={20} color="#E1FF00" />
+              </button>
             </div>
 
             {/* Indicators */}
@@ -945,13 +1012,12 @@ const CitricaLanding = () => {
         </Container>
 
         <div className="border-t border-[#E1FF00]/20 mt-8 pt-8">
-          <Container>
             <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center">
               <Text variant="label" color="#FFFFFF" className="opacity-50">
                 © 2024 Cítrica. Todos los derechos reservados. Transformando ideas en soluciones digitales.
               </Text>
             </Col>
-          </Container>
+     
         </div>
       </footer>
     </div>
