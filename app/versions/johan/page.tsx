@@ -16,7 +16,7 @@ const NeuralPlexus: React.FC<NeuralPlexusProps> = ({ className = "" }) => {
   const animationRef = useRef<number>();
   const nodesRef = useRef<any[]>([]);
   const connectionsRef = useRef<any[]>([]);
-  
+
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -463,7 +463,7 @@ const CitricaLanding = () => {
               </div>
 
               {/* Mobile Menu Button */}
-              <button 
+              <button
                 className="md:hidden p-2 hover:bg-[#E1FF00]/10 rounded-full transition-colors"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
@@ -475,22 +475,22 @@ const CitricaLanding = () => {
             <div className={`md:hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}>
               <div className="pb-4 space-y-4">
                 <div className="flex flex-col space-y-3">
-                  <a 
-                    href="#inicio" 
+                  <a
+                    href="#inicio"
                     className="text-white hover:text-[#E1FF00] transition-colors py-2 px-4 rounded-lg hover:bg-[#E1FF00]/10"
                     onClick={handleMobileMenuClick}
                   >
                     <Text variant="body" color="#E1FF00">Inicio</Text>
                   </a>
-                  <a 
-                    href="#proyectos" 
+                  <a
+                    href="#proyectos"
                     className="text-white hover:text-[#E1FF00] transition-colors py-2 px-4 rounded-lg hover:bg-[#E1FF00]/10"
                     onClick={handleMobileMenuClick}
                   >
                     <Text variant="body" color="#E1FF00">Proyectos</Text>
                   </a>
-                  <a 
-                    href="#contacto" 
+                  <a
+                    href="#contacto"
                     className="text-white hover:text-[#E1FF00] transition-colors py-2 px-4 rounded-lg hover:bg-[#E1FF00]/10"
                     onClick={handleMobileMenuClick}
                   >
@@ -600,9 +600,6 @@ const CitricaLanding = () => {
           </Col>
         </Container>
       </section>
-
-
-
 
       {/* About Section */}
       <section className="py-20 relative">
@@ -728,64 +725,120 @@ const CitricaLanding = () => {
             </button>
 
             {/* Carousel Container */}
+            {/* Carousel Container */}
             <div className="overflow-hidden w-full max-w-5xl">
-              <div
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ 
-                  transform: `translateX(-${currentProject * (window.innerWidth < 640 ? 100 : 100 / 3)}%)` 
-                }}
-              >
-                {projects.concat(projects).map((project, index) => (
-                  <div
-                    key={`${project.id}-${index}`}
-                    className="w-full sm:w-1/3 px-4 flex-shrink-0"
-                  >
-                    {/* Glow Effect */}
-                    <div className="relative group cursor-pointer h-[500px]">
-                      <div className="absolute -inset-1 bg-gradient-to-r from-[#E1FF00] via-[#FF5B00] to-[#00FFFF] rounded-2xl opacity-0 group-hover:opacity-75 blur transition-all duration-500"></div>
+              {/* Carrusel para móvil */}
+              <div className="block sm:hidden">
+                <div
+                  className="flex transition-transform duration-500 ease-in-out"
+                  style={{ transform: `translateX(-${currentProject * 100}%)` }}
+                >
+                  {projects.map((project, index) => (
+                    <div key={project.id} className="w-full px-4 flex-shrink-0">
+                      {/* Glow Effect */}
+                      <div className="relative group cursor-pointer h-[500px]">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-[#E1FF00] via-[#FF5B00] to-[#00FFFF] rounded-2xl opacity-0 group-hover:opacity-75 blur transition-all duration-500"></div>
 
-                      <article className="relative bg-[#1a1823] rounded-2xl p-6 border border-[#E1FF00]/20 hover:border-[#E1FF00]/50 transition-all h-full flex flex-col">
-                        {/* Project Image Placeholder */}
-                        <div className="h-48 bg-gradient-to-br from-[#E1FF00]/20 to-[#FF5B00]/20 rounded-lg mb-6 flex items-center justify-center flex-shrink-0">
-                          <Icon name="Image" size={48} color="#E1FF00" />
-                        </div>
+                        <article className="relative bg-[#1a1823] rounded-2xl p-6 border border-[#E1FF00]/20 hover:border-[#E1FF00]/50 transition-all h-full flex flex-col">
+                          {/* Project Image Placeholder */}
+                          <div className="h-48 bg-gradient-to-br from-[#E1FF00]/20 to-[#FF5B00]/20 rounded-lg mb-6 flex items-center justify-center flex-shrink-0">
+                            <Icon name="Image" size={48} color="#E1FF00" />
+                          </div>
 
-                        {/* Category Badge */}
-                        <div className="inline-block w-fit px-3 py-1 bg-[#FF5B00]/20 border border-[#FF5B00]/30 rounded-full mb-4 flex-shrink-0">
-                          <Text variant="label" color="#FF5B00">
-                            {project.category}
-                          </Text>
-                        </div>
+                          {/* Category Badge */}
+                          <div className="inline-block w-fit px-3 py-1 bg-[#FF5B00]/20 border border-[#FF5B00]/30 rounded-full mb-4 flex-shrink-0">
+                            <Text variant="label" color="#FF5B00">
+                              {project.category}
+                            </Text>
+                          </div>
 
-                        <h3 className="mb-3 flex-shrink-0">
-                          <Text variant="subtitle" color="#FFFFFF">
-                            {project.title}
-                          </Text>
-                        </h3>
+                          <h3 className="mb-3 flex-shrink-0">
+                            <Text variant="subtitle" color="#FFFFFF">
+                              {project.title}
+                            </Text>
+                          </h3>
 
-                        <p className="mb-4 flex-grow overflow-hidden">
-                          <Text variant="body" color="#FFFFFF" className="opacity-70 line-clamp-3">
-                            {project.description}
-                          </Text>
-                        </p>
+                          <p className="mb-4 flex-grow overflow-hidden">
+                            <Text variant="body" color="#FFFFFF" className="opacity-70 line-clamp-3">
+                              {project.description}
+                            </Text>
+                          </p>
 
-                        {/* Tech Stack */}
-                        <div className="flex flex-wrap gap-2 mt-auto flex-shrink-0">
-                          {project.tech.map((tech, techIndex) => (
-                            <span
-                              key={techIndex}
-                              className="px-2 py-1 bg-[#00FFFF]/10 border border-[#00FFFF]/20 rounded text-xs"
-                            >
-                              <Text variant="label" color="#00FFFF">
-                                {tech}
-                              </Text>
-                            </span>
-                          ))}
-                        </div>
-                      </article>
+                          {/* Tech Stack */}
+                          <div className="flex flex-wrap gap-2 mt-auto flex-shrink-0">
+                            {project.tech.map((tech, techIndex) => (
+                              <span
+                                key={techIndex}
+                                className="px-2 py-1 bg-[#00FFFF]/10 border border-[#00FFFF]/20 rounded text-xs"
+                              >
+                                <Text variant="label" color="#00FFFF">
+                                  {tech}
+                                </Text>
+                              </span>
+                            ))}
+                          </div>
+                        </article>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              </div>
+
+              {/* Carrusel para desktop */}
+              <div className="hidden sm:block">
+                <div
+                  className="flex transition-transform duration-500 ease-in-out"
+                  style={{ transform: `translateX(-${currentProject * (100 / 3)}%)` }}
+                >
+                  {projects.concat(projects).map((project, index) => (
+                    <div key={`${project.id}-${index}`} className="w-1/3 px-4 flex-shrink-0">
+                      {/* Glow Effect */}
+                      <div className="relative group cursor-pointer h-[500px]">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-[#E1FF00] via-[#FF5B00] to-[#00FFFF] rounded-2xl opacity-0 group-hover:opacity-75 blur transition-all duration-500"></div>
+
+                        <article className="relative bg-[#1a1823] rounded-2xl p-6 border border-[#E1FF00]/20 hover:border-[#E1FF00]/50 transition-all h-full flex flex-col">
+                          {/* Project Image Placeholder */}
+                          <div className="h-48 bg-gradient-to-br from-[#E1FF00]/20 to-[#FF5B00]/20 rounded-lg mb-6 flex items-center justify-center flex-shrink-0">
+                            <Icon name="Image" size={48} color="#E1FF00" />
+                          </div>
+
+                          {/* Category Badge */}
+                          <div className="inline-block w-fit px-3 py-1 bg-[#FF5B00]/20 border border-[#FF5B00]/30 rounded-full mb-4 flex-shrink-0">
+                            <Text variant="label" color="#FF5B00">
+                              {project.category}
+                            </Text>
+                          </div>
+
+                          <h3 className="mb-3 flex-shrink-0">
+                            <Text variant="subtitle" color="#FFFFFF">
+                              {project.title}
+                            </Text>
+                          </h3>
+
+                          <p className="mb-4 flex-grow overflow-hidden">
+                            <Text variant="body" color="#FFFFFF" className="opacity-70 line-clamp-3">
+                              {project.description}
+                            </Text>
+                          </p>
+
+                          {/* Tech Stack */}
+                          <div className="flex flex-wrap gap-2 mt-auto flex-shrink-0">
+                            {project.tech.map((tech, techIndex) => (
+                              <span
+                                key={techIndex}
+                                className="px-2 py-1 bg-[#00FFFF]/10 border border-[#00FFFF]/20 rounded text-xs"
+                              >
+                                <Text variant="label" color="#00FFFF">
+                                  {tech}
+                                </Text>
+                              </span>
+                            ))}
+                          </div>
+                        </article>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -1012,12 +1065,12 @@ const CitricaLanding = () => {
         </Container>
 
         <div className="border-t border-[#E1FF00]/20 mt-8 pt-8">
-            <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center">
-              <Text variant="label" color="#FFFFFF" className="opacity-50">
-                © 2024 Cítrica. Todos los derechos reservados. Transformando ideas en soluciones digitales.
-              </Text>
-            </Col>
-     
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center">
+            <Text variant="label" color="#FFFFFF" className="opacity-50">
+              © 2024 Cítrica. Todos los derechos reservados. Transformando ideas en soluciones digitales.
+            </Text>
+          </Col>
+
         </div>
       </footer>
     </div>
