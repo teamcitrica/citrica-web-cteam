@@ -355,15 +355,15 @@ const CitricaLanding = () => {
       title: "HealthCare Platform",
       description: "Sistema integral de gestión médica con telemedicina y seguimiento de pacientes en tiempo real.",
       tech: ["Next.js", "Express", "MongoDB", "Socket.io"],
-      image: "/api/placeholder/400/300",
+      image: "/img-3.jpeg",
       category: "HealthTech"
     },
     {
       id: 4,
-      title: "EdTech Learning Suite",
-      description: "Plataforma educativa interactiva con contenido adaptativo y sistema de evaluación inteligente.",
-      tech: ["React Native", "Firebase", "AI/ML", "WebRTC"],
-      image: "/api/placeholder/400/300",
+        title: "EdTech Learning Suite",
+        description: "Plataforma educativa interactiva con contenido adaptativo y sistema de evaluación inteligente.",
+        tech: ["React Native", "Firebase", "AI/ML", "WebRTC"],
+      image: "/img-4.jpeg",
       category: "Education"
     }
   ];
