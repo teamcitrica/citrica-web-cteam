@@ -5,6 +5,7 @@ import Text from '@ui/atoms/text';
 import Button from '@ui/molecules/button';
 import Icon from '@ui/atoms/icon';
 import GooeyNav from '@/shared/components/citrica-ui/molecules/gooeynav';
+import ResponsiveCarousel from '@/shared/components/citrica-ui/molecules/carrusel-citrica';
 
 // Componente Neural Plexus
 interface NeuralPlexusProps {
@@ -338,7 +339,7 @@ const CitricaLanding = () => {
       title: "E-commerce Fashion Hub",
       description: "Plataforma completa de comercio electrónico con experiencia de usuario premium y gestión avanzada de inventario.",
       tech: ["React", "Node.js", "MongoDB", "Stripe"],
-      image: "/api/placeholder/400/300",
+      image: "/img-1.jpg",
       category: "E-commerce"
     },
     {
@@ -346,7 +347,7 @@ const CitricaLanding = () => {
       title: "FinTech Dashboard",
       description: "Dashboard de análisis financiero en tiempo real con visualizaciones interactivas y reporting automático.",
       tech: ["Vue.js", "Python", "PostgreSQL", "D3.js"],
-      image: "/api/placeholder/400/300",
+      image: "/img-2.jpg",
       category: "FinTech"
     },
     {
@@ -593,9 +594,13 @@ const CitricaLanding = () => {
               </div>
 
               {/* Scroll Indicator */}
-              <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-                <Icon name="ChevronDown" size={32} color="#E1FF00" />
-              </div>
+{/* <div className="relative w-screen">
+  <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 animate-bounce">
+    <Icon name="ChevronDown" size={32} color="#E1FF00" />
+  </div>
+</div> */}
+
+
             </div>
           </Col>
         </Container>
@@ -706,173 +711,12 @@ const CitricaLanding = () => {
               </p>
             </div>
           </Col>
-
+            <ResponsiveCarousel
+              projects={projects}
+              className=""
+            />
           {/* Project Cards Carousel */}
-          <div className="relative max-w-6xl mx-auto flex justify-center">
-            {/* Navigation Buttons - Hidden on mobile */}
-            <button
-              onClick={() => setCurrentProject(currentProject === 0 ? projects.length - 1 : currentProject - 1)}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-[#E1FF00]/20 hover:bg-[#E1FF00]/30 rounded-full transition-all hidden sm:block"
-            >
-              <Icon name="ChevronLeft" size={24} color="#E1FF00" />
-            </button>
 
-            <button
-              onClick={() => setCurrentProject((currentProject + 1) % projects.length)}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 p-3 bg-[#E1FF00]/20 hover:bg-[#E1FF00]/30 rounded-full transition-all hidden sm:block"
-            >
-              <Icon name="ChevronRight" size={24} color="#E1FF00" />
-            </button>
-
-            {/* Carousel Container */}
-            {/* Carousel Container */}
-            <div className="overflow-hidden w-full max-w-5xl">
-              {/* Carrusel para móvil */}
-              <div className="block sm:hidden">
-                <div
-                  className="flex transition-transform duration-500 ease-in-out"
-                  style={{ transform: `translateX(-${currentProject * 100}%)` }}
-                >
-                  {projects.map((project, index) => (
-                    <div key={project.id} className="w-full px-4 flex-shrink-0">
-                      {/* Glow Effect */}
-                      <div className="relative group cursor-pointer h-[500px]">
-                        <div className="absolute -inset-1 bg-gradient-to-r from-[#E1FF00] via-[#FF5B00] to-[#00FFFF] rounded-2xl opacity-0 group-hover:opacity-75 blur transition-all duration-500"></div>
-
-                        <article className="relative bg-[#1a1823] rounded-2xl p-6 border border-[#E1FF00]/20 hover:border-[#E1FF00]/50 transition-all h-full flex flex-col">
-                          {/* Project Image Placeholder */}
-                          <div className="h-48 bg-gradient-to-br from-[#E1FF00]/20 to-[#FF5B00]/20 rounded-lg mb-6 flex items-center justify-center flex-shrink-0">
-                            <Icon name="Image" size={48} color="#E1FF00" />
-                          </div>
-
-                          {/* Category Badge */}
-                          <div className="inline-block w-fit px-3 py-1 bg-[#FF5B00]/20 border border-[#FF5B00]/30 rounded-full mb-4 flex-shrink-0">
-                            <Text variant="label" color="#FF5B00">
-                              {project.category}
-                            </Text>
-                          </div>
-
-                          <h3 className="mb-3 flex-shrink-0">
-                            <Text variant="subtitle" color="#FFFFFF">
-                              {project.title}
-                            </Text>
-                          </h3>
-
-                          <p className="mb-4 flex-grow overflow-hidden">
-                            <Text variant="body" color="#FFFFFF" className="opacity-70 line-clamp-3">
-                              {project.description}
-                            </Text>
-                          </p>
-
-                          {/* Tech Stack */}
-                          <div className="flex flex-wrap gap-2 mt-auto flex-shrink-0">
-                            {project.tech.map((tech, techIndex) => (
-                              <span
-                                key={techIndex}
-                                className="px-2 py-1 bg-[#00FFFF]/10 border border-[#00FFFF]/20 rounded text-xs"
-                              >
-                                <Text variant="label" color="#00FFFF">
-                                  {tech}
-                                </Text>
-                              </span>
-                            ))}
-                          </div>
-                        </article>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Carrusel para desktop */}
-              <div className="hidden sm:block">
-                <div
-                  className="flex transition-transform duration-500 ease-in-out"
-                  style={{ transform: `translateX(-${currentProject * (100 / 3)}%)` }}
-                >
-                  {projects.concat(projects).map((project, index) => (
-                    <div key={`${project.id}-${index}`} className="w-1/3 px-4 flex-shrink-0">
-                      {/* Glow Effect */}
-                      <div className="relative group cursor-pointer h-[500px]">
-                        <div className="absolute -inset-1 bg-gradient-to-r from-[#E1FF00] via-[#FF5B00] to-[#00FFFF] rounded-2xl opacity-0 group-hover:opacity-75 blur transition-all duration-500"></div>
-
-                        <article className="relative bg-[#1a1823] rounded-2xl p-6 border border-[#E1FF00]/20 hover:border-[#E1FF00]/50 transition-all h-full flex flex-col">
-                          {/* Project Image Placeholder */}
-                          <div className="h-48 bg-gradient-to-br from-[#E1FF00]/20 to-[#FF5B00]/20 rounded-lg mb-6 flex items-center justify-center flex-shrink-0">
-                            <Icon name="Image" size={48} color="#E1FF00" />
-                          </div>
-
-                          {/* Category Badge */}
-                          <div className="inline-block w-fit px-3 py-1 bg-[#FF5B00]/20 border border-[#FF5B00]/30 rounded-full mb-4 flex-shrink-0">
-                            <Text variant="label" color="#FF5B00">
-                              {project.category}
-                            </Text>
-                          </div>
-
-                          <h3 className="mb-3 flex-shrink-0">
-                            <Text variant="subtitle" color="#FFFFFF">
-                              {project.title}
-                            </Text>
-                          </h3>
-
-                          <p className="mb-4 flex-grow overflow-hidden">
-                            <Text variant="body" color="#FFFFFF" className="opacity-70 line-clamp-3">
-                              {project.description}
-                            </Text>
-                          </p>
-
-                          {/* Tech Stack */}
-                          <div className="flex flex-wrap gap-2 mt-auto flex-shrink-0">
-                            {project.tech.map((tech, techIndex) => (
-                              <span
-                                key={techIndex}
-                                className="px-2 py-1 bg-[#00FFFF]/10 border border-[#00FFFF]/20 rounded text-xs"
-                              >
-                                <Text variant="label" color="#00FFFF">
-                                  {tech}
-                                </Text>
-                              </span>
-                            ))}
-                          </div>
-                        </article>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile Navigation Buttons */}
-            <div className="sm:hidden flex justify-between w-full absolute top-1/2 transform -translate-y-1/2 px-4 z-10">
-              <button
-                onClick={() => setCurrentProject(currentProject === 0 ? projects.length - 1 : currentProject - 1)}
-                className="p-3 bg-[#E1FF00]/20 hover:bg-[#E1FF00]/30 rounded-full transition-all"
-              >
-                <Icon name="ChevronLeft" size={20} color="#E1FF00" />
-              </button>
-
-              <button
-                onClick={() => setCurrentProject((currentProject + 1) % projects.length)}
-                className="p-3 bg-[#E1FF00]/20 hover:bg-[#E1FF00]/30 rounded-full transition-all"
-              >
-                <Icon name="ChevronRight" size={20} color="#E1FF00" />
-              </button>
-            </div>
-
-            {/* Indicators */}
-            <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center space-x-2">
-              {projects.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentProject(index)}
-                  className={`w-3 h-3 rounded-full transition-all ${index === currentProject
-                    ? 'bg-[#E1FF00]'
-                    : 'bg-[#E1FF00]/30'
-                    }`}
-                />
-              ))}
-            </div>
-          </div>
         </Container>
       </section>
 
