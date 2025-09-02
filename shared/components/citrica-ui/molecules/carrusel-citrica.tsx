@@ -83,7 +83,7 @@ const ResponsiveCarousel: React.FC<ResponsiveCarouselProps> = ({
 
   return (
     <div className={`w-full max-w-6xl mx-auto relative px-4 sm:px-6 ${className}`}>
-      
+
       {/* Flecha izquierda */}
       <button
         onClick={prevProject}
@@ -113,8 +113,8 @@ const ResponsiveCarousel: React.FC<ResponsiveCarouselProps> = ({
           {projects.map((project) => (
             <div
               key={project.id}
-              className="w-[90%] max-w-[320px] md:w-1/2 lg:w-1/3 
-                         px-2 sm:px-4 flex-shrink-0 mx-auto"
+              className="w-full md:w-1/2 lg:w-1/3 
+           px-2 sm:px-4 flex-shrink-0"
             >
               <div className="relative group cursor-pointer h-auto sm:h-auto lg:h-auto">
                 {/* Glow */}
@@ -126,14 +126,14 @@ const ResponsiveCarousel: React.FC<ResponsiveCarouselProps> = ({
                                     transition-all h-full flex flex-col">
 
                   {/* Imagen */}
-<div className="h-32 sm:h-40 lg:h-48 bg-gradient-to-br from-[#E1FF00]/20 to-[#FF5B00]/20
+                  <div className="h-32 sm:h-40 lg:h-48 bg-gradient-to-br from-[#E1FF00]/20 to-[#FF5B00]/20
                 rounded-lg mb-4 sm:mb-6 flex items-center justify-center flex-shrink-0 overflow-hidden">
-  <img 
-    src={project.image} 
-    alt={project.title} 
-    className="w-full h-full object-cover rounded-lg" 
-  />
-</div>
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
 
                   {/* Categoría */}
                   <div className="inline-block w-fit px-3 py-1 bg-[#FF5B00]/20 
