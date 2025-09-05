@@ -60,33 +60,33 @@ const CitricaWebsite = () => {
   const technologies = [
     {
       title: "Presentaciones que inspiran",
-      description: "Diseños únicos que comunican efectivamente tu propuesta de valor",
+      description: "<strong>Figma</strong> permite la colaboración en tiempo real, <strong>prototipos interactivos</strong>, diseños visualmente atractivos y <strong>acceso desde cualquier lugar</strong>, asegurando que tus presentaciones sean tan profesionales y convincentes como tus productos digitales.",
       icon: "Presentation",
       color: "#E1FF00"
     },
     {
       title: "Front-end robusto",
-      description: "Interfaces modernas, rápidas y optimizadas para todos los dispositivos",
+      description: "<strong>HTML5, CSS3 y SASS</strong> para <strong>interfaces modernas y responsivas</strong>. <strong>TypeScript</strong> para un código <strong>más seguro y mantenible</strong>. <strong>ReactJS y Next.js</strong> para aplicaciones <strong>web rápidas y dinámicas.</strong>",
       icon: "Layers",
       color: "#00FFFF"
     },
     {
       title: "Desarrollo móvil eficiente",
-      description: "Apps nativas e híbridas con la mejor experiencia de usuario",
+      description: "<strong>React Native</strong> para crear aplicaciones nativas para <strong>iOS</strong> y <strong>Android</strong> con un solo código base.",
       icon: "Smartphone",
       color: "#FF5B00"
     },
     {
       title: "Back-end potente",
-      description: "Arquitecturas escalables y seguras que crecen con tu negocio",
+      description: "<strong>Strapi</strong> para una <strong>gestión de contenido</strong> flexible y escalable. <strong>PostgreSQL</strong> para <strong>bases de datos seguras y confiables.</strong> <strong>AWS S3</strong> para un <strong>almacenamiento</strong> en la nube <strong>seguro.</strong>",
       icon: "Server",
-      color: "#E5FFFF"
+      color: "#E1FF00"
     }
   ]
 
   const process = [
-    { step: "01", icon: "ClipboardList", title: "Planificación", description: "Definimos objetivos y estrategia del proyecto", color: "#E1FF00" },
-    { step: "02", icon: "Palette", title: "Diseño", description: "Creamos prototipos y experiencias de usuario", color: "#FF5B00" },
+    { step: "01", icon: "ClipboardList", title: "Planificación", description: "Definimos objetivos y estrategia del proyecto", color: "#e1ff00" },
+    { step: "02", icon: "Palette", title: "Diseño", description: "Creamos prototipos y experiencias de usuario", color: "#ff5b00" },
     { step: "03", icon: "Code", title: "Desarrollo", description: "Construimos tu solución con las mejores tecnologías", color: "#00FFFF" },
     { step: "04", icon: "TestTube", title: "Pruebas", description: "Validamos calidad y rendimiento exhaustivamente", color: "#E5FFFF" },
     { step: "05", icon: "Rocket", title: "Implementación", description: "Desplegamos tu proyecto de forma segura", color: "#E1FF00" },
@@ -103,9 +103,9 @@ const CitricaWebsite = () => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#16141F' }}>
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 transition-all duration-300 backdrop-blur-sm" style={{ backgroundColor: '#16141F98' }}>
+      <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-black/80 bg-opacity-80 backdrop-blur-sm " >
         <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="flex justify-between items-center py-4">
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="flex justify-between items-center pt-4">
             <div className="flex items-center space-x-2">
               <div className="w-24 h-16">
                 <img
@@ -136,7 +136,7 @@ const CitricaWebsite = () => {
                   label="Hablemos"
                   color="primary"
                   variant="primary"
-                  className='px-8 bg-[#E1FF00]'
+                  className='px-8 bg-[#E1FF00] rounded-[80]'
                 />
               </div>
               <div className="md:hidden ml-4">
@@ -150,17 +150,17 @@ const CitricaWebsite = () => {
       {/* Hero Section */}
       <section id="inicio" className="min-h-screen pt-56 relative overflow-hidden">
         <div className="absolute inset-0 -z-80">
-            <DotGrid
-              dotSize={4}
-              gap={16}
-              baseColor="#006666"
-              activeColor="#E1ff00"
-              proximity={120}
-              shockRadius={250}
-              shockStrength={5}
-              resistance={750}
-              returnDuration={1.5}
-            />
+          <DotGrid
+            dotSize={4}
+            gap={16}
+            baseColor="#006666"
+            activeColor="#E1ff00"
+            proximity={120}
+            shockRadius={250}
+            shockStrength={5}
+            resistance={750}
+            returnDuration={1.5}
+          />
         </div>
         <Container>
           <Col cols={{ lg: 8, md: 6, sm: 4 }} className="text-center mx-auto mb-12">
@@ -181,33 +181,33 @@ const CitricaWebsite = () => {
                 onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
                 label="Conócenos ahora"
                 variant="primary"
-                className='px-8 bg-[#E1FF00]'
+                className='px-8 bg-[#E1FF00] rounded-[80]'
               />
               <Button
                 onClick={() => document.getElementById('proyectos')?.scrollIntoView({ behavior: 'smooth' })}
                 label="Ver Proyectos"
                 color="secondary"
-                className="bg-[#E5FFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8"
+                className="bg-[#E5FFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8 rounded-[80]"
               />
             </div>
           </Col>
         </Container>
 
         {/* Services Grid */}
-        <Container className='bg-gradient-to-br from-[#0F2027] via-[#203A43] to-[#2C5364] p-8 rounded-xl'>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="mb-6 flex items-center justify-center text-center bg-opacity-10 backdrop-blur-sm">
+        <Container className='bg-opacity-10 backdrop-blur-sm p-4 rounded-3xl border border-white border-opacity-10'>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="mb-6 flex items-center justify-center text-center">
             <Text variant="title" color="#FF5B00" weight="bold">
               Nuestros servicios
             </Text>
           </Col>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
             {services.map((service, index) => (
-              <div key={index} className="bg-white/20 bg-opacity-5 backdrop-blur-sm rounded-2xl p-6 hover:bg-opacity-10 transition-all duration-300 hover:transform hover:scale-105 flex flex-col items-center text-center">
+              <div key={index} className="bg-white/10 bg-opacity-5 backdrop-blur-sm rounded-2xl p-6 hover:bg-opacity-10 transition-all duration-300 hover:transform hover:scale-105 flex flex-col items-center text-center">
                 <div className="mb-4 flex items-center justify-center" style={{ backgroundColor: '#16141F', width: '48px', height: '48px', borderRadius: '9999px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Icon name={service.icon as any} color={service.color} size={32} />
                 </div>
                 <h3 className="mb-2">
-                  <Text variant="subtitle" color="#E5FFFF" weight="bold">
+                  <Text variant="subtitle" color="#ffffff" weight="bold">
                     {service.title}
                   </Text>
                 </h3>
@@ -312,7 +312,7 @@ const CitricaWebsite = () => {
                     </Text>
                   </h3>
                   <Text variant="body" color="#bbba9b" className="opacity-80">
-                    Desarrolladores senior con más de 5 años de experiencia
+                    Desarrolladores senior con amplia experiencia
                   </Text>
                 </div>
                 <div className="absolute left-1/2 -translate-x-1/2 bg-[#16141F] p-3 rounded-full border-2 border-[#FF5B00]">
@@ -360,7 +360,7 @@ const CitricaWebsite = () => {
       </section>
 
       {/* Latest Projects */}
-      <section id="proyectos" className="py-20 bg-[#FF00D4]">
+      {/*       <section id="proyectos" className="py-20 bg-[#580049]">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <h2 className="mb-6">
@@ -381,7 +381,7 @@ const CitricaWebsite = () => {
                 </div>
                 <div className="p-6">
                   <h3 className="mb-2">
-                    <Text variant="body" color="#FF6638" weight="bold">
+                    <Text variant="body" color="#FF00D4" weight="bold">
                       {project.title}
                     </Text>
                   </h3>
@@ -390,7 +390,7 @@ const CitricaWebsite = () => {
                       {project.description}
                     </Text>
                   </div>
-                  <div className="bg-[#43261C] px-3 py-2 rounded-lg">
+                  <div className="bg-[#16141F] px-3 py-2 rounded-lg">
                     <Text variant="label" color="#bbba9b" weight="bold">
                       {project.tech}
                     </Text>
@@ -400,48 +400,63 @@ const CitricaWebsite = () => {
             ))}
           </Col>
         </Container>
-      </section>
+      </section> */}
 
-      {/* Technologies */}
-      <section className="py-20">
+      {/* Technologies Section */}
+      <section id="technologies" className="pb-20 ">
         <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
+          {/* Título principal */}
+          <Col cols={{lgPush:2, lg: 8, md: 6, sm: 4 }} className="text-center mb-12">
             <h2 className="mb-6">
               <Text variant="title" color="#FF5B00" weight="bold">
-                Tecnologías que usamos
+                Tecnología de punta para resultados excepcionales
               </Text>
             </h2>
-            <Text variant="body" color="#E5FFFF" className="opacity-90">
-              Las mejores herramientas para crear soluciones excepcionales
-            </Text>
+            <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
+              <Text variant="body" color="#E5FFFF" className="opacity-90">
+                En Cítrica, utilizamos un conjunto de tecnologías de vanguardia para garantizar que tus productos digitales sean de la más alta calidad:
+              </Text>
+            </Col>
           </Col>
 
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Grid de tecnologías */}
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {technologies.map((tech, index) => (
-              <div key={index} className="bg-white bg-opacity-5 backdrop-blur-sm rounded-2xl p-8 hover:bg-opacity-10 transition-all duration-500 hover:transform hover:scale-105 animate-fade-in-up group border border-white border-opacity-10 hover:border-opacity"
-                style={{ animationDelay: `${index * 100}ms` }}
+              <div
+                key={index}
+                className="bg-white rounded-2xl p-8 flex flex-col items-center text-center shadow-md border-4 transition-all duration-300 hover:shadow-xl hover:scale-105"
+                style={{ borderColor: tech.color }}
               >
-                <div className="flex items-center mb-4">
-                  <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center mr-4"
-                    style={{ backgroundColor: tech.color }}
-                  >
-                    <Icon name={tech.icon as any} color="#16141F" size={24} />
-                  </div>
-                  <h3>
-                    <Text variant="subtitle" color="#E5FFFF" weight="bold">
-                      {tech.title}
-                    </Text>
-                  </h3>
+                {/* Icono */}
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
+                  style={{ backgroundColor: tech.color }}
+                >
+                  <Icon name={tech.icon as any} color="#16141F" size={24} />
                 </div>
-                <Text variant="body" color="#E5FFFF" className="opacity-80">
-                  {tech.description}
-                </Text>
+
+                {/* Título */}
+                <h3 className="text-lg font-bold text-gray-900 mb-3">
+                  {tech.title}
+                </h3>
+
+                {/* Descripción */}
+                <p className="text-gray-600 text-sm leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: tech.description }}>
+                </p>
               </div>
             ))}
           </Col>
+
+          {/* Texto final */}
+          <div className="text-center mt-10 max-w-3xl mx-auto">
+            <p className="text-white text-sm">
+              Estas herramientas nos permiten crear productos digitales de alto rendimiento, escalables y fáciles de mantener, asegurando una experiencia excepcional para tus usuarios.
+            </p>
+          </div>
         </Container>
       </section>
+
 
       {/* Process */}
       <section id="process" className="py-20 bg-white">
@@ -476,7 +491,7 @@ const CitricaWebsite = () => {
                     </div>
                     <div className="space-y-4 pt-4">
                       <div className="flex items-center space-x-3">
-                        <div className="p-3 rounded-lg shadow-sm" style={{ backgroundColor: `${step.color}20` }}>
+                        <div className="p-3 rounded-lg shadow-sm" style={{ backgroundColor: '#16141F' }}>
                           <Icon name={step.icon as any} size={24} className="w-6 h-6"
                             style={{ color: step.color }}
                           />
@@ -557,23 +572,25 @@ const CitricaWebsite = () => {
             </div>
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
               <Button
-                onClick={() => window.open('mailto:contacto@citrica.com', '_blank')}
+                onClick={() => window.open('mailto:admin@citrica.dev', '_blank')}
                 label="Escribir Email"
                 color="primary"
                 variant="primary"
+                className='bg-[#ffffff] text-sm rounded-[80] px-8'
               />
               <Button
-                onClick={() => window.open('https://wa.me/1234567890', '_blank')}
+                onClick={() => window.open('https://wa.me/51942627383', '_blank')}
                 label="WhatsApp"
                 color="success"
                 variant="primary"
+                className='bg-[#ffffff] text-sm rounded-[80] px-8'
               />
             </div>
             <div className="flex flex-col justify-center items-center space-x-8 gap-4">
               <div className="flex items-center space-x-2">
                 <Icon name="Mail" color="#16141F" size={20} />
                 <Link
-                  href="mailto:contacto@citrica.com"
+                  href="mailto:admin@citrica.dev"
                 >
                   <Text variant="body" color="#16141F" weight="bold">
                     contacto@citrica.com
@@ -584,12 +601,12 @@ const CitricaWebsite = () => {
               <div className="flex items-center space-x-2">
                 <Icon name="Phone" color="#16141F" size={20} />
                 <Link
-                  href="tel:515551234567"
+                  href="tel:+51942627383"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <Text variant="body" color="#16141F" weight="bold">
-                    +1 (555) 123-4567
+                    +51 942 627-383
                   </Text>
                 </Link>
               </div>
@@ -601,8 +618,8 @@ const CitricaWebsite = () => {
       {/* Footer */}
       <footer className="pt-12" style={{ backgroundColor: '#16141F', borderTop: '1px solid rgba(225, 255, 0, 0.2)' }}>
         <Container>
-          <Col cols={{ lg: 6, md: 6, sm: 4 }} className='flex flex-col text-center justify-center gap-2'>
-            <div className="flex items-center justify-center lg:justify-start space-x-2">
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className='flex flex-col text-center justify-center gap-2'>
+            <div className="flex items-center justify-center lg:justify-center space-x-2">
               <div className="w-24 h-16">
                 <img
                   src="/img/citrica-logo.png"
@@ -610,7 +627,7 @@ const CitricaWebsite = () => {
                 />
               </div>
             </div>
-            <h2 className="mb-8 lg:text-start md:text-center">
+            <h2 className="mb-8 lg:text-center md:text-center">
               <Text variant="label" color="#E5FFFF" className="opacity-70">
                 Transformamos ideas en soluciones digitales que impulsan el crecimiento de tu negocio.
               </Text>
@@ -618,13 +635,13 @@ const CitricaWebsite = () => {
           </Col>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mt-8">
             <Divider className="mb-8 bg-gray-800" />
-            <div className='flex justify-between'>
+            <div className='flex justify-center'>
               <h2 className="mb-8">
                 <Text variant="label" color="#E5FFFF" className="opacity-50">
                   © 2025 Cítrica.
                 </Text>
               </h2>
-              <div className="flex justify-center lg:justify-end space-x-6 mb-8">
+              {/* <div className="flex justify-center lg:justify-end space-x-6 mb-8">
                 <Link
                   href="https://www.facebook.com/citrica"
                   target="_blank"
@@ -653,7 +670,7 @@ const CitricaWebsite = () => {
                 >
                   <Icon name="Github" color="#E5FFFF" size={24} className="transition-all duration-300" />
                 </Link>
-              </div>
+              </div> */}
             </div>
           </Col>
         </Container>
