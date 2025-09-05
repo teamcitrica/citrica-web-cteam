@@ -5,8 +5,8 @@ import Text from '@/shared/components/citrica-ui/atoms/text'
 import Icon from '@/shared/components/citrica-ui/atoms/icon'
 import Button from '@/shared/components/citrica-ui/molecules/button'
 import CurvedLoop from './components/CurvedLoop'
-import { CheckCircle } from 'lucide-react'
 import { Divider, Link } from '@heroui/react'
+import DotGrid from './components/DotGrid'
 
 const CitricaWebsite = () => {
   const services = [
@@ -94,16 +94,16 @@ const CitricaWebsite = () => {
   ]
 
   const stats = [
-    { icon: CheckCircle, number: 150, suffix: "+", label: "Proyectos Entregados" },
-    { icon: CheckCircle, number: 98, suffix: "%", label: "Clientes Satisfechos" },
-    { icon: CheckCircle, number: 24, suffix: "/7", label: "Soporte activo" },
-    { icon: CheckCircle, number: 10, suffix: "x", label: "Velocidad de entrega" },
+    { icon: "CheckCircle", number: 150, suffix: "+", label: "Proyectos Entregados" },
+    { icon: "CheckCircle", number: 98, suffix: "%", label: "Clientes Satisfechos" },
+    { icon: "CheckCircle", number: 24, suffix: "/7", label: "Soporte activo" },
+    { icon: "CheckCircle", number: 10, suffix: "x", label: "Velocidad de entrega" },
   ]
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#16141F' }}>
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50  transition-all duration-300 backdrop-blur-sm" style={{ backgroundColor: '#16141F98' }}>
+      <nav className="fixed top-0 w-full z-50 transition-all duration-300 backdrop-blur-sm" style={{ backgroundColor: '#16141F98' }}>
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
@@ -136,7 +136,7 @@ const CitricaWebsite = () => {
                   label="Hablemos"
                   color="primary"
                   variant="primary"
-                  className='px-8'
+                  className='px-8 bg-[#E1FF00]'
                 />
               </div>
               <div className="md:hidden ml-4">
@@ -148,16 +148,23 @@ const CitricaWebsite = () => {
       </nav>
 
       {/* Hero Section */}
-      <section id="inicio" className="min-h-screen pt-64 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-5 pointer-events-none">
-          <div className="absolute top-40 left-20 w-32 h-32 rounded-full" style={{ backgroundColor: '#E1FF00' }}></div>
-          <div className="absolute bottom-40 right-32 w-24 h-24 rounded-full" style={{ backgroundColor: '#00FFFF' }}></div>
-          <div className="absolute top-60 right-20 w-16 h-16 rounded-full" style={{ backgroundColor: '#FF5B00' }}></div>
+      <section id="inicio" className="min-h-screen pt-56 relative overflow-hidden">
+        <div className="absolute inset-0 -z-80">
+            <DotGrid
+              dotSize={4}
+              gap={16}
+              baseColor="#006666"
+              activeColor="#E1ff00"
+              proximity={120}
+              shockRadius={250}
+              shockStrength={5}
+              resistance={750}
+              returnDuration={1.5}
+            />
         </div>
-
         <Container>
           <Col cols={{ lg: 8, md: 6, sm: 4 }} className="text-center mx-auto mb-12">
-            <div className="mb-12 space-y-4">
+            <div className="mb-12 space-y-4 bg-opacity-10 backdrop-blur-sm p-4 rounded-3xl border border-white border-opacity-10">
               <h2>
                 <Text variant="display" color="#FFFFFF">
                   <span style={{ color: '#FF5B00' }}>APLICACIONES Y SITIOS WEB A MEDIDA</span> PARA TU NEGOCIO
@@ -173,15 +180,14 @@ const CitricaWebsite = () => {
               <Button
                 onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
                 label="Conócenos ahora"
-                color="primary"
                 variant="primary"
-                className='px-8'
+                className='px-8 bg-[#E1FF00]'
               />
               <Button
                 onClick={() => document.getElementById('proyectos')?.scrollIntoView({ behavior: 'smooth' })}
                 label="Ver Proyectos"
                 color="secondary"
-                className="bg-[#E5FFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)]"
+                className="bg-[#E5FFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8"
               />
             </div>
           </Col>
@@ -189,7 +195,7 @@ const CitricaWebsite = () => {
 
         {/* Services Grid */}
         <Container className='bg-gradient-to-br from-[#0F2027] via-[#203A43] to-[#2C5364] p-8 rounded-xl'>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="mb-6 flex items-center justify-center text-center">
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="mb-6 flex items-center justify-center text-center bg-opacity-10 backdrop-blur-sm">
             <Text variant="title" color="#FF5B00" weight="bold">
               Nuestros servicios
             </Text>
@@ -240,7 +246,7 @@ const CitricaWebsite = () => {
         <Container>
           {/* Íconos animados con contadores e información */}
           <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-            <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-3xl p-8 h-full flex flex-col items-center justify-center">
+            <div className="bg-white rounded-3xl p-8 h-full flex flex-col items-center justify-center">
               <div className="text-center mb-10">
                 <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center animate-spin-slow">
                   <Icon name="Rocket" color="#E5FFFF" size={48} />
@@ -252,26 +258,23 @@ const CitricaWebsite = () => {
 
               {/* Stats Icons */}
               <Col cols={{ lg: 12, md: 4, sm: 4 }} className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full'>
-                {stats.map((stat, index) => {
-                  const Icon = stat.icon
-                  return (
-                    <div
-                      key={index}
-                      className="text-center hover:scale-105 transition-transform duration-300"
-                    >
-                      <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-[#E1FF00] to-[#00FFFF] flex items-center justify-center">
-                        <Icon className="text-[#16141F]" size={24} />
-                      </div>
-                      <div className="text-2xl font-bold text-[#16141F] mb-1">
-                        {stat.number}
-                        {stat.suffix}
-                      </div>
-                      <div className="text-sm text-[#16141F]/80 font-medium">
-                        {stat.label}
-                      </div>
+                {stats.map((stat, index) => (
+                  <div
+                    key={index}
+                    className="text-center hover:scale-105 transition-transform duration-300"
+                  >
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-[#E1FF00] to-[#00FFFF] flex items-center justify-center">
+                      <Icon name={stat.icon as any} className="text-[#16141F]" size={24} />
                     </div>
-                  )
-                })}
+                    <div className="text-2xl font-bold text-[#16141F] mb-1">
+                      {stat.number}
+                      {stat.suffix}
+                    </div>
+                    <div className="text-sm text-[#16141F]/80 font-medium">
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
               </Col>
             </div>
           </Col>
@@ -299,7 +302,7 @@ const CitricaWebsite = () => {
           <Col cols={{ lg: 12, md: 6, sm: 4 }}>
             <div className="relative max-w-4xl mx-auto">
               {/* Línea central */}
-              <div className="absolute left-1/2 h-full w-0.5 bg-[#3a3927] -translate-x-1/2"></div>
+              <div className="absolute left-1/2 h-full w-0.5 bg-yellow-600 -translate-x-1/2"></div>
 
               <div className="relative mb-12 flex items-center w-full">
                 <div className="w-1/2 pr-12 text-right">
@@ -357,11 +360,11 @@ const CitricaWebsite = () => {
       </section>
 
       {/* Latest Projects */}
-      <section id="proyectos" className="py-20 bg-[#27271b]">
+      <section id="proyectos" className="py-20 bg-[#FF00D4]">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <h2 className="mb-6">
-              <Text variant="title" color="#FF5B00" weight="bold">
+              <Text variant="title" color="#E5FFFF" weight="bold">
                 Últimos proyectos
               </Text>
             </h2>
@@ -441,7 +444,7 @@ const CitricaWebsite = () => {
       </section>
 
       {/* Process */}
-      <section id="process" className="py-20 bg-[#27271b]">
+      <section id="process" className="py-20 bg-white">
         <Container>
           <div className="space-y-12">
             <div className="text-center space-y-4">
@@ -451,7 +454,7 @@ const CitricaWebsite = () => {
                 </Text>
               </h2>
               <p>
-                <Text variant="body" color="#E5FFFF" className="opacity-90">
+                <Text variant="body" color="#16141F" className="opacity-90">
                   Seguimos una metodología probada que garantiza la entrega exitosa de tu proyecto,
                   desde la conceptualización hasta el soporte post-lanzamiento
                 </Text>
