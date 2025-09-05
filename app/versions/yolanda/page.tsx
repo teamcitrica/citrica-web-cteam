@@ -4,28 +4,35 @@ import { Container, Col } from '@/styles/07-objects/objects'
 import Text from '@/shared/components/citrica-ui/atoms/text'
 import Icon from '@/shared/components/citrica-ui/atoms/icon'
 import Button from '@/shared/components/citrica-ui/molecules/button'
+import CurvedLoop from './components/CurvedLoop'
+import { CheckCircle } from 'lucide-react'
+import { Divider, Link } from '@heroui/react'
 
 const CitricaWebsite = () => {
   const services = [
     {
       title: "Landing Pages",
-      description: "Páginas de aterrizaje optimizadas para conversión",
-      icon: "Globe"
+      description: "Convierte visitantes en clientes con páginas de aterrizaje de alto impacto.",
+      icon: "Globe",
+      color: "#E1FF00",
     },
     {
       title: "Websites",
-      description: "Sitios web corporativos profesionales",
-      icon: "Monitor"
+      description: "Posiciona tu marca y atrae nuevos clientes con un sitio web profesional.",
+      icon: "Monitor",
+      color: "#00FFFF",
     },
     {
       title: "Web Apps",
-      description: "Aplicaciones web robustas y escalables",
-      icon: "Code"
+      description: "Optimiza tus procesos con aplicaciones web intuitivas y funcionales.",
+      icon: "Code",
+      color: "#FF5B00",
     },
     {
       title: "Mobile Apps",
-      description: "Aplicaciones móviles nativas e híbridas",
-      icon: "Smartphone"
+      description: "Apps móviles para conectar tu negocio con tus clientes, al instante.",
+      icon: "Smartphone",
+      color: "#E1FF00",
     }
   ]
 
@@ -34,19 +41,19 @@ const CitricaWebsite = () => {
       title: "E-commerce Fashion",
       description: "Plataforma completa de comercio electrónico con gestión de inventario",
       tech: "React • Node.js • MongoDB",
-      image: "/api/placeholder/400/250"
+      image: "/e-commerce.png"
     },
     {
       title: "Sistema ERP",
       description: "Sistema integral de gestión empresarial para medianas empresas",
       tech: "Vue.js • Laravel • MySQL",
-      image: "/api/placeholder/400/250"
+      image: "/dashboard.png"
     },
     {
       title: "App de Delivery",
       description: "Aplicación móvil para delivery con tracking en tiempo real",
       tech: "React Native • Firebase • Google Maps",
-      image: "/api/placeholder/400/250"
+      image: "/delivery.png"
     }
   ]
 
@@ -78,23 +85,34 @@ const CitricaWebsite = () => {
   ]
 
   const process = [
-    { step: "01", title: "Planificación", description: "Definimos objetivos y estrategia del proyecto" },
-    { step: "02", title: "Diseño", description: "Creamos prototipos y experiencias de usuario" },
-    { step: "03", title: "Desarrollo", description: "Construimos tu solución con las mejores tecnologías" },
-    { step: "04", title: "Pruebas", description: "Validamos calidad y rendimiento exhaustivamente" },
-    { step: "05", title: "Implementación", description: "Desplegamos tu proyecto de forma segura" },
-    { step: "06", title: "Soporte", description: "Mantenimiento continuo y evolución constante" }
+    { step: "01", icon: "ClipboardList", title: "Planificación", description: "Definimos objetivos y estrategia del proyecto", color: "#E1FF00" },
+    { step: "02", icon: "Palette", title: "Diseño", description: "Creamos prototipos y experiencias de usuario", color: "#FF5B00" },
+    { step: "03", icon: "Code", title: "Desarrollo", description: "Construimos tu solución con las mejores tecnologías", color: "#00FFFF" },
+    { step: "04", icon: "TestTube", title: "Pruebas", description: "Validamos calidad y rendimiento exhaustivamente", color: "#E5FFFF" },
+    { step: "05", icon: "Rocket", title: "Implementación", description: "Desplegamos tu proyecto de forma segura", color: "#E1FF00" },
+    { step: "06", icon: "Headphones", title: "Soporte", description: "Mantenimiento continuo y evolución constante", color: "#FF5B00" }
+  ]
+
+  const stats = [
+    { icon: CheckCircle, number: 150, suffix: "+", label: "Proyectos Entregados" },
+    { icon: CheckCircle, number: 98, suffix: "%", label: "Clientes Satisfechos" },
+    { icon: CheckCircle, number: 24, suffix: "/7", label: "Soporte activo" },
+    { icon: CheckCircle, number: 10, suffix: "x", label: "Velocidad de entrega" },
   ]
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#16141F' }}>
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-opacity-95 backdrop-blur-sm" style={{ backgroundColor: '#16141F' }}>
+      <nav className="fixed top-0 w-full z-50  transition-all duration-300 backdrop-blur-sm" style={{ backgroundColor: '#16141F98' }}>
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full" style={{ backgroundColor: '#E1FF00' }}></div>
-              <Text variant="title" color="#E5FFFF" weight="bold">Cítrica</Text>
+              <div className="w-24 h-16">
+                <img
+                  src="/img/citrica-logo.png"
+                  alt="Logo Cítrica"
+                />
+              </div>
             </div>
             <div className="hidden lg:flex space-x-8">
               <a href="#inicio" className="hover:opacity-80 transition-opacity">
@@ -110,57 +128,77 @@ const CitricaWebsite = () => {
                 <Text variant="body" color="#E5FFFF">Contacto</Text>
               </a>
             </div>
-            <div className="lg:hidden">
-              <Icon name="Menu" color="#E5FFFF" size={24} />
+            {/* Right side - action button + hamburger on small screens only */}
+            <div className="flex items-center md:justify-end">
+              <div className="hidden md:block">
+                <Button
+                  onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
+                  label="Hablemos"
+                  color="primary"
+                  variant="primary"
+                  className='px-8'
+                />
+              </div>
+              <div className="md:hidden ml-4">
+                <Icon name="Menu" color="#E5FFFF" size={24} />
+              </div>
             </div>
           </Col>
         </Container>
       </nav>
 
       {/* Hero Section */}
-      <section id="inicio" className="pt-32 pb-20 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-20 left-20 w-32 h-32 rounded-full" style={{ backgroundColor: '#E1FF00' }}></div>
+      <section id="inicio" className="min-h-screen pt-64 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-5 pointer-events-none">
+          <div className="absolute top-40 left-20 w-32 h-32 rounded-full" style={{ backgroundColor: '#E1FF00' }}></div>
           <div className="absolute bottom-40 right-32 w-24 h-24 rounded-full" style={{ backgroundColor: '#00FFFF' }}></div>
           <div className="absolute top-60 right-20 w-16 h-16 rounded-full" style={{ backgroundColor: '#FF5B00' }}></div>
         </div>
-        
+
         <Container>
-          <Col cols={{ lg: 8, md: 6, sm: 4 }} className="text-center mx-auto mb-16">
-            <h1 className="mb-6">
-              <Text variant="display" color="#E5FFFF" className="leading-tight">
-                APLICACIONES Y SITIOS WEB A MEDIDA PARA TU NEGOCIO
-              </Text>
-            </h1>
-            <div className="mb-8">
-              <Text variant="title" color="#00FFFF">
-                Transformamos ideas en soluciones digitales que impulsan el crecimiento
-              </Text>
+          <Col cols={{ lg: 8, md: 6, sm: 4 }} className="text-center mx-auto mb-12">
+            <div className="mb-12 space-y-4">
+              <h2>
+                <Text variant="display" color="#FFFFFF">
+                  <span style={{ color: '#FF5B00' }}>APLICACIONES Y SITIOS WEB A MEDIDA</span> PARA TU NEGOCIO
+                </Text>
+              </h2>
+              <p>
+                <Text variant="body" color="#E5FFFF">
+                  Transformamos tus ideas en soluciones digitales que impulsan el crecimiento de tu empresa
+                </Text>
+              </p>
             </div>
-            <div className="flex justify-center space-x-4">
-              <Button 
+            <div className="flex justify-center space-x-4 mb-12">
+              <Button
                 onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
-                label="Iniciar Proyecto"
+                label="Conócenos ahora"
                 color="primary"
                 variant="primary"
+                className='px-8'
               />
-              <Button 
+              <Button
                 onClick={() => document.getElementById('proyectos')?.scrollIntoView({ behavior: 'smooth' })}
                 label="Ver Proyectos"
                 color="secondary"
-                variant="secondary"
+                className="bg-[#E5FFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)]"
               />
             </div>
           </Col>
         </Container>
 
         {/* Services Grid */}
-        <Container>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-16">
+        <Container className='bg-gradient-to-br from-[#0F2027] via-[#203A43] to-[#2C5364] p-8 rounded-xl'>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="mb-6 flex items-center justify-center text-center">
+            <Text variant="title" color="#FF5B00" weight="bold">
+              Nuestros servicios
+            </Text>
+          </Col>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
             {services.map((service, index) => (
-              <div key={index} className="bg-white bg-opacity-5 backdrop-blur-sm rounded-2xl p-6 hover:bg-opacity-10 transition-all duration-300 hover:transform hover:scale-105">
-                <div className="mb-4">
-                  <Icon name={service.icon as any} color="#E1FF00" size={32} />
+              <div key={index} className="bg-white/20 bg-opacity-5 backdrop-blur-sm rounded-2xl p-6 hover:bg-opacity-10 transition-all duration-300 hover:transform hover:scale-105 flex flex-col items-center text-center">
+                <div className="mb-4 flex items-center justify-center" style={{ backgroundColor: '#16141F', width: '48px', height: '48px', borderRadius: '9999px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon name={service.icon as any} color={service.color} size={32} />
                 </div>
                 <h3 className="mb-2">
                   <Text variant="subtitle" color="#E5FFFF" weight="bold">
@@ -170,166 +208,194 @@ const CitricaWebsite = () => {
                 <Text variant="body" color="#E5FFFF" className="opacity-80">
                   {service.description}
                 </Text>
+                <div
+                  className="mt-8 h-1 w-full rounded-full"
+                  style={{
+                    background: `linear-gradient(90deg, ${service.color}00, ${service.color}, ${service.color}00)`,
+                  }}
+                />
               </div>
             ))}
-          </div>
+          </Col>
+        </Container>
+      </section>
+
+      <section id='servicios'>
+        <Container>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="flex justify-center p-0">
+            <CurvedLoop
+              marqueeText="Tiendas en línea • Mercados • Aplicaciones de streaming • Sitios web a medida • Landing pages • CRM • ERP • Herramientas de gestión de proyectos •"
+              speed={1}
+              curveAmount={0}
+              direction="right"
+              interactive={true}
+              className="custom-text-style"
+            />
+          </Col>
         </Container>
       </section>
 
       {/* Value Proposition */}
-      <section className="py-20" style={{ backgroundColor: '#E1FF00' }}>
+      <section id="valores" className=''>
         <Container>
-          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <h2 className="mb-6">
-              <Text variant="headline" color="#16141F" weight="bold">
-                ¿Por qué elegir Cítrica?
-              </Text>
-            </h2>
-            <div className="space-y-4 mb-8">
-              <div className="flex items-center space-x-3">
-                <Icon name="CheckCircle" color="#16141F" size={24} />
-                <Text variant="body" color="#16141F" weight="bold">
-                  +50 proyectos exitosos entregados
-                </Text>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Icon name="CheckCircle" color="#16141F" size={24} />
-                <Text variant="body" color="#16141F" weight="bold">
-                  Tecnologías de vanguardia
-                </Text>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Icon name="CheckCircle" color="#16141F" size={24} />
-                <Text variant="body" color="#16141F" weight="bold">
-                  Soporte 24/7 post-lanzamiento
-                </Text>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Icon name="CheckCircle" color="#16141F" size={24} />
-                <Text variant="body" color="#16141F" weight="bold">
-                  Entrega en tiempo récord
-                </Text>
-              </div>
-            </div>
-          </Col>
-          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-3xl p-8 h-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
+          {/* Íconos animados con contadores e información */}
+          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+            <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-3xl p-8 h-full flex flex-col items-center justify-center">
+              <div className="text-center mb-10">
+                <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center animate-spin-slow">
                   <Icon name="Rocket" color="#E5FFFF" size={48} />
                 </div>
                 <Text variant="title" color="#16141F" weight="bold">
                   Impulsamos tu crecimiento digital
                 </Text>
               </div>
+
+              {/* Stats Icons */}
+              <Col cols={{ lg: 12, md: 4, sm: 4 }} className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full'>
+                {stats.map((stat, index) => {
+                  const Icon = stat.icon
+                  return (
+                    <div
+                      key={index}
+                      className="text-center hover:scale-105 transition-transform duration-300"
+                    >
+                      <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-[#E1FF00] to-[#00FFFF] flex items-center justify-center">
+                        <Icon className="text-[#16141F]" size={24} />
+                      </div>
+                      <div className="text-2xl font-bold text-[#16141F] mb-1">
+                        {stat.number}
+                        {stat.suffix}
+                      </div>
+                      <div className="text-sm text-[#16141F]/80 font-medium">
+                        {stat.label}
+                      </div>
+                    </div>
+                  )
+                })}
+              </Col>
             </div>
           </Col>
         </Container>
       </section>
+
 
       {/* About Us */}
       <section className="py-20">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <h2 className="mb-6">
-              <Text variant="headline" color="#E1FF00" weight="bold">
-                Quiénes somos
+              <Text variant="title" color="#FF5B00" weight="bold">
+                ¿Quiénes somos?
               </Text>
             </h2>
             <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
-              <Text variant="title" color="#E5FFFF" className="opacity-90">
-                Somos un equipo de desarrolladores y diseñadores apasionados por crear 
+              <Text variant="body" color="#E5FFFF" className="opacity-90">
+                Somos un equipo de desarrolladores y diseñadores apasionados por crear
                 experiencias digitales excepcionales que transforman negocios.
               </Text>
             </Col>
           </Col>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#00FFFF' }}>
-                <Icon name="Users" color="#16141F" size={32} />
+
+          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+            <div className="relative max-w-4xl mx-auto">
+              {/* Línea central */}
+              <div className="absolute left-1/2 h-full w-0.5 bg-[#3a3927] -translate-x-1/2"></div>
+
+              <div className="relative mb-12 flex items-center w-full">
+                <div className="w-1/2 pr-12 text-right">
+                  <h3 className="mb-2">
+                    <Text variant="subtitle" color="#E5FFFF" weight="bold">
+                      Equipo Experto
+                    </Text>
+                  </h3>
+                  <Text variant="body" color="#bbba9b" className="opacity-80">
+                    Desarrolladores senior con más de 5 años de experiencia
+                  </Text>
+                </div>
+                <div className="absolute left-1/2 -translate-x-1/2 bg-[#16141F] p-3 rounded-full border-2 border-[#FF5B00]">
+                  <Icon name="Users" color="#E5FFFF" size={32} />
+                </div>
+                <div className="w-1/2"></div>
               </div>
-              <h3 className="mb-2">
-                <Text variant="subtitle" color="#E5FFFF" weight="bold">
-                  Equipo Experto
-                </Text>
-              </h3>
-              <Text variant="body" color="#E5FFFF" className="opacity-80">
-                Desarrolladores senior con más de 5 años de experiencia
-              </Text>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FF5B00' }}>
-                <Icon name="Award" color="#16141F" size={32} />
+
+              <div className="relative mb-12 flex items-center w-full">
+                <div className="w-1/2"></div>
+                <div className="absolute left-1/2 -translate-x-1/2 bg-[#16141F] p-3 rounded-full border-2 border-[#00FFFF]">
+                  <Icon name="Award" color="#E5FFFF" size={32} />
+                </div>
+                <div className="w-1/2 pl-12 text-left">
+                  <h3 className="mb-2">
+                    <Text variant="subtitle" color="#E5FFFF" weight="bold">
+                      Calidad Garantizada
+                    </Text>
+                  </h3>
+                  <Text variant="body" color="#bbba9b" className="opacity-80">
+                    Procesos de calidad certificados y mejores prácticas
+                  </Text>
+                </div>
               </div>
-              <h3 className="mb-2">
-                <Text variant="subtitle" color="#E5FFFF" weight="bold">
-                  Calidad Garantizada
-                </Text>
-              </h3>
-              <Text variant="body" color="#E5FFFF" className="opacity-80">
-                Procesos de calidad certificados y mejores prácticas
-              </Text>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#E1FF00' }}>
-                <Icon name="Zap" color="#16141F" size={32} />
+
+              <div className="relative mb-12 flex items-center w-full">
+                <div className="w-1/2 pr-12 text-right">
+                  <h3 className="mb-2">
+                    <Text variant="subtitle" color="#E5FFFF" weight="bold">
+                      Innovación Constante
+                    </Text>
+                  </h3>
+                  <Text variant="body" color="#bbba9b" className="opacity-80">
+                    Siempre a la vanguardia de las últimas tecnologías
+                  </Text>
+                </div>
+                <div className="absolute left-1/2 -translate-x-1/2 bg-[#16141F] p-3 rounded-full border-2 border-[#E1FF00]">
+                  <Icon name="Zap" color="#E5FFFF" size={24} />
+                </div>
+                <div className="w-1/2"></div>
               </div>
-              <h3 className="mb-2">
-                <Text variant="subtitle" color="#E5FFFF" weight="bold">
-                  Innovación Constante
-                </Text>
-              </h3>
-              <Text variant="body" color="#E5FFFF" className="opacity-80">
-                Siempre a la vanguardia de las últimas tecnologías
-              </Text>
             </div>
-          </div>
+          </Col>
         </Container>
       </section>
 
       {/* Latest Projects */}
-      <section id="proyectos" className="py-20" style={{ backgroundColor: '#E5FFFF' }}>
+      <section id="proyectos" className="py-20 bg-[#27271b]">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <h2 className="mb-6">
-              <Text variant="headline" color="#16141F" weight="bold">
+              <Text variant="title" color="#FF5B00" weight="bold">
                 Últimos proyectos
               </Text>
             </h2>
-            <Text variant="title" color="#16141F" className="opacity-80">
+            <Text variant="body" color="#E5FFFF" className="opacity-80">
               Conoce algunos de nuestros trabajos más recientes
             </Text>
           </Col>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {projects.map((project, index) => (
-              <div key={index} className="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300">
-                <div className="h-48 bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center">
-                  <Icon name="Image" color="#E5FFFF" size={48} />
+              <div key={index} className="bg-[#12111180] backdrop-blur-3xl border border-[#292929e6] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-105 hover:-rotate-1 animate-fade-in-up group" style={{ animationDelay: `${index * 150}ms` }}>
+                <div className="h-80 w-full overflow-hidden">
+                  <img src={project.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="image-projects" />
                 </div>
                 <div className="p-6">
                   <h3 className="mb-2">
-                    <Text variant="subtitle" color="#16141F" weight="bold">
+                    <Text variant="body" color="#FF6638" weight="bold">
                       {project.title}
                     </Text>
                   </h3>
                   <div className="mb-3">
-                    <Text variant="body" color="#16141F" className="opacity-70">
+                    <Text variant="label" color="#FFFFFF" className="opacity-70">
                       {project.description}
                     </Text>
                   </div>
-                  <div className="bg-gray-100 px-3 py-2 rounded-lg">
-                    <Text variant="label" color="#16141F" weight="bold">
+                  <div className="bg-[#43261C] px-3 py-2 rounded-lg">
+                    <Text variant="label" color="#bbba9b" weight="bold">
                       {project.tech}
                     </Text>
                   </div>
                 </div>
               </div>
             ))}
-          </div>
+          </Col>
         </Container>
       </section>
 
@@ -338,20 +404,22 @@ const CitricaWebsite = () => {
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <h2 className="mb-6">
-              <Text variant="headline" color="#00FFFF" weight="bold">
+              <Text variant="title" color="#FF5B00" weight="bold">
                 Tecnologías que usamos
               </Text>
             </h2>
-            <Text variant="title" color="#E5FFFF" className="opacity-90">
+            <Text variant="body" color="#E5FFFF" className="opacity-90">
               Las mejores herramientas para crear soluciones excepcionales
             </Text>
           </Col>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {technologies.map((tech, index) => (
-              <div key={index} className="bg-white bg-opacity-5 backdrop-blur-sm rounded-2xl p-8 hover:bg-opacity-10 transition-all duration-300">
+              <div key={index} className="bg-white bg-opacity-5 backdrop-blur-sm rounded-2xl p-8 hover:bg-opacity-10 transition-all duration-500 hover:transform hover:scale-105 animate-fade-in-up group border border-white border-opacity-10 hover:border-opacity"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
                 <div className="flex items-center mb-4">
-                  <div 
+                  <div
                     className="w-12 h-12 rounded-full flex items-center justify-center mr-4"
                     style={{ backgroundColor: tech.color }}
                   >
@@ -368,43 +436,104 @@ const CitricaWebsite = () => {
                 </Text>
               </div>
             ))}
-          </div>
+          </Col>
         </Container>
       </section>
 
       {/* Process */}
-      <section className="py-20" style={{ backgroundColor: 'rgba(255, 91, 0, 0.1)' }}>
+      <section id="process" className="py-20 bg-[#27271b]">
         <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
-            <h2 className="mb-6">
-              <Text variant="headline" color="#FF5B00" weight="bold">
-                Nuestro proceso de trabajo
-              </Text>
-            </h2>
-            <Text variant="title" color="#E5FFFF" className="opacity-90">
-              Una metodología probada para el éxito de tu proyecto
-            </Text>
-          </Col>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {process.map((step, index) => (
-              <div key={index} className="text-center">
-                <div 
-                  className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl font-bold"
-                  style={{ backgroundColor: '#FF5B00', color: '#16141F' }}
-                >
-                  {step.step}
-                </div>
-                <h3 className="mb-2">
-                  <Text variant="subtitle" color="#E5FFFF" weight="bold">
-                    {step.title}
-                  </Text>
-                </h3>
-                <Text variant="body" color="#E5FFFF" className="opacity-80">
-                  {step.description}
+          <div className="space-y-12">
+            <div className="text-center space-y-4">
+              <h2>
+                <Text variant="title" color="#FF5B00" weight="bold">
+                  Nuestro Proceso de Trabajo
                 </Text>
-              </div>
-            ))}
+              </h2>
+              <p>
+                <Text variant="body" color="#E5FFFF" className="opacity-90">
+                  Seguimos una metodología probada que garantiza la entrega exitosa de tu proyecto,
+                  desde la conceptualización hasta el soporte post-lanzamiento
+                </Text>
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
+              {process.map((step, index) => (
+                <div key={index} className="relative">
+                  <div className="relative p-8 h-full border-2 rounded-xl hover:shadow-xl transition-all duration-500 group-hover:scale-105 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm hover:from-white/20 hover:to-white/10">
+                    {/* Step Number */}
+                    <div
+                      className="absolute -top-4 -left-4 w-12 h-12 rounded-full flex items-center justify-center border-4 border-white shadow-lg z-10"
+                      style={{ backgroundColor: step.color }}
+                    >
+                      <Text variant="body" color="#16141F" className="font-bold">
+                        {step.step}
+                      </Text>
+                    </div>
+                    <div className="space-y-4 pt-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-3 rounded-lg shadow-sm" style={{ backgroundColor: `${step.color}20` }}>
+                          <Icon name={step.icon as any} size={24} className="w-6 h-6"
+                            style={{ color: step.color }}
+                          />
+                        </div>
+                        <h3>
+                          <Text variant="subtitle" color="#16141F">
+                            {step.title}
+                          </Text>
+                        </h3>
+                      </div>
+                      <p>
+                        <Text variant="body" color="#16141F" className="opacity-80 leading-relaxed">
+                          {step.description}
+                        </Text>
+                      </p>
+                    </div>
+
+                    {/* Connection Line for larger screens - solo en desktop */}
+                    {index < process.length - 1 && index % 3 !== 3 && (
+                      <div className="hidden lg:block absolute -right-4 top-1/2 transform -translate-y-1/2 z-0">
+                        <div className="w-8 h-0.5 bg-gray-300"></div>
+                        <div
+                          className="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white shadow-sm"
+                          style={{
+                            backgroundColor: process[index + 1]?.color,
+                          }}
+                        ></div>
+                      </div>
+                    )}
+
+                    {/* Connection Line vertical para el layout de 2 columnas */}
+                    {index < process.length - 1 && index % 2 !== 2 && (
+                      <div className="hidden md:block lg:hidden absolute -bottom-4 left-1/2 transform -translate-x-1/2 z-0">
+                        <div className="h-8 w-0.5 bg-gray-300"></div>
+                        <div
+                          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full border-2 border-white shadow-sm"
+                          style={{
+                            backgroundColor: process[index + 1]?.color,
+                          }}
+                        ></div>
+                      </div>
+                    )}
+
+                    {/* Connection Line vertical para mobile */}
+                    {index < process.length - 1 && (
+                      <div className="block md:hidden absolute -bottom-4 left-1/2 transform -translate-x-1/2 z-0">
+                        <div className="h-8 w-0.5 bg-gray-300"></div>
+                        <div
+                          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3 h-3 rounded-full border-2 border-white shadow-sm"
+                          style={{
+                            backgroundColor: process[index + 1]?.color,
+                          }}
+                        ></div>
+                      </div>
+                    )}
+
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </Container>
       </section>
@@ -412,43 +541,54 @@ const CitricaWebsite = () => {
       {/* CTA Section */}
       <section id="contacto" className="py-20" style={{ backgroundColor: '#E1FF00' }}>
         <Container>
-          <Col cols={{ lg: 8, md: 6, sm: 4 }} className="text-center mx-auto">
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mx-auto">
             <h2 className="mb-6">
               <Text variant="headline" color="#16141F" weight="bold">
                 ¿Listo para transformar tu negocio?
               </Text>
             </h2>
             <div className="mb-8">
-              <Text variant="title" color="#16141F" className="opacity-80">
+              <Text variant="body" color="#16141F" className="opacity-80">
                 Contactanos hoy y descubre cómo podemos impulsar tu crecimiento digital
               </Text>
             </div>
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
-              <Button 
+              <Button
                 onClick={() => window.open('mailto:contacto@citrica.com', '_blank')}
                 label="Escribir Email"
                 color="primary"
                 variant="primary"
               />
-              <Button 
+              <Button
                 onClick={() => window.open('https://wa.me/1234567890', '_blank')}
                 label="WhatsApp"
                 color="success"
                 variant="primary"
               />
             </div>
-            <div className="flex justify-center space-x-8">
+            <div className="flex flex-col justify-center items-center space-x-8 gap-4">
               <div className="flex items-center space-x-2">
                 <Icon name="Mail" color="#16141F" size={20} />
-                <Text variant="body" color="#16141F" weight="bold">
-                  contacto@citrica.com
-                </Text>
+                <Link
+                  href="mailto:contacto@citrica.com"
+                >
+                  <Text variant="body" color="#16141F" weight="bold">
+                    contacto@citrica.com
+                  </Text>
+                </Link>
+
               </div>
               <div className="flex items-center space-x-2">
                 <Icon name="Phone" color="#16141F" size={20} />
-                <Text variant="body" color="#16141F" weight="bold">
-                  +1 (555) 123-4567
-                </Text>
+                <Link
+                  href="tel:515551234567"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Text variant="body" color="#16141F" weight="bold">
+                    +1 (555) 123-4567
+                  </Text>
+                </Link>
               </div>
             </div>
           </Col>
@@ -456,30 +596,66 @@ const CitricaWebsite = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12" style={{ backgroundColor: '#16141F', borderTop: '1px solid rgba(225, 255, 0, 0.2)' }}>
+      <footer className="pt-12" style={{ backgroundColor: '#16141F', borderTop: '1px solid rgba(225, 255, 0, 0.2)' }}>
         <Container>
-          <Col cols={{ lg: 6, md: 3, sm: 2 }}>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 rounded-full" style={{ backgroundColor: '#E1FF00' }}></div>
-              <Text variant="title" color="#E5FFFF" weight="bold">Cítrica</Text>
+          <Col cols={{ lg: 6, md: 6, sm: 4 }} className='flex flex-col text-center justify-center gap-2'>
+            <div className="flex items-center justify-center lg:justify-start space-x-2">
+              <div className="w-24 h-16">
+                <img
+                  src="/img/citrica-logo.png"
+                  alt="Logo Cítrica"
+                />
+              </div>
             </div>
-            <Text variant="body" color="#E5FFFF" className="opacity-70">
-              Transformamos ideas en soluciones digitales que impulsan el crecimiento de tu negocio.
-            </Text>
+            <h2 className="mb-8 lg:text-start md:text-center">
+              <Text variant="label" color="#E5FFFF" className="opacity-70">
+                Transformamos ideas en soluciones digitales que impulsan el crecimiento de tu negocio.
+              </Text>
+            </h2>
           </Col>
-          <Col cols={{ lg: 6, md: 3, sm: 2 }} className="text-right">
-            <div className="flex justify-end space-x-6 mb-4">
-              <Icon name="Twitter" color="#E5FFFF" size={24} className="opacity-70 hover:opacity-100 cursor-pointer transition-opacity" />
-              <Icon name="Linkedin" color="#E5FFFF" size={24} className="opacity-70 hover:opacity-100 cursor-pointer transition-opacity" />
-              <Icon name="Github" color="#E5FFFF" size={24} className="opacity-70 hover:opacity-100 cursor-pointer transition-opacity" />
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mt-8">
+            <Divider className="mb-8 bg-gray-800" />
+            <div className='flex justify-between'>
+              <h2 className="mb-8">
+                <Text variant="label" color="#E5FFFF" className="opacity-50">
+                  © 2025 Cítrica.
+                </Text>
+              </h2>
+              <div className="flex justify-center lg:justify-end space-x-6 mb-8">
+                <Link
+                  href="https://www.facebook.com/citrica"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Icon name="Instagram" color="#E5FFFF" size={24} className="transition-all duration-300" />
+                </Link>
+                <Link
+                  href="https://www.facebook.com/citrica"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Icon name="Twitter" color="#E5FFFF" size={24} className="transition-all duration-300" />
+                </Link>
+                <Link
+                  href="https://www.facebook.com/citrica"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Icon name="Linkedin" color="#E5FFFF" size={24} className="transition-all duration-300" />
+                </Link>
+                <Link
+                  href="https://www.facebook.com/citrica"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Icon name="Github" color="#E5FFFF" size={24} className="transition-all duration-300" />
+                </Link>
+              </div>
             </div>
-            <Text variant="body" color="#E5FFFF" className="opacity-50">
-              © 2024 Cítrica. Todos los derechos reservados.
-            </Text>
           </Col>
         </Container>
       </footer>
-    </div>
+    </div >
   )
 }
 
