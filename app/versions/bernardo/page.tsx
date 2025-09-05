@@ -1,110 +1,38 @@
-'use client'
-import React, { useState } from 'react';
+"use client"
+import React from 'react';
 import { Container, Col } from '@/styles/07-objects/objects';
-import Text from '@/shared/components/citrica-ui/atoms/text';
-import Button from '@/shared/components/citrica-ui/molecules/button';
-import Icon from '@/shared/components/citrica-ui/atoms/icon';
+import Text from "@/shared/components/citrica-ui/atoms/text";
+import Button from "@/shared/components/citrica-ui/molecules/button";
+import Icon from "@/shared/components/citrica-ui/atoms/icon";
 import Card from '@/shared/components/citrica-ui/atoms/card';
 
-const CitricaWireframe = () => {
-  const [formData, setFormData] = useState({
-    nombre: '',
-    email: '',
-    mensaje: ''
-  });
-
-  const [activeService, setActiveService] = useState(0);
-
-  const services = [
-    {
-      title: "Landing Pages",
-      description: "Páginas optimizadas para conversión y captación de leads efectiva",
-      features: ["Diseño responsive", "SEO optimizado", "Alta conversión"]
-    },
-    {
-      title: "Websites",
-      description: "Sitios web corporativos que reflejan la identidad de tu marca",
-      features: ["CMS integrado", "Panel administrativo", "Optimización mobile"]
-    },
-    {
-      title: "Web Apps",
-      description: "Aplicaciones web robustas que automatizan procesos de negocio",
-      features: ["Escalabilidad", "Integración APIs", "Dashboard analytics"]
-    },
-    {
-      title: "Mobile Apps",
-      description: "Aplicaciones móviles nativas que conectan con tus clientes",
-      features: ["iOS y Android", "Push notifications", "Analytics integrado"]
-    }
-  ];
-
-  const processSteps = [
-    { step: "01", title: "Planificación", desc: "Análisis de requisitos y definición de objetivos" },
-    { step: "02", title: "Diseño", desc: "Wireframes, prototipos y diseño de interfaz" },
-    { step: "03", title: "Desarrollo", desc: "Implementación con tecnologías de vanguardia" },
-    { step: "04", title: "Pruebas", desc: "Testing exhaustivo de funcionalidad y rendimiento" },
-    { step: "05", title: "Implementación", desc: "Despliegue optimizado y puesta en producción" },
-    { step: "06", title: "Mantenimiento", desc: "Soporte continuo y actualizaciones regulares" }
-  ];
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Formulario enviado:', formData);
-    // Aquí iría la lógica para enviar el formulario
-  };
-
+export default function CitricaLanding() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white border-b-2 border-gray-300">
+      <nav className="fixed top-0 w-full z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-700/50" role="navigation" aria-label="Navegación principal">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }}>
             <div className="flex justify-between items-center py-4">
-              {/* Logo Placeholder */}
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gray-300 rounded flex items-center justify-center border-2 border-black">
-                  <Icon name="Code" size={20} color="#000" />
-                </div>
-                <h1>
-                  <Text variant="title" color="#000000">Cítrica dev</Text>
-                </h1>
-              </div>
-
-              {/* Desktop Menu */}
+              <h1 className="text-2xl font-bold text-yellow-400">
+                Cítrica
+              </h1>
               <div className="hidden md:flex space-x-8">
-                <a href="#inicio" className="hover:underline">
-                  <Text variant="body" color="#000000">Inicio</Text>
-                </a>
-                <a href="#servicios" className="hover:underline">
-                  <Text variant="body" color="#000000">Servicios</Text>
-                </a>
-                <a href="#proceso" className="hover:underline">
-                  <Text variant="body" color="#000000">Proceso</Text>
-                </a>
-                <a href="#contacto" className="hover:underline">
-                  <Text variant="body" color="#000000">Contacto</Text>
-                </a>
+                {['Servicios', 'Proyectos', 'Proceso', 'Contacto'].map((item) => (
+                  <a 
+                    key={item} 
+                    href={`#${item.toLowerCase()}`} 
+                    className="text-slate-300 hover:text-yellow-400 transition-colors duration-300 font-medium"
+                  >
+                    {item}
+                  </a>
+                ))}
               </div>
-
-              {/* Mobile Menu Button */}
-              <div className="md:hidden">
-                <Icon name="Menu" size={24} color="#000" />
-              </div>
-
-              {/* CTA Button */}
               <div className="hidden md:block">
                 <Button
-                  onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
-                  label="Contáctanos"
+                  onClick={() => { }}
+                  label="Comenzar"
                   variant="primary"
-                  className="border-2 border-black bg-black text-white px-6 py-2 hover:bg-white hover:text-black transition-all"
                 />
               </div>
             </div>
@@ -113,423 +41,364 @@ const CitricaWireframe = () => {
       </nav>
 
       {/* Hero Section */}
-      <section id="inicio" className="pt-20 pb-16 bg-gray-100 border-b-2 border-gray-300">
+      <header className="pt-32 pb-20 relative overflow-hidden">
+        {/* Gradient Background Elements */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-20 left-20 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-20 w-80 h-80 bg-cyan-400/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-500/5 rounded-full blur-3xl"></div>
+        </div>
+
         <Container>
-          <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto text-center">
-            <div className="space-y-8">
-              {/* Main Headline */}
-              <header>
-                <h1 className="mb-6">
-                  <Text variant="display" color="#000000" className="leading-tight font-bold">
-                    APLICACIONES Y SITIOS WEB A MEDIDA PARA TU NEGOCIO
-                  </Text>
-                </h1>
-              </header>
-
-              {/* Subheadline */}
-              <div>
-                <h2>
-                  <Text variant="title" color="#666666">
-                    Desarrollamos soluciones web y móviles adaptadas a las necesidades de tu empresa
-                  </Text>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+            <div className="text-center relative z-10 max-w-5xl mx-auto">
+              <div className="mb-12">
+                <h2 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
+                  <span className="block text-slate-100">APLICACIONES Y</span>
+                  <span className="block text-slate-100">SITIOS WEB</span>
+                  <span className="block text-yellow-400 mt-2">A MEDIDA</span>
                 </h2>
+                <p className="text-xl md:text-2xl text-slate-400 font-light">
+                  Para impulsar tu negocio al siguiente nivel
+                </p>
               </div>
 
-              {/* Service Tags */}
-              <div className="flex justify-center flex-wrap gap-4 my-8">
-                {services.map((service, index) => (
-                  <div key={index} className="px-4 py-2 border-2 border-gray-400 bg-white">
-                    <Text variant="body" color="#000000">{service.title}</Text>
-                  </div>
-                ))}
-              </div>
+              {/* Servicios destacados */}
+              <section className="mb-12" aria-labelledby="servicios-destacados">
+                <h3 id="servicios-destacados" className="sr-only">Servicios destacados</h3>
+                <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+                  {[
+                    { name: 'Landing Pages', color: 'yellow', icon: 'Rocket' },
+                    { name: 'Websites', color: 'cyan', icon: 'Globe' },
+                    { name: 'Web Apps', color: 'orange', icon: 'Code' },
+                    { name: 'Mobile Apps', color: 'slate', icon: 'Smartphone' }
+                  ].map((service, index) => (
+                    <div key={index} className="group">
+                      <div className={`px-6 py-3 rounded-full border-2 transition-all duration-300 hover:scale-105 cursor-pointer
+                        ${service.color === 'yellow' ? 'border-yellow-400/40 bg-yellow-400/10 hover:bg-yellow-400/20' :
+                          service.color === 'cyan' ? 'border-cyan-400/40 bg-cyan-400/10 hover:bg-cyan-400/20' :
+                          service.color === 'orange' ? 'border-orange-500/40 bg-orange-500/10 hover:bg-orange-500/20' :
+                          'border-slate-400/40 bg-slate-400/10 hover:bg-slate-400/20'}`}>
+                        <span className={`font-semibold flex items-center gap-2
+                          ${service.color === 'yellow' ? 'text-yellow-400' :
+                            service.color === 'cyan' ? 'text-cyan-400' :
+                            service.color === 'orange' ? 'text-orange-500' :
+                            'text-slate-400'}`}>
+                          <Icon name={service.icon === 'Rocket' ? 'Rocket' : service.icon === 'Globe' ? 'Globe' : service.icon === 'Code' ? 'Code' : 'Smartphone'} size={16} />
+                          {service.name}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                 <Button
-                  onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={() => { }}
                   label="Comenzar Proyecto"
                   variant="primary"
-                  className="border-2 border-black bg-black text-white px-8 py-3 hover:bg-white hover:text-black transition-all"
                 />
                 <Button
-                  onClick={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}
-                  label="Ver Servicios"
+                  onClick={() => { }}
+                  label="Ver Portafolio"
                   variant="secondary"
-                  className="border-2 border-black bg-white text-black px-8 py-3 hover:bg-black hover:text-white transition-all"
+                  color='secondary'
                 />
               </div>
             </div>
           </Col>
         </Container>
-      </section>
+      </header>
 
-      {/* About Section */}
-      <section className="py-16 border-b-2 border-gray-300">
+      {/* Propuesta de Valor */}
+      <section className="py-20 relative" aria-labelledby="propuesta-valor">
         <Container>
           <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <div className="space-y-6">
-              <header>
-                <h2>
-                  <Text variant="headline" color="#000000">¿Quiénes somos?</Text>
-                </h2>
-              </header>
-              
-              <div className="space-y-4">
-                <p>
-                  <Text variant="body" color="#666666">
-                    Cítrica dev es un equipo de expertos en desarrollo de software B2B especializado en crear 
-                    soluciones digitales personalizadas que impulsan el crecimiento de tu negocio.
-                  </Text>
-                </p>
-                
-                <p>
-                  <Text variant="body" color="#666666">
-                    Combinamos experiencia técnica con creatividad para entregar productos que no solo 
-                    funcionan perfectamente, sino que destacan en el mercado.
-                  </Text>
-                </p>
-              </div>
+            <div className="pr-0 lg:pr-12">
+              <h2 id="propuesta-valor" className="text-4xl font-bold text-yellow-400 mb-6">
+                ¿Por qué Cítrica?
+              </h2>
+              <p className="text-lg text-slate-300 mb-4 leading-relaxed">
+                Somos especialistas en desarrollo de software B2B, enfocados en crear
+                soluciones digitales que impulsen el crecimiento de tu negocio.
+              </p>
+              <p className="text-lg text-slate-300 mb-8 leading-relaxed">
+                Combinamos experiencia técnica con creatividad para entregar productos
+                que no solo funcionan perfectamente, sino que destacan en el mercado.
+              </p>
 
-              {/* Key Points */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+              <ul className="space-y-4">
                 {[
-                  "50+ Proyectos exitosos",
-                  "5+ Años de experiencia",
-                  "100% Satisfacción del cliente",
-                  "Soporte 24/7"
-                ].map((point, index) => (
-                  <div key={index} className="flex items-center space-x-3 p-3 border border-gray-300">
-                    <Icon name="CheckCircle" size={20} color="#000" />
-                    <Text variant="body" color="#000000">{point}</Text>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Col>
-
-          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            {/* Image Placeholder */}
-            <div className="w-full h-80 bg-gray-300 border-2 border-black flex items-center justify-center">
-              <div className="text-center">
-                <Icon name="Users" size={64} color="#666" />
-                <div className="mt-4">
-                  <Text variant="body" color="#666666">[IMAGEN DEL EQUIPO]</Text>
-                </div>
-              </div>
-            </div>
-          </Col>
-        </Container>
-      </section>
-
-      {/* Services Section */}
-      <section id="servicios" className="py-16 bg-gray-100 border-b-2 border-gray-300">
-        <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-            <div className="text-center mb-12">
-              <header>
-                <h2>
-                  <Text variant="headline" color="#000000">Nuestros servicios</Text>
-                </h2>
-              </header>
-              <div className="mt-4">
-                <Text variant="title" color="#666666">
-                  Soluciones digitales completas para tu empresa
-                </Text>
-              </div>
-            </div>
-          </Col>
-
-          {/* Services Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {services.map((service, index) => (
-              <div 
-                key={index}
-                className={`p-6 border-2 border-gray-400 cursor-pointer transition-all ${
-                  activeService === index ? 'bg-black text-white' : 'bg-white hover:bg-gray-200'
-                }`}
-                onClick={() => setActiveService(index)}
-              >
-                <article>
-                  {/* Service Icon Placeholder */}
-                  <div className={`w-16 h-16 mb-4 border-2 flex items-center justify-center ${
-                    activeService === index ? 'border-white bg-white' : 'border-black bg-gray-300'
-                  }`}>
-                    <Icon 
-                      name={index === 0 ? "Globe" : index === 1 ? "Monitor" : index === 2 ? "Code" : "Smartphone"} 
-                      size={32} 
-                      color={activeService === index ? "#000" : "#666"} 
-                    />
-                  </div>
-
-                  <h3>
-                    <Text 
-                      variant="subtitle" 
-                      color={activeService === index ? "#FFFFFF" : "#000000"}
-                      weight="bold"
-                    >
-                      {service.title}
-                    </Text>
-                  </h3>
-
-                  <p className="mt-3 mb-4">
-                    <Text 
-                      variant="body" 
-                      color={activeService === index ? "#CCCCCC" : "#666666"}
-                    >
-                      {service.description}
-                    </Text>
-                  </p>
-
-                  {/* Features List */}
-                  <ul className="space-y-2">
-                    {service.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-center space-x-2">
-                        <Icon 
-                          name="Check" 
-                          size={16} 
-                          color={activeService === index ? "#FFFFFF" : "#000000"} 
-                        />
-                        <Text 
-                          variant="label" 
-                          color={activeService === index ? "#FFFFFF" : "#000000"}
-                        >
-                          {feature}
-                        </Text>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      {/* Process Section */}
-      <section id="proceso" className="py-16 border-b-2 border-gray-300">
-        <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-            <div className="text-center mb-12">
-              <header>
-                <h2>
-                  <Text variant="headline" color="#000000">Nuestro proceso</Text>
-                </h2>
-              </header>
-              <div className="mt-4">
-                <Text variant="title" color="#666666">
-                  Metodología probada para el éxito de tu proyecto
-                </Text>
-              </div>
-            </div>
-          </Col>
-
-          {/* Process Steps */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {processSteps.map((step, index) => (
-              <article key={index} className="text-center">
-                {/* Step Number */}
-                <div className="w-20 h-20 mx-auto mb-6 bg-black border-2 border-black flex items-center justify-center">
-                  <Text variant="title" color="#FFFFFF" weight="bold">
-                    {step.step}
-                  </Text>
-                </div>
-
-                <h3>
-                  <Text variant="subtitle" color="#000000" weight="bold">
-                    {step.title}
-                  </Text>
-                </h3>
-
-                <p className="mt-3">
-                  <Text variant="body" color="#666666">
-                    {step.desc}
-                  </Text>
-                </p>
-
-                {/* Connector Line (except for last item) */}
-                {index < processSteps.length - 1 && index % 3 !== 2 && (
-                  <div className="hidden lg:block absolute top-10 -right-4 w-8 h-0.5 bg-gray-400" />
-                )}
-              </article>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      {/* Contact Section */}
-      <section id="contacto" className="py-16 bg-gray-100">
-        <Container>
-          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <div className="space-y-6">
-              <header>
-                <h2>
-                  <Text variant="headline" color="#000000">Contáctanos</Text>
-                </h2>
-              </header>
-
-              <div>
-                <Text variant="title" color="#666666">
-                  ¿Listo para transformar tu idea en realidad? Conversemos sobre tu próximo proyecto.
-                </Text>
-              </div>
-
-              {/* Contact Info */}
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3 p-4 border-2 border-gray-300 bg-white">
-                  <Icon name="Mail" size={24} color="#000" />
-                  <div>
-                    <Text variant="body" color="#000000" weight="bold">Email</Text>
-                    <Text variant="body" color="#666666">hello@citrica.dev</Text>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 p-4 border-2 border-gray-300 bg-white">
-                  <Icon name="Phone" size={24} color="#000" />
-                  <div>
-                    <Text variant="body" color="#000000" weight="bold">Teléfono</Text>
-                    <Text variant="body" color="#666666">+51 999 888 777</Text>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3 p-4 border-2 border-gray-300 bg-white">
-                  <Icon name="MapPin" size={24} color="#000" />
-                  <div>
-                    <Text variant="body" color="#000000" weight="bold">Ubicación</Text>
-                    <Text variant="body" color="#666666">Lima, Perú</Text>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Col>
-
-          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            {/* Contact Form */}
-            <div className="bg-white p-8 border-2 border-black">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label>
-                    <Text variant="body" color="#000000" weight="bold">Nombre *</Text>
-                  </label>
-                  <input
-                    type="text"
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full mt-2 p-3 border-2 border-gray-400 focus:border-black outline-none"
-                    placeholder="Tu nombre completo"
-                  />
-                </div>
-
-                <div>
-                  <label>
-                    <Text variant="body" color="#000000" weight="bold">Email *</Text>
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full mt-2 p-3 border-2 border-gray-400 focus:border-black outline-none"
-                    placeholder="tu@email.com"
-                  />
-                </div>
-
-                <div>
-                  <label>
-                    <Text variant="body" color="#000000" weight="bold">Mensaje *</Text>
-                  </label>
-                  <textarea
-                    name="mensaje"
-                    value={formData.mensaje}
-                    onChange={handleInputChange}
-                    required
-                    rows={5}
-                    className="w-full mt-2 p-3 border-2 border-gray-400 focus:border-black outline-none resize-vertical"
-                    placeholder="Cuéntanos sobre tu proyecto..."
-                  />
-                </div>
-
-                <Button
-                  onClick={() => {}}
-                  label="Enviar Mensaje"
-                  variant="primary"
-                  className="w-full border-2 border-black bg-black text-white py-4 hover:bg-white hover:text-black transition-all"
-                />
-              </form>
-            </div>
-          </Col>
-        </Container>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-12 bg-black border-t-2 border-gray-800">
-        <Container>
-          <Col cols={{ lg: 4, md: 2, sm: 4 }}>
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-white border-2 border-white rounded flex items-center justify-center">
-                <Icon name="Code" size={20} color="#000" />
-              </div>
-              <Text variant="title" color="#FFFFFF">Cítrica dev</Text>
-            </div>
-            <Text variant="body" color="#CCCCCC">
-              Aplicaciones y sitios web a medida para tu negocio.
-            </Text>
-          </Col>
-
-          <Col cols={{ lg: 4, md: 2, sm: 4 }}>
-            <nav>
-              <h3>
-                <Text variant="subtitle" color="#FFFFFF" className="mb-4">Servicios</Text>
-              </h3>
-              <ul className="space-y-2">
-                {["Landing Pages", "Websites", "Web Apps", "Mobile Apps"].map((service, index) => (
-                  <li key={index}>
-                    <a href="#servicios" className="hover:underline">
-                      <Text variant="body" color="#CCCCCC">{service}</Text>
-                    </a>
+                  'Desarrollo ágil y entregas rápidas',
+                  'Tecnologías de vanguardia',
+                  'Soporte continuo post-lanzamiento'
+                ].map((benefit, index) => (
+                  <li key={index} className="flex items-center">
+                    <Icon name="CheckCircle" size={20} color="#facc15" />
+                    <span className="ml-3 text-slate-300 font-medium">
+                      {benefit}
+                    </span>
                   </li>
                 ))}
               </ul>
-            </nav>
+            </div>
           </Col>
 
-          <Col cols={{ lg: 4, md: 2, sm: 4 }}>
-            <div>
-              <h3>
-                <Text variant="subtitle" color="#FFFFFF" className="mb-4">Síguenos</Text>
-              </h3>
-              <div className="flex space-x-4">
-                {["Linkedin", "Github", "Twitter", "Instagram"].map((social, index) => (
-                  <a key={index} href="#" className="hover:opacity-80 transition-opacity">
-                    <div className="w-10 h-10 border-2 border-white flex items-center justify-center hover:bg-white hover:text-black transition-all">
-                      <Icon 
-                        name={social as any} 
-                        size={20} 
-                        color="#FFFFFF" 
-                      />
+          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
+            <div className="flex items-center justify-center h-full mt-12 lg:mt-0">
+              <figure className="relative">
+                <div className="w-80 h-80 relative">
+                  {/* Círculos concéntricos animados */}
+                  <div className="absolute inset-0 border-2 border-yellow-400/30 rounded-full animate-pulse"></div>
+                  <div className="absolute inset-4 border-2 border-cyan-400/30 rounded-full animate-pulse delay-700"></div>
+                  <div className="absolute inset-8 border-2 border-orange-500/30 rounded-full animate-pulse delay-1000"></div>
+
+                  {/* Centro */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-6xl mb-4">💻</div>
+                      <h3 className="text-2xl font-bold text-yellow-400 mb-2">
+                        Innovación
+                      </h3>
+                      <p className="text-cyan-400 text-lg">
+                        Tecnológica
+                      </p>
                     </div>
-                  </a>
-                ))}
+                  </div>
+                </div>
+              </figure>
+            </div>
+          </Col>
+        </Container>
+      </section>
+
+      {/* Servicios */}
+      <section id="servicios" className="py-20 bg-slate-800/50" aria-labelledby="servicios-titulo">
+        <Container>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+            <header className="text-center mb-16">
+              <h2 id="servicios-titulo" className="text-4xl font-bold text-yellow-400 mb-4">
+                Nuestros Servicios
+              </h2>
+              <p className="text-xl text-slate-400">
+                Soluciones digitales completas para tu empresa
+              </p>
+            </header>
+          </Col>
+
+          {[
+            {
+              title: 'Landing Pages',
+              description: 'Páginas optimizadas para conversión que captan leads efectivamente',
+              color: 'yellow',
+              icon: 'Rocket'
+            },
+            {
+              title: 'Websites Corporativos',
+              description: 'Sitios web responsivos que reflejan la identidad de tu marca',
+              color: 'cyan',
+              icon: 'Globe'
+            },
+            {
+              title: 'Aplicaciones Web',
+              description: 'Sistemas robustos que automatizan procesos de negocio',
+              color: 'orange',
+              icon: 'Code'
+            },
+            {
+              title: 'Apps Móviles',
+              description: 'Aplicaciones nativas que conectan tu negocio con clientes',
+              color: 'slate',
+              icon: 'Smartphone'
+            }
+          ].map((service, index) => (
+            <Col key={index} cols={{ lg: 3, md: 6, sm: 4 }}>
+              <article className="bg-slate-700/50 backdrop-blur-sm rounded-xl p-8 border border-slate-600/50 hover:border-slate-500/50 transition-all duration-300 hover:transform hover:-translate-y-1 h-full">
+                <div className="text-center">
+                  <div className={`w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center
+                    ${service.color === 'yellow' ? 'bg-yellow-400/20 border border-yellow-400/30' :
+                      service.color === 'cyan' ? 'bg-cyan-400/20 border border-cyan-400/30' :
+                      service.color === 'orange' ? 'bg-orange-500/20 border border-orange-500/30' :
+                      'bg-slate-400/20 border border-slate-400/30'}`}>
+                    <Icon
+                      name={service.icon === 'Rocket' ? 'Rocket' : service.icon === 'Globe' ? 'Globe' : service.icon === 'Code' ? 'Code' : 'Smartphone'}
+                      size={32}
+                      color={service.color === 'yellow' ? '#facc15' : service.color === 'cyan' ? '#22d3ee' : service.color === 'orange' ? '#f97316' : '#94a3b8'}
+                    />
+                  </div>
+                  <h3 className={`text-xl font-bold mb-3
+                    ${service.color === 'yellow' ? 'text-yellow-400' :
+                      service.color === 'cyan' ? 'text-cyan-400' :
+                      service.color === 'orange' ? 'text-orange-500' :
+                      'text-slate-400'}`}>
+                    {service.title}
+                  </h3>
+                  <p className="text-slate-300 leading-relaxed">
+                    {service.description}
+                  </p>
+                </div>
+              </article>
+            </Col>
+          ))}
+        </Container>
+      </section>
+
+      {/* Tecnologías */}
+      <section id="tecnologias" className="py-20" aria-labelledby="fortalezas-titulo">
+        <Container>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+            <header className="text-center mb-16">
+              <h2 id="fortalezas-titulo" className="text-4xl font-bold text-yellow-400 mb-4">
+                Nuestras Fortalezas
+              </h2>
+              <p className="text-xl text-slate-400">
+                Lo que nos hace únicos en el desarrollo de software
+              </p>
+            </header>
+          </Col>
+
+          {[
+            {
+              title: 'Diseño que Inspira',
+              description: 'Interfaces modernas que cautivan usuarios y mejoran la experiencia',
+              color: 'yellow',
+              emoji: '✨'
+            },
+            {
+              title: 'Frontend Robusto',
+              description: 'React, Vue.js y tecnologías modernas para experiencias fluidas',
+              color: 'cyan',
+              emoji: '⚛️'
+            },
+            {
+              title: 'Desarrollo Móvil',
+              description: 'Apps nativas y PWAs optimizadas para máximo rendimiento',
+              color: 'orange',
+              emoji: '📱'
+            },
+            {
+              title: 'Backend Escalable',
+              description: 'Arquitectura sólida, segura y preparada para el crecimiento',
+              color: 'slate',
+              emoji: '⚡'
+            }
+          ].map((tech, index) => (
+            <Col key={index} cols={{ lg: 3, md: 6, sm: 4 }}>
+              <article className="text-center mb-8 group">
+                <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center text-3xl transition-transform duration-300 group-hover:scale-110
+                  ${tech.color === 'yellow' ? 'bg-yellow-400/20 border-2 border-yellow-400/40' :
+                    tech.color === 'cyan' ? 'bg-cyan-400/20 border-2 border-cyan-400/40' :
+                    tech.color === 'orange' ? 'bg-orange-500/20 border-2 border-orange-500/40' :
+                    'bg-slate-400/20 border-2 border-slate-400/40'}`}>
+                  <span>{tech.emoji}</span>
+                </div>
+                <h3 className={`text-xl font-bold mb-3
+                  ${tech.color === 'yellow' ? 'text-yellow-400' :
+                    tech.color === 'cyan' ? 'text-cyan-400' :
+                    tech.color === 'orange' ? 'text-orange-500' :
+                    'text-slate-400'}`}>
+                  {tech.title}
+                </h3>
+                <p className="text-slate-300 leading-relaxed">
+                  {tech.description}
+                </p>
+              </article>
+            </Col>
+          ))}
+        </Container>
+      </section>
+
+      {/* Proceso */}
+      <section id="proceso" className="py-20 bg-slate-800/50" aria-labelledby="proceso-titulo">
+        <Container>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+            <header className="text-center mb-16">
+              <h2 id="proceso-titulo" className="text-4xl font-bold text-yellow-400 mb-4">
+                Nuestro Proceso
+              </h2>
+              <p className="text-xl text-slate-400">
+                Metodología probada para el éxito de tu proyecto
+              </p>
+            </header>
+          </Col>
+
+          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                { step: '1', title: 'Planificación', desc: 'Análisis detallado de requisitos y definición de objetivos claros', color: 'yellow' },
+                { step: '2', title: 'Diseño UX/UI', desc: 'Wireframes, prototipos y diseño centrado en el usuario', color: 'cyan' },
+                { step: '3', title: 'Desarrollo', desc: 'Implementación ágil con entregas incrementales', color: 'orange' },
+                { step: '4', title: 'Testing', desc: 'Pruebas exhaustivas de funcionalidad y rendimiento', color: 'slate' },
+                { step: '5', title: 'Despliegue', desc: 'Implementación optimizada y puesta en producción', color: 'yellow' },
+                { step: '6', title: 'Soporte', desc: 'Mantenimiento continuo y actualizaciones regulares', color: 'cyan' }
+              ].map((process, index) => (
+                <article key={index} className="bg-slate-700/60 rounded-xl p-6 border border-slate-600/50 hover:border-slate-500/50 transition-all duration-300">
+                  <div className={`w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center font-bold text-lg text-slate-900
+                    ${process.color === 'yellow' ? 'bg-yellow-400' :
+                      process.color === 'cyan' ? 'bg-cyan-400' :
+                      process.color === 'orange' ? 'bg-orange-500' :
+                      'bg-slate-400'}`}>
+                    {process.step}
+                  </div>
+                  <h3 className={`text-lg font-bold text-center mb-2
+                    ${process.color === 'yellow' ? 'text-yellow-400' :
+                      process.color === 'cyan' ? 'text-cyan-400' :
+                      process.color === 'orange' ? 'text-orange-500' :
+                      'text-slate-400'}`}>
+                    {process.title}
+                  </h3>
+                  <p className="text-slate-300 text-center leading-relaxed">
+                    {process.desc}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </Col>
+        </Container>
+      </section>
+
+      {/* CTA Final */}
+      <section className="py-20 text-center relative" aria-labelledby="cta-titulo">
+        <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 to-cyan-400/5"></div>
+        <Container>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+            <div className="relative z-10 max-w-4xl mx-auto">
+              <h2 id="cta-titulo" className="text-4xl md:text-5xl font-bold text-slate-100 mb-6">
+                ¿Listo para transformar tu idea en realidad?
+              </h2>
+              <p className="text-xl text-slate-400 mb-10">
+                Conversemos sobre tu próximo proyecto y descubre cómo podemos ayudarte a alcanzar tus objetivos digitales
+              </p>
+              <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                <Button
+                  onClick={() => { }}
+                  label="Comenzar Ahora"
+                  variant="primary"
+                />
+                <Button
+                  onClick={() => { }}
+                  label="Agendar Consulta Gratuita"
+                  variant="secondary"
+                />
               </div>
             </div>
           </Col>
         </Container>
+      </section>
 
-        <div className="border-t-2 border-gray-800 mt-8 pt-8">
-          <Container>
-            <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center">
-              <Text variant="body" color="#CCCCCC">
-                © 2024 Cítrica dev. Todos los derechos reservados.
-              </Text>
-            </Col>
-          </Container>
-        </div>
+      {/* Footer básico */}
+      <footer className="py-12 border-t border-slate-700/50 bg-slate-900" role="contentinfo">
+        <Container>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+            <div className="text-center">
+              <p className="text-slate-400">
+                © 2024 Cítrica. Transformando ideas en soluciones digitales exitosas.
+              </p>
+            </div>
+          </Col>
+        </Container>
       </footer>
     </div>
   );
-};
-
-export default CitricaWireframe;
+}
