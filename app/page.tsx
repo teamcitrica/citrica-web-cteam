@@ -136,7 +136,7 @@ const CitricaWebsite = () => {
                   label="Hablemos"
                   color="primary"
                   variant="primary"
-                  className='px-8 bg-[#E1FF00] rounded-[80]'
+                  className='px-8 bg-[#FF5B00] rounded-[80]'
                 />
               </div>
               <div className="md:hidden ml-4">
@@ -148,7 +148,7 @@ const CitricaWebsite = () => {
       </nav>
 
       {/* Hero Section */}
-      <section id="inicio" className="min-h-screen pt-56 relative overflow-hidden">
+      <section id="inicio" className="min-h-screen pt-44 relative overflow-hidden">
         <div className="absolute inset-0 -z-80">
           <DotGrid
             dotSize={4}
@@ -163,10 +163,10 @@ const CitricaWebsite = () => {
           />
         </div>
         <Container>
-          <Col cols={{ lg: 8, md: 6, sm: 4 }} className="text-center mx-auto mb-12">
-            <div className="mb-12 space-y-4 bg-opacity-10 backdrop-blur-sm p-4 rounded-3xl border border-white border-opacity-10">
+          <Col cols={{ lg: 10, md: 6, sm: 4 }} className="text-center mx-auto mb-12">
+            <div className="mb-12 space-y-8 bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
               <h2>
-                <Text variant="display" color="#FFFFFF">
+                <Text variant="display" weight="bold" color="#FFFFFF">
                   <span style={{ color: '#FF5B00' }}>APLICACIONES Y SITIOS WEB A MEDIDA</span> PARA TU NEGOCIO
                 </Text>
               </h2>
@@ -187,31 +187,31 @@ const CitricaWebsite = () => {
                 onClick={() => document.getElementById('proyectos')?.scrollIntoView({ behavior: 'smooth' })}
                 label="Ver Proyectos"
                 color="secondary"
-                className="bg-[#E5FFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8 rounded-[80]"
+                className="hidden bg-[#E5FFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8 rounded-[80]"
               />
             </div>
           </Col>
         </Container>
 
         {/* Services Grid */}
-        <Container className='bg-opacity-10 backdrop-blur-sm p-4 rounded-3xl border border-white border-opacity-10'>
+        <Container className='bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10'>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="mb-6 flex items-center justify-center text-center">
-            <Text variant="title" color="#FF5B00" weight="bold">
+            <Text variant="headline" color="#FF5B00" weight="bold">
               Nuestros servicios
             </Text>
           </Col>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
             {services.map((service, index) => (
-              <div key={index} className="bg-white/10 bg-opacity-5 backdrop-blur-sm rounded-2xl p-6 hover:bg-opacity-10 transition-all duration-300 hover:transform hover:scale-105 flex flex-col items-center text-center">
+              <div key={index} className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 hover:bg-opacity-10 transition-all duration-300 hover:transform hover:scale-105 flex flex-col items-center text-center">
                 <div className="mb-4 flex items-center justify-center" style={{ backgroundColor: '#16141F', width: '48px', height: '48px', borderRadius: '9999px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Icon name={service.icon as any} color={service.color} size={32} />
                 </div>
-                <h3 className="mb-2">
+                <h3 className="mb-4">
                   <Text variant="subtitle" color="#ffffff" weight="bold">
                     {service.title}
                   </Text>
                 </h3>
-                <Text variant="body" color="#E5FFFF" className="opacity-80">
+                <Text variant="body" color="#ffffff" className="opacity-60">
                   {service.description}
                 </Text>
                 <div

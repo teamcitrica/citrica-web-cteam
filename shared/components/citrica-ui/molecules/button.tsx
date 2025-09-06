@@ -31,7 +31,7 @@ const Button = ({
   onClick,
   label,
   color = "primary",
-  textVariant = "label",
+  textVariant = "body",
   variant = "primary",
   className = "",
   textClassName = "", // <-- nuevo prop
