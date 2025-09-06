@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { Container, Col } from '@/styles/07-objects/objects'
 import Text from '@/shared/components/citrica-ui/atoms/text'
 import Icon from '@/shared/components/citrica-ui/atoms/icon'
@@ -9,6 +9,8 @@ import { Divider, Link } from '@heroui/react'
 import DotGrid from './versions/yolanda/components/DotGrid'
 
 const CitricaWebsite = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const services = [
     {
       title: "Landing Pages",
@@ -140,8 +142,56 @@ const CitricaWebsite = () => {
                 />
               </div>
               <div className="md:hidden ml-4">
-                <Icon name="Menu" color="#E5FFFF" size={24} />
+                <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                  <Icon name={isMenuOpen ? "X" : "Menu"} color="#E5FFFF" size={24} />
+                </button>
               </div>
+            </div>
+            {/* Mobile Menu - visible on small screens */}
+            <div
+              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+                }`}
+            >
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="absolute top-6 right-6"
+                aria-label="Cerrar menú"
+              >
+                <Icon name="X" color="#E5FFFF" size={28} />
+              </button>
+
+              <a href="#inicio" className="text-white text-lg" onClick={() => setIsMenuOpen(false)}>
+                <Text variant="body" color="#E5FFFF">
+                  Inicio
+                </Text>
+              </a>
+              <a href="#servicios" className="text-white text-lg" onClick={() => setIsMenuOpen(false)}>
+                <Text variant="body" color="#E5FFFF">
+                  Servicios
+                </Text>
+              </a>
+              <a href="#proyectos" className="text-white text-lg" onClick={() => setIsMenuOpen(false)}>
+                <Text variant="body" color="#E5FFFF">
+                  Proyectos
+                </Text>
+              </a>
+              <a href="#contacto" className="text-white text-lg" onClick={() => setIsMenuOpen(false)}>
+                <Text variant="body" color="#E5FFFF">
+                Contacto
+                </Text>
+              </a>
+
+              {/* Botón CTA */}
+              <Button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                label="Hablemos"
+                color="primary"
+                variant="primary"
+                className="w-full bg-[#E1FF00] text-black rounded-[80]"
+              />
             </div>
           </Col>
         </Container>
@@ -406,7 +456,7 @@ const CitricaWebsite = () => {
       <section id="technologies" className="pb-20 ">
         <Container>
           {/* Título principal */}
-          <Col cols={{lgPush:2, lg: 8, md: 6, sm: 4 }} className="text-center mb-12">
+          <Col cols={{ lgPush: 2, lg: 8, md: 6, sm: 4 }} className="text-center mb-12">
             <h2 className="mb-6">
               <Text variant="title" color="#FF5B00" weight="bold">
                 Tecnología de punta para resultados excepcionales
@@ -437,11 +487,13 @@ const CitricaWebsite = () => {
 
                 {/* Título */}
                 <h3 className="text-lg font-bold text-gray-900 mb-3">
-                  {tech.title}
+                  <Text variant="body" color="#16141F" weight="bold">
+                    {tech.title}
+                  </Text>
                 </h3>
 
                 {/* Descripción */}
-                <p className="text-gray-600 text-sm leading-relaxed"
+                <p className="text-description text-gray-600 text-sm leading-relaxed"
                   dangerouslySetInnerHTML={{ __html: tech.description }}>
                 </p>
               </div>
@@ -451,7 +503,9 @@ const CitricaWebsite = () => {
           {/* Texto final */}
           <div className="text-center mt-10 max-w-3xl mx-auto">
             <p className="text-white text-sm">
-              Estas herramientas nos permiten crear productos digitales de alto rendimiento, escalables y fáciles de mantener, asegurando una experiencia excepcional para tus usuarios.
+              <Text variant="body" color="#ffffff" weight="bold">
+                Estas herramientas nos permiten crear productos digitales de alto rendimiento, escalables y fáciles de mantener, asegurando una experiencia excepcional para tus usuarios.
+              </Text>
             </p>
           </div>
         </Container>
@@ -461,20 +515,23 @@ const CitricaWebsite = () => {
       {/* Process */}
       <section id="process" className="py-20 bg-white">
         <Container>
+
           <div className="space-y-12">
-            <div className="text-center space-y-4">
-              <h2>
-                <Text variant="title" color="#FF5B00" weight="bold">
-                  Nuestro Proceso de Trabajo
-                </Text>
-              </h2>
-              <p>
-                <Text variant="body" color="#16141F" className="opacity-90">
-                  Seguimos una metodología probada que garantiza la entrega exitosa de tu proyecto,
-                  desde la conceptualización hasta el soporte post-lanzamiento
-                </Text>
-              </p>
-            </div>
+            <Col cols={{ lgPush: 2, lg: 8, md: 6, sm: 4 }} className="text-center mb-12">
+              <div className="text-center space-y-4">
+                <h2>
+                  <Text variant="title" color="#FF5B00" weight="bold">
+                    Nuestro Proceso de Trabajo
+                  </Text>
+                </h2>
+                <p>
+                  <Text variant="body" color="#16141F" className="opacity-90">
+                    Seguimos una metodología probada que garantiza la entrega exitosa de tu proyecto,
+                    desde la conceptualización hasta el soporte post-lanzamiento
+                  </Text>
+                </p>
+              </div>
+            </Col>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
               {process.map((step, index) => (
@@ -567,7 +624,7 @@ const CitricaWebsite = () => {
             </h2>
             <div className="mb-8">
               <Text variant="body" color="#16141F" className="opacity-80">
-                Contactanos hoy y descubre cómo podemos impulsar tu crecimiento digital
+                Contáctanos hoy y descubre cómo podemos impulsar tu crecimiento digital
               </Text>
             </div>
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
