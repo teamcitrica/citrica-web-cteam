@@ -29,8 +29,7 @@ const CitricaLanding = () => {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="pt-24 pb-16 bg-gradient-to-br from-white to-gray-50">
-      <div style={{ width: '100%', height: '600px', position: 'relative' }}>
-    </div>
+      
         <Container>
           <Col cols={{ lg: 6, md: 6, sm: 4 }} className="flex flex-col justify-center min-h-[60vh]">
             <div className="space-y-6">
