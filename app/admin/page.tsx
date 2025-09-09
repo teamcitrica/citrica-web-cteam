@@ -3,7 +3,7 @@ import Text from '@ui/atoms/text';
 
 const PanelPage = () => {
   return (
-    <div><Text variant="display" color='#45F'>Panel Page</Text></div>
+    <div><Text variant="display" color='#45F'>Panel de Administrador</Text></div>
   )
 }
 

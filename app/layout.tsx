@@ -3,8 +3,8 @@ import { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import { Providers } from "../shared/providers";
 // import { Toaster } from 'react-hot-toast';
-// import SupabaseProvider from './context/supabase-context' <== DESCOMENTAR PARA USAR SUPABASE
-// import { AuthContextProvider } from "./context/AuthContext"; <== DESCOMENTAR PARA USAR AUTH
+import SupabaseProvider from "@/shared/context/supabase-context"
+import { AuthContextProvider } from "@/shared/context/auth-context"; 
 import Navbar from "@ui/organism/navbar";
 
 
@@ -33,14 +33,14 @@ export default function RootLayout({
 			<body
 			>
 				{/* <Toaster/>  SE CAMBIÓ POR HEROUI TOAST*/}
-				{/* <SupabaseProvider> */}
-					{/* <AuthContextProvider> */}
+				<SupabaseProvider>
+					<AuthContextProvider>
 						<Providers themeProps={{ attribute: "data-theme", defaultTheme: "light" }}>
 							{/* <Navbar /> */}
 							{children}
 						</Providers>
-					{/* </AuthContextProvider> */}
-				{/* </SupabaseProvider> */}
+					</AuthContextProvider>
+				</SupabaseProvider>
 			</body>
 		</html>
 	);
