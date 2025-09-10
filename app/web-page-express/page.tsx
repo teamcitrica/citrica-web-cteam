@@ -55,6 +55,12 @@ const CitricaLanding = () => {
     });
   };
 
+  const process = [
+    { icon: "Rocket", title: "Emprendedores & Startups", description: "Lanza tu presencia digital rápidamente sin inversiones enormes.", color: "#e1ff00" },
+    { icon: "User", title: "Profesionales Independientes", description: "Muestra tu portafolio y servicios de manera profesional.", color: "#ff5b00" },
+    { icon: "Building", title: "Pequeñas Empresas", description: "Establece tu presencia online y atrae más clientes locales", color: "#00FFFF" },
+  ]
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -215,7 +221,7 @@ const CitricaLanding = () => {
       </section>
 
       {/* Process Section */}
-      <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
+      <section className="py-16">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12">
             <h2>
@@ -305,78 +311,57 @@ const CitricaLanding = () => {
       </section>
 
       {/* Target Audience Section */}
-      <section className="py-16 bg-white">
+      <section id="process" className="py-20 bg-white">
         <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12">
-            <h2>
-              <Text variant="headline" weight='bold' textColor="color-text-black">
-                Perfecto Para
-              </Text>
-            </h2>
-          </Col>
 
-          <Col cols={{ lg: 4, md: 2, sm: 4 }} className="mb-8">
-            <div className="flex items-start space-x-4 p-6 border border-gray-200 rounded-xl">
-              <Icon name="Rocket" size={32} color="#39aab4" />
-              <div>
-                <h3>
-                  <Text variant="subtitle" weight='bold' textColor="color-text-black">
-                    Emprendedores & Startups
+          <div className="space-y-12">
+            <Col cols={{ lgPush: 2, lg: 8, md: 6, sm: 4 }} className="text-center mb-12">
+              <div className="text-center space-y-4">
+                <h2>
+                  <Text variant="headline" color="#FF5B00" weight="bold">
+                    Perfecto Para
                   </Text>
-                </h3>
-                <p className="mt-2">
-                  <Text variant="body" textColor="color-text-black">
-                    Lanza tu presencia digital rápidamente sin inversiones enormes
-                  </Text>
-                </p>
+                </h2>
               </div>
-            </div>
-          </Col>
+            </Col>
 
-          <Col cols={{ lg: 4, md: 2, sm: 4 }} className="mb-8">
-            <div className="flex items-start space-x-4 p-6 border border-gray-200 rounded-xl">
-              <Icon name="User" size={32} color="#39aab4" />
-              <div>
-                <h3>
-                  <Text variant="subtitle" weight='bold' textColor="color-text-black">
-                    Profesionales Independientes
-                  </Text>
-                </h3>
-                <p className="mt-2">
-                  <Text variant="body" textColor="color-text-black">
-                    Muestra tu portafolio y servicios de manera profesional
-                  </Text>
-                </p>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
+              {process.map((step, index) => (
+                <div key={index} className="relative">
+                  <div className="relative p-8 h-full border-2 rounded-xl hover:shadow-xl transition-all duration-500 group-hover:scale-105 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm hover:from-white/20 hover:to-white/10">
+                    <div className="space-y-4 pt-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-3 rounded-lg shadow-sm" style={{ backgroundColor: '#16141F' }}>
+                          <Icon name={step.icon as any} size={24} className="w-6 h-6"
+                            style={{ color: step.color }}
+                          />
+                        </div>
+                        <h3>
+                          <Text variant="subtitle" color="#16141F">
+                            {step.title}
+                          </Text>
+                        </h3>
+                      </div>
+                      <p>
+                        <Text variant="body" color="#16141F" className="opacity-80 leading-relaxed">
+                          {step.description}
+                        </Text>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          </Col>
-
-          <Col cols={{ lg: 4, md: 2, sm: 4 }} className="mb-8">
-            <div className="flex items-start space-x-4 p-6 border border-gray-200 rounded-xl">
-              <Icon name="Building" size={32} color="#39aab4" />
-              <div>
-                <h3>
-                  <Text variant="subtitle" weight='bold' textColor="color-text-black">
-                    Pequeñas Empresas
-                  </Text>
-                </h3>
-                <p className="mt-2">
-                  <Text variant="body" textColor="color-text-black">
-                    Establece tu presencia online y atrae más clientes locales
-                  </Text>
-                </p>
-              </div>
-            </div>
-          </Col>
+          </div>
         </Container>
       </section>
 
       {/* Pricing Section */}
       <section className="py-16 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
         <Container>
-          <Col cols={{ lg: 12 , md: 6, sm: 4 }} className="text-center mb-12">
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12">
             <h2>
-              <Text variant="headline" weight='bold' textColor="color-text-white">
+              <Text variant="headline" weight='bold' textColor="color-primary">
                 Precio Transparente
               </Text>
             </h2>
@@ -387,18 +372,20 @@ const CitricaLanding = () => {
             </p>
           </Col>
 
-          <Col cols={{ lg: 8, md: 4, sm: 4, lgPush: 2 }} className="lg:col-start-3 md:col-start-2">
-            <div className="bg-white rounded-2xl p-8 text-center text-gray-900">
-              <div className="mb-6">
-                <span className="text-5xl font-bold text-blue-600">$300</span>
-                <span className="text-xl text-gray-600 ml-2">USD</span>
-              </div>
-
-              <h3 className="mb-6">
-                <Text variant="title" weight='bold' textColor="color-text-black">
+          <Col cols={{ lg: 6, md: 4, sm: 4, lgPush: 3 }} className="lg:col-start-3 md:col-start-2">
+            <div className="bg-white rounded-2xl py-8 px-16 text-center text-gray-900">
+            <h3 className="mb-2">
+                <Text variant="subtitle" weight='bold' textColor="color-text-black">
                   Web Page Express
                 </Text>
               </h3>
+              <div className="mb-8">
+                <span className="text-3xl ct-color-primary ml-2">US</span>
+                <span className="text-4xl font-bold ct-color-primary ml-2">$</span>
+                <span className="text-5xl font-bold ct-color-primary">300</span>
+              </div>
+
+              
 
               <ul className="space-y-4 mb-8">
                 <li className="flex items-center space-x-3">
@@ -437,6 +424,7 @@ const CitricaLanding = () => {
                 variant="primary"
                 color="primary"
                 textVariant="body"
+                className='px-8 bg-[#E1FF00] rounded-[80]'                              
               />
             </div>
           </Col>
@@ -449,12 +437,12 @@ const CitricaLanding = () => {
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mx-auto">
             <h2 className="mb-6">
               <Text variant="headline" color="#16141F" weight="bold">
-              ¿Listo para tener tu sitio web?
+                ¿Listo para tener tu sitio web?
               </Text>
             </h2>
             <div className="mb-8">
               <Text variant="body" color="#16141F" className="opacity-80">
-              Comienza hoy mismo y ten tu presencia digital lista en una semana.
+                Comienza hoy mismo y ten tu presencia digital lista en una semana.
               </Text>
             </div>
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
