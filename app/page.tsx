@@ -7,6 +7,13 @@ import Button from '@/shared/components/citrica-ui/molecules/button'
 import CurvedLoop from './versions/yolanda/components/CurvedLoop'
 import { Divider, Link } from '@heroui/react'
 import DotGrid from './versions/yolanda/components/DotGrid'
+import {
+  Avatar,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@heroui/react";
 
 const CitricaWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -115,6 +122,7 @@ const CitricaWebsite = () => {
                   alt="Logo Cítrica"
                 />
               </div>
+              
             </div>
             <div className="hidden lg:flex space-x-8">
               <a href="#inicio" className="hover:opacity-80 transition-opacity">
