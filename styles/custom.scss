@@ -6,6 +6,7 @@
 .bg-black-gradient {
   background-color: var(--color-surface-container);
 }
+
 :root {
   --linear-ease: linear(0, 0.068, 0.19 2.7%, 0.804 8.1%, 1.037, 1.199 13.2%, 1.245, 1.27 15.8%, 1.274, 1.272 17.4%, 1.249 19.1%, 0.996 28%, 0.949, 0.928 33.3%, 0.926, 0.933 36.8%, 1.001 45.6%, 1.013, 1.019 50.8%, 1.018 54.4%, 1 63.1%, 0.995 68%, 1.001 85%, 1);
 }
@@ -277,6 +278,120 @@
   font-family: var(--font-family-d);
 }
 
+// styles admin (copia mi olllita)
+
+.text-sidebar-panel-administrativo {
+  font-family: $font-family-b;
+  font-weight: 600;
+  font-size: 14px;
+  color: #212121;
+}
+
+.text-menuitems {
+  font-family: $font-family-b;
+  font-weight: 400;
+  font-size: 14px;
+  color: #1D192B;
+}
+
+// styles del user box
+.text-name-users {
+  font-family: $font-family-b;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 20px;
+  color: #414141;
+}
+
+// styles login 
+.bg-login {
+  background: url("https://citrica-websites.s3.us-east-1.amazonaws.com/miollita-cteeam/bg-login.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  width: 100%;
+  max-width: 484px;
+  height: 473px;
+  border: 1px solid #E9E8DD;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  box-shadow: 8px 8px 24px rgba(102, 102, 102, 0.3);
+}
+
+$container-inputs : (sm: (padding: 0px 8px,
+  ),
+  md: (padding: 0px px,
+  ),
+  lg: (padding: 0px 0px,
+  ));
+
+.container-inputs {
+  width: 100%;
+  max-width: 484px;
+  height: 473px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #E9E8DD;
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+  box-shadow: 8px 8px 24px rgba(102, 102, 102, 0.3);
+  background: #FFFFFF;
+  @include a-set($container-inputs );
+}
+
+.bottom-login {
+  font-family: $font-family-b;
+  font-weight: 700;
+  font-size: 16px;
+  width: 100%;
+  max-width: 312px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  border-radius: 12px;
+  background: #E9E8DD;
+  color: #666666;
+}
+.bg-color-ct-black {
+  background-color: #16141F;
+}
+
+.bg-color-ct-primary {
+  background-color: #FF5B00;
+}
+
+.bg-color-ct-secondary {
+  background-color: #E1FF00;
+}
+
+.bg-color-ct-tertiary {
+  background-color: #00FFFF;
+}
+
+.bg-color-ct-cuaternary {
+  background-color: #FF00D4;
+}
+
+.text-dark-bkg {
+  background-color: #16141FCC;
+}
+
+.ct-color-primary {
+  color: #FF5B00;
+}
+
+.ct-color-secondary {
+  color: #E1FF00;
+}
+
+.ct-color-tertiary {
+  color: #00FFFF;
+}
+
+.ct-color-cuaternary {
+  color: #FF00D4;
+}
 // styles admin (copia mi olllita)
 
 .text-sidebar-panel-administrativo {
