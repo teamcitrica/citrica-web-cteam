@@ -24,8 +24,8 @@ const CitricaLanding = () => {
       color: "#00FFFF",
     },
     {
-      title: "Solo US $300",
-      description: "Incluye 3 meses de alojamiento sin costo",
+      title: "Costo accesible",
+      description: "",
       icon: "DollarSign",
       color: "#FF5B00",
     },
@@ -80,33 +80,31 @@ const CitricaLanding = () => {
         </div>
         <Container>
           <Col cols={{ lg: 10, md: 6, sm: 4 }} className="text-center mx-auto mb-12">
-            <div className="text-dark-bkg mb-12 space-y-8 bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
-              <h2>
-                <Text variant="display" weight="bold" color="#FFFFFF">
-                  <span style={{ color: '#FF5B00' }}>PÁGINAS WEB EXPRESS</span>
+            <div className="text-dark-bkg mb-12 bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
+              <h1 className='mb-4'>
+                <Text variant="display" weight="bold" color="#FF5B00">
+                  PÁGINAS WEB EXPRESS
+                </Text>
+              </h1>
+              <h2 className='mb-8'>
+                <Text variant="body" weight='bold' textColor="color-text-white">
+                  Lanza tu proyecto, idea o negocio online de forma rápida y a un costo accesible.
                 </Text>
               </h2>
-              <h2>
-                <Text variant="title" textColor="color-text-white">
-                  Tu página web profesional en una semana.
-                </Text>
-              </h2>
-              <p>
-                <Text variant="body" weight='bold' textColor="color-secondary">
-                  Desarrollo web express en tiempo record. <br />
-                  Solo USD $300 + hosting gratis por 3 meses. <br />
+              <p className='pb-2'>
+                <Text variant="subtitle" weight='bold' textColor="color-secondary">
+                  USD $ <span className='text-5xl' >300</span>
                 </Text>
               </p>
-              <p>
-                <Text variant="body" textColor="color-text-white">
-                  Tu presencia digital para un lanzamiento inmediato.
+              <p className='mb-12'>
+                <Text variant="subtitle" textColor="color-secondary">
+                  Hosting gratis por 3 meses.
                 </Text>
               </p>
-            </div>
-            <div className="flex justify-center space-x-4 mb-12">
+            <div className="flex justify-center space-x-4 mb-2">
               <Button
                 onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
-                label="Conócenos ahora"
+                label="¡Quiero mi Landing Page!"
                 variant="primary"
                 className='px-8 bg-[#E1FF00] rounded-[80]'
               />
@@ -116,6 +114,7 @@ const CitricaLanding = () => {
                 color="secondary"
                 className="hidden bg-[#E5FFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8 rounded-[80]"
               />
+            </div>
             </div>
           </Col>
         </Container>
@@ -374,7 +373,7 @@ const CitricaLanding = () => {
 
           <Col cols={{ lg: 6, md: 4, sm: 4, lgPush: 3 }} className="lg:col-start-3 md:col-start-2">
             <div className="bg-white rounded-2xl py-8 px-16 text-center text-gray-900">
-            <h3 className="mb-2">
+              <h3 className="mb-2">
                 <Text variant="subtitle" weight='bold' textColor="color-text-black">
                   Web Page Express
                 </Text>
@@ -385,7 +384,7 @@ const CitricaLanding = () => {
                 <span className="text-5xl font-bold ct-color-primary">300</span>
               </div>
 
-              
+
 
               <ul className="space-y-4 mb-8">
                 <li className="flex items-center space-x-3">
@@ -424,7 +423,7 @@ const CitricaLanding = () => {
                 variant="primary"
                 color="primary"
                 textVariant="body"
-                className='px-8 bg-[#E1FF00] rounded-[80]'                              
+                className='px-8 bg-[#E1FF00] rounded-[80]'
               />
             </div>
           </Col>
