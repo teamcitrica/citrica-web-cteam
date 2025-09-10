@@ -5,6 +5,8 @@ import Text from '@ui/atoms/text'
 import Icon from '@ui/atoms/icon'
 import Button from '@ui/molecules/button'
 import { addToast } from "@heroui/toast"
+import DotGrid from '../versions/yolanda/components/DotGrid'
+
 
 const CitricaLanding = () => {
   const handleContactClick = () => {
@@ -28,8 +30,20 @@ const CitricaLanding = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="pt-24 pb-16 bg-gradient-to-br from-white to-gray-50">
-      
+      <section className="pt-24 pb-16 bg-color-ct-black">
+        <div className="absolute inset-0 -z-80">
+          <DotGrid
+            dotSize={4}
+            gap={16}
+            baseColor="#006666"
+            activeColor="#E1ff00"
+            proximity={120}
+            shockRadius={250}
+            shockStrength={5}
+            resistance={750}
+            returnDuration={1.5}
+          />
+        </div>
         <Container>
           <Col cols={{ lg: 6, md: 6, sm: 4 }} className="flex flex-col justify-center min-h-[60vh]">
             <div className="space-y-6">
@@ -98,7 +112,7 @@ const CitricaLanding = () => {
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12">
             <h2>
-              <Text variant="headline" textColor="color-text-black">
+              <Text variant="headline" weight='bold' textColor="color-text-black">
                 ¿Por qué elegir Web Page Express?
               </Text>
             </h2>
@@ -115,7 +129,7 @@ const CitricaLanding = () => {
                 <Icon name="Clock" size={48} color="#39aab4" />
               </div>
               <h3>
-                <Text variant="title" textColor="color-text-black">
+                <Text variant="title" weight='bold' textColor="color-text-black">
                   Rapidez Express
                 </Text>
               </h3>
@@ -133,7 +147,7 @@ const CitricaLanding = () => {
                 <Icon name="Palette" size={48} color="#39aab4" />
               </div>
               <h3>
-                <Text variant="title" textColor="color-text-black">
+                <Text variant="title" weight='bold' textColor="color-text-black">
                   Diseño Profesional
                 </Text>
               </h3>
@@ -151,7 +165,7 @@ const CitricaLanding = () => {
                 <Icon name="Shield" size={48} color="#39aab4" />
               </div>
               <h3>
-                <Text variant="title" textColor="color-text-black">
+                <Text variant="title" weight='bold' textColor="color-text-black">
                   Precio Transparente
                 </Text>
               </h3>
@@ -170,7 +184,7 @@ const CitricaLanding = () => {
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12">
             <h2>
-              <Text variant="headline" textColor="color-text-black">
+              <Text variant="headline" weight='bold' textColor="color-text-black">
                 Proceso Simple en 4 Pasos
               </Text>
             </h2>
@@ -187,7 +201,7 @@ const CitricaLanding = () => {
                 <span className="text-2xl font-bold text-blue-600">1</span>
               </div>
               <h3>
-                <Text variant="subtitle" textColor="color-text-black">
+                <Text variant="subtitle" weight='bold' textColor="color-text-black">
                   Reunión Inicial
                 </Text>
               </h3>
@@ -205,7 +219,7 @@ const CitricaLanding = () => {
                 <span className="text-2xl font-bold text-green-600">2</span>
               </div>
               <h3>
-                <Text variant="subtitle" textColor="color-text-black">
+                <Text variant="subtitle" weight='bold' textColor="color-text-black">
                   Formulario Detallado
                 </Text>
               </h3>
@@ -223,7 +237,7 @@ const CitricaLanding = () => {
                 <span className="text-2xl font-bold text-yellow-600">3</span>
               </div>
               <h3>
-                <Text variant="subtitle" textColor="color-text-black">
+                <Text variant="subtitle" weight='bold' textColor="color-text-black">
                   Propuesta y Ajustes
                 </Text>
               </h3>
@@ -241,7 +255,7 @@ const CitricaLanding = () => {
                 <span className="text-2xl font-bold text-purple-600">4</span>
               </div>
               <h3>
-                <Text variant="subtitle" textColor="color-text-black">
+                <Text variant="subtitle" weight='bold' textColor="color-text-black">
                   Publicación
                 </Text>
               </h3>
@@ -260,7 +274,7 @@ const CitricaLanding = () => {
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12">
             <h2>
-              <Text variant="headline" textColor="color-text-black">
+              <Text variant="headline"  weight='bold' textColor="color-text-black">
                 Perfecto Para
               </Text>
             </h2>
@@ -271,7 +285,7 @@ const CitricaLanding = () => {
               <Icon name="Rocket" size={32} color="#39aab4" />
               <div>
                 <h3>
-                  <Text variant="subtitle" textColor="color-text-black">
+                  <Text variant="subtitle" weight='bold' textColor="color-text-black">
                     Emprendedores & Startups
                   </Text>
                 </h3>
@@ -289,7 +303,7 @@ const CitricaLanding = () => {
               <Icon name="User" size={32} color="#39aab4" />
               <div>
                 <h3>
-                  <Text variant="subtitle" textColor="color-text-black">
+                  <Text variant="subtitle" weight='bold' textColor="color-text-black">
                     Profesionales Independientes
                   </Text>
                 </h3>
@@ -307,7 +321,7 @@ const CitricaLanding = () => {
               <Icon name="Building" size={32} color="#39aab4" />
               <div>
                 <h3>
-                  <Text variant="subtitle" textColor="color-text-black">
+                  <Text variant="subtitle" weight='bold' textColor="color-text-black">
                     Pequeñas Empresas
                   </Text>
                 </h3>
@@ -327,7 +341,7 @@ const CitricaLanding = () => {
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12">
             <h2>
-              <Text variant="headline" textColor="color-text-white">
+              <Text variant="headline" weight='bold' textColor="color-text-white">
                 Precio Transparente
               </Text>
             </h2>
@@ -346,7 +360,7 @@ const CitricaLanding = () => {
               </div>
               
               <h3 className="mb-6">
-                <Text variant="title" textColor="color-text-black">
+                <Text variant="title" weight='bold' textColor="color-text-black">
                   Web Page Express
                 </Text>
               </h3>
@@ -399,7 +413,7 @@ const CitricaLanding = () => {
         <Container>
           <Col cols={{ lg: 8, md: 4, sm: 4 }} className="lg:col-start-3 md:col-start-2 text-center">
             <h2>
-              <Text variant="headline" textColor="color-text-white">
+              <Text variant="headline" weight='bold' textColor="color-text-white">
                 ¿Listo para tener tu sitio web?
               </Text>
             </h2>
