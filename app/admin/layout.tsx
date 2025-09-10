@@ -9,6 +9,7 @@ import Button from "@ui/molecules/button";
 import { Container, Col } from '@citrica/objects'
 import Navbar from "@/shared/components/citrica-ui/organism/navbar";
 import "@/styles/globals.scss";
+
 export default function PanelLayout({
 	children,
 }: {
