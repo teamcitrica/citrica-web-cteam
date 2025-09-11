@@ -14,5 +14,6 @@ export interface MenuItem {
 
 export interface SidebarProps {
   items: MenuItem[];
+  session:any;
 }
 
