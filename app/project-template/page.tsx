@@ -597,7 +597,7 @@ const ProjectTemplate = () => {
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <header>
               <h2 className="mb-6">
-                <Text variant="headline" color="#FF5B00" >
+                <Text variant="headline" weight="bold" color="#FF5B00" >
                   Otros Proyectos
                 </Text>
               </h2>
