@@ -357,6 +357,10 @@ $container-inputs : (sm: (padding: 0px 8px,
   background-color: #16141F;
 }
 
+.bg-color-ct-white {
+  background-color: #FFFFFF;
+}
+
 .bg-color-ct-primary {
   background-color: #FF5B00;
 }
@@ -375,6 +379,10 @@ $container-inputs : (sm: (padding: 0px 8px,
 
 .text-dark-bkg {
   background-color: #16141FCC;
+}
+
+.ct-color-white {
+  color: #FFFFFF;
 }
 
 .ct-color-primary {

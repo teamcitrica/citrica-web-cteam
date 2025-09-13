@@ -7,6 +7,7 @@ import Button from '@/shared/components/citrica-ui/molecules/button'
 import CurvedLoop from './versions/yolanda/components/CurvedLoop'
 import { Divider, Link } from '@heroui/react'
 import DotGrid from './versions/yolanda/components/DotGrid'
+import Navbar from '../shared/components/citrica-ui/organism/navbar'
 import {
   Avatar,
   Dropdown,
@@ -111,7 +112,7 @@ const CitricaWebsite = () => {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#16141F' }}>
-      {/* Navigation */}
+      {/* Navigation */}      
       <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-black/80 bg-opacity-80 backdrop-blur-sm " >
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="flex justify-between items-center pt-4">
