@@ -84,7 +84,15 @@ const ProjectTemplate = () => {
               </div>
             </div>
             <div className="hidden lg:flex space-x-8">
-              <a href="#descripcion" className="hover:opacity-80 transition-opacity">
+              <a href="#inicio" className="hover:opacity-80 transition-opacity">
+                <Text variant="body" color="#E5FFFF">
+                  Inicio
+                </Text>
+              </a>
+              <a
+                href="#descripcion"
+                className="hover:opacity-80 transition-opacity"
+              >
                 <Text variant="body" color="#E5FFFF">
                   Sobre el Proyecto
                 </Text>
@@ -94,15 +102,7 @@ const ProjectTemplate = () => {
                 className="hover:opacity-80 transition-opacity"
               >
                 <Text variant="body" color="#E5FFFF">
-                  La Solución
-                </Text>
-              </a>
-              <a
-                href="#cta"
-                className="hover:opacity-80 transition-opacity"
-              >
-                <Text variant="body" color="#E5FFFF">
-                  Contacto
+                   La Solución
                 </Text>
               </a>
               <a
@@ -209,26 +209,23 @@ const ProjectTemplate = () => {
       </nav>
 
       {/* Hero Banner */}
-      <section className="pt-44 pb-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#16141F] to-[#1a1823]" />
-        <div className="absolute top-20 right-20 w-96 h-96 bg-[#E1FF00] opacity-10 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-20 w-64 h-64 bg-[#00FFFF] opacity-10 rounded-full blur-3xl" />
+      <section id="inicio" className="pt-[100] relative overflow-hidden bg-color-on-tertiary">                
 
         <Container className="relative z-10">
-          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <div className="space-y-8">
+          <Col cols={{ lg: 5, md: 6, sm: 4 }}>
+            <div className="h-full flex flex-col justify-center">
               {/* Categoría */}
-                  <div className="inline-block px-3 py-1 bg-[#FF5B00]/20 border border-[#FF5B00]/30 rounded-full mb-4">
-                    <Text variant="label" color="#FF5B00">
+                  <div className="block w-fit px-5 py-1 bg-[#00FFFF]/20 border border-[#FF5B00]/30 rounded-full mb-5">
+                    <Text variant="label" color="#00FFFF">
                       E-Commerce
                     </Text>
                   </div>
               <header>
-                <h1>
+                <h1 className="mb-1">
                   <Text
                     variant="display"
                     weight="bold"
-                    color="#FF5B00"
+                    color="#FFFFFF"
                     className="leading-tight"
                   >
                     BGood
@@ -236,8 +233,8 @@ const ProjectTemplate = () => {
                 </h1>
               </header>
 
-              <h2>
-                <Text variant="title" color="#FFFFFF">
+              <h2 className="mb-9">
+                <Text variant="title" color="#00FFFF">
                   Plataforma Inteligente para la Gestión Integral de Suministros
                   en Edificios.
                 </Text>
@@ -249,24 +246,17 @@ const ProjectTemplate = () => {
                   variant="primary"
                   color="default"
                   onClick={handleContactClick}
-                  className="bg-[#FF5B00] text-[#16141F] hover:bg-[#E1FF00]/90 rounded-full px-5"
+                  className="bg-[#00FFFF] text-[#003333] hover:bg-[#E1FF00]/90 rounded-full px-5"
                 />
               </div>
             </div>
           </Col>
 
-          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
+          <Col cols={{ lg: 7, md: 6, sm: 4 }}>
             <div className="relative">
               {/* Placeholder para imagen del proyecto */}
-              <div className="w-full h-96 bg-gradient-to-br from-[#E1FF00]/20 to-[#FF5B00]/20 rounded-2xl flex items-center justify-center border border-[#E1FF00]/30">
-                <div className="text-center">
-                  <Icon name="Monitor" size={80} color="#E1FF00" />
-                  <div className="mt-4">
-                    <Text variant="body" color="#E5FFFF" className="opacity-70">
-                      [Imagen del Proyecto]
-                    </Text>
-                  </div>
-                </div>
+              <div className="w-full  flex items-center justify-center">
+                <img src="/img/bgood-hero-img.png" alt=""/>
               </div>
             </div>
           </Col>

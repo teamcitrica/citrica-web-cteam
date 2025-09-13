@@ -7,7 +7,11 @@ import Button from "@/shared/components/citrica-ui/molecules/button";
 import CurvedLoop from "./versions/yolanda/components/CurvedLoop";
 import { Divider, Link } from "@heroui/react";
 import DotGrid from "./versions/yolanda/components/DotGrid";
+import { addToast } from "@heroui/toast";
 import Navbar from "../shared/components/citrica-ui/organism/navbar";
+import ProjectsGallery from '@/shared/components/project-components/project-gallery'; 
+
+
 import {
   Avatar,
   Dropdown,
@@ -72,6 +76,33 @@ const CitricaWebsite = () => {
       image: "/delivery.png",
     },
   ];
+
+    const otherProjects = [
+    {
+      id: 1,
+      title: "E-commerce Fashion",
+      description:
+        "Plataforma completa de comercio electrónico con gestión de inventario avanzada",
+      tech: ["React", "Node.js", "PostgreSQL"],
+      category: "E-commerce",
+    },
+    {
+      id: 2,
+      title: "FinTech Dashboard",
+      description:
+        "Dashboard de análisis financiero en tiempo real con visualizaciones interactivas",
+      tech: ["Vue.js", "Python", "MongoDB"],
+      category: "FinTech",
+    },
+    {
+      id: 3,
+      title: "HealthCare Platform",
+      description: "Sistema integral de gestión médica con telemedicina",
+      tech: ["Next.js", "Express", "MySQL"],
+      category: "HealthTech",
+    },
+  ];
+
 
   const technologies = [
     {
@@ -374,6 +405,7 @@ const CitricaWebsite = () => {
           </Col>
         </Container>
 
+        
         {/* Services Grid */}
         <Container className="bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
           <Col
@@ -429,7 +461,7 @@ const CitricaWebsite = () => {
             ))}
           </Col>
         </Container>
-      </section>
+      </section>      
 
       <section id="servicios">
         <Container>
@@ -494,7 +526,7 @@ const CitricaWebsite = () => {
             </div>
           </Col>
         </Container>
-      </section>
+      </section>      
 
       {/* About Us */}
       <section className="py-20">
@@ -575,7 +607,7 @@ const CitricaWebsite = () => {
       </section>
 
       {/* Latest Projects */}
-      {/*       <section id="proyectos" className="py-20 bg-[#580049]">
+            <section id="proyectos" className="py-20 bg-[#580049]">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <h2 className="mb-6">
@@ -615,10 +647,10 @@ const CitricaWebsite = () => {
             ))}
           </Col>
         </Container>
-      </section> */}
+      </section>
 
       {/* Technologies Section */}
-      <section id="technologies" className="pb-20 ">
+      <section id="technologies" className="pb-20 pt-20">
         <Container>
           {/* Título principal */}
           <Col
