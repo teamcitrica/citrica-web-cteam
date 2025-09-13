@@ -533,7 +533,7 @@ const CitricaWebsite = () => {
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <h2 className="mb-6">
-              <Text variant="title" color="#FF5B00" weight="bold">
+              <Text variant="headline" color="#FF5B00" weight="bold">
                 ¿Quiénes somos?
               </Text>
             </h2>
@@ -611,7 +611,7 @@ const CitricaWebsite = () => {
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <h2 className="mb-6">
-              <Text variant="title" color="#E5FFFF" weight="bold">
+              <Text variant="headline" color="#E5FFFF" weight="bold">
                 Últimos proyectos
               </Text>
             </h2>
@@ -658,7 +658,7 @@ const CitricaWebsite = () => {
             className="text-center mb-12"
           >
             <h2 className="mb-6">
-              <Text variant="title" color="#FF5B00" weight="bold">
+              <Text variant="headline" color="#FF5B00" weight="bold">
                 Tecnología de punta para resultados excepcionales
               </Text>
             </h2>
@@ -729,7 +729,7 @@ const CitricaWebsite = () => {
             >
               <div className="text-center space-y-4">
                 <h2>
-                  <Text variant="title" color="#FF5B00" weight="bold">
+                  <Text variant="headline" color="#FF5B00" weight="bold">
                     Nuestro Proceso de Trabajo
                   </Text>
                 </h2>

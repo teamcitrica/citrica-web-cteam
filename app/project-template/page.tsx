@@ -255,8 +255,8 @@ const ProjectTemplate = () => {
           <Col cols={{ lg: 7, md: 6, sm: 4 }}>
             <div className="relative">
               {/* Placeholder para imagen del proyecto */}
-              <div className="w-full  flex items-center justify-center">
-                <img src="/img/bgood-hero-img.png" alt=""/>
+              <div className="w-full flex items-center justify-center">
+                <img src="/img/bgood-hero-img.png" alt="Project image" className="proyect-page-hero-img-shadow"/>
               </div>
             </div>
           </Col>
