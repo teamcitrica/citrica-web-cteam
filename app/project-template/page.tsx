@@ -1,13 +1,17 @@
-"use client"
-import React from 'react'
-import { Container, Col } from '@citrica/objects'
-import Text from '@ui/atoms/text'
-import Icon from '@ui/atoms/icon'
-import Button from '@ui/molecules/button'
-import { addToast } from "@heroui/toast"
-import { Divider, Link } from '@heroui/react'
+"use client";
+import React, { useState } from "react";
+import { Container, Col } from "@citrica/objects";
+import Text from "@ui/atoms/text";
+import Icon from "@ui/atoms/icon";
+import Button from "@ui/molecules/button";
+import { addToast } from "@heroui/toast";
+import { Divider, Link } from "@heroui/react";
+
 
 const ProjectTemplate = () => {
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const handleContactClick = () => {
     addToast({
       title: "¡Gracias por tu interés!",
@@ -22,7 +26,7 @@ const ProjectTemplate = () => {
     { name: "Node.js", icon: "Server", color: "#00FFFF" },
     { name: "MongoDB", icon: "Database", color: "#FF5B00" },
     { name: "TypeScript", icon: "FileCode", color: "#E1FF00" },
-    { name: "AWS", icon: "Cloud", color: "#00FFFF" }
+    { name: "AWS", icon: "Cloud", color: "#00FFFF" },
   ];
 
   const features = [
@@ -31,77 +35,174 @@ const ProjectTemplate = () => {
     "API REST escalable y documentada",
     "Interfaz responsive y moderna",
     "Integración con servicios de terceros",
-    "Sistema de notificaciones push"
+    "Sistema de notificaciones push",
   ];
 
   const otherProjects = [
     {
       id: 1,
       title: "E-commerce Fashion",
-      description: "Plataforma completa de comercio electrónico con gestión de inventario avanzada",
+      description:
+        "Plataforma completa de comercio electrónico con gestión de inventario avanzada",
       tech: ["React", "Node.js", "PostgreSQL"],
-      category: "E-commerce"
+      category: "E-commerce",
     },
     {
       id: 2,
       title: "FinTech Dashboard",
-      description: "Dashboard de análisis financiero en tiempo real con visualizaciones interactivas",
+      description:
+        "Dashboard de análisis financiero en tiempo real con visualizaciones interactivas",
       tech: ["Vue.js", "Python", "MongoDB"],
-      category: "FinTech"
+      category: "FinTech",
     },
     {
       id: 3,
       title: "HealthCare Platform",
       description: "Sistema integral de gestión médica con telemedicina",
       tech: ["Next.js", "Express", "MySQL"],
-      category: "HealthTech"
-    }
+      category: "HealthTech",
+    },
   ];
 
+  
+
   return (
+    
     <div className="min-h-screen bg-[#16141F]">
+      
       {/* Header/Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-[#16141F]/95 backdrop-blur-md border-b border-[#E1FF00]/20">
+     <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-black/80 bg-opacity-80 backdrop-blur-sm ">
+     
         <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-            <div className="flex justify-between items-center py-4">
-              {/* Logo y Back Button */}
-              <div className="flex items-center space-x-4">
-                <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-                  <div className="w-24 h-16">
-                    <img
-                      src="/img/citrica-logo.png"
-                      alt="Logo Cítrica"
-                    />
-                  </div>
-                </Link>
+          <Col
+            cols={{ lg: 12, md: 6, sm: 4 }}
+            className="flex justify-between items-center pt-4"
+          >
+            <div className="flex items-center space-x-2">
+              <div className="w-24 h-16">
+                <img src="/img/citrica-logo.png" alt="Logo Cítrica" />
               </div>
-
-              {/* Navigation Links */}
-              <div className="hidden md:flex space-x-6">
-                <a href="#descripcion" className="hover:opacity-80 transition-opacity">
-                  <Text variant="body" color="#E5FFFF">Descripción</Text>
-                </a>
-                <a href="#solucion" className="hover:opacity-80 transition-opacity">
-                  <Text variant="body" color="#E5FFFF">Solución</Text>
-                </a>
-                <a href="#tecnologias" className="hover:opacity-80 transition-opacity">
-                  <Text variant="body" color="#E5FFFF">Tecnologías</Text>
-                </a>
-                <a href="#otros-proyectos" className="hover:opacity-80 transition-opacity">
-                  <Text variant="body" color="#E5FFFF">Otros Proyectos</Text>
-                </a>
-              </div>
-
-              {/* CTA Button */}
+            </div>
+            <div className="hidden lg:flex space-x-8">
+              <a href="#descripcion" className="hover:opacity-80 transition-opacity">
+                <Text variant="body" color="#E5FFFF">
+                  Sobre el Proyecto
+                </Text>
+              </a>
+              <a
+                href="#solucion"
+                className="hover:opacity-80 transition-opacity"
+              >
+                <Text variant="body" color="#E5FFFF">
+                  La Solución
+                </Text>
+              </a>
+              <a
+                href="#cta"
+                className="hover:opacity-80 transition-opacity"
+              >
+                <Text variant="body" color="#E5FFFF">
+                  Contacto
+                </Text>
+              </a>
+              <a
+                href="#otros-proyectos"
+                className="hover:opacity-80 transition-opacity"
+              >
+                <Text variant="body" color="#E5FFFF">
+                  Otros proyectos
+                </Text>
+              </a>
+            </div>
+            {/* Right side - action button + hamburger on small screens only */}
+            <div className="flex items-center md:justify-end">
               <div className="hidden md:block">
                 <Button
-                  onClick={handleContactClick}
+                  onClick={() =>
+                    document
+                      .getElementById("contacto")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
                   label="Regresar"
+                  color="primary"
                   variant="primary"
-                  className='px-6 bg-[#E1FF00] rounded-full'
+                  className="px-8 bg-[#E1FF00] rounded-[80]"
                 />
               </div>
+              <div className="md:hidden ml-4">
+                <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                  <Icon
+                    name={isMenuOpen ? "X" : "Menu"}
+                    color="#E5FFFF"
+                    size={24}
+                  />
+                </button>
+              </div>
+            </div>
+            {/* Mobile Menu - visible on small screens */}
+            <div
+              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${
+                isMenuOpen ? "translate-x-0" : "translate-x-full"
+              }`}
+            >
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="absolute top-6 right-6"
+                aria-label="Cerrar menú"
+              >
+                <Icon name="X" color="#E5FFFF" size={28} />
+              </button>
+
+              <a
+                href="#inicio"
+                className="text-white text-lg"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Text variant="body" color="#E5FFFF">
+                  Inicio
+                </Text>
+              </a>
+              <a
+                href="#servicios"
+                className="text-white text-lg"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Text variant="body" color="#E5FFFF">
+                  Servicios
+                </Text>
+              </a>
+              <a
+                href="#proyectos"
+                className="text-white text-lg"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Text variant="body" color="#E5FFFF">
+                  Proyectos
+                </Text>
+              </a>
+              <a
+                href="#contacto"
+                className="text-white text-lg"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Text variant="body" color="#E5FFFF">
+                  Contacto
+                </Text>
+              </a>
+
+              {/* Botón CTA */}
+              <Button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  document
+                    .getElementById("contacto")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }}
+                label="Hablemos"
+                color="primary"
+                variant="primary"
+                className="w-full bg-[#E1FF00] text-black rounded-[80]"
+              />
             </div>
           </Col>
         </Container>
@@ -115,19 +216,30 @@ const ProjectTemplate = () => {
 
         <Container className="relative z-10">
           <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <div className="space-y-8">              
-
+            <div className="space-y-8">
+              {/* Categoría */}
+                  <div className="inline-block px-3 py-1 bg-[#FF5B00]/20 border border-[#FF5B00]/30 rounded-full mb-4">
+                    <Text variant="label" color="#FF5B00">
+                      E-Commerce
+                    </Text>
+                  </div>
               <header>
                 <h1>
-                  <Text variant="display" color="#E5FFFF" className="leading-tight">
+                  <Text
+                    variant="display"
+                    weight="bold"
+                    color="#FF5B00"
+                    className="leading-tight"
+                  >
                     BGood
                   </Text>
                 </h1>
               </header>
 
               <h2>
-                <Text variant="title" color="#E1FF00">
-                  Plataforma Inteligente para la Gestión Integral de Suministros en Edificios.
+                <Text variant="title" color="#FFFFFF">
+                  Plataforma Inteligente para la Gestión Integral de Suministros
+                  en Edificios.
                 </Text>
               </h2>
 
@@ -137,8 +249,8 @@ const ProjectTemplate = () => {
                   variant="primary"
                   color="default"
                   onClick={handleContactClick}
-                  className="bg-[#E1FF00] text-[#16141F] hover:bg-[#E1FF00]/90 rounded-full px-5"
-                />                
+                  className="bg-[#FF5B00] text-[#16141F] hover:bg-[#E1FF00]/90 rounded-full px-5"
+                />
               </div>
             </div>
           </Col>
@@ -164,10 +276,10 @@ const ProjectTemplate = () => {
       {/* Descripción del Proyecto */}
       <section id="descripcion" className="py-20 bg-color-ct-white">
         <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12">
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center">
             <header>
               <h2>
-                <Text variant="headline" color='#FF5B00' className="mb-6">
+                <Text variant="headline" weight="bold" color="#FF5B00" className="mb-6">
                   Sobre el Proyecto
                 </Text>
               </h2>
@@ -177,8 +289,21 @@ const ProjectTemplate = () => {
           <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
             <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
               <p className="mb-6">
-                <Text variant="body" color="#16141F" className="leading-relaxed">
-                  Desarrollar e implementar una plataforma web integral que permita a los administradores de edificios ofrecer a sus conserjes una tienda en línea personalizada para la adquisición eficiente de suministros esenciales (uniformes, limpieza, oficina y ferretería). El objetivo principal es optimizar todo el proceso de suministro, desde la solicitud del conserje hasta la recepción conforme del pedido, integrando un sistema de control de stock robusto y funcionalidades avanzadas de gestión presupuestaria y supervisión.
+                <Text
+                  variant="body"
+                  color="#16141F"
+                  className="leading-relaxed"
+                >
+                  Desarrollar e implementar una plataforma web integral que
+                  permita a los administradores de edificios ofrecer a sus
+                  conserjes una tienda en línea personalizada para la
+                  adquisición eficiente de suministros esenciales (uniformes,
+                  limpieza, oficina y ferretería). El objetivo principal es
+                  optimizar todo el proceso de suministro, desde la solicitud
+                  del conserje hasta la recepción conforme del pedido,
+                  integrando un sistema de control de stock robusto y
+                  funcionalidades avanzadas de gestión presupuestaria y
+                  supervisión.
                 </Text>
               </p>
 
@@ -211,15 +336,29 @@ const ProjectTemplate = () => {
             <div className="space-y-6">
               <header>
                 <h2>
-                  <Text variant="headline" color="#FF5B00">
+                  <Text variant="headline" weight="bold" color="#FF5B00">
                     El Desafío
                   </Text>
                 </h2>
               </header>
 
               <p>
-                <Text variant="body" color="#16141F" className="leading-relaxed">
-                  El desafío central consistió en diseñar una solución que no solo facilitara la compra y aprobación de suministros, sino que también ofreciera un control exhaustivo del inventario en el almacén. Esto implicó la implementación de un sistema Kardex integrado para el seguimiento detallado del stock, las entradas y salidas de cada artículo, evitando así desabastecimientos y pérdidas. Adicionalmente, se requería la creación de un flujo de trabajo intuitivo para múltiples roles de usuario, la gestión de presupuestos descentralizados por edificio y la provisión de herramientas de supervisión efectivas para los administradores.
+                <Text
+                  variant="body"
+                  color="#16141F"
+                  className="leading-relaxed"
+                >
+                  El desafío central consistió en diseñar una solución que no
+                  solo facilitara la compra y aprobación de suministros, sino
+                  que también ofreciera un control exhaustivo del inventario en
+                  el almacén. Esto implicó la implementación de un sistema
+                  Kardex integrado para el seguimiento detallado del stock, las
+                  entradas y salidas de cada artículo, evitando así
+                  desabastecimientos y pérdidas. Adicionalmente, se requería la
+                  creación de un flujo de trabajo intuitivo para múltiples roles
+                  de usuario, la gestión de presupuestos descentralizados por
+                  edificio y la provisión de herramientas de supervisión
+                  efectivas para los administradores.
                 </Text>
               </p>
             </div>
@@ -260,15 +399,35 @@ const ProjectTemplate = () => {
             <div className="space-y-6">
               <header>
                 <h2>
-                  <Text variant="headline" color="#FF5B00">
+                  <Text variant="headline" weight="bold" color="#FF5B00">
                     La Solución
                   </Text>
                 </h2>
               </header>
 
               <p>
-                <Text variant="body" color="#16141F" className="leading-relaxed">
-                  Se desarrolló una web app modular y escalable, con interfaces de usuario personalizadas para conserjes, administradores, supervisores y personal de almacén. Los conserjes pueden realizar pedidos fácilmente a través de un catálogo intuitivo, los cuales son revisados y aprobados por los administradores, quienes también gestionan los presupuestos de sus edificios. La implementación de un sistema Kardex permite al personal de almacén mantener un control preciso del stock, registrar entradas y salidas, y asegurar la disponibilidad de los productos solicitados. Los supervisores tienen una visión global del proceso y del cumplimiento presupuestario. El sistema de notificaciones mantiene a todos los usuarios informados sobre el estado de los pedidos, y la confirmación de recepción cierra el ciclo de compra. La plataforma se construyó con tecnologías web modernas, priorizando la seguridad, la eficiencia y la mejora continua en la gestión de suministros para edificios.
+                <Text
+                  variant="body"
+                  color="#16141F"
+                  className="leading-relaxed"
+                >
+                  Se desarrolló una web app modular y escalable, con interfaces
+                  de usuario personalizadas para conserjes, administradores,
+                  supervisores y personal de almacén. Los conserjes pueden
+                  realizar pedidos fácilmente a través de un catálogo intuitivo,
+                  los cuales son revisados y aprobados por los administradores,
+                  quienes también gestionan los presupuestos de sus edificios.
+                  La implementación de un sistema Kardex permite al personal de
+                  almacén mantener un control preciso del stock, registrar
+                  entradas y salidas, y asegurar la disponibilidad de los
+                  productos solicitados. Los supervisores tienen una visión
+                  global del proceso y del cumplimiento presupuestario. El
+                  sistema de notificaciones mantiene a todos los usuarios
+                  informados sobre el estado de los pedidos, y la confirmación
+                  de recepción cierra el ciclo de compra. La plataforma se
+                  construyó con tecnologías web modernas, priorizando la
+                  seguridad, la eficiencia y la mejora continua en la gestión de
+                  suministros para edificios.
                 </Text>
               </p>
             </div>
@@ -282,16 +441,24 @@ const ProjectTemplate = () => {
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12">
             <header>
               <h2>
-                <Text variant="headline" color="#FF5B00" weight='bold' className="mb-6">
+                <Text
+                  variant="headline"
+                  color="#FF5B00"
+                  weight="bold"
+                  className="mb-6"
+                >
                   Características Principales
                 </Text>
               </h2>
             </header>
           </Col>
 
-          <Col cols={{ lg: 6, md: 6, sm: 4 }} >
-            <ul className='list-disc'>
-              <li>Catálogo en línea de uniformes, artículos de limpieza, suministros de oficina y ferretería.</li>
+          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
+            <ul className="list-disc">
+              <li>
+                Catálogo en línea de uniformes, artículos de limpieza,
+                suministros de oficina y ferretería.
+              </li>
               <li>Carrito de compras para seleccionar productos.</li>
               <li>Funcionalidad para generar solicitudes de pedido.</li>
               <li>Historial de pedidos realizados.</li>
@@ -299,54 +466,73 @@ const ProjectTemplate = () => {
               <li>Recomendaciones personalizadas de productos (potencial).</li>
               <li>Panel de control para la gestión de la plataforma.</li>
               <li>Gestión de perfiles de edificios suscritos.</li>
-              <li>Revisión y aprobación de pedidos por parte de los administradores.</li>
+              <li>
+                Revisión y aprobación de pedidos por parte de los
+                administradores.
+              </li>
               <li>Generación automática de órdenes de compra.</li>
-              <li>Establecimiento y gestión de límites presupuestarios anuales y mensuales por edificio.</li>
+              <li>
+                Establecimiento y gestión de límites presupuestarios anuales y
+                mensuales por edificio.
+              </li>
               <li>Visualización del consumo de suministros por edificio.</li>
-              <li>Administración de cuentas de usuarios (conserjes, administradores, supervisores, etc.).</li>
+              <li>
+                Administración de cuentas de usuarios (conserjes,
+                administradores, supervisores, etc.).
+              </li>
               <li>Recepción y gestión de órdenes de compra en el almacén.</li>
             </ul>
           </Col>
 
-          <Col cols={{ lg: 6, md: 6, sm: 4 }} >
-            <ul className='list-disc'>
+          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
+            <ul className="list-disc">
               <li>Interfaz para la preparación y el embalaje de pedidos.</li>
               <li>Registro y seguimiento de los despachos.</li>
               <li>Panel de supervisión con vista general de la actividad.</li>
-              <li>Monitoreo del estado de los pedidos en los diferentes edificios.</li>
-              <li>Visualización del cumplimiento presupuestario por edificio.</li>
+              <li>
+                Monitoreo del estado de los pedidos en los diferentes edificios.
+              </li>
+              <li>
+                Visualización del cumplimiento presupuestario por edificio.
+              </li>
               <li>Posibilidad de generar reportes sobre pedidos y gastos.</li>
-              <li>Sistema Kardex integrado para el control y seguimiento del stock en el almacén.</li>
+              <li>
+                Sistema Kardex integrado para el control y seguimiento del stock
+                en el almacén.
+              </li>
               <li>Sistema de notificaciones sobre el estado de los pedidos.</li>
               <li>Seguimiento en tiempo real del estado de cada pedido.</li>
-              <li>Opción para confirmar la recepción del pedido (conforme o no conforme).</li>
+              <li>
+                Opción para confirmar la recepción del pedido (conforme o no
+                conforme).
+              </li>
               <li>Infraestructura potencial para programas de fidelización.</li>
               <li>Diseño centrado en la usabilidad.</li>
               <li>Arquitectura escalable.</li>
               <li>Medidas de seguridad para la protección de datos.</li>
             </ul>
           </Col>
-
-
-
-
         </Container>
       </section>
 
       {/* Tecnologías */}
-      <section id="tecnologias" className="py-20 bg-gradient-to-r from-[#16141F] via-[#1a1823] to-[#16141F]">
-        <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12">
+      <section
+        id="tecnologias"
+        className="py-20 bg-[#FFFFFF]"
+      >
+        <Container className="justify-center">
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12 ">
             <header>
-              <h2>
-                <Text variant="headline" color="#FF5B00" className="mb-6">
+              <h2 className="mb-6">
+                <Text variant="headline" weight="bold" color="#FF5B00">
                   Tecnologías Utilizadas
                 </Text>
               </h2>
             </header>
             <p>
-              <Text variant="body" color="#E5FFFF" className="opacity-80">
-                Stack tecnológico moderno para máximo rendimiento y escalabilidad
+              <Text variant="body" color="#16141F" className="opacity-80">
+                Stack tecnológico moderno para máximo rendimiento y
+                escalabilidad
               </Text>
             </p>
           </Col>
@@ -356,11 +542,14 @@ const ProjectTemplate = () => {
               <div key={index} className="text-center group">
                 <div
                   className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110 border-2"
-                  style={{ backgroundColor: `${tech.color}20`, borderColor: `${tech.color}40` }}
+                  style={{
+                    backgroundColor: `${tech.color}20`,
+                    borderColor: `${tech.color}40`,
+                  }}
                 >
                   <Icon name={tech.icon as any} size={32} color={tech.color} />
                 </div>
-                <Text variant="body" color="#E5FFFF" className="font-medium">
+                <Text variant="body" color="#16141F" className="font-medium">
                   {tech.name}
                 </Text>
               </div>
@@ -370,12 +559,12 @@ const ProjectTemplate = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20" style={{ backgroundColor: '#E1FF00' }}>
+      <section id="cta" className="py-20" style={{ backgroundColor: "#E1FF00" }}>
         <Container>
           <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto text-center">
             <header>
-              <h2>
-                <Text variant="headline" color="#16141F" className="mb-6">
+              <h2 className="mb-6">
+                <Text variant="headline" weight="bold" color="#16141F" className="mb-6">
                   ¿Te Interesa un Proyecto Similar?
                 </Text>
               </h2>
@@ -383,25 +572,29 @@ const ProjectTemplate = () => {
 
             <p className="mb-8">
               <Text variant="body" color="#16141F" className="opacity-80">
-                Podemos ayudarte a transformar tu negocio con soluciones digitales personalizadas.
-                Conversemos sobre tu próximo proyecto.
+                Podemos ayudarte a transformar tu negocio con soluciones
+                digitales personalizadas. Conversemos sobre tu próximo proyecto.
               </Text>
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
-                onClick={() => window.open('mailto:admin@citrica.dev', '_blank')}
+                onClick={() =>
+                  window.open("mailto:admin@citrica.dev", "_blank")
+                }
                 label="Solicitar Cotización"
                 color="primary"
                 variant="primary"
-                className='bg-[#16141F] text-[#E1FF00] rounded-full px-8'
+                className="bg-[#FFFFFF] text-[#16141F] rounded-full px-8"
               />
               <Button
-                onClick={() => window.open('https://wa.me/51942627383', '_blank')}
+                onClick={() =>
+                  window.open("https://wa.me/51942627383", "_blank")
+                }
                 label="Contactar por WhatsApp"
                 color="success"
                 variant="primary"
-                className='bg-[#16141F] text-white rounded-full px-8'
+                className="bg-[#FFFFFF] text-[#16141F] rounded-full px-8"
               />
             </div>
           </Col>
@@ -413,14 +606,14 @@ const ProjectTemplate = () => {
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <header>
-              <h2>
-                <Text variant="headline" color="#00FFFF" className="mb-6">
+              <h2 className="mb-6">
+                <Text variant="headline" color="#FF5B00" >
                   Otros Proyectos
                 </Text>
               </h2>
             </header>
             <p>
-              <Text variant="body" color="#E5FFFF" className="opacity-80">
+              <Text variant="body" color="#FFFFFF" className="opacity-80">
                 Explora más de nuestros trabajos y casos de éxito
               </Text>
             </p>
@@ -428,13 +621,20 @@ const ProjectTemplate = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {otherProjects.map((project, index) => (
-              <article key={project.id} className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-[#E1FF00]/30 transition-all duration-300 hover:transform hover:scale-105">
+              <article
+                key={project.id}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-[#E1FF00]/30 transition-all duration-300 hover:transform hover:scale-105"
+              >
                 {/* Imagen placeholder */}
                 <div className="h-48 bg-gradient-to-br from-[#E1FF00]/20 to-[#FF5B00]/20 flex items-center justify-center">
                   <div className="text-center">
                     <Icon name="Image" size={48} color="#E1FF00" />
                     <div className="mt-2">
-                      <Text variant="label" color="#E5FFFF" className="opacity-50">
+                      <Text
+                        variant="label"
+                        color="#E5FFFF"
+                        className="opacity-50"
+                      >
                         [{project.category}]
                       </Text>
                     </div>
@@ -458,13 +658,17 @@ const ProjectTemplate = () => {
 
                   {/* Descripción */}
                   <p className="mb-4">
-                    <Text variant="body" color="#E5FFFF" className="opacity-70 leading-relaxed">
+                    <Text
+                      variant="body"
+                      color="#FFFFFF"
+                      className="opacity-70 leading-relaxed"
+                    >
                       {project.description}
                     </Text>
                   </p>
 
                   {/* Tecnologías */}
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  {/* <div className="flex flex-wrap gap-2 mb-4">
                     {project.tech.map((tech, techIndex) => (
                       <span
                         key={techIndex}
@@ -475,7 +679,7 @@ const ProjectTemplate = () => {
                         </Text>
                       </span>
                     ))}
-                  </div>
+                  </div> */}
 
                   {/* Botón */}
                   <Button
@@ -488,7 +692,7 @@ const ProjectTemplate = () => {
                     }}
                     label="Ver Detalles"
                     variant="secondary"
-                    className="w-full border-[#E1FF00] text-[#E1FF00] hover:bg-[#E1FF00]/10"
+                    className="w-full bg-[#E1FF00] text-[#E1FF00] hover:bg-[#E1FF00]/10 rounded-full"
                   />
                 </div>
               </article>
@@ -498,26 +702,33 @@ const ProjectTemplate = () => {
       </section>
 
       {/* Footer */}
-      <footer className="pt-12" style={{ backgroundColor: '#16141F', borderTop: '1px solid rgba(225, 255, 0, 0.2)' }}>
+      <footer
+        className="pt-12"
+        style={{
+          backgroundColor: "#16141F",
+          borderTop: "1px solid rgba(225, 255, 0, 0.2)",
+        }}
+      >
         <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className='flex flex-col text-center justify-center gap-2'>
+          <Col
+            cols={{ lg: 12, md: 6, sm: 4 }}
+            className="flex flex-col text-center justify-center gap-2"
+          >
             <div className="flex items-center justify-center lg:justify-center space-x-2">
               <div className="w-24 h-16">
-                <img
-                  src="/img/citrica-logo.png"
-                  alt="Logo Cítrica"
-                />
+                <img src="/img/citrica-logo.png" alt="Logo Cítrica" />
               </div>
             </div>
             <h2 className="mb-8 lg:text-center md:text-center">
               <Text variant="label" color="#E5FFFF" className="opacity-70">
-                Transformamos ideas en soluciones digitales que impulsan el crecimiento de tu negocio.
+                Transformamos ideas en soluciones digitales que impulsan el
+                crecimiento de tu negocio.
               </Text>
             </h2>
           </Col>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mt-8">
             <Divider className="mb-8 bg-gray-800" />
-            <div className='flex justify-center'>
+            <div className="flex justify-center">
               <h2 className="mb-8">
                 <Text variant="label" color="#E5FFFF" className="opacity-50">
                   © 2025 Cítrica.
@@ -528,7 +739,7 @@ const ProjectTemplate = () => {
         </Container>
       </footer>
     </div>
-  )
-}
+  );
+};
 
-export default ProjectTemplate
+export default ProjectTemplate;
