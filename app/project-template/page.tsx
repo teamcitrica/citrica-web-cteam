@@ -64,15 +64,15 @@ const ProjectTemplate = () => {
     },
   ];
 
-  
+
 
   return (
-    
+
     <div className="min-h-screen bg-[#16141F]">
-      
+
       {/* Header/Navigation */}
-     <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-black/80 bg-opacity-80 backdrop-blur-sm ">
-     
+      <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-black/80 bg-opacity-80 backdrop-blur-sm ">
+
         <Container>
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
@@ -102,7 +102,7 @@ const ProjectTemplate = () => {
                 className="hover:opacity-80 transition-opacity"
               >
                 <Text variant="body" color="#E5FFFF">
-                   La Solución
+                  La Solución
                 </Text>
               </a>
               <a
@@ -141,9 +141,8 @@ const ProjectTemplate = () => {
             </div>
             {/* Mobile Menu - visible on small screens */}
             <div
-              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${
-                isMenuOpen ? "translate-x-0" : "translate-x-full"
-              }`}
+              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+                }`}
             >
               <button
                 onClick={() => setIsMenuOpen(false)}
@@ -209,17 +208,17 @@ const ProjectTemplate = () => {
       </nav>
 
       {/* Hero Banner */}
-      <section id="inicio" className="pt-[100] relative overflow-hidden bg-color-on-tertiary">                
+      <section id="inicio" className="pt-[100] relative overflow-hidden gradient-project-hero">
 
         <Container className="relative z-10">
           <Col cols={{ lg: 5, md: 6, sm: 4 }}>
             <div className="h-full flex flex-col justify-center">
               {/* Categoría */}
-                  <div className="block w-fit px-5 py-1 bg-[#00FFFF]/20 border border-[#FF5B00]/30 rounded-full mb-5">
-                    <Text variant="label" color="#00FFFF">
-                      E-Commerce
-                    </Text>
-                  </div>
+              <div className="block w-fit px-5 py-1 bg-[#00FFFF]/20 border border-[#00FFFF]/30 rounded-full mb-5">
+                <Text variant="label" color="#00FFFF">
+                  E-Commerce
+                </Text>
+              </div>
               <header>
                 <h1 className="mb-1">
                   <Text
@@ -256,7 +255,7 @@ const ProjectTemplate = () => {
             <div className="relative">
               {/* Placeholder para imagen del proyecto */}
               <div className="w-full flex items-center justify-center">
-                <img src="/img/bgood-hero-img.png" alt="Project image" className="proyect-page-hero-img-shadow"/>
+                <img src="/img/bgood-hero-img.png" alt="Project image" className="proyect-page-hero-img-shadow" />
               </div>
             </div>
           </Col>
@@ -264,21 +263,18 @@ const ProjectTemplate = () => {
       </section>
 
       {/* Descripción del Proyecto */}
-      <section id="descripcion" className="py-20 bg-color-ct-white">
+      <section id="descripcion" className="py-20 bg-white">
         <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center">
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center bg-color-ct-tertiary-container rounded-xl p-8">
             <header>
               <h2>
-                <Text variant="headline" weight="bold" color="#FF5B00" className="mb-6">
+                <Text variant="headline" weight="bold" color="#003333" className="mb-6">
                   Sobre el Proyecto
                 </Text>
-              </h2>
+              </h2>              
             </header>
-          </Col>
-
-          <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
-            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-              <p className="mb-6">
+            <div className="flex justify-center bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+              <p className="text-ch-width mt-4">
                 <Text
                   variant="body"
                   color="#16141F"
@@ -315,7 +311,8 @@ const ProjectTemplate = () => {
                 </div>
               </div> */}
             </div>
-          </Col>
+            
+          </Col>          
         </Container>
       </section>
 

@@ -30,8 +30,10 @@
   margin: 0;
   position: relative;
   z-index: 3;
-  color: #FFFFFF; /* texto blanco */
-  text-shadow: none; /* quitamos sombra */
+  color: #FFFFFF;
+  /* texto blanco */
+  text-shadow: none;
+  /* quitamos sombra */
 }
 
 .gooey-nav-container nav ul li {
@@ -39,8 +41,10 @@
   position: relative;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
-  color: #FFFFFF; /* texto blanco por defecto */
-  box-shadow: none; /* quitamos sombra */
+  color: #FFFFFF;
+  /* texto blanco por defecto */
+  box-shadow: none;
+  /* quitamos sombra */
 }
 
 .gooey-nav-container nav ul li a {
@@ -52,11 +56,13 @@
 
 
 .gooey-nav-container nav ul li a:hover {
-  color: #E1FF00; /* hover amarillo */
+  color: #E1FF00;
+  /* hover amarillo */
 }
 
 .gooey-nav-container nav ul li.active {
-  color: #E1FF00; /* activo amarillo */
+  color: #E1FF00;
+  /* activo amarillo */
 }
 
 .gooey-nav-container nav ul li::after {
@@ -64,7 +70,8 @@
   position: absolute;
   inset: 0;
   border-radius: 10px;
-  background: transparent; /* eliminamos fondo blanco feo */
+  background: transparent;
+  /* eliminamos fondo blanco feo */
   opacity: 0;
   transform: scale(0);
   transition: all 0.3s ease;
@@ -90,7 +97,8 @@
 }
 
 .gooey-nav-container .effect.text.active {
-  color: #000000; /* activo amarillo */
+  color: #000000;
+  /* activo amarillo */
 }
 
 .gooey-nav-container .effect.filter {
@@ -107,7 +115,8 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: #E1FF00; /* amarillo en el efecto */
+  background: #E1FF00;
+  /* amarillo en el efecto */
   transform: scale(0);
   opacity: 0;
   z-index: -1;
@@ -144,7 +153,8 @@
 }
 
 .point {
-  background: #E1FF00; /* partículas amarillas */
+  background: #E1FF00;
+  /* partículas amarillas */
   opacity: 1;
   animation: point calc(var(--time)) ease 1 -350ms;
 }
@@ -209,9 +219,9 @@
 .aurora {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 20% 20%, rgba(0,255,200,0.5), transparent 60%),
-              radial-gradient(circle at 80% 30%, rgba(0,150,255,0.4), transparent 60%),
-              radial-gradient(circle at 50% 80%, rgba(255,0,200,0.4), transparent 70%);
+  background: radial-gradient(circle at 20% 20%, rgba(0, 255, 200, 0.5), transparent 60%),
+    radial-gradient(circle at 80% 30%, rgba(0, 150, 255, 0.4), transparent 60%),
+    radial-gradient(circle at 50% 80%, rgba(255, 0, 200, 0.4), transparent 70%);
   filter: blur(100px);
   animation: auroraMove 15s ease-in-out infinite alternate;
 }
@@ -220,9 +230,11 @@
   0% {
     background-position: 0% 0%, 100% 0%, 50% 100%;
   }
+
   50% {
     background-position: 50% 30%, 60% 60%, 40% 90%;
   }
+
   100% {
     background-position: 100% 100%, 0% 100%, 60% 20%;
   }
@@ -353,6 +365,7 @@ $container-inputs : (sm: (padding: 0px 8px,
   background: #E9E8DD;
   color: #666666;
 }
+
 .bg-color-ct-black {
   background-color: #16141F;
 }
@@ -371,6 +384,10 @@ $container-inputs : (sm: (padding: 0px 8px,
 
 .bg-color-ct-tertiary {
   background-color: #00FFFF;
+}
+
+.bg-color-ct-tertiary-container {
+  background-color: #E6F4F4;
 }
 
 .bg-color-ct-on-tertiary {
@@ -405,10 +422,28 @@ $container-inputs : (sm: (padding: 0px 8px,
   color: #003333;
 }
 
+.ct-color-tertiary-container {
+  color: #CCFFFF;
+}
+
 .ct-color-cuaternary {
   color: #FF00D4;
 }
 
 .proyect-page-hero-img-shadow {
   filter: drop-shadow(-29px 72px 30 #000000AA);
+}
+
+.gradient-project-hero {
+  background: #003333;
+  background: linear-gradient(44deg, rgba(0, 51, 51, 1) 41%, rgba(0, 130, 130, 1) 100%);
+}
+
+.gradient-1-project-section {
+  background: #dff0ee;
+  background: linear-gradient(44deg, rgba(223, 240, 238, 1) 41%, rgba(237, 255, 251, 1) 100%);
+}
+
+.text-ch-width {
+  width: 75ch;
 }
