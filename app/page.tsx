@@ -98,13 +98,13 @@ const CitricaWebsite = () => {
     { step: "01", icon: "ClipboardList", title: "Planificación", description: "Definimos objetivos y estrategia del proyecto", color: "#e1ff00" },
     { step: "02", icon: "Palette", title: "Diseño", description: "Creamos prototipos y experiencias de usuario", color: "#ff5b00" },
     { step: "03", icon: "Code", title: "Desarrollo", description: "Construimos tu solución con las mejores tecnologías", color: "#00FFFF" },
-    { step: "04", icon: "TestTube", title: "Pruebas", description: "Validamos calidad y rendimiento exhaustivamente", color: "#E5FFFF" },
+    { step: "04", icon: "TestTube", title: "Pruebas", description: "Validamos calidad y rendimiento exhaustivamente", color: "#FF00D4" },
     { step: "05", icon: "Rocket", title: "Implementación", description: "Desplegamos tu proyecto de forma segura", color: "#E1FF00" },
     { step: "06", icon: "Headphones", title: "Soporte", description: "Mantenimiento continuo y evolución constante", color: "#FF5B00" }
   ]
 
   const stats = [
-    { icon: "CheckCircle", number: 150, suffix: "+", label: "Proyectos Entregados" },
+    // { icon: "CheckCircle", number: 150, suffix: "+", label: "Proyectos Entregados" },
     { icon: "CheckCircle", number: 98, suffix: "%", label: "Clientes Satisfechos" },
     { icon: "CheckCircle", number: 24, suffix: "/7", label: "Soporte activo" },
     { icon: "CheckCircle", number: 10, suffix: "x", label: "Velocidad de entrega" },
@@ -127,16 +127,16 @@ const CitricaWebsite = () => {
             </div>
             <div className="hidden lg:flex space-x-8">
               <a href="#inicio" className="hover:opacity-80 transition-opacity">
-                <Text variant="body" color="#E5FFFF">Inicio</Text>
+                <Text variant="body" color="#FFFFFF">Inicio</Text>
               </a>
               <a href="#servicios" className="hover:opacity-80 transition-opacity">
-                <Text variant="body" color="#E5FFFF">Servicios</Text>
+                <Text variant="body" color="#FFFFFF">Servicios</Text>
               </a>
               <a href="#proyectos" className="hover:opacity-80 transition-opacity">
-                <Text variant="body" color="#E5FFFF">Proyectos</Text>
+                <Text variant="body" color="#FFFFFF">Proyectos</Text>
               </a>
               <a href="#contacto" className="hover:opacity-80 transition-opacity">
-                <Text variant="body" color="#E5FFFF">Contacto</Text>
+                <Text variant="body" color="#FFFFFF">Contacto</Text>
               </a>
             </div>
             {/* Right side - action button + hamburger on small screens only */}
@@ -152,7 +152,7 @@ const CitricaWebsite = () => {
               </div>
               <div className="md:hidden ml-4">
                 <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                  <Icon name={isMenuOpen ? "X" : "Menu"} color="#E5FFFF" size={24} />
+                  <Icon name={isMenuOpen ? "X" : "Menu"} color="#FFFFFF" size={24} />
                 </button>
               </div>
             </div>
@@ -166,26 +166,26 @@ const CitricaWebsite = () => {
                 className="absolute top-6 right-6"
                 aria-label="Cerrar menú"
               >
-                <Icon name="X" color="#E5FFFF" size={28} />
+                <Icon name="X" color="#FFFFFF" size={28} />
               </button>
 
               <a href="#inicio" className="text-white text-lg" onClick={() => setIsMenuOpen(false)}>
-                <Text variant="body" color="#E5FFFF">
+                <Text variant="body" color="#FFFFFF">
                   Inicio
                 </Text>
               </a>
               <a href="#servicios" className="text-white text-lg" onClick={() => setIsMenuOpen(false)}>
-                <Text variant="body" color="#E5FFFF">
+                <Text variant="body" color="#FFFFFF">
                   Servicios
                 </Text>
               </a>
               <a href="#proyectos" className="text-white text-lg" onClick={() => setIsMenuOpen(false)}>
-                <Text variant="body" color="#E5FFFF">
+                <Text variant="body" color="#FFFFFF">
                   Proyectos
                 </Text>
               </a>
               <a href="#contacto" className="text-white text-lg" onClick={() => setIsMenuOpen(false)}>
-                <Text variant="body" color="#E5FFFF">
+                <Text variant="body" color="#FFFFFF">
                 Contacto
                 </Text>
               </a>
@@ -230,7 +230,7 @@ const CitricaWebsite = () => {
                 </Text>
               </h2>
               <p>
-                <Text variant="body" color="#E5FFFF">
+                <Text variant="body" color="#FFFFFF">
                   Transformamos tus ideas en soluciones digitales que impulsan el crecimiento de tu empresa
                 </Text>
               </p>
@@ -246,7 +246,7 @@ const CitricaWebsite = () => {
                 onClick={() => document.getElementById('proyectos')?.scrollIntoView({ behavior: 'smooth' })}
                 label="Ver Proyectos"
                 color="secondary"
-                className="hidden bg-[#E5FFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8 rounded-[80]"
+                className="hidden bg-[#FFFFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8 rounded-[80]"
               />
             </div>
           </Col>
@@ -308,7 +308,7 @@ const CitricaWebsite = () => {
             <div className="bg-white rounded-3xl p-8 h-full flex flex-col items-center justify-center">
               <div className="text-center mb-10">
                 <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center animate-spin-slow">
-                  <Icon name="Rocket" color="#E5FFFF" size={48} />
+                  <Icon name="Rocket" color="#FFFFFF" size={48} />
                 </div>
                 <Text variant="title" color="#16141F" weight="bold">
                   Impulsamos tu crecimiento digital
@@ -316,7 +316,7 @@ const CitricaWebsite = () => {
               </div>
 
               {/* Stats Icons */}
-              <Col cols={{ lg: 12, md: 4, sm: 4 }} className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full'>
+              <Col cols={{ lg: 12, md: 4, sm: 4 }} className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full'>
                 {stats.map((stat, index) => (
                   <div
                     key={index}
@@ -351,7 +351,7 @@ const CitricaWebsite = () => {
               </Text>
             </h2>
             <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
-              <Text variant="body" color="#E5FFFF" className="opacity-90">
+              <Text variant="body" color="#FFFFFF" className="opacity-90">
                 Somos un equipo de desarrolladores y diseñadores apasionados por crear
                 experiencias digitales excepcionales que transforman negocios.
               </Text>
@@ -361,21 +361,21 @@ const CitricaWebsite = () => {
           <Col cols={{ lg: 12, md: 6, sm: 4 }}>
             <div className="relative max-w-4xl mx-auto">
               {/* Línea central */}
-              <div className="absolute left-1/2 h-full w-0.5 bg-yellow-600 -translate-x-1/2"></div>
+              <div className="absolute left-1/2 h-full w-0.5 bg-white opacity-50 -translate-x-1/2"></div>
 
               <div className="relative mb-12 flex items-center w-full">
                 <div className="w-1/2 pr-12 text-right">
                   <h3 className="mb-2">
-                    <Text variant="subtitle" color="#E5FFFF" weight="bold">
+                    <Text variant="subtitle" color="#FF5B00" weight="bold">
                       Equipo Experto
                     </Text>
                   </h3>
-                  <Text variant="body" color="#bbba9b" className="opacity-80">
+                  <Text variant="body" color="#FFFFFF" className="opacity-80">
                     Desarrolladores senior con amplia experiencia
                   </Text>
                 </div>
                 <div className="absolute left-1/2 -translate-x-1/2 bg-[#16141F] p-3 rounded-full border-2 border-[#FF5B00]">
-                  <Icon name="Users" color="#E5FFFF" size={32} />
+                  <Icon name="Users" color="#FF5B00" size={32} />
                 </div>
                 <div className="w-1/2"></div>
               </div>
@@ -383,15 +383,15 @@ const CitricaWebsite = () => {
               <div className="relative mb-12 flex items-center w-full">
                 <div className="w-1/2"></div>
                 <div className="absolute left-1/2 -translate-x-1/2 bg-[#16141F] p-3 rounded-full border-2 border-[#00FFFF]">
-                  <Icon name="Award" color="#E5FFFF" size={32} />
+                  <Icon name="Award" color="#00FFFF" size={32} />
                 </div>
                 <div className="w-1/2 pl-12 text-left">
                   <h3 className="mb-2">
-                    <Text variant="subtitle" color="#E5FFFF" weight="bold">
+                    <Text variant="subtitle" color="#00FFFF" weight="bold">
                       Calidad Garantizada
                     </Text>
                   </h3>
-                  <Text variant="body" color="#bbba9b" className="opacity-80">
+                  <Text variant="body" color="#FFFFFF" className="opacity-80">
                     Procesos de calidad certificados y mejores prácticas
                   </Text>
                 </div>
@@ -400,16 +400,16 @@ const CitricaWebsite = () => {
               <div className="relative mb-12 flex items-center w-full">
                 <div className="w-1/2 pr-12 text-right">
                   <h3 className="mb-2">
-                    <Text variant="subtitle" color="#E5FFFF" weight="bold">
+                    <Text variant="subtitle" color="#E1FF00" weight="bold">
                       Innovación Constante
                     </Text>
                   </h3>
-                  <Text variant="body" color="#bbba9b" className="opacity-80">
+                  <Text variant="body" color="#FFFFFF" className="opacity-80">
                     Siempre a la vanguardia de las últimas tecnologías
                   </Text>
                 </div>
                 <div className="absolute left-1/2 -translate-x-1/2 bg-[#16141F] p-3 rounded-full border-2 border-[#E1FF00]">
-                  <Icon name="Zap" color="#E5FFFF" size={24} />
+                  <Icon name="Zap" color="#E1FF00" size={24} />
                 </div>
                 <div className="w-1/2"></div>
               </div>
@@ -472,7 +472,7 @@ const CitricaWebsite = () => {
               </Text>
             </h2>
             <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
-              <Text variant="body" color="#E5FFFF" className="opacity-90">
+              <Text variant="body" color="#FFFFFF" className="opacity-90">
                 En Cítrica, utilizamos un conjunto de tecnologías de vanguardia para garantizar que tus productos digitales sean de la más alta calidad:
               </Text>
             </Col>
@@ -694,7 +694,7 @@ const CitricaWebsite = () => {
               </div>
             </div>
             <h2 className="mb-8 lg:text-center md:text-center">
-              <Text variant="label" color="#E5FFFF" className="opacity-70">
+              <Text variant="label" color="#FFFFFF" className="opacity-70">
                 Transformamos ideas en soluciones digitales que impulsan el crecimiento de tu negocio.
               </Text>
             </h2>
@@ -703,7 +703,7 @@ const CitricaWebsite = () => {
             <Divider className="mb-8 bg-gray-800" />
             <div className='flex justify-center'>
               <h2 className="mb-8">
-                <Text variant="label" color="#E5FFFF" className="opacity-50">
+                <Text variant="label" color="#FFFFFF" className="opacity-50">
                   © 2025 Cítrica.
                 </Text>
               </h2>
