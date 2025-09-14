@@ -373,7 +373,11 @@ $container-inputs : (sm: (padding: 0px 8px,
   background-color: #00FFFF;
 }
 
+<<<<<<< HEAD
 .bg-color-ct-on-tertiary {
+=======
+.bg-color-on-tertiary {
+>>>>>>> be090f9e70a66cd8a9686f699f796f1b7dd95e8c
   background-color: #003333;
 }
 
@@ -407,4 +411,8 @@ $container-inputs : (sm: (padding: 0px 8px,
 
 .ct-color-cuaternary {
   color: #FF00D4;
+}
+
+.proyect-page-hero-img-shadow {
+  filter: drop-shadow(-29px 72px 30 #000000AA);
 }

@@ -4,14 +4,14 @@ import type { LucideProps } from "lucide-react";
 import { getCSSVariable } from '@/shared/utils/general';
 
 // Define the type for all available Lucide icons
-type IconName = keyof typeof LucideIcons;
+export type IconName = keyof typeof LucideIcons;
 
 interface IconProps extends LucideProps {
-  name: IconName;
+  name: IconName | string; // Permitir tanto IconName como string
   size?: number;
-  strokeWidth?: number; // Optional stroke width for the icon
-  color?: string; // Optional color for the icon
-  fallback?: IconName; // Optional fallback icon if the requested one doesn't exist
+  strokeWidth?: number;
+  color?: string;
+  fallback?: IconName;
 }
 
 // EDIT HERE
@@ -25,12 +25,15 @@ const Icon = ({
     strokeWidth = DEFAULT_STROKE_WIDTH, 
     fallback = DEFAULT_FALLBACK,
     ...props }: IconProps): JSX.Element => {
-  // Get the icon component dynamically from the imported Lucide icons
-  const IconComponent = LucideIcons[name] || LucideIcons[fallback];
+  
+  // Intentar obtener el componente del icono
+  const IconComponent = LucideIcons[name as IconName] || LucideIcons[fallback];
 
   // Ensure IconComponent is treated as a valid React component
   if (!IconComponent) {
-    throw new Error(`Icon "${name}" not found and fallback "${fallback}" is invalid.`);
+    console.warn(`Icon "${name}" not found, using fallback "${fallback}"`);
+    const FallbackComponent = LucideIcons[fallback];
+    return React.createElement(FallbackComponent as React.ComponentType<LucideProps>, { size, strokeWidth, ...props });
   }
 
   // Return the icon with all props passed through
@@ -38,4 +41,3 @@ const Icon = ({
 };
 
 export default Icon;
-export type { IconName };
