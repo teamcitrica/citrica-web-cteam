@@ -117,17 +117,19 @@ const ProjectTemplate = () => {
             {/* Right side - action button + hamburger on small screens only */}
             <div className="flex items-center md:justify-end">
               <div className="hidden md:block">
-                <Button
-                  onClick={() =>
-                    document
-                      .getElementById("contacto")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
-                  label="Regresar"
-                  color="primary"
-                  variant="primary"
-                  className="px-8 bg-[#E1FF00] rounded-[80]"
-                />
+                <Link href="/">
+                  <Button
+                    onClick={() =>
+                      document
+                        .getElementById("contacto")
+                        ?.scrollIntoView({ behavior: "smooth" })
+                    }
+                    label="Regresar"
+                    color="primary"
+                    variant="primary"
+                    className="px-8 bg-[#E1FF00] rounded-[80]"
+                  />
+                </Link>
               </div>
               <div className="md:hidden ml-4">
                 <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -354,7 +356,7 @@ const ProjectTemplate = () => {
 
           <Col cols={{ lg: 6, md: 6, sm: 4 }}>
             <div className="w-full h-80 rounded-2xl overflow-hidden project-img-shadow">
-              <img src="/img/shopping-cart.jpg" alt="" className="object-center"/>
+              <img src="/img/shopping-cart.jpg" alt="" className="object-center" />
             </div>
           </Col>
         </Container>
@@ -365,7 +367,7 @@ const ProjectTemplate = () => {
         <Container>
           <Col cols={{ lg: 6, md: 6, sm: 4 }}>
             <div className="w-full h-full rounded-2xl overflow-hidden project-img-shadow bg-[#F2F2F2]">
-              <img src="/img/super-user-products.jpg" alt="Imagen de detalle de la tabla de productos" className="object-cover"/>
+              <img src="/img/super-user-products.jpg" alt="Imagen de detalle de la tabla de productos" className="object-cover" />
             </div>
           </Col>
 

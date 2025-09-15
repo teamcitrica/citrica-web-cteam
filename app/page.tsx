@@ -532,7 +532,89 @@ const CitricaWebsite = () => {
             </Text>
           </Col>
 
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {otherProjects.map((project, index) => (
+              <article
+                key={project.id}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-[#E1FF00]/30 transition-all duration-300 hover:transform hover:scale-105"
+              >
+                {/* Imagen placeholder */}
+                <div className="h-48 bg-gradient-to-br from-[#E1FF00]/20 to-[#FF5B00]/20 flex items-center justify-center">
+                  <div className="text-center">
+                    <Icon name="Image" size={48} color="#E1FF00" />
+                    <div className="mt-2">
+                      <Text
+                        variant="label"
+                        color="#E5FFFF"
+                        className="opacity-50"
+                      >
+                        [{project.category}]
+                      </Text>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  {/* Categoría */}
+                  <div className="inline-block px-3 py-1 bg-[#FF5B00]/20 border border-[#FF5B00]/30 rounded-full mb-4">
+                    <Text variant="label" color="#FF5B00">
+                      {project.category}
+                    </Text>
+                  </div>
+
+                  {/* Título */}
+                  <h3 className="mb-3">
+                    <Text variant="subtitle" color="#FFFFFF">
+                      {project.title}
+                    </Text>
+                  </h3>
+
+                  {/* Descripción */}
+                  <p className="mb-4">
+                    <Text
+                      variant="body"
+                      color="#FFFFFF"
+                      className="opacity-70 leading-relaxed"
+                    >
+                      {project.description}
+                    </Text>
+                  </p>
+
+                  {/* Tecnologías */}
+                  {/* <div className="flex flex-wrap gap-2 mb-4">
+                    {project.tech.map((tech, techIndex) => (
+                      <span
+                        key={techIndex}
+                        className="px-2 py-1 bg-[#00FFFF]/10 border border-[#00FFFF]/20 rounded text-xs"
+                      >
+                        <Text variant="label" color="#00FFFF">
+                          {tech}
+                        </Text>
+                      </span>
+                    ))}
+                  </div> */}
+
+                  {/* Botón */}
+                  <Button
+                    onClick={() => {
+                      addToast({
+                        title: "Proyecto seleccionado",
+                        description: `Viendo detalles de ${project.title}`,
+                        color: "success",
+                      });
+                    }}
+                    label="Ver Detalles"
+                    variant="secondary"
+                    className="w-full bg-[#E1FF00] text-[#E1FF00] hover:bg-[#E1FF00]/10 rounded-full"
+                  />
+                </div>
+              </article>
+            ))}
+          </div>
+            
+            
+            {/* ESTAS SON LAS CARDS ANTIGUAS , COMENTADAS POR SI SE NECESITAN LUEGO  */}
+          {/* <Col cols={{ lg: 12, md: 6, sm: 4 }} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {projects.map((project, index) => (
               <div key={index} className="bg-[#12111180] backdrop-blur-3xl border border-[#292929e6] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-105 hover:-rotate-1 animate-fade-in-up group" style={{ animationDelay: `${index * 150}ms` }}>
                 <div className="h-80 w-full overflow-hidden">
@@ -557,7 +639,7 @@ const CitricaWebsite = () => {
                 </div>
               </div>
             ))}
-          </Col>
+          </Col> */}
         </Container>
       </section>
 
