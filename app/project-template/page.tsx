@@ -263,20 +263,21 @@ const ProjectTemplate = () => {
       </section>
 
       {/* Descripción del Proyecto */}
-      <section id="descripcion" className="py-20 bg-white">
+      <section id="descripcion" className="pt-20 bg-white">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center bg-color-ct-tertiary-container rounded-xl p-8">
             <header>
               <h2>
-                <Text variant="headline" weight="bold" color="#003333" className="mb-6">
+                <Text variant="display" weight="bold" color="#006666" className="mb-6">
                   Sobre el Proyecto
                 </Text>
-              </h2>              
+              </h2>
             </header>
             <div className="flex justify-center bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
               <p className="text-ch-width mt-4">
                 <Text
-                  variant="body"
+                  variant="subtitle"
+                  weight="bold"
                   color="#16141F"
                   className="leading-relaxed"
                 >
@@ -311,19 +312,19 @@ const ProjectTemplate = () => {
                 </div>
               </div> */}
             </div>
-            
-          </Col>          
+
+          </Col>
         </Container>
       </section>
 
       {/* Desafío */}
-      <section className="py-20 bg-[#FFFFFF]">
+      <section className="pt-20 bg-[#FFFFFF]">
         <Container>
           <Col cols={{ lg: 6, md: 6, sm: 4 }}>
             <div className="space-y-6">
               <header>
                 <h2>
-                  <Text variant="headline" weight="bold" color="#FF5B00">
+                  <Text variant="headline" weight="bold" color="#006666">
                     El Desafío
                   </Text>
                 </h2>
@@ -352,33 +353,19 @@ const ProjectTemplate = () => {
           </Col>
 
           <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <div className="w-full h-80 bg-gradient-to-br from-[#FF5B00]/20 to-[#E1FF00]/20 rounded-2xl flex items-center justify-center border border-[#FF5B00]/30">
-              <div className="text-center">
-                <Icon name="Target" size={80} color="#FF5B00" />
-                <div className="mt-4">
-                  <Text variant="body" color="#E5FFFF" className="opacity-70">
-                    [Diagrama del Problema]
-                  </Text>
-                </div>
-              </div>
+            <div className="w-full h-80 rounded-2xl overflow-hidden project-img-shadow">
+              <img src="/img/shopping-cart.jpg" alt="" className="object-center"/>
             </div>
           </Col>
         </Container>
       </section>
 
       {/* Solución */}
-      <section id="solucion" className="py-20 bg-[#FFFFFF]">
+      <section id="solucion" className="pt-20 bg-[#FFFFFF]">
         <Container>
           <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <div className="w-full h-80 bg-gradient-to-br from-[#00FFFF]/20 to-[#E1FF00]/20 rounded-2xl flex items-center justify-center border border-[#00FFFF]/30">
-              <div className="text-center">
-                <Icon name="CheckCircle" size={80} color="#00FFFF" />
-                <div className="mt-4">
-                  <Text variant="body" color="#E5FFFF" className="opacity-70">
-                    [Arquitectura de la Solución]
-                  </Text>
-                </div>
-              </div>
+            <div className="w-full h-full rounded-2xl overflow-hidden project-img-shadow bg-[#F2F2F2]">
+              <img src="/img/super-user-products.jpg" alt="Imagen de detalle de la tabla de productos" className="object-cover"/>
             </div>
           </Col>
 
@@ -386,7 +373,7 @@ const ProjectTemplate = () => {
             <div className="space-y-6">
               <header>
                 <h2>
-                  <Text variant="headline" weight="bold" color="#FF5B00">
+                  <Text variant="headline" weight="bold" color="#006666">
                     La Solución
                   </Text>
                 </h2>
@@ -423,81 +410,78 @@ const ProjectTemplate = () => {
       </section>
 
       {/* Características */}
-      <section className="py-20 bg-[#FFFFFF]">
+      <section className="pt-20 bg-[#FFFFFF]">
         <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12">
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="mb-12 space-y-6 bg-color-ct-tertiary-container rounded-xl py-8">
             <header>
-              <h2>
+              <h2 className="text-center">
                 <Text
                   variant="headline"
-                  color="#FF5B00"
+                  color="#006666"
                   weight="bold"
-                  className="mb-6"
                 >
                   Características Principales
                 </Text>
               </h2>
             </header>
-          </Col>
 
-          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <ul className="list-disc">
-              <li>
-                Catálogo en línea de uniformes, artículos de limpieza,
-                suministros de oficina y ferretería.
-              </li>
-              <li>Carrito de compras para seleccionar productos.</li>
-              <li>Funcionalidad para generar solicitudes de pedido.</li>
-              <li>Historial de pedidos realizados.</li>
-              <li>Opción para crear listas de compras recurrentes.</li>
-              <li>Recomendaciones personalizadas de productos (potencial).</li>
-              <li>Panel de control para la gestión de la plataforma.</li>
-              <li>Gestión de perfiles de edificios suscritos.</li>
-              <li>
-                Revisión y aprobación de pedidos por parte de los
-                administradores.
-              </li>
-              <li>Generación automática de órdenes de compra.</li>
-              <li>
-                Establecimiento y gestión de límites presupuestarios anuales y
-                mensuales por edificio.
-              </li>
-              <li>Visualización del consumo de suministros por edificio.</li>
-              <li>
-                Administración de cuentas de usuarios (conserjes,
-                administradores, supervisores, etc.).
-              </li>
-              <li>Recepción y gestión de órdenes de compra en el almacén.</li>
-            </ul>
-          </Col>
+            <div className="flex gap-10 px-10">
 
-          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <ul className="list-disc">
-              <li>Interfaz para la preparación y el embalaje de pedidos.</li>
-              <li>Registro y seguimiento de los despachos.</li>
-              <li>Panel de supervisión con vista general de la actividad.</li>
-              <li>
-                Monitoreo del estado de los pedidos en los diferentes edificios.
-              </li>
-              <li>
-                Visualización del cumplimiento presupuestario por edificio.
-              </li>
-              <li>Posibilidad de generar reportes sobre pedidos y gastos.</li>
-              <li>
-                Sistema Kardex integrado para el control y seguimiento del stock
-                en el almacén.
-              </li>
-              <li>Sistema de notificaciones sobre el estado de los pedidos.</li>
-              <li>Seguimiento en tiempo real del estado de cada pedido.</li>
-              <li>
-                Opción para confirmar la recepción del pedido (conforme o no
-                conforme).
-              </li>
-              <li>Infraestructura potencial para programas de fidelización.</li>
-              <li>Diseño centrado en la usabilidad.</li>
-              <li>Arquitectura escalable.</li>
-              <li>Medidas de seguridad para la protección de datos.</li>
-            </ul>
+              <ul className="list-disc">
+                <li>
+                  Catálogo en línea con filtros por categoría y subcategoría.
+                </li>
+                <li>Carrito de compras para seleccionar productos.</li>
+                <li>Funcionalidad para generar solicitudes de pedido.</li>
+                <li>Historial de pedidos realizados.</li>
+                <li>Opción para crear listas de compras recurrentes.</li>
+                <li>Recomendaciones personalizadas de productos (potencial).</li>
+                <li>Panel de control para la gestión de la plataforma.</li>
+                <li>Gestión de perfiles de edificios suscritos.</li>
+                <li>
+                  Revisión y aprobación de pedidos por parte de los
+                  administradores.
+                </li>
+                <li>Generación automática de órdenes de compra.</li>
+                <li>
+                  Establecimiento y gestión de límites presupuestarios anuales y
+                  mensuales por edificio.
+                </li>
+                <li>Visualización del consumo de suministros por edificio.</li>
+                <li>
+                  Administración de cuentas de usuarios (conserjes,
+                  administradores, supervisores, etc.).
+                </li>
+                <li>Recepción y gestión de órdenes de compra en el almacén.</li>
+              </ul>
+
+              <ul className="list-disc">
+                <li>Interfaz para la preparación y el embalaje de pedidos.</li>
+                <li>Registro y seguimiento de los despachos.</li>
+                <li>Panel de supervisión con vista general de la actividad.</li>
+                <li>
+                  Monitoreo del estado de los pedidos en los diferentes edificios.
+                </li>
+                <li>
+                  Visualización del cumplimiento presupuestario por edificio.
+                </li>
+                <li>Posibilidad de generar reportes sobre pedidos y gastos.</li>
+                <li>
+                  Sistema Kardex integrado para el control y seguimiento del stock
+                  en el almacén.
+                </li>
+                <li>Sistema de notificaciones sobre el estado de los pedidos.</li>
+                <li>Seguimiento en tiempo real del estado de cada pedido.</li>
+                <li>
+                  Opción para confirmar la recepción del pedido (conforme o no
+                  conforme).
+                </li>
+                <li>Infraestructura potencial para programas de fidelización.</li>
+                <li>Diseño centrado en la usabilidad.</li>
+                <li>Arquitectura escalable.</li>
+                <li>Medidas de seguridad para la protección de datos.</li>
+              </ul>
+            </div>
           </Col>
         </Container>
       </section>
@@ -511,13 +495,13 @@ const ProjectTemplate = () => {
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12 ">
             <header>
               <h2 className="mb-6">
-                <Text variant="headline" weight="bold" color="#FF5B00">
+                <Text variant="headline" weight="bold" color="#006666">
                   Tecnologías Utilizadas
                 </Text>
               </h2>
             </header>
             <p>
-              <Text variant="body" color="#16141F" className="opacity-80">
+              <Text variant="subtitle" color="#16141F" className="opacity-80">
                 Stack tecnológico moderno para máximo rendimiento y
                 escalabilidad
               </Text>
