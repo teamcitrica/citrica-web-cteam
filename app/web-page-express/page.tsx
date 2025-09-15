@@ -220,7 +220,7 @@ const CitricaLanding = () => {
       </section>
 
       {/* Process Section */}
-      <section className="py-16">
+      <section className="py-16 bg-color-ct-white">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12">
             <h2>
@@ -310,7 +310,7 @@ const CitricaLanding = () => {
       </section>
 
       {/* Target Audience Section */}
-      <section id="process" className="py-20 bg-white">
+      <section id="process" className="py-20">
         <Container>
 
           <div className="space-y-12">
@@ -326,7 +326,7 @@ const CitricaLanding = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
               {process.map((step, index) => (
-                <div key={index} className="relative">
+                <div key={index} className="relative bg-color-ct-white">
                   <div className="relative p-8 h-full border-2 rounded-xl hover:shadow-xl transition-all duration-500 group-hover:scale-105 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm hover:from-white/20 hover:to-white/10">
                     <div className="space-y-4 pt-4">
                       <div className="flex items-center space-x-3">
@@ -356,7 +356,7 @@ const CitricaLanding = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-16 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+      <section className="py-16 bg-color-ct-on-tertiary text-white">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12">
             <h2>
@@ -374,7 +374,7 @@ const CitricaLanding = () => {
           <Col cols={{ lg: 6, md: 4, sm: 4, lgPush: 3 }} className="lg:col-start-3 md:col-start-2">
             <div className="bg-white rounded-2xl py-8 px-16 text-center text-gray-900">
               <h3 className="mb-2">
-                <Text variant="subtitle" weight='bold' textColor="color-text-black">
+                <Text variant="subtitle" weight='bold' textColor="color-on-tertiary">
                   Web Page Express
                 </Text>
               </h3>
@@ -383,8 +383,6 @@ const CitricaLanding = () => {
                 <span className="text-4xl font-bold ct-color-primary ml-2">$</span>
                 <span className="text-5xl font-bold ct-color-primary">300</span>
               </div>
-
-
 
               <ul className="space-y-4 mb-8">
                 <li className="flex items-center space-x-3">
@@ -423,7 +421,7 @@ const CitricaLanding = () => {
                 variant="primary"
                 color="primary"
                 textVariant="body"
-                className='px-8 bg-[#E1FF00] rounded-[80]'
+                className='px-8 bg-[#FF5B00] rounded-[80]'                                
               />
             </div>
           </Col>
