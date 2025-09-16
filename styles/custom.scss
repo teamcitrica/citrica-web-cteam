@@ -449,11 +449,11 @@ $container-inputs : (sm: (padding: 0px 8px,
 }
 
 .text-ch-width {
-  width: 75ch;
+  max-width: 75ch;
 }
 
 .text-ch-width-md {
-  width: 50ch;
+  max-width: 50ch;
 }
 
 .project-img-shadow {

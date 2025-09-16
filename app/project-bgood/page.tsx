@@ -59,11 +59,15 @@ const ProjectTemplate = () => {
   ];
 
   const technologies = [
-    { name: "React", icon: "Code", color: "#E1FF00" },
-    { name: "Node.js", icon: "Server", color: "#00FFFF" },
+    { name: "HTML 5", icon: "Code", color: "#FF5B00" },
+    { name: "TypeScript", icon: "Code", color: "#FF5B00" },
+    { name: "React JS", icon: "Code", color: "#FF5B00" },
+    { name: "Next JS", icon: "Code", color: "#FF5B00" },
+    { name: "CSS 3", icon: "PaintBucket", color: "#FF5B00" },
+    { name: "Sass", icon: "PaintBucket", color: "#FF5B00" },
+    { name: "Node.js", icon: "Server", color: "#FF5B00" },
+    { name: "AWS", icon: "Cloud", color: "#FF5B00" },
     { name: "MongoDB", icon: "Database", color: "#FF5B00" },
-    { name: "TypeScript", icon: "FileCode", color: "#E1FF00" },
-    { name: "AWS", icon: "Cloud", color: "#00FFFF" },
   ];
 
   const features = [
@@ -111,11 +115,14 @@ const ProjectTemplate = () => {
             noPadding
             className="flex justify-between items-center pt-4"
           >
+            <Link href="/">
+            
             <div className="flex items-center space-x-2">
-              <div className="w-24 h-16">
-                <img src="/img/citrica-logo.png" alt="Logo Cítrica" />
+              <div className="w-24 h-17">
+                <img src="/img/citrica-logo.png" alt="Logo Cítrica" className="h-12"/>
               </div>
             </div>
+            </Link>
             <div className="hidden lg:flex space-x-8">
               <a href="#inicio" className="hover:opacity-80 transition-opacity">
                 <Text variant="body" color="#E5FFFF">
@@ -143,7 +150,7 @@ const ProjectTemplate = () => {
                 className="hover:opacity-80 transition-opacity"
               >
                 <Text variant="body" color="#E5FFFF">
-                  Otros proyectos
+                  Otros Proyectos
                 </Text>
               </a>
             </div>
@@ -198,34 +205,36 @@ const ProjectTemplate = () => {
                 </Text>
               </a>
               <a
-                href="#servicios"
+                href="#descripcion"
                 className="text-white text-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Text variant="body" color="#E5FFFF">
-                  Servicios
+                  Sobre el Proyecto
                 </Text>
               </a>
               <a
-                href="#proyectos"
+                href="#solucion"
                 className="text-white text-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Text variant="body" color="#E5FFFF">
-                  Proyectos
+                  La Solución
                 </Text>
               </a>
               <a
-                href="#contacto"
+                href="#otros-proyectos"
                 className="text-white text-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Text variant="body" color="#E5FFFF">
-                  Contacto
+                  Otros Proyectos
                 </Text>
               </a>
 
               {/* Botón CTA */}
+              <Link href="/">
+              
               <Button
                 onClick={() => {
                   setIsMenuOpen(false);
@@ -236,8 +245,9 @@ const ProjectTemplate = () => {
                 label="Hablemos"
                 color="primary"
                 variant="primary"
-                className="w-full bg-[#E1FF00] text-black rounded-[80]"
+                className="px-8 mt-[10px] bg-[#E1FF00] text-black rounded-[80]"
               />
+              </Link>
             </div>
           </Col>
         </Container>
@@ -505,12 +515,12 @@ const ProjectTemplate = () => {
                 <Text variant="body" color="#003333" className="opacity-60">
                   {service.description}
                 </Text>
-                <div
+                {/* <div
                   className="mt-8 h-1 w-full rounded-full"
                   style={{
                     background: `linear-gradient(90deg, #00666600, #006666, #00666600)`,
                   }}
-                />
+                /> */}
               </div>
             ))}
           </Col>
