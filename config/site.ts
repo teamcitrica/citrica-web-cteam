@@ -4,8 +4,8 @@ import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck } from "lucide
 const SUBITEM_SEARCH_PARAM = "page";
 
 export const siteConfig = {
-	name: "Proyecto Web",
-	description: "Descripción Proyecto Web",
+	name: "Cítrica",
+	description: "Aplicaciones y sitios web a meedida para tu negocio",
 	navLinks: [
 		{
 			title: "Inicio",
