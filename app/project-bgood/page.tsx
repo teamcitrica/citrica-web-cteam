@@ -116,12 +116,15 @@ const ProjectTemplate = () => {
             className="flex justify-between items-center pt-4"
           >
             <Link href="/">
-            
-            <div className="flex items-center space-x-2">
-              <div className="w-24 h-17">
-                <img src="/img/citrica-logo.png" alt="Logo Cítrica" className="h-12"/>
+              <div className="flex items-center space-x-2">
+                <div className="w-24 h-17">
+                  <img
+                    src="/img/citrica-logo.png"
+                    alt="Logo Cítrica"
+                    className="h-12"
+                  />
+                </div>
               </div>
-            </div>
             </Link>
             <div className="hidden lg:flex space-x-8">
               <a href="#inicio" className="hover:opacity-80 transition-opacity">
@@ -234,19 +237,18 @@ const ProjectTemplate = () => {
 
               {/* Botón CTA */}
               <Link href="/">
-              
-              <Button
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  document
-                    .getElementById("contacto")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-                label="Hablemos"
-                color="primary"
-                variant="primary"
-                className="px-8 mt-[10px] bg-[#E1FF00] text-black rounded-[80]"
-              />
+                <Button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    document
+                      .getElementById("contacto")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  label="Hablemos"
+                  color="primary"
+                  variant="primary"
+                  className="px-8 mt-[10px] bg-[#E1FF00] text-black rounded-[80]"
+                />
               </Link>
             </div>
           </Col>
