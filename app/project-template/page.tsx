@@ -7,9 +7,7 @@ import Button from "@ui/molecules/button";
 import { addToast } from "@heroui/toast";
 import { Divider, Link } from "@heroui/react";
 
-
 const ProjectTemplate = () => {
-
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleContactClick = () => {
@@ -20,6 +18,39 @@ const ProjectTemplate = () => {
       radius: "sm",
     });
   };
+
+  const services = [
+    {
+      title: "Gestión de pedidos",
+      description: "Catálogo en línea, carrito de compras, historial y listas de pedidos recurrentes.",
+      icon: "ListCheck",
+      color: "#E1FF00",
+    },
+    {
+      title: "Gestión administrativa",
+      description: "Aprobación de pedidos, límites presupuestarios, administración de perfiles y generación de órdenes de compra.",
+      icon: "FolderKanban",
+      color: "#00FFFF",
+    },
+    {
+      title: "Gestión de inventario",
+      description: "Control de stock con sistema Kardex integrado, registro de entradas y salidas, y preparación de pedidos.",
+      icon: "Blocks",
+      color: "#FF5B00",
+    },
+    {
+      title: "Monitoreo y reportes",
+      description: "Panel de supervisión, seguimiento en tiempo real, reportes de gastos y visualización del cumplimiento presupuestario.",
+      icon: "ScanSearch",
+      color: "#E1FF00",
+    },
+    {
+      title: "Usabilidad y seguridad",
+      description: "Diseño intuitivo, arquitectura escalable y protección de datos.",
+      icon: "Lock",
+      color: "#E1FF00",
+    },
+  ];
 
   const technologies = [
     { name: "React", icon: "Code", color: "#E1FF00" },
@@ -64,15 +95,10 @@ const ProjectTemplate = () => {
     },
   ];
 
-
-
   return (
-
     <div className="min-h-screen bg-[#16141F]">
-
       {/* Header/Navigation */}
       <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-black/80 bg-opacity-80 backdrop-blur-sm ">
-
         <Container>
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
@@ -143,8 +169,9 @@ const ProjectTemplate = () => {
             </div>
             {/* Mobile Menu - visible on small screens */}
             <div
-              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${isMenuOpen ? "translate-x-0" : "translate-x-full"
-                }`}
+              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${
+                isMenuOpen ? "translate-x-0" : "translate-x-full"
+              }`}
             >
               <button
                 onClick={() => setIsMenuOpen(false)}
@@ -210,8 +237,10 @@ const ProjectTemplate = () => {
       </nav>
 
       {/* Hero Banner */}
-      <section id="inicio" className="pt-[100] relative overflow-hidden gradient-project-hero">
-
+      <section
+        id="inicio"
+        className="pt-[100] relative overflow-hidden gradient-project-hero"
+      >
         <Container className="relative z-10">
           <Col cols={{ lg: 5, md: 6, sm: 4 }}>
             <div className="h-full flex flex-col justify-center">
@@ -257,7 +286,11 @@ const ProjectTemplate = () => {
             <div className="relative">
               {/* Placeholder para imagen del proyecto */}
               <div className="w-full flex items-center justify-center">
-                <img src="/img/bgood-hero-img.png" alt="Project image" className="proyect-page-hero-img-shadow" />
+                <img
+                  src="/img/bgood-hero-img.png"
+                  alt="Project image"
+                  className="proyect-page-hero-img-shadow"
+                />
               </div>
             </div>
           </Col>
@@ -267,32 +300,39 @@ const ProjectTemplate = () => {
       {/* Descripción del Proyecto */}
       <section id="descripcion" className="pt-20 bg-white">
         <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center bg-color-ct-tertiary-container rounded-xl p-8">
-            <header>
-              <h2>
-                <Text variant="display" weight="bold" color="#006666" className="mb-6">
+          <Col
+            cols={{ lg: 12, md: 6, sm: 4 }}
+            className="text-center bg-color-ct-tertiary-container rounded-xl p-8"
+          >
+            <div>
+              <h2 className="mb-4">
+                <Text variant="display" weight="bold" color="#006666">
                   Sobre el Proyecto
                 </Text>
               </h2>
-            </header>
-            <div className="flex justify-center bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
-              <p className="text-ch-width mt-4">
+            </div>
+            <div className="flex justify-center">
+              <h2 className="text-ch-width">
+                <Text variant="subtitle" weight="bold" color="#16141F">
+                  BGood es una plataforma web desarrollada para optimizar la
+                  gestión de suministros en edificios.
+                </Text>
+              </h2>
+            </div>
+            <div className="flex justify-center backdrop-blur-sm rounded-2xl border border-white/10">
+              <p className="text-ch-width mt-2">
                 <Text
-                  variant="subtitle"
-                  weight="bold"
+                  variant="body"
                   color="#16141F"
                   className="leading-relaxed"
                 >
-                  Desarrollar e implementar una plataforma web integral que
-                  permita a los administradores de edificios ofrecer a sus
-                  conserjes una tienda en línea personalizada para la
-                  adquisición eficiente de suministros esenciales (uniformes,
-                  limpieza, oficina y ferretería). El objetivo principal es
-                  optimizar todo el proceso de suministro, desde la solicitud
-                  del conserje hasta la recepción conforme del pedido,
-                  integrando un sistema de control de stock robusto y
-                  funcionalidades avanzadas de gestión presupuestaria y
-                  supervisión.
+                  A través de una tienda en línea, los administradores pueden
+                  facilitar a los conserjes la adquisición de productos
+                  esenciales, simplificando el proceso desde la solicitud hasta
+                  la entrega. La plataforma integra un sistema de control de
+                  inventario, gestión de presupuestos y herramientas de
+                  supervisión para garantizar un flujo de trabajo eficiente y
+                  transparente.
                 </Text>
               </p>
 
@@ -314,7 +354,6 @@ const ProjectTemplate = () => {
                 </div>
               </div> */}
             </div>
-
           </Col>
         </Container>
       </section>
@@ -338,25 +377,27 @@ const ProjectTemplate = () => {
                   color="#16141F"
                   className="leading-relaxed"
                 >
-                  El desafío central consistió en diseñar una solución que no
-                  solo facilitara la compra y aprobación de suministros, sino
-                  que también ofreciera un control exhaustivo del inventario en
-                  el almacén. Esto implicó la implementación de un sistema
-                  Kardex integrado para el seguimiento detallado del stock, las
-                  entradas y salidas de cada artículo, evitando así
-                  desabastecimientos y pérdidas. Adicionalmente, se requería la
-                  creación de un flujo de trabajo intuitivo para múltiples roles
-                  de usuario, la gestión de presupuestos descentralizados por
-                  edificio y la provisión de herramientas de supervisión
-                  efectivas para los administradores.
+                  El principal desafío fue crear una solución que, además de
+                  simplificar la compra y aprobación de suministros, permitiera
+                  un control exhaustivo del inventario. Esto implicó la
+                  implementación de un sistema Kardex para el seguimiento de
+                  entradas y salidas de cada artículo, previniendo
+                  desabastecimientos. Adicionalmente, se necesitaba un flujo de
+                  trabajo intuitivo para múltiples roles, una gestión
+                  presupuestaria descentralizada por edificio y herramientas de
+                  supervisión efectivas.
                 </Text>
               </p>
             </div>
           </Col>
 
           <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <div className="w-full h-80 rounded-2xl overflow-hidden project-img-shadow">
-              <img src="/img/shopping-cart.jpg" alt="" className="object-center" />
+            <div className="w-full h-[300px] rounded-2xl overflow-hidden project-img-shadow">
+              <img
+                src="/img/shopping-cart.jpg"
+                alt=""
+                className="object-center"
+              />
             </div>
           </Col>
         </Container>
@@ -367,7 +408,11 @@ const ProjectTemplate = () => {
         <Container>
           <Col cols={{ lg: 6, md: 6, sm: 4 }}>
             <div className="w-full h-full rounded-2xl overflow-hidden project-img-shadow bg-[#F2F2F2]">
-              <img src="/img/super-user-products.jpg" alt="Imagen de detalle de la tabla de productos" className="object-cover" />
+              <img
+                src="/img/super-user-products.jpg"
+                alt="Imagen de detalle de la tabla de productos"
+                className="object-cover"
+              />
             </div>
           </Col>
 
@@ -387,23 +432,15 @@ const ProjectTemplate = () => {
                   color="#16141F"
                   className="leading-relaxed"
                 >
-                  Se desarrolló una web app modular y escalable, con interfaces
-                  de usuario personalizadas para conserjes, administradores,
-                  supervisores y personal de almacén. Los conserjes pueden
-                  realizar pedidos fácilmente a través de un catálogo intuitivo,
-                  los cuales son revisados y aprobados por los administradores,
-                  quienes también gestionan los presupuestos de sus edificios.
-                  La implementación de un sistema Kardex permite al personal de
-                  almacén mantener un control preciso del stock, registrar
-                  entradas y salidas, y asegurar la disponibilidad de los
-                  productos solicitados. Los supervisores tienen una visión
-                  global del proceso y del cumplimiento presupuestario. El
-                  sistema de notificaciones mantiene a todos los usuarios
-                  informados sobre el estado de los pedidos, y la confirmación
-                  de recepción cierra el ciclo de compra. La plataforma se
-                  construyó con tecnologías web modernas, priorizando la
-                  seguridad, la eficiencia y la mejora continua en la gestión de
-                  suministros para edificios.
+                  Se desarrolló una web app modular y escalable con interfaces
+                  personalizadas para cada usuario. Los conserjes realizan
+                  pedidos a través de un catálogo, los cuales son aprobados por
+                  los administradores, quienes también gestionan sus
+                  presupuestos. El sistema Kardex permite al personal de almacén
+                  mantener un control preciso del stock. Los supervisores tienen
+                  una visión global del proceso y del cumplimiento
+                  presupuestario, mientras que las notificaciones mantienen a
+                  todos informados sobre el estado de los pedidos.
                 </Text>
               </p>
             </div>
@@ -414,85 +451,100 @@ const ProjectTemplate = () => {
       {/* Características */}
       <section className="pt-20 bg-[#FFFFFF]">
         <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="mb-12 space-y-6 bg-color-ct-tertiary-container rounded-xl py-8">
+          <Col
+            cols={{ lg: 12, md: 6, sm: 4 }}
+            className=""
+          >
             <header>
               <h2 className="text-center">
-                <Text
-                  variant="headline"
-                  color="#006666"
-                  weight="bold"
-                >
+                <Text variant="headline" color="#006666" weight="bold">
                   Características Principales
                 </Text>
               </h2>
             </header>
 
-            <div className="flex gap-10 px-10">
+            
 
-              <ul className="list-disc">
-                <li>
-                  Catálogo en línea con filtros por categoría y subcategoría.
-                </li>
-                <li>Carrito de compras para seleccionar productos.</li>
-                <li>Funcionalidad para generar solicitudes de pedido.</li>
-                <li>Historial de pedidos realizados.</li>
-                <li>Opción para crear listas de compras recurrentes.</li>
-                <li>Recomendaciones personalizadas de productos (potencial).</li>
-                <li>Panel de control para la gestión de la plataforma.</li>
-                <li>Gestión de perfiles de edificios suscritos.</li>
-                <li>
-                  Revisión y aprobación de pedidos por parte de los
-                  administradores.
-                </li>
-                <li>Generación automática de órdenes de compra.</li>
-                <li>
-                  Establecimiento y gestión de límites presupuestarios anuales y
-                  mensuales por edificio.
-                </li>
-                <li>Visualización del consumo de suministros por edificio.</li>
-                <li>
-                  Administración de cuentas de usuarios (conserjes,
-                  administradores, supervisores, etc.).
-                </li>
-                <li>Recepción y gestión de órdenes de compra en el almacén.</li>
-              </ul>
-
-              <ul className="list-disc">
-                <li>Interfaz para la preparación y el embalaje de pedidos.</li>
-                <li>Registro y seguimiento de los despachos.</li>
-                <li>Panel de supervisión con vista general de la actividad.</li>
-                <li>
-                  Monitoreo del estado de los pedidos en los diferentes edificios.
-                </li>
-                <li>
-                  Visualización del cumplimiento presupuestario por edificio.
-                </li>
-                <li>Posibilidad de generar reportes sobre pedidos y gastos.</li>
-                <li>
-                  Sistema Kardex integrado para el control y seguimiento del stock
-                  en el almacén.
-                </li>
-                <li>Sistema de notificaciones sobre el estado de los pedidos.</li>
-                <li>Seguimiento en tiempo real del estado de cada pedido.</li>
-                <li>
-                  Opción para confirmar la recepción del pedido (conforme o no
-                  conforme).
-                </li>
-                <li>Infraestructura potencial para programas de fidelización.</li>
-                <li>Diseño centrado en la usabilidad.</li>
-                <li>Arquitectura escalable.</li>
-                <li>Medidas de seguridad para la protección de datos.</li>
-              </ul>
-            </div>
+            
+          </Col>
+        </Container>
+        <Container className='bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10'>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+            {services.map((service, index) => (
+              <div key={index} className="bg-color-ct-tertiary-container border-[2px] border-[#00666633] rounded-2xl p-6 flex flex-col items-center text-center">
+                <div className="mb-4 flex items-center justify-center" style={{ backgroundColor: '#16141F', width: '48px', height: '48px', borderRadius: '9999px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon name={service.icon as any} color={service.color} size={32} />
+                </div>
+                <h3 className="mb-4">
+                  <Text variant="subtitle" color="#006666" weight="bold">
+                    {service.title}
+                  </Text>
+                </h3>
+                <Text variant="body" color="#003333" className="opacity-60">
+                  {service.description}
+                </Text>
+                <div
+                  className="mt-8 h-1 w-full rounded-full"
+                  style={{
+                    background: `linear-gradient(90deg, #00666600, #006666, #00666600)`,
+                  }}
+                />
+              </div>
+            ))}
           </Col>
         </Container>
       </section>
 
+      {/* Características */}
+      {/* <section className="pt-20 bg-[#FFFFFF]">
+        <Container>
+          <Col
+            cols={{ lg: 12, md: 6, sm: 4 }}
+            className="mb-12 space-y-6 bg-color-ct-tertiary-container rounded-xl py-8"
+          >
+            <header>
+              <h2 className="text-center">
+                <Text variant="headline" color="#006666" weight="bold">
+                  Características Principales
+                </Text>
+              </h2>
+            </header>
+
+            <div className="flex justify-center gap-10 px-10">              
+              <ul className="list-disc text-ch-width-md">
+                <li>
+                  <span className="font-bold">Gestión de pedidos:</span>{" "}
+                  Catálogo en línea, carrito de compras, historial y listas de
+                  pedidos recurrentes.
+                </li>
+                <li>
+                  <span className="font-bold">Gestión administrativa:</span>{" "}
+                  Aprobación de pedidos, límites presupuestarios, administración
+                  de perfiles y generación de órdenes de compra.
+                </li>
+                <li>
+                  <span className="font-bold">Gestión de inventario:</span>{" "}
+                  Control de stock con sistema Kardex integrado, registro de
+                  entradas y salidas, y preparación de pedidos.
+                </li>
+                <li>
+                  <span className="font-bold">Monitoreo y reportes:</span> Panel
+                  de supervisión, seguimiento en tiempo real, reportes de gastos
+                  y visualización del cumplimiento presupuestario.
+                </li>
+                <li>
+                  <span className="font-bold">Usabilidad y seguridad:</span>{" "}
+                  Diseño intuitivo, arquitectura escalable y protección de
+                  datos.
+                </li>
+              </ul>
+            </div>
+          </Col>
+        </Container>
+      </section> */}
+
       {/* Tecnologías */}
-      <section
-        id="tecnologias"
-        className="py-20 bg-[#FFFFFF]"
-      >
+      <section id="tecnologias" className="pt-10 pb-20 bg-[#FFFFFF]">
         <Container className="justify-center">
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-12 ">
             <header>
@@ -502,10 +554,10 @@ const ProjectTemplate = () => {
                 </Text>
               </h2>
             </header>
-            <p>
+            <p className="text-ch-width center">
               <Text variant="subtitle" color="#16141F" className="opacity-80">
-                Stack tecnológico moderno para máximo rendimiento y
-                escalabilidad
+                La plataforma fue construida con un stack tecnológico moderno
+                para garantizar el máximo rendimiento y escalabilidad.
               </Text>
             </p>
           </Col>
@@ -532,12 +584,21 @@ const ProjectTemplate = () => {
       </section>
 
       {/* CTA Section */}
-      <section id="cta" className="py-20" style={{ backgroundColor: "#E1FF00" }}>
+      <section
+        id="cta"
+        className="py-20"
+        style={{ backgroundColor: "#E1FF00" }}
+      >
         <Container>
           <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto text-center">
             <header>
               <h2 className="mb-6">
-                <Text variant="headline" weight="bold" color="#16141F" className="mb-6">
+                <Text
+                  variant="headline"
+                  weight="bold"
+                  color="#16141F"
+                  className="mb-6"
+                >
                   ¿Te Interesa un Proyecto Similar?
                 </Text>
               </h2>
@@ -580,7 +641,7 @@ const ProjectTemplate = () => {
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <header>
               <h2 className="mb-6">
-                <Text variant="headline" weight="bold" color="#FF5B00" >
+                <Text variant="headline" weight="bold" color="#FF5B00">
                   Otros Proyectos
                 </Text>
               </h2>
