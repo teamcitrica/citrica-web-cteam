@@ -9,8 +9,7 @@ import { Divider, Link } from "@heroui/react";
 import DotGrid from "./versions/yolanda/components/DotGrid";
 import { addToast } from "@heroui/toast";
 import Navbar from "../shared/components/citrica-ui/organism/navbar";
-import ProjectsGallery from '@/shared/components/project-components/project-gallery'; 
-
+import ProjectsGallery from "@/shared/components/project-components/project-gallery";
 
 import {
   Avatar,
@@ -56,9 +55,9 @@ const CitricaWebsite = () => {
 
   const projects = [
     {
-      title: "E-commerce Fashion",
+      title: "BGood",
       description:
-        "Plataforma completa de comercio electrónico con gestión de inventario",
+        "Plataforma Inteligente para la Gestión Integral de Suministros en Edificios.",
       tech: "React • Node.js • MongoDB",
       image: "/e-commerce.png",
     },
@@ -77,32 +76,37 @@ const CitricaWebsite = () => {
     },
   ];
 
-    const otherProjects = [
+  const otherProjects = [
     {
       id: 1,
-      title: "E-commerce Fashion",
+      image: "/img/bgood-hero-img.png",
+      title: "BGood",
       description:
-        "Plataforma completa de comercio electrónico con gestión de inventario avanzada",
+        "Plataforma Inteligente para la Gestión Integral de Suministros en Edificios.",
       tech: ["React", "Node.js", "PostgreSQL"],
       category: "E-commerce",
+      link: "/project-bgood",
     },
     {
       id: 2,
-      title: "FinTech Dashboard",
+      image: "/img/bgood-hero-img.png",
+      title: "MiOllita Mobile App",
       description:
-        "Dashboard de análisis financiero en tiempo real con visualizaciones interactivas",
+        "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.",
       tech: ["Vue.js", "Python", "MongoDB"],
-      category: "FinTech",
+      category: "Mobile App",
+      link: "/project-miollita",
     },
     {
       id: 3,
-      title: "HealthCare Platform",
-      description: "Sistema integral de gestión médica con telemedicina",
+      image: "/img/cojones-hero-img.png",
+      title: "Co.Jones",
+      description: "Web Estratégico para Captación de Clientes",
       tech: ["Next.js", "Express", "MySQL"],
-      category: "HealthTech",
+      category: "Website",
+      link: "/project-cojones",
     },
   ];
-
 
   const technologies = [
     {
@@ -136,17 +140,58 @@ const CitricaWebsite = () => {
   ];
 
   const process = [
-    { step: "01", icon: "ClipboardList", title: "Planificación", description: "Definimos objetivos y estrategia del proyecto", color: "#e1ff00" },
-    { step: "02", icon: "Palette", title: "Diseño", description: "Creamos prototipos y experiencias de usuario", color: "#ff5b00" },
-    { step: "03", icon: "Code", title: "Desarrollo", description: "Construimos tu solución con las mejores tecnologías", color: "#00FFFF" },
-    { step: "04", icon: "TestTube", title: "Pruebas", description: "Validamos calidad y rendimiento exhaustivamente", color: "#FF00D4" },
-    { step: "05", icon: "Rocket", title: "Implementación", description: "Desplegamos tu proyecto de forma segura", color: "#E1FF00" },
-    { step: "06", icon: "Headphones", title: "Soporte", description: "Mantenimiento continuo y evolución constante", color: "#FF5B00" }
-  ]
+    {
+      step: "01",
+      icon: "ClipboardList",
+      title: "Planificación",
+      description: "Definimos objetivos y estrategia del proyecto",
+      color: "#e1ff00",
+    },
+    {
+      step: "02",
+      icon: "Palette",
+      title: "Diseño",
+      description: "Creamos prototipos y experiencias de usuario",
+      color: "#ff5b00",
+    },
+    {
+      step: "03",
+      icon: "Code",
+      title: "Desarrollo",
+      description: "Construimos tu solución con las mejores tecnologías",
+      color: "#00FFFF",
+    },
+    {
+      step: "04",
+      icon: "TestTube",
+      title: "Pruebas",
+      description: "Validamos calidad y rendimiento exhaustivamente",
+      color: "#FF00D4",
+    },
+    {
+      step: "05",
+      icon: "Rocket",
+      title: "Implementación",
+      description: "Desplegamos tu proyecto de forma segura",
+      color: "#E1FF00",
+    },
+    {
+      step: "06",
+      icon: "Headphones",
+      title: "Soporte",
+      description: "Mantenimiento continuo y evolución constante",
+      color: "#FF5B00",
+    },
+  ];
 
   const stats = [
     // { icon: "CheckCircle", number: 150, suffix: "+", label: "Proyectos Entregados" },
-    { icon: "CheckCircle", number: 98, suffix: "%", label: "Clientes Satisfechos" },
+    {
+      icon: "CheckCircle",
+      number: 98,
+      suffix: "%",
+      label: "Clientes Satisfechos",
+    },
     { icon: "CheckCircle", number: 24, suffix: "/7", label: "Soporte activo" },
     {
       icon: "CheckCircle",
@@ -160,28 +205,51 @@ const CitricaWebsite = () => {
     <div className="min-h-screen" style={{ backgroundColor: "#16141F" }}>
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-black/80 bg-opacity-80 backdrop-blur-sm ">
-        <Container>
+        <Container className="py-2">
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
+            noPadding
             className="flex justify-between items-center pt-4"
           >
+            <Link href="/"></Link>
             <div className="flex items-center space-x-2">
-              <div className="w-24 h-16">
-                <img src="/img/citrica-logo.png" alt="Logo Cítrica" />
+              <div className="w-24 h-17">
+                <img
+                  src="/img/citrica-logo.png"
+                  alt="Logo Cítrica"
+                  className="h-12"
+                />
               </div>
             </div>
             <div className="hidden lg:flex space-x-8">
               <a href="#inicio" className="hover:opacity-80 transition-opacity">
-                <Text variant="body" color="#FFFFFF">Inicio</Text>
+                <Text variant="body" color="#FFFFFF">
+                  Inicio
+                </Text>
               </a>
-              <a href="#servicios" className="hover:opacity-80 transition-opacity">
-                <Text variant="body" color="#FFFFFF">Servicios</Text>
+              <a
+                href="#servicios"
+                className="hover:opacity-80 transition-opacity"
+              >
+                <Text variant="body" color="#FFFFFF">
+                  Servicios
+                </Text>
               </a>
-              <a href="#proyectos" className="hover:opacity-80 transition-opacity">
-                <Text variant="body" color="#FFFFFF">Proyectos</Text>
+              <a
+                href="#proyectos"
+                className="hover:opacity-80 transition-opacity"
+              >
+                <Text variant="body" color="#FFFFFF">
+                  Proyectos
+                </Text>
               </a>
-              <a href="#contacto" className="hover:opacity-80 transition-opacity">
-                <Text variant="body" color="#FFFFFF">Contacto</Text>
+              <a
+                href="#contacto"
+                className="hover:opacity-80 transition-opacity"
+              >
+                <Text variant="body" color="#FFFFFF">
+                  Contacto
+                </Text>
               </a>
             </div>
             {/* Right side - action button + hamburger on small screens only */}
@@ -201,7 +269,11 @@ const CitricaWebsite = () => {
               </div>
               <div className="md:hidden ml-4">
                 <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                  <Icon name={isMenuOpen ? "X" : "Menu"} color="#FFFFFF" size={24} />
+                  <Icon
+                    name={isMenuOpen ? "X" : "Menu"}
+                    color="#FFFFFF"
+                    size={24}
+                  />
                 </button>
               </div>
             </div>
@@ -219,24 +291,40 @@ const CitricaWebsite = () => {
                 <Icon name="X" color="#FFFFFF" size={28} />
               </button>
 
-              <a href="#inicio" className="text-white text-lg" onClick={() => setIsMenuOpen(false)}>
+              <a
+                href="#inicio"
+                className="text-white text-lg"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 <Text variant="body" color="#FFFFFF">
                   Inicio
                 </Text>
               </a>
-              <a href="#servicios" className="text-white text-lg" onClick={() => setIsMenuOpen(false)}>
+              <a
+                href="#servicios"
+                className="text-white text-lg"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 <Text variant="body" color="#FFFFFF">
                   Servicios
                 </Text>
               </a>
-              <a href="#proyectos" className="text-white text-lg" onClick={() => setIsMenuOpen(false)}>
+              <a
+                href="#proyectos"
+                className="text-white text-lg"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 <Text variant="body" color="#FFFFFF">
                   Proyectos
                 </Text>
               </a>
-              <a href="#contacto" className="text-white text-lg" onClick={() => setIsMenuOpen(false)}>
+              <a
+                href="#contacto"
+                className="text-white text-lg"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 <Text variant="body" color="#FFFFFF">
-                Contacto
+                  Contacto
                 </Text>
               </a>
 
@@ -292,7 +380,8 @@ const CitricaWebsite = () => {
               </h2>
               <p>
                 <Text variant="body" color="#FFFFFF">
-                  Transformamos tus ideas en soluciones digitales que impulsan el crecimiento de tu empresa
+                  Transformamos tus ideas en soluciones digitales que impulsan
+                  el crecimiento de tu empresa
                 </Text>
               </p>
             </div>
@@ -321,7 +410,6 @@ const CitricaWebsite = () => {
           </Col>
         </Container>
 
-        
         {/* Services Grid */}
         <Container className="bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
           <Col
@@ -377,7 +465,7 @@ const CitricaWebsite = () => {
             ))}
           </Col>
         </Container>
-      </section>      
+      </section>
 
       <section id="servicios">
         <Container>
@@ -413,7 +501,10 @@ const CitricaWebsite = () => {
               </div>
 
               {/* Stats Icons */}
-              <Col cols={{ lg: 12, md: 4, sm: 4 }} className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full'>
+              <Col
+                cols={{ lg: 12, md: 4, sm: 4 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full"
+              >
                 {stats.map((stat, index) => (
                   <div
                     key={index}
@@ -439,7 +530,7 @@ const CitricaWebsite = () => {
             </div>
           </Col>
         </Container>
-      </section>      
+      </section>
 
       {/* About Us */}
       <section className="py-20">
@@ -452,8 +543,9 @@ const CitricaWebsite = () => {
             </h2>
             <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
               <Text variant="body" color="#FFFFFF" className="opacity-90">
-                Somos un equipo de desarrolladores y diseñadores apasionados por crear
-                experiencias digitales excepcionales que transforman negocios.
+                Somos un equipo de desarrolladores y diseñadores apasionados por
+                crear experiencias digitales excepcionales que transforman
+                negocios.
               </Text>
             </Col>
           </Col>
@@ -519,53 +611,42 @@ const CitricaWebsite = () => {
       </section>
 
       {/* Latest Projects */}
-            <section id="proyectos" className="py-20 bg-[#580049]">
+      <section id="proyectos" className="py-20 gradient-project-hero">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <h2 className="mb-6">
-              <Text variant="headline" color="#E5FFFF" weight="bold">
+              <Text variant="headline" color="#FFFFFF" weight="bold">
                 Últimos proyectos
               </Text>
             </h2>
-            <Text variant="body" color="#E5FFFF" className="opacity-80">
+            <Text variant="body" color="#E5FFFF">
               Conoce algunos de nuestros trabajos más recientes
             </Text>
           </Col>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {otherProjects.map((project, index) => (
+            {otherProjects.map((otherProjects, index) => (
               <article
-                key={project.id}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-[#E1FF00]/30 transition-all duration-300 hover:transform hover:scale-105"
+                key={otherProjects.id}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border-[2px] border-[#E1FF0022]"
               >
                 {/* Imagen placeholder */}
-                <div className="h-48 bg-gradient-to-br from-[#E1FF00]/20 to-[#FF5B00]/20 flex items-center justify-center">
-                  <div className="text-center">
-                    <Icon name="Image" size={48} color="#E1FF00" />
-                    <div className="mt-2">
-                      <Text
-                        variant="label"
-                        color="#E5FFFF"
-                        className="opacity-50"
-                      >
-                        [{project.category}]
-                      </Text>
-                    </div>
-                  </div>
+                <div className="h-48 gradient-project-hero flex items-center justify-center overflow-hidden">
+                  <img src={otherProjects.image} alt="" />
                 </div>
 
                 <div className="p-6">
                   {/* Categoría */}
-                  <div className="inline-block px-3 py-1 bg-[#FF5B00]/20 border border-[#FF5B00]/30 rounded-full mb-4">
-                    <Text variant="label" color="#FF5B00">
-                      {project.category}
+                  <div className="inline-block px-3 py-1 bg-[#E1FF00]/20 border border-[#E1FF00]/30 rounded-full mb-4">
+                    <Text variant="label" color="#E1FF00">
+                      {otherProjects.category}
                     </Text>
                   </div>
 
                   {/* Título */}
                   <h3 className="mb-3">
                     <Text variant="subtitle" color="#FFFFFF">
-                      {project.title}
+                      {otherProjects.title}
                     </Text>
                   </h3>
 
@@ -573,10 +654,10 @@ const CitricaWebsite = () => {
                   <p className="mb-4">
                     <Text
                       variant="body"
-                      color="#FFFFFF"
-                      className="opacity-70 leading-relaxed"
+                      color="#FFFFFFBB"
+                      className="leading-relaxed"
                     >
-                      {project.description}
+                      {otherProjects.description}
                     </Text>
                   </p>
 
@@ -595,25 +676,20 @@ const CitricaWebsite = () => {
                   </div> */}
 
                   {/* Botón */}
-                  <Button
-                    onClick={() => {
-                      addToast({
-                        title: "Proyecto seleccionado",
-                        description: `Viendo detalles de ${project.title}`,
-                        color: "success",
-                      });
-                    }}
-                    label="Ver Detalles"
-                    variant="secondary"
-                    className="w-full bg-[#E1FF00] text-[#E1FF00] hover:bg-[#E1FF00]/10 rounded-full"
-                  />
+                  <Link href={otherProjects.link} className="w-full">
+                    <Button
+                      onClick={() => {}}
+                      label="Ver Detalles"
+                      variant="secondary"
+                      className="w-full bg-[#E1FF00] text-[#E1FF00] rounded-full"
+                    />
+                  </Link>
                 </div>
               </article>
             ))}
           </div>
-            
-            
-            {/* ESTAS SON LAS CARDS ANTIGUAS , COMENTADAS POR SI SE NECESITAN LUEGO  */}
+
+          {/* ESTAS SON LAS CARDS ANTIGUAS , COMENTADAS POR SI SE NECESITAN LUEGO  */}
           {/* <Col cols={{ lg: 12, md: 6, sm: 4 }} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {projects.map((project, index) => (
               <div key={index} className="bg-[#12111180] backdrop-blur-3xl border border-[#292929e6] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-105 hover:-rotate-1 animate-fade-in-up group" style={{ animationDelay: `${index * 150}ms` }}>
@@ -658,7 +734,9 @@ const CitricaWebsite = () => {
             </h2>
             <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
               <Text variant="body" color="#FFFFFF" className="opacity-90">
-                En Cítrica, utilizamos un conjunto de tecnologías de vanguardia para garantizar que tus productos digitales sean de la más alta calidad:
+                En Cítrica, utilizamos un conjunto de tecnologías de vanguardia
+                para garantizar que tus productos digitales sean de la más alta
+                calidad:
               </Text>
             </Col>
           </Col>
@@ -913,7 +991,8 @@ const CitricaWebsite = () => {
             </div>
             <h2 className="mb-8 lg:text-center md:text-center">
               <Text variant="label" color="#FFFFFF" className="opacity-70">
-                Transformamos ideas en soluciones digitales que impulsan el crecimiento de tu negocio.
+                Transformamos ideas en soluciones digitales que impulsan el
+                crecimiento de tu negocio.
               </Text>
             </h2>
           </Col>

@@ -6,6 +6,7 @@ import Icon from "@ui/atoms/icon";
 import Button from "@ui/molecules/button";
 import { addToast } from "@heroui/toast";
 import { Divider, Link } from "@heroui/react";
+import NotFound from "../not-found";
 
 const ProjectTemplate = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,42 +23,51 @@ const ProjectTemplate = () => {
   const services = [
     {
       title: "Gestión de pedidos",
-      description: "Catálogo en línea, carrito de compras, historial y listas de pedidos recurrentes.",
+      description:
+        "Catálogo en línea, carrito de compras, historial y listas de pedidos recurrentes.",
       icon: "ListCheck",
       color: "#E1FF00",
     },
     {
       title: "Gestión administrativa",
-      description: "Aprobación de pedidos, límites presupuestarios, administración de perfiles y generación de órdenes de compra.",
+      description:
+        "Aprobación de pedidos, límites presupuestarios, administración de perfiles y generación de órdenes de compra.",
       icon: "FolderKanban",
       color: "#00FFFF",
     },
     {
       title: "Gestión de inventario",
-      description: "Control de stock con sistema Kardex integrado, registro de entradas y salidas, y preparación de pedidos.",
+      description:
+        "Control de stock con sistema Kardex integrado, registro de entradas y salidas, y preparación de pedidos.",
       icon: "Blocks",
       color: "#FF5B00",
     },
     {
       title: "Monitoreo y reportes",
-      description: "Panel de supervisión, seguimiento en tiempo real, reportes de gastos y visualización del cumplimiento presupuestario.",
+      description:
+        "Panel de supervisión, seguimiento en tiempo real, reportes de gastos y visualización del cumplimiento presupuestario.",
       icon: "ScanSearch",
       color: "#E1FF00",
     },
     {
       title: "Usabilidad y seguridad",
-      description: "Diseño intuitivo, arquitectura escalable y protección de datos.",
+      description:
+        "Diseño intuitivo, arquitectura escalable y protección de datos.",
       icon: "Lock",
       color: "#E1FF00",
     },
   ];
 
   const technologies = [
-    { name: "React", icon: "Code", color: "#E1FF00" },
-    { name: "Node.js", icon: "Server", color: "#00FFFF" },
+    { name: "HTML 5", icon: "Code", color: "#FF5B00" },
+    { name: "TypeScript", icon: "Code", color: "#FF5B00" },
+    { name: "React JS", icon: "Code", color: "#FF5B00" },
+    { name: "Next JS", icon: "Code", color: "#FF5B00" },
+    { name: "CSS 3", icon: "PaintBucket", color: "#FF5B00" },
+    { name: "Sass", icon: "PaintBucket", color: "#FF5B00" },
+    { name: "Node.js", icon: "Server", color: "#FF5B00" },
+    { name: "AWS", icon: "Cloud", color: "#FF5B00" },
     { name: "MongoDB", icon: "Database", color: "#FF5B00" },
-    { name: "TypeScript", icon: "FileCode", color: "#E1FF00" },
-    { name: "AWS", icon: "Cloud", color: "#00FFFF" },
   ];
 
   const features = [
@@ -99,16 +109,23 @@ const ProjectTemplate = () => {
     <div className="min-h-screen bg-[#16141F]">
       {/* Header/Navigation */}
       <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-black/80 bg-opacity-80 backdrop-blur-sm ">
-        <Container>
+        <Container className="py-2">
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
+            noPadding
             className="flex justify-between items-center pt-4"
           >
-            <div className="flex items-center space-x-2">
-              <div className="w-24 h-16">
-                <img src="/img/citrica-logo.png" alt="Logo Cítrica" />
+            <Link href="/">
+              <div className="flex items-center space-x-2">
+                <div className="w-24 h-17">
+                  <img
+                    src="/img/citrica-logo.png"
+                    alt="Logo Cítrica"
+                    className="h-12"
+                  />
+                </div>
               </div>
-            </div>
+            </Link>
             <div className="hidden lg:flex space-x-8">
               <a href="#inicio" className="hover:opacity-80 transition-opacity">
                 <Text variant="body" color="#E5FFFF">
@@ -136,7 +153,7 @@ const ProjectTemplate = () => {
                 className="hover:opacity-80 transition-opacity"
               >
                 <Text variant="body" color="#E5FFFF">
-                  Otros proyectos
+                  Otros Proyectos
                 </Text>
               </a>
             </div>
@@ -191,46 +208,48 @@ const ProjectTemplate = () => {
                 </Text>
               </a>
               <a
-                href="#servicios"
+                href="#descripcion"
                 className="text-white text-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Text variant="body" color="#E5FFFF">
-                  Servicios
+                  Sobre el Proyecto
                 </Text>
               </a>
               <a
-                href="#proyectos"
+                href="#solucion"
                 className="text-white text-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Text variant="body" color="#E5FFFF">
-                  Proyectos
+                  La Solución
                 </Text>
               </a>
               <a
-                href="#contacto"
+                href="#otros-proyectos"
                 className="text-white text-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Text variant="body" color="#E5FFFF">
-                  Contacto
+                  Otros Proyectos
                 </Text>
               </a>
 
               {/* Botón CTA */}
-              <Button
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  document
-                    .getElementById("contacto")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-                label="Hablemos"
-                color="primary"
-                variant="primary"
-                className="w-full bg-[#E1FF00] text-black rounded-[80]"
-              />
+              <Link href="/">
+                <Button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    document
+                      .getElementById("contacto")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  label="Hablemos"
+                  color="primary"
+                  variant="primary"
+                  className="px-8 mt-[10px] bg-[#E1FF00] text-black rounded-[80]"
+                />
+              </Link>
             </div>
           </Col>
         </Container>
@@ -242,7 +261,7 @@ const ProjectTemplate = () => {
         className="pt-[100] relative overflow-hidden gradient-project-hero"
       >
         <Container className="relative z-10">
-          <Col cols={{ lg: 5, md: 6, sm: 4 }}>
+          <Col cols={{ lg: 5, md: 6, sm: 4 }} noPadding>
             <div className="h-full flex flex-col justify-center">
               {/* Categoría */}
               <div className="block w-fit px-5 py-1 bg-[#00FFFF]/20 border border-[#00FFFF]/30 rounded-full mb-5">
@@ -302,7 +321,7 @@ const ProjectTemplate = () => {
         <Container>
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
-            className="text-center bg-color-ct-tertiary-container rounded-xl p-8"
+            className="text-center bg-color-ct-tertiary-container border-[2px] border-[#00666633] rounded-xl p-8"
           >
             <div>
               <h2 className="mb-4">
@@ -361,8 +380,8 @@ const ProjectTemplate = () => {
       {/* Desafío */}
       <section className="pt-20 bg-[#FFFFFF]">
         <Container>
-          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <div className="space-y-6">
+          <Col cols={{ lg: 6, md: 6, sm: 4 }} noPadding>
+            <div className="space-y-6 pr-[56px]">
               <header>
                 <h2>
                   <Text variant="headline" weight="bold" color="#006666">
@@ -375,7 +394,7 @@ const ProjectTemplate = () => {
                 <Text
                   variant="body"
                   color="#16141F"
-                  className="leading-relaxed"
+                  className="leading-relaxed-[28px]"
                 >
                   El principal desafío fue crear una solución que, además de
                   simplificar la compra y aprobación de suministros, permitiera
@@ -391,8 +410,8 @@ const ProjectTemplate = () => {
             </div>
           </Col>
 
-          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <div className="w-full h-[300px] rounded-2xl overflow-hidden project-img-shadow">
+          <Col cols={{ lg: 6, md: 6, sm: 4 }} noPadding>
+            <div className="w-full h-[475px] rounded-2xl overflow-hidden project-img-shadow">
               <img
                 src="/img/shopping-cart.jpg"
                 alt=""
@@ -406,7 +425,7 @@ const ProjectTemplate = () => {
       {/* Solución */}
       <section id="solucion" className="pt-20 bg-[#FFFFFF]">
         <Container>
-          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
+          <Col cols={{ lg: 6, md: 6, sm: 4 }} noPadding>
             <div className="w-full h-full rounded-2xl overflow-hidden project-img-shadow bg-[#F2F2F2]">
               <img
                 src="/img/super-user-products.jpg"
@@ -416,8 +435,8 @@ const ProjectTemplate = () => {
             </div>
           </Col>
 
-          <Col cols={{ lg: 6, md: 6, sm: 4 }}>
-            <div className="space-y-6">
+          <Col cols={{ lg: 6, md: 6, sm: 4 }} noPadding>
+            <div className="space-y-6 pl-[56px]">
               <header>
                 <h2>
                   <Text variant="headline" weight="bold" color="#006666">
@@ -451,10 +470,7 @@ const ProjectTemplate = () => {
       {/* Características */}
       <section className="pt-20 bg-[#FFFFFF]">
         <Container>
-          <Col
-            cols={{ lg: 12, md: 6, sm: 4 }}
-            className=""
-          >
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="">
             <header>
               <h2 className="text-center">
                 <Text variant="headline" color="#006666" weight="bold">
@@ -462,18 +478,36 @@ const ProjectTemplate = () => {
                 </Text>
               </h2>
             </header>
-
-            
-
-            
           </Col>
         </Container>
-        <Container className='bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10'>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+        <Container className="bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
+          <Col
+            cols={{ lg: 12, md: 6, sm: 4 }}
+            noPadding
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4"
+          >
             {services.map((service, index) => (
-              <div key={index} className="bg-color-ct-tertiary-container border-[2px] border-[#00666633] rounded-2xl p-6 flex flex-col items-center text-center">
-                <div className="mb-4 flex items-center justify-center" style={{ backgroundColor: '#16141F', width: '48px', height: '48px', borderRadius: '9999px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon name={service.icon as any} color={service.color} size={32} />
+              <div
+                key={index}
+                className="bg-color-ct-tertiary-container border-[2px] border-[#00666633] rounded-2xl p-6 flex flex-col items-center text-center"
+              >
+                <div
+                  className="mb-4 flex items-center justify-center"
+                  style={{
+                    backgroundColor: "#16141F",
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "9999px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Icon
+                    name={service.icon as any}
+                    color={service.color}
+                    size={32}
+                  />
                 </div>
                 <h3 className="mb-4">
                   <Text variant="subtitle" color="#006666" weight="bold">
@@ -483,12 +517,12 @@ const ProjectTemplate = () => {
                 <Text variant="body" color="#003333" className="opacity-60">
                   {service.description}
                 </Text>
-                <div
+                {/* <div
                   className="mt-8 h-1 w-full rounded-full"
                   style={{
                     background: `linear-gradient(90deg, #00666600, #006666, #00666600)`,
                   }}
-                />
+                /> */}
               </div>
             ))}
           </Col>
