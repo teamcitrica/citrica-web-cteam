@@ -99,7 +99,7 @@ const CitricaWebsite = () => {
     },
     {
       id: 3,
-      image: "/img/bgood-hero-img.png",
+      image: "/img/cojones-hero-img.png",
       title: "Co.Jones",
       description: "Web Estratégico para Captación de Clientes",
       tech: ["Next.js", "Express", "MySQL"],
