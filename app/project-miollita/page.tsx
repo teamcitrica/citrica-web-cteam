@@ -22,37 +22,44 @@ const ProjectTemplate = () => {
 
   const services = [
     {
-      title: "Gestión de pedidos",
+      title: "Planificación flexible",
       description:
-        "Catálogo en línea, carrito de compras, historial y listas de pedidos recurrentes.",
+        "Elige cómo quieres organizar tus comidas: por día, recibiendo sugerencias instantáneas, o por semana, creando un menú completo y guardándolo.",
       icon: "ListCheck",
       color: "#E1FF00",
     },
     {
-      title: "Gestión administrativa",
+      title: "Sugerencias instantáneas",
       description:
-        "Aprobación de pedidos, límites presupuestarios, administración de perfiles y generación de órdenes de compra.",
+        "Solo selecciona la comida que quieres preparar, y MiOllita te ofrece ideas rápidas y deliciosas para el desayuno, el almuerzo y la cena.",
       icon: "FolderKanban",
       color: "#00FFFF",
     },
     {
-      title: "Gestión de inventario",
+      title: "Función Chocolatea",
       description:
-        "Control de stock con sistema Kardex integrado, registro de entradas y salidas, y preparación de pedidos.",
+        "¿No puedes decidirte? Selecciona tus opciones favoritas y Chocolatea elegirá una receta al azar para ti, resolviendo tu indecisión en segundos.",
       icon: "Blocks",
       color: "#FF5B00",
     },
     {
-      title: "Monitoreo y reportes",
+      title: "Menú semanal personalizado",
       description:
-        "Panel de supervisión, seguimiento en tiempo real, reportes de gastos y visualización del cumplimiento presupuestario.",
+        "Planifica tu menú para toda la semana con facilidad. Usa las recetas de la app o agrega las tuyas, y guarda tu menú para no tener que preocuparte más.",
       icon: "ScanSearch",
       color: "#E1FF00",
     },
     {
-      title: "Usabilidad y seguridad",
+      title: "Recetas simples y sabrosas",
       description:
-        "Diseño intuitivo, arquitectura escalable y protección de datos.",
+        "La app se enfoca en recetas fáciles de seguir y pensadas para simplificar tu rutina diaria, haciéndote la vida más sencilla.",
+      icon: "Lock",
+      color: "#E1FF00",
+    },
+    {
+      title: "Notificaciones inteligentes",
+      description:
+        "Recibe recordatorios para cada comida, enviados justo a la hora adecuada, para que siempre sepas qué vas a cocinar.",
       icon: "Lock",
       color: "#E1FF00",
     },
@@ -266,7 +273,7 @@ const ProjectTemplate = () => {
               {/* Categoría */}
               <div className="block w-fit px-5 py-1 bg-[#00FFFF]/20 border border-[#00FFFF]/30 rounded-full mb-5">
                 <Text variant="label" color="#00FFFF">
-                  E-Commerce
+                  Mobile App
                 </Text>
               </div>
               <header>
@@ -277,15 +284,15 @@ const ProjectTemplate = () => {
                     color="#FFFFFF"
                     className="leading-tight"
                   >
-                    BGood
+                    MiOllita
                   </Text>
                 </h1>
               </header>
 
               <h2 className="mb-9">
                 <Text variant="title" color="#00FFFF">
-                  Plataforma Inteligente para la Gestión Integral de Suministros
-                  en Edificios.
+                  App para ayudar a decidir qué cocinar y planificar las
+                  comidas.
                 </Text>
               </h2>
 
@@ -306,7 +313,7 @@ const ProjectTemplate = () => {
               {/* Placeholder para imagen del proyecto */}
               <div className="w-full flex items-center justify-center">
                 <img
-                  src="/img/bgood-hero-img.png"
+                  src="/img/miollita-hero-img-lg.png"
                   alt="Project image"
                   className="proyect-page-hero-img-shadow"
                 />
@@ -333,8 +340,8 @@ const ProjectTemplate = () => {
             <div className="flex justify-center">
               <h2 className="text-ch-width">
                 <Text variant="subtitle" weight="bold" color="#16141F">
-                  BGood es una plataforma web desarrollada para optimizar la
-                  gestión de suministros en edificios.
+                  MiOllita es una aplicación de recetas diseñada para liberar a
+                  las personas del estrés diario de decidir qué cocinar.
                 </Text>
               </h2>
             </div>
@@ -345,13 +352,11 @@ const ProjectTemplate = () => {
                   color="#16141F"
                   className="leading-relaxed"
                 >
-                  A través de una tienda en línea, los administradores pueden
-                  facilitar a los conserjes la adquisición de productos
-                  esenciales, simplificando el proceso desde la solicitud hasta
-                  la entrega. La plataforma integra un sistema de control de
-                  inventario, gestión de presupuestos y herramientas de
-                  supervisión para garantizar un flujo de trabajo eficiente y
-                  transparente.
+                  Nuestra app ofrece una solución simple y efectiva para
+                  encontrar inspiración al instante, ya sea para el desayuno, el
+                  almuerzo o la cena. Además, brinda herramientas para
+                  planificar tus comidas semanalmente, garantizando que tengas
+                  un menú organizado y listo para disfrutar.
                 </Text>
               </p>
 
@@ -396,15 +401,14 @@ const ProjectTemplate = () => {
                   color="#16141F"
                   className="leading-relaxed-[28px]"
                 >
-                  El principal desafío fue crear una solución que, además de
-                  simplificar la compra y aprobación de suministros, permitiera
-                  un control exhaustivo del inventario. Esto implicó la
-                  implementación de un sistema Kardex para el seguimiento de
-                  entradas y salidas de cada artículo, previniendo
-                  desabastecimientos. Adicionalmente, se necesitaba un flujo de
-                  trabajo intuitivo para múltiples roles, una gestión
-                  presupuestaria descentralizada por edificio y herramientas de
-                  supervisión efectivas.
+                  El principal desafío fue crear una herramienta que no solo
+                  ofreciera ideas de recetas, sino que realmente solucionara la
+                  indecisión y la falta de tiempo. La solución debía ser rápida,
+                  intuitiva y capaz de adaptarse a las necesidades de cada
+                  usuario, ya sea que busquen una sugerencia para hoy o quieran
+                  organizar toda la semana. Además, necesitábamos una función
+                  lúdica y útil, como la de seleccionar una opción al azar, para
+                  aquellos momentos de verdadera duda.
                 </Text>
               </p>
             </div>
@@ -451,15 +455,16 @@ const ProjectTemplate = () => {
                   color="#16141F"
                   className="leading-relaxed"
                 >
-                  Se desarrolló una web app modular y escalable con interfaces
-                  personalizadas para cada usuario. Los conserjes realizan
-                  pedidos a través de un catálogo, los cuales son aprobados por
-                  los administradores, quienes también gestionan sus
-                  presupuestos. El sistema Kardex permite al personal de almacén
-                  mantener un control preciso del stock. Los supervisores tienen
-                  una visión global del proceso y del cumplimiento
-                  presupuestario, mientras que las notificaciones mantienen a
-                  todos informados sobre el estado de los pedidos.
+                  Desarrollamos una aplicación con una interfaz limpia y
+                  amigable, dividida en dos flujos principales: la planificación
+                  diaria y la semanal. Para la planificación diaria, el usuario
+                  simplemente selecciona la comida del día y recibe sugerencias
+                  instantáneas de recetas. La función "Chocolatea" fue integrada
+                  para permitir que la app escoja al azar entre las opciones
+                  favoritas del usuario, eliminando la indecisión. Para la
+                  planificación semanal, el usuario puede organizar cada comida,
+                  utilizando tanto las sugerencias de la app como sus propias
+                  recetas, y guardar su menú para consultarlo fácilmente.
                 </Text>
               </p>
             </div>
@@ -590,8 +595,7 @@ const ProjectTemplate = () => {
             </header>
             <p className="text-ch-width center">
               <Text variant="subtitle" color="#16141F" className="opacity-80">
-                La plataforma fue construida con un stack tecnológico moderno
-                para garantizar el máximo rendimiento y escalabilidad.
+                La aplicación fue desarrollada con tecnologías modernas y versátiles que nos permitió crear una experiencia fluida y optimizada. Esto asegura que la app funcione de manera rápida y eficiente en dispositivos Android.
               </Text>
             </p>
           </Col>
