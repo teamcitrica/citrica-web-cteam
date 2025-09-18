@@ -286,7 +286,7 @@ const ProjectTemplate = () => {
                   variant="primary"
                   color="default"
                   onClick={handleContactClick}
-                  className="bg-[#00FFFF] text-[#003333] hover:bg-[#E1FF00]/90 rounded-full px-5"
+                  className="bg-[#00FFFF] text-[#003333] rounded-full px-5"
                 />
               </div>
             </div>
