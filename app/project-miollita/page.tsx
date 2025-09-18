@@ -68,10 +68,8 @@ const ProjectTemplate = () => {
   const technologies = [
     { name: "HTML 5", icon: "Code", color: "#FF5B00" },
     { name: "TypeScript", icon: "Code", color: "#FF5B00" },
-    { name: "React JS", icon: "Code", color: "#FF5B00" },
-    { name: "Next JS", icon: "Code", color: "#FF5B00" },
+    { name: "React Native", icon: "Code", color: "#FF5B00" },
     { name: "CSS 3", icon: "PaintBucket", color: "#FF5B00" },
-    { name: "Sass", icon: "PaintBucket", color: "#FF5B00" },
     { name: "Node.js", icon: "Server", color: "#FF5B00" },
     { name: "AWS", icon: "Cloud", color: "#FF5B00" },
     { name: "MongoDB", icon: "Database", color: "#FF5B00" },
@@ -89,26 +87,32 @@ const ProjectTemplate = () => {
   const otherProjects = [
     {
       id: 1,
-      title: "E-commerce Fashion",
+      image: "/img/bgood-hero-img.png",
+      title: "BGood",
       description:
-        "Plataforma completa de comercio electrónico con gestión de inventario avanzada",
+        "Plataforma Inteligente para la Gestión Integral de Suministros en Edificios.",
       tech: ["React", "Node.js", "PostgreSQL"],
       category: "E-commerce",
+      link: "/project-bgood",
     },
     {
       id: 2,
-      title: "FinTech Dashboard",
+      image: "/img/miollita-hero-img-lg.png",
+      title: "MiOllita Mobile App",
       description:
-        "Dashboard de análisis financiero en tiempo real con visualizaciones interactivas",
+        "App para ayudar a decidir qué cocinar y planificar las comidas.",
       tech: ["Vue.js", "Python", "MongoDB"],
-      category: "FinTech",
+      category: "Mobile App",
+      link: "/project-miollita",
     },
     {
       id: 3,
-      title: "HealthCare Platform",
-      description: "Sistema integral de gestión médica con telemedicina",
+      image: "/img/cojones-hero-img.png",
+      title: "Co.Jones",
+      description: "Web Estratégico para Captación de Clientes",
       tech: ["Next.js", "Express", "MySQL"],
-      category: "HealthTech",
+      category: "Website",
+      link: "/project-cojones",
     },
   ];
 
@@ -430,9 +434,9 @@ const ProjectTemplate = () => {
       <section id="solucion" className="pt-20 bg-[#FFFFFF]">
         <Container>
           <Col cols={{ lg: 6, md: 6, sm: 4 }} noPadding>
-            <div className="w-full h-full rounded-2xl overflow-hidden project-img-shadow bg-[#F2F2F2]">
+            <div className="w-full h-full rounded-2xl overflow-hidden  bg-[#F2F2F2]">
               <img
-                src="/img/super-user-products.jpg"
+                src="/img/mockup-program-week.jpg"
                 alt="Imagen de detalle de la tabla de productos"
                 className="object-cover"
               />
@@ -674,12 +678,12 @@ const ProjectTemplate = () => {
       </section>
 
       {/* Otros Proyectos */}
-      <section id="otros-proyectos" className="py-20 bg-[#16141F]">
+      <section id="otros-proyectos" className="py-20 gradient-project-hero">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <header>
               <h2 className="mb-6">
-                <Text variant="headline" weight="bold" color="#FF5B00">
+                <Text variant="headline" weight="bold" color="#FFFFFF">
                   Otros Proyectos
                 </Text>
               </h2>
@@ -698,25 +702,18 @@ const ProjectTemplate = () => {
                 className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-[#E1FF00]/30 transition-all duration-300 hover:transform hover:scale-105"
               >
                 {/* Imagen placeholder */}
-                <div className="h-48 bg-gradient-to-br from-[#E1FF00]/20 to-[#FF5B00]/20 flex items-center justify-center">
-                  <div className="text-center">
-                    <Icon name="Image" size={48} color="#E1FF00" />
-                    <div className="mt-2">
-                      <Text
-                        variant="label"
-                        color="#E5FFFF"
-                        className="opacity-50"
-                      >
-                        [{project.category}]
-                      </Text>
-                    </div>
-                  </div>
+                <div className="h-48 gradient-project-hero flex items-center justify-center">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="object-contain h-full"
+                  />
                 </div>
 
                 <div className="p-6">
                   {/* Categoría */}
-                  <div className="inline-block px-3 py-1 bg-[#FF5B00]/20 border border-[#FF5B00]/30 rounded-full mb-4">
-                    <Text variant="label" color="#FF5B00">
+                  <div className="inline-block px-3 py-1 bg-[#E1FF00]/20 border border-[#E1FF00]/30 rounded-full mb-4">
+                    <Text variant="label" color="#E1FF00">
                       {project.category}
                     </Text>
                   </div>
