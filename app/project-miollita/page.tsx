@@ -415,9 +415,9 @@ const ProjectTemplate = () => {
           </Col>
 
           <Col cols={{ lg: 6, md: 6, sm: 4 }} noPadding>
-            <div className="w-full h-[475px] rounded-2xl overflow-hidden project-img-shadow">
+            <div className="w-full rounded-2xl overflow-hidden">
               <img
-                src="/img/shopping-cart.jpg"
+                src="/img/mockup-comidas.jpg"
                 alt=""
                 className="object-center"
               />
