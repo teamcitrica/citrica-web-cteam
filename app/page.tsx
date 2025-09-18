@@ -89,10 +89,10 @@ const CitricaWebsite = () => {
     },
     {
       id: 2,
-      image: "/img/bgood-hero-img.png",
+      image: "/img/miollita-hero-img-lg.png",
       title: "MiOllita Mobile App",
       description:
-        "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.",
+        "App para ayudar a decidir qué cocinar y planificar las comidas.",
       tech: ["Vue.js", "Python", "MongoDB"],
       category: "Mobile App",
       link: "/project-miollita",
@@ -211,7 +211,6 @@ const CitricaWebsite = () => {
             noPadding
             className="flex justify-between items-center pt-4"
           >
-            <Link href="/"></Link>
             <div className="flex items-center space-x-2">
               <div className="w-24 h-17">
                 <img
@@ -221,6 +220,7 @@ const CitricaWebsite = () => {
                 />
               </div>
             </div>
+
             <div className="hidden lg:flex space-x-8">
               <a href="#inicio" className="hover:opacity-80 transition-opacity">
                 <Text variant="body" color="#FFFFFF">
@@ -636,33 +636,34 @@ const CitricaWebsite = () => {
                 </div>
 
                 <div className="p-6">
-                  {/* Categoría */}
-                  <div className="inline-block px-3 py-1 bg-[#E1FF00]/20 border border-[#E1FF00]/30 rounded-full mb-4">
-                    <Text variant="label" color="#E1FF00">
-                      {otherProjects.category}
-                    </Text>
-                  </div>
+                  
+                    {/* Categoría */}
+                    <div className="inline-block px-3 py-1 bg-[#E1FF00]/20 border border-[#E1FF00]/30 rounded-full mb-4">
+                      <Text variant="label" color="#E1FF00">
+                        {otherProjects.category}
+                      </Text>
+                    </div>
 
-                  {/* Título */}
-                  <h3 className="mb-3">
-                    <Text variant="subtitle" color="#FFFFFF">
-                      {otherProjects.title}
-                    </Text>
-                  </h3>
+                    {/* Título */}
+                    <h3 className="mb-3">
+                      <Text variant="subtitle" color="#FFFFFF">
+                        {otherProjects.title}
+                      </Text>
+                    </h3>
 
-                  {/* Descripción */}
-                  <p className="mb-4">
-                    <Text
-                      variant="body"
-                      color="#FFFFFFBB"
-                      className="leading-relaxed"
-                    >
-                      {otherProjects.description}
-                    </Text>
-                  </p>
+                    {/* Descripción */}
+                    <p className="mb-4">
+                      <Text
+                        variant="body"
+                        color="#FFFFFFBB"
+                        className="leading-relaxed"
+                      >
+                        {otherProjects.description}
+                      </Text>
+                    </p>
 
-                  {/* Tecnologías */}
-                  {/* <div className="flex flex-wrap gap-2 mb-4">
+                    {/* Tecnologías */}
+                    {/* <div className="flex flex-wrap gap-2 mb-4">
                     {project.tech.map((tech, techIndex) => (
                       <span
                         key={techIndex}
@@ -674,6 +675,7 @@ const CitricaWebsite = () => {
                       </span>
                     ))}
                   </div> */}
+                  
 
                   {/* Botón */}
                   <Link href={otherProjects.link} className="w-full">
@@ -945,7 +947,7 @@ const CitricaWebsite = () => {
                 className="bg-[#ffffff] text-sm rounded-[80] px-8"
               />
             </div>
-            <div className="flex flex-col justify-center items-center space-x-8 gap-4">
+            <div className="flex flex-col justify-center items-center gap-1">
               <div className="flex items-center space-x-2">
                 <Icon name="Mail" color="#16141F" size={20} />
                 <Link href="mailto:admin@citrica.dev">
