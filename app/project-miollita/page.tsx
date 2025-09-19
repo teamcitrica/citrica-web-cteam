@@ -599,7 +599,10 @@ const ProjectTemplate = () => {
             </header>
             <p className="text-ch-width center">
               <Text variant="subtitle" color="#16141F" className="opacity-80">
-                La aplicación fue desarrollada con tecnologías modernas y versátiles que nos permitió crear una experiencia fluida y optimizada. Esto asegura que la app funcione de manera rápida y eficiente en dispositivos Android.
+                La aplicación fue desarrollada con tecnologías modernas y
+                versátiles que nos permitió crear una experiencia fluida y
+                optimizada. Esto asegura que la app funcione de manera rápida y
+                eficiente en dispositivos Android.
               </Text>
             </p>
           </Col>
@@ -681,31 +684,29 @@ const ProjectTemplate = () => {
       <section id="otros-proyectos" className="py-20 gradient-project-hero">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
-            <header>
-              <h2 className="mb-6">
-                <Text variant="headline" weight="bold" color="#FFFFFF">
-                  Otros Proyectos
-                </Text>
-              </h2>
-            </header>
+            <h2 className="mb-6">
+              <Text variant="headline" weight="bold" color="#FFFFFF">
+                Otros Proyectos
+              </Text>
+            </h2>
             <p>
-              <Text variant="body" color="#FFFFFF" className="opacity-80">
+              <Text variant="body" color="#E5FFFF">
                 Explora más de nuestros trabajos y casos de éxito
               </Text>
             </p>
           </Col>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {otherProjects.map((project, index) => (
+            {otherProjects.map((otherProject, index) => (
               <article
-                key={project.id}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-[#E1FF00]/30 transition-all duration-300 hover:transform hover:scale-105"
+                key={otherProject.id}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border-[2px] border-[#E1FF0022]"
               >
                 {/* Imagen placeholder */}
                 <div className="h-48 gradient-project-hero flex items-center justify-center">
                   <img
-                    src={project.image}
-                    alt={project.title}
+                    src={otherProject.image}
+                    alt={otherProject.title}
                     className="object-contain h-full"
                   />
                 </div>
@@ -714,14 +715,14 @@ const ProjectTemplate = () => {
                   {/* Categoría */}
                   <div className="inline-block px-3 py-1 bg-[#E1FF00]/20 border border-[#E1FF00]/30 rounded-full mb-4">
                     <Text variant="label" color="#E1FF00">
-                      {project.category}
+                      {otherProject.category}
                     </Text>
                   </div>
 
                   {/* Título */}
                   <h3 className="mb-3">
                     <Text variant="subtitle" color="#FFFFFF">
-                      {project.title}
+                      {otherProject.title}
                     </Text>
                   </h3>
 
@@ -732,7 +733,7 @@ const ProjectTemplate = () => {
                       color="#FFFFFF"
                       className="opacity-70 leading-relaxed"
                     >
-                      {project.description}
+                      {otherProject.description}
                     </Text>
                   </p>
 
@@ -755,7 +756,7 @@ const ProjectTemplate = () => {
                     onClick={() => {
                       addToast({
                         title: "Proyecto seleccionado",
-                        description: `Viendo detalles de ${project.title}`,
+                        description: `Viendo detalles de ${otherProject.title}`,
                         color: "success",
                       });
                     }}

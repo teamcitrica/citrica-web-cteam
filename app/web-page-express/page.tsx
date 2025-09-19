@@ -81,32 +81,29 @@ const CitricaLanding = () => {
         <Container>
           <Col cols={{ lg: 10, md: 6, sm: 4 }} className="text-center mx-auto mb-12">
             <div className="text-dark-bkg mb-12 bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
-              <h1 className='mb-4'>
-                <Text variant="display" weight="bold" color="#FF5B00">
+              <h1 className='mb-2'>
+                <Text variant="subtitle" weight="bold" color="#FF5B00">
                   PÁGINAS WEB EXPRESS
                 </Text>
               </h1>
-              <h2 className='mb-8'>
-                <Text variant="body" weight='bold' textColor="color-text-white">
-                  Lanza tu proyecto, idea o negocio online de forma rápida y a un costo accesible.
+              <h2 className='mb-5 balance-text'>
+                <Text variant="display" textColor="color-text-white">
+                  Tu negocio en línea, listo para el despegue <span className='ct-color-primary'>en una semana.</span> 
                 </Text>
               </h2>
-              <p className='pb-2'>
-                <Text variant="subtitle" weight='bold' textColor="color-secondary">
-                  USD $ <span className='text-5xl' >300</span>
+
+              <p className='pb-8 text-ch-width balance-text center'>
+                <Text variant='body' textColor='color-text-white'>
+                  Una solución rápida para tener una presencia digital profesional mediante una página web de alto impacto.
                 </Text>
               </p>
-              <p className='mb-12'>
-                <Text variant="subtitle" textColor="color-secondary">
-                  Hosting gratis por 3 meses.
-                </Text>
-              </p>
+              
             <div className="flex justify-center space-x-4 mb-2">
               <Button
                 onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
-                label="¡Quiero mi Landing Page!"
+                label="¡Quiero mi página!"
                 variant="primary"
-                className='px-8 bg-[#E1FF00] rounded-[80]'
+                className='px-8 bg-[#FF5B00] rounded-[80]'                
               />
               <Button
                 onClick={() => document.getElementById('proyectos')?.scrollIntoView({ behavior: 'smooth' })}
