@@ -619,9 +619,11 @@ const CitricaWebsite = () => {
                 Últimos proyectos
               </Text>
             </h2>
-            <Text variant="body" color="#E5FFFF">
-              Conoce algunos de nuestros trabajos más recientes
-            </Text>
+            <p>
+              <Text variant="body" color="#E5FFFF">
+                Conoce algunos de nuestros trabajos más recientes
+              </Text>
+            </p>
           </Col>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -631,39 +633,42 @@ const CitricaWebsite = () => {
                 className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border-[2px] border-[#E1FF0022]"
               >
                 {/* Imagen placeholder */}
-                <div className="h-48 gradient-project-hero flex items-center justify-center overflow-hidden">
-                  <img src={otherProjects.image} alt="" />
+                <div className="h-48 gradient-project-hero flex items-center justify-center">
+                  <img
+                    src={otherProjects.image}
+                    alt={otherProjects.title}
+                    className="object-contain h-full"
+                  />
                 </div>
 
                 <div className="p-6">
-                  
-                    {/* Categoría */}
-                    <div className="inline-block px-3 py-1 bg-[#E1FF00]/20 border border-[#E1FF00]/30 rounded-full mb-4">
-                      <Text variant="label" color="#E1FF00">
-                        {otherProjects.category}
-                      </Text>
-                    </div>
+                  {/* Categoría */}
+                  <div className="inline-block px-3 py-1 bg-[#E1FF00]/20 border border-[#E1FF00]/30 rounded-full mb-4">
+                    <Text variant="label" color="#E1FF00">
+                      {otherProjects.category}
+                    </Text>
+                  </div>
 
-                    {/* Título */}
-                    <h3 className="mb-3">
-                      <Text variant="subtitle" color="#FFFFFF">
-                        {otherProjects.title}
-                      </Text>
-                    </h3>
+                  {/* Título */}
+                  <h3 className="mb-3">
+                    <Text variant="subtitle" color="#FFFFFF">
+                      {otherProjects.title}
+                    </Text>
+                  </h3>
 
-                    {/* Descripción */}
-                    <p className="mb-4">
-                      <Text
-                        variant="body"
-                        color="#FFFFFFBB"
-                        className="leading-relaxed"
-                      >
-                        {otherProjects.description}
-                      </Text>
-                    </p>
+                  {/* Descripción */}
+                  <p className="mb-4">
+                    <Text
+                      variant="body"
+                      color="#FFFFFFBB"
+                      className="leading-relaxed"
+                    >
+                      {otherProjects.description}
+                    </Text>
+                  </p>
 
-                    {/* Tecnologías */}
-                    {/* <div className="flex flex-wrap gap-2 mb-4">
+                  {/* Tecnologías */}
+                  {/* <div className="flex flex-wrap gap-2 mb-4">
                     {project.tech.map((tech, techIndex) => (
                       <span
                         key={techIndex}
@@ -675,7 +680,6 @@ const CitricaWebsite = () => {
                       </span>
                     ))}
                   </div> */}
-                  
 
                   {/* Botón */}
                   <Link href={otherProjects.link} className="w-full">
