@@ -373,7 +373,7 @@ const CitricaWebsite = () => {
               <h2>
                 <Text variant="display" weight="bold" color="#FFFFFF">
                   <span style={{ color: "#FF5B00" }}>
-                    APLICACIONES Y SITIOS WEB A MEDIDA
+                    APPS Y SITIOS WEB A MEDIDA
                   </span>{" "}
                   PARA TU NEGOCIO
                 </Text>
