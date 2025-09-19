@@ -1,56 +1,116 @@
 'use client'
+import React from "react";
 import Text from "../atoms/text";
-import { Button as ButtonHeroUI } from "@heroui/react";
+import {Button as ButtonHeroUI} from "@heroui/react";
+import clsx from 'clsx';
+import { get } from "http";
 
 type ButtonProps = {
-  onClick: () => void;
-  label: string;
-  variant?: "primary" | "secondary";
+  onClick?: () => void;
+  label?: string;
+  children?: React.ReactNode;
+  // variant?: "solid" | "bordered" | "light" | "flat" | "faded" | "shadow" | "ghost";
+  variant?: "primary" | "secondary" | "flat" | "success" | "warning" | "danger";
   textVariant?: "label" | "body" | "title" | "display" | "headline" | "subtitle";
-  color?: "primary" | "secondary" | "default" | "success" | "warning" | "danger";
+  // color?: "primary" | "secondary" | "default" | "success" | "warning" | "danger";
+  size?: "sm" | "md" | "lg";
+  // radius?: "none" | "sm" | "md" | "lg" | "full";
   className?: string;
-  textClassName?: string; // <-- para controlar el color del texto
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  isLoading?: boolean;
+  startContent?: React.ReactNode;
+  endContent?: React.ReactNode;
+  fullWidth?: boolean;
 };
 
-const getTextColor = (color: string) => {
-  switch (color) {
+
+
+
+const getTextColorByVariant = (variant: string) => {
+  switch (variant) {
     case "primary":
-      return "text-black";
+      return "color-on-primary";
     case "secondary":
-      return "text-white";
-    case "default":
-      return "text-white";
+      return "color-on-secondary";
     case "success":
-      return "text-white";
+      return "color-on-success";
+    case "warning":
+      return "color-on-warning";
+    case "danger":
+      return "color-on-danger";
+    case "flat":
+      return "color-black";
     default:
-      return "text-black";
+      return "color-on-primary";
   }
-};
+}
 
-const Button = ({
-  onClick,
+const getBtnClassByVariant = (variant: string) => {
+  switch (variant) {
+    case "primary":
+      return "btn-primary";
+    case "secondary":
+      return "btn-secondary";
+    case "success":
+      return "btn-success";
+    case "warning":
+      return "btn-warning";
+    case "danger":
+      return "btn-danger";
+    case "flat":
+      return "btn-flat";
+    default:
+      return "btn-primary";
+  }
+}
+
+const Button = ({ 
+  onClick, 
   label,
-  color = "primary",
-  textVariant = "body",
-  variant = "primary",
+  children,
+  textVariant = "label", // Set default text variant
+  variant = "primary", 
+  size = "md",
   className = "",
-  textClassName = "", // <-- nuevo prop
+  type = "button",
+  disabled = false,
+  isLoading = false,
+  startContent,
+  endContent,
+  fullWidth = false
 }: ButtonProps) => {
-  return (
-    <ButtonHeroUI
-      color={color}
-      onPress={onClick}
-      className={`py-2 px-2 ${className}`}
-      variant={variant === "primary" ? "solid" : "bordered"}
+  const content = children || (label && (
+    <Text 
+      variant={textVariant} 
+      textColor={getTextColorByVariant(variant)}
     >
-      <Text
-        variant={textVariant}
-        className={`${getTextColor(color)} ${textClassName}`}
-      >
-        {label}
-      </Text>
+      {label}
+    </Text>
+  ));
+
+  return (
+    <ButtonHeroUI 
+      color="default" 
+      onPress={onClick} 
+      className={clsx(
+        "btn-citrica-ui", 
+        getBtnClassByVariant(variant), 
+        className
+      )} 
+      // variant={variant}
+      size={size}
+      radius={"none"}
+      type={type}
+      isDisabled={disabled}
+      isLoading={isLoading}
+      startContent={startContent}
+      endContent={endContent}
+      fullWidth={fullWidth}
+    >
+      {content}
     </ButtonHeroUI>
-  );
-};
+  )
+}
 
 export default Button;

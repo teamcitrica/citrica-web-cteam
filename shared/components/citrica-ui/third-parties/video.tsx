@@ -2,16 +2,20 @@ import React from 'react';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 
-export const VideoJS = (props) => {
-  const videoRef = React.useRef(null);
-  const playerRef = React.useRef(null);
-  const {options, onReady} = props;
+interface VideoJSProps {
+  options: any; // Video.js options object
+  onReady?: (player: any) => void; // Video.js player instance
+  className?: string;
+}
+
+export const VideoJS: React.FC<VideoJSProps> = ({ options, onReady, className }) => {
+  const videoRef = React.useRef<HTMLDivElement>(null);
+  const playerRef = React.useRef<any>(null);
 
   React.useEffect(() => {
-
     // Make sure Video.js player is only initialized once
-    if (!playerRef.current) {
-      // The Video.js player needs to be _inside_ the component el for React 18 Strict Mode. 
+    if (!playerRef.current && videoRef.current) {
+      // The Video.js player needs to be _inside_ the component el for React 18 Strict Mode.
       const videoElement = document.createElement("video-js");
 
       videoElement.classList.add('vjs-big-play-centered');
@@ -24,13 +28,17 @@ export const VideoJS = (props) => {
 
     // You could update an existing player in the `else` block here
     // on prop change, for example:
-    } else {
+    } else if (playerRef.current && options) {
       const player = playerRef.current;
 
-      player.autoplay(options.autoplay);
-      player.src(options.sources);
+      if (options.autoplay !== undefined) {
+        player.autoplay(options.autoplay);
+      }
+      if (options.sources) {
+        player.src(options.sources);
+      }
     }
-  }, [options, videoRef]);
+  }, [options, onReady]);
 
   // Dispose the Video.js player when the functional component unmounts
   React.useEffect(() => {
@@ -42,13 +50,14 @@ export const VideoJS = (props) => {
         playerRef.current = null;
       }
     };
-  }, [playerRef]);
+  }, []);
 
   return (
-    <div data-vjs-player>
+    <div data-vjs-player className={className}>
       <div ref={videoRef} />
     </div>
   );
 }
 
 export default VideoJS;
+export type { VideoJSProps };
