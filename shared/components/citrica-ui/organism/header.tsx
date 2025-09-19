@@ -6,7 +6,7 @@ import { siteConfig } from '@/config/site';
 
 interface HeaderProps {
   logo?: React.ReactNode;
-  variant?: 'travel' | 'team' | 'minimal'; // Nueva prop para las variantes
+  variant?: 'floating' | 'split' | 'standard'; // Nueva prop para las variantes
   className?: string;
   showButton?: boolean; // Prop para mostrar/ocultar el botón
   buttonText?: string; // Texto personalizable del botón
@@ -15,7 +15,7 @@ interface HeaderProps {
 
 const Header = ({ 
   logo, 
-  variant = 'travel', 
+  variant = 'floating', 
   className = '', 
   showButton = false, 
   buttonText = 'GET STARTED',
@@ -45,8 +45,8 @@ const Header = ({
     setIsOpen(false);
   };
 
-  // Renderizar variante Travel (como Matour)
-  if (variant === 'travel') {
+  // Renderizar variante Floating (como Matour)
+  if (variant === 'floating') {
     return (
       <nav 
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -171,8 +171,8 @@ const Header = ({
     );
   }
 
-  // Renderizar variante Team (como Flowblox)
-  if (variant === 'team') {
+  // Renderizar variante Split (como Flowblox)
+  if (variant === 'split') {
     // Calcular distribución de elementos de navegación
     const totalItems = navItems.length;
     const leftItemsCount = Math.ceil(totalItems / 2); // Da preferencia al lado izquierdo
@@ -315,8 +315,8 @@ const Header = ({
     );
   }
 
-  // Renderizar variante Minimal (con navegación completa como Lienzo Production Studio)
-  if (variant === 'minimal') {
+  // Renderizar variante Standard (con navegación completa como Lienzo Production Studio)
+  if (variant === 'standard') {
     return (
       <nav 
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
