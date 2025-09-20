@@ -1,6 +1,7 @@
 @import '../01-settings/colors.scss';
 @import '../01-settings/colors-dark-theme.scss';
 @import '../01-settings/colors-light-theme.scss';
+@import '../10-tokens/form-tokens.scss';
 :root{
   &[data-theme="light"] {
     @include light-theme;
@@ -9,6 +10,7 @@
     @include dark-theme;
   }
   @include a-set($root-vars);
+  @include form-tokens;
 }
 
 *,
