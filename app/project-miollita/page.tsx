@@ -300,7 +300,7 @@ const ProjectTemplate = () => {
                   label="Ver Demo"
                   variant="primary"
                   onClick={handleContactClick}
-                  className="bg-[#00FFFF] text-[#003333] rounded-full px-5"
+                  className="btn-primary-color-2"
                 />
               </div>
             </div>
