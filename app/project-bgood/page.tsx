@@ -1,12 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import { Container, Col } from "@citrica/objects";
-import Text from "@ui/atoms/text";
-import Icon from "@ui/atoms/icon";
-import Button from "@ui/molecules/button";
+import { Text, Icon, Button} from "@citrica-ui";
 import { addToast } from "@heroui/toast";
 import { Divider, Link } from "@heroui/react";
-import NotFound from "../not-found";
 
 const ProjectTemplate = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -168,7 +165,6 @@ const ProjectTemplate = () => {
                         ?.scrollIntoView({ behavior: "smooth" })
                     }
                     label="Regresar"
-                    color="primary"
                     variant="primary"
                     className="px-8 bg-[#E1FF00] rounded-[80]"
                   />
@@ -245,7 +241,6 @@ const ProjectTemplate = () => {
                       ?.scrollIntoView({ behavior: "smooth" });
                   }}
                   label="Hablemos"
-                  color="primary"
                   variant="primary"
                   className="px-8 mt-[10px] bg-[#E1FF00] text-black rounded-[80]"
                 />
@@ -293,7 +288,6 @@ const ProjectTemplate = () => {
                 <Button
                   label="Ver Demo"
                   variant="primary"
-                  color="default"
                   onClick={handleContactClick}
                   className="bg-[#00FFFF] text-[#003333] rounded-full px-5"
                 />
@@ -651,7 +645,6 @@ const ProjectTemplate = () => {
                   window.open("mailto:admin@citrica.dev", "_blank")
                 }
                 label="Solicitar Cotización"
-                color="primary"
                 variant="primary"
                 className="bg-[#FFFFFF] text-[#16141F] rounded-full px-8"
               />
@@ -660,7 +653,6 @@ const ProjectTemplate = () => {
                   window.open("https://wa.me/51942627383", "_blank")
                 }
                 label="Contactar por WhatsApp"
-                color="success"
                 variant="primary"
                 className="bg-[#FFFFFF] text-[#16141F] rounded-full px-8"
               />

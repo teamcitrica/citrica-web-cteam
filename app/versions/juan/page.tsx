@@ -1,6 +1,6 @@
 import React from 'react';
 import HeroSection from './components/hero-section';
-import AboutSection from './components/about-section';
+// import AboutSection from './components/about-section';
 import TeamSection from './components/team-section';
 import ProjectsSection from './components/projects-section';
 import ProcessSection from './components/process-section';
@@ -14,7 +14,7 @@ const LandingPage = () => {
       <HeroSection />
       
       {/* About Section */}
-      <AboutSection />
+      {/* <AboutSection /> */}
       
       {/* Team Section */}
       <TeamSection />
