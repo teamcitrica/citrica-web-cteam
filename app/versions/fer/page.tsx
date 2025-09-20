@@ -118,14 +118,12 @@ const CitricaLanding = () => {
                   <Button 
                     label="Comenzar Proyecto"
                     variant="primary"
-                    color="default"
                     onClick={() => {}}
                     className="bg-[#E1FF00] text-[#16141F] hover:bg-[#E1FF00]/90"
                   />
                   <Button 
                     label="Ver Proyectos"
                     variant="secondary"
-                    color="default"
                     onClick={() => {}}
                     className="border-[#00FFFF] text-[#00FFFF] hover:bg-[#00FFFF]/10"
                   />
@@ -402,14 +400,12 @@ const CitricaLanding = () => {
                 <Button 
                   label="Solicitar Cotización"
                   variant="primary"
-                  color="default"
                   onClick={() => {}}
                   className="bg-[#16141F] text-[#E1FF00] hover:bg-[#16141F]/90"
                 />
                 <Button 
                   label="Agendar Llamada"
                   variant="secondary"
-                  color="default"
                   onClick={() => {}}
                   className="border-[#16141F] text-[#16141F] hover:bg-[#16141F]/10"
                 />

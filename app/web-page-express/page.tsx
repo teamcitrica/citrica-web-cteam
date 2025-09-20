@@ -108,7 +108,7 @@ const CitricaLanding = () => {
               <Button
                 onClick={() => document.getElementById('proyectos')?.scrollIntoView({ behavior: 'smooth' })}
                 label="Ver Proyectos"
-                color="secondary"
+                variant="secondary"
                 className="hidden bg-[#E5FFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8 rounded-[80]"
               />
             </div>
@@ -416,7 +416,6 @@ const CitricaLanding = () => {
                 onClick={handleContactClick}
                 label="Comenzar mi proyecto"
                 variant="primary"
-                color="primary"
                 textVariant="body"
                 className='px-8 bg-[#FF5B00] rounded-[80]'                                
               />
@@ -443,14 +442,12 @@ const CitricaLanding = () => {
               <Button
                 onClick={() => window.open('mailto:admin@citrica.dev', '_blank')}
                 label="Escribir Email"
-                color="primary"
                 variant="primary"
                 className='bg-[#ffffff] text-sm rounded-[80] px-8'
               />
               <Button
                 onClick={() => window.open('https://wa.me/51942627383', '_blank')}
                 label="WhatsApp"
-                color="success"
                 variant="primary"
                 className='bg-[#ffffff] text-sm rounded-[80] px-8'
               />
