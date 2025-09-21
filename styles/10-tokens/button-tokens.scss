@@ -7,7 +7,7 @@ $btn-citrica-ui: (
     padding: 10px 20px,
   ),
   lg: (
-    padding: 20px 50px,
+    padding: 20px 30px,
   )
 );
 .btn-citrica-ui{
@@ -55,19 +55,19 @@ $btn-citrica-ui: (
   }
 }
 
-// .btn-secondary-color-2{
-//   background-color: var(--color-tertiary) !important;
-//   border: none;
-//   &:hover{
-//     background-color: var(--color-tertiary-btn-hover) !important;
-//     .text-component {
-//       color: var(--color-tertiary-btn-text-hover) !important;
-//     }
-//   }
-// }
-// .btn-secondary-color-2 .text-component{
-//   color: var(--color-on-tertiary) !important;
-// }
+.btn-secondary-color-2{
+  background-color: var(--color-on-secondary) !important;
+  border: none;
+  &:hover{
+    background-color: var(--color-tertiary-btn-hover) !important;
+    .text-component {
+      color: var(--color-tertiary-btn-text-hover) !important;
+    }
+  }
+}
+.btn-secondary-color-2 .text-component{
+  color: var(--color-on-tertiary) !important;
+}
 
 .btn-flat{
   background-color: transparent;
