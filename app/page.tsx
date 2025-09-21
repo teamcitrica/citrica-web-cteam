@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { Container, Col } from "@/styles/07-objects/objects";
-import { Text , Icon, Button} from "@citrica-ui";
+import { Text, Icon, Button } from "@citrica-ui";
 import CurvedLoop from "./versions/yolanda/components/CurvedLoop";
 import { Divider, Link } from "@heroui/react";
 import DotGrid from "./versions/yolanda/components/DotGrid";
@@ -36,6 +36,13 @@ const CitricaWebsite = () => {
       description:
         "Apps móviles para conectar tu negocio con tus clientes, al instante.",
       icon: "Smartphone",
+      color: "#FF00D4",
+    },
+    {
+      title: "Integración de IA",
+      description:
+        "Automatiza procesos y toma decisiones más inteligentes.",
+      icon: "Sparkles",
       color: "#E1FF00",
     },
   ];
@@ -352,8 +359,8 @@ const CitricaWebsite = () => {
             cols={{ lg: 10, md: 6, sm: 4 }}
             className="text-center mx-auto mb-12"
           >
-            <div className="mb-12 space-y-8 bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
-              <h2 className="text-balance">
+            <div className="mb-14 bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
+              <h2 className="text-balance mb-4">
                 <Text variant="display" weight="bold" color="#FFFFFF">
                   <span style={{ color: "#FF5B00" }}>
                     APPS Y SITIOS WEB A MEDIDA
@@ -361,32 +368,22 @@ const CitricaWebsite = () => {
                   PARA TU NEGOCIO
                 </Text>
               </h2>
-              <p>
-                <Text variant="body" color="#FFFFFF">
+              <p className="text-ch-width text-balance center" >
+                <Text variant="subtitle" color="#FFFFFF">
                   Transformamos tus ideas en soluciones digitales que impulsan
                   el crecimiento de tu empresa
                 </Text>
               </p>
-            </div>
-            <div className="flex justify-center space-x-4 mb-12">
               <Button
                 onClick={() =>
                   document
                     .getElementById("contacto")
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
-                label="Conócenos ahora"
+                label="CONÓCENOS AHORA"
                 variant="primary"
-                className="px-8 bg-[#E1FF00] rounded-[80]"
-              />
-              <Button
-                onClick={() =>
-                  document
-                    .getElementById("proyectos")
-                    ?.scrollIntoView({ behavior: "smooth" })
-                }
-                label="Ver Proyectos"
-                className="hidden bg-[#FFFFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8 rounded-[80]"
+                textVariant="body"
+                className="mt-9"
               />
             </div>
           </Col>
@@ -404,7 +401,7 @@ const CitricaWebsite = () => {
           </Col>
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4"
           >
             {services.map((service, index) => (
               <div
@@ -456,25 +453,24 @@ const CitricaWebsite = () => {
             className="flex justify-center p-0"
           >
             <CurvedLoop
-              marqueeText="Tiendas en línea • Mercados • Aplicaciones de streaming • Sitios web a medida • Landing pages • CRM • ERP • Herramientas de gestión de proyectos •"
+              marqueeText="Tiendas en línea • Mercados • Aplicaciones de streaming • Sitios web a medida • Landing pages • Implementación de IA • CRM • ERP • Herramientas de gestión de proyectos •"
               speed={1}
               curveAmount={0}
               direction="right"
               interactive={true}
-              className="custom-text-style"
+              className="custom-text-style opacity-60"
             />
           </Col>
         </Container>
       </section>
 
       {/* Value Proposition */}
-      <section id="valores" className="">
+      <section id="valores" className="bg-color-ct-white py-12">
         <Container>
           {/* Íconos animados con contadores e información */}
           <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-            <div className="bg-white rounded-3xl p-8 h-full flex flex-col items-center justify-center">
               <div className="text-center mb-10">
-                <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center animate-spin-slow">
+                <div className="w-32 h-32 mx-auto mb-6 bg-color-ct-primary rounded-full flex items-center justify-center animate-spin-slow">
                   <Icon name="Rocket" color="#FFFFFF" size={48} />
                 </div>
                 <Text variant="title" color="#16141F" weight="bold">
@@ -492,7 +488,7 @@ const CitricaWebsite = () => {
                     key={index}
                     className="text-center hover:scale-105 transition-transform duration-300"
                   >
-                    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gradient-to-r from-[#E1FF00] to-[#00FFFF] flex items-center justify-center">
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-color-ct-secondary flex items-center justify-center">
                       <Icon
                         name={stat.icon as any}
                         className="text-[#16141F]"
@@ -509,7 +505,6 @@ const CitricaWebsite = () => {
                   </div>
                 ))}
               </Col>
-            </div>
           </Col>
         </Container>
       </section>
@@ -524,11 +519,13 @@ const CitricaWebsite = () => {
               </Text>
             </h2>
             <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
-              <Text variant="body" color="#FFFFFF" className="opacity-90">
-                Somos un equipo de desarrolladores y diseñadores apasionados por
-                crear experiencias digitales excepcionales que transforman
-                negocios.
-              </Text>
+              <p className="text-ch-width text-balance">
+                <Text variant="body" color="#FFFFFF" className="opacity-90">
+                  Somos un equipo de desarrolladores y diseñadores apasionados por
+                  crear experiencias digitales excepcionales que transforman
+                  negocios.
+                </Text>
+              </p>
             </Col>
           </Col>
 
@@ -668,8 +665,8 @@ const CitricaWebsite = () => {
                     <Button
                       onClick={() => { }}
                       label="Ver Detalles"
-                      variant="secondary"
-                      className="w-full bg-[#E1FF00] text-[#E1FF00] rounded-full"
+                      variant="secondary"  
+                      fullWidth
                     />
                   </Link>
                 </div>
@@ -920,7 +917,6 @@ const CitricaWebsite = () => {
                 }
                 label="Escribir Email"
                 variant="primary"
-                className="bg-[#ffffff] text-sm rounded-[80] px-8"
               />
               <Button
                 onClick={() =>
@@ -928,7 +924,6 @@ const CitricaWebsite = () => {
                 }
                 label="WhatsApp"
                 variant="primary"
-                className="bg-[#ffffff] text-sm rounded-[80] px-8"
               />
             </div>
             <div className="flex flex-col justify-center items-center gap-1">
