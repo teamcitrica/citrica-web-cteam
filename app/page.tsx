@@ -386,7 +386,6 @@ const CitricaWebsite = () => {
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
                 label="Ver Proyectos"
-                color="secondary"
                 className="hidden bg-[#FFFFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8 rounded-[80]"
               />
             </div>
