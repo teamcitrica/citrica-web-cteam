@@ -262,9 +262,7 @@ const CitricaWebsite = () => {
                       ?.scrollIntoView({ behavior: "smooth" })
                   }
                   label="Hablemos"
-                  color="primary"
                   variant="primary"
-                  className="px-8 bg-[#FF5B00] rounded-[80]"
                 />
               </div>
               <div className="md:hidden ml-4">
@@ -279,9 +277,8 @@ const CitricaWebsite = () => {
             </div>
             {/* Mobile Menu - visible on small screens */}
             <div
-              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${
-                isMenuOpen ? "translate-x-0" : "translate-x-full"
-              }`}
+              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+                }`}
             >
               <button
                 onClick={() => setIsMenuOpen(false)}
@@ -337,7 +334,6 @@ const CitricaWebsite = () => {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 label="Hablemos"
-                color="primary"
                 variant="primary"
                 className="w-full bg-[#E1FF00] text-black rounded-[80]"
               />
@@ -370,7 +366,7 @@ const CitricaWebsite = () => {
             className="text-center mx-auto mb-12"
           >
             <div className="mb-12 space-y-8 bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
-              <h2>
+              <h2 className="text-balance">
                 <Text variant="display" weight="bold" color="#FFFFFF">
                   <span style={{ color: "#FF5B00" }}>
                     APPS Y SITIOS WEB A MEDIDA
@@ -403,7 +399,6 @@ const CitricaWebsite = () => {
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
                 label="Ver Proyectos"
-                color="secondary"
                 className="hidden bg-[#FFFFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8 rounded-[80]"
               />
             </div>
@@ -684,7 +679,7 @@ const CitricaWebsite = () => {
                   {/* Botón */}
                   <Link href={otherProjects.link} className="w-full">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       label="Ver Detalles"
                       variant="secondary"
                       className="w-full bg-[#E1FF00] text-[#E1FF00] rounded-full"
@@ -937,7 +932,6 @@ const CitricaWebsite = () => {
                   window.open("mailto:admin@citrica.dev", "_blank")
                 }
                 label="Escribir Email"
-                color="primary"
                 variant="primary"
                 className="bg-[#ffffff] text-sm rounded-[80] px-8"
               />
@@ -946,7 +940,6 @@ const CitricaWebsite = () => {
                   window.open("https://wa.me/51942627383", "_blank")
                 }
                 label="WhatsApp"
-                color="success"
                 variant="primary"
                 className="bg-[#ffffff] text-sm rounded-[80] px-8"
               />
