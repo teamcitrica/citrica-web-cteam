@@ -94,7 +94,7 @@ const Button = ({
       color="default" 
       onPress={onClick} 
       className={clsx(
-        "btn-citrica-ui", 
+        "btn-citrica-ui",
         getBtnClassByVariant(variant), 
         className
       )} 

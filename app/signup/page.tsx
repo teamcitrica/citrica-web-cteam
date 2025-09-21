@@ -179,7 +179,6 @@ const SignupPage = () => {
                   onClick={handleSignup}
                   label={isLoading ? "Registrando..." : "Crear Cuenta"}
                   variant="primary"
-                  color="primary"
                   textVariant="body"
                 />
               </div>

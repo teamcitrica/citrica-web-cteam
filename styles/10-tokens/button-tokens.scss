@@ -27,6 +27,22 @@ $btn-citrica-ui: (
     }
   }
 }
+
+.btn-primary-color-2{
+  background-color: var(--color-tertiary) !important;
+  border: none;
+  &:hover{
+    background-color: var(--color-tertiary-btn-hover) !important;
+    .text-component {
+      color: var(--color-tertiary-btn-text-hover) !important;
+    }
+  }
+}
+.btn-primary-color-2 .text-component{
+  color: var(--color-on-tertiary) !important;
+}
+
+
 .btn-secondary{
   background-color: var(--color-secondary-btn);
   color: var(--color-secondary-btn-text);
@@ -38,6 +54,21 @@ $btn-citrica-ui: (
     }
   }
 }
+
+// .btn-secondary-color-2{
+//   background-color: var(--color-tertiary) !important;
+//   border: none;
+//   &:hover{
+//     background-color: var(--color-tertiary-btn-hover) !important;
+//     .text-component {
+//       color: var(--color-tertiary-btn-text-hover) !important;
+//     }
+//   }
+// }
+// .btn-secondary-color-2 .text-component{
+//   color: var(--color-on-tertiary) !important;
+// }
+
 .btn-flat{
   background-color: transparent;
   color: var(--color-flat-btn-text);
@@ -49,3 +80,17 @@ $btn-citrica-ui: (
     }
   }
 }
+
+// .btn-flat-color-2{
+//   background-color: var(--color-tertiary) !important;
+//   border: none;
+//   &:hover{
+//     background-color: var(--color-tertiary-btn-hover) !important;
+//     .text-component {
+//       color: var(--color-tertiary-btn-text-hover) !important;
+//     }
+//   }
+// }
+// .btn-flat-color-2 .text-component{
+//   color: var(--color-on-tertiary) !important;
+// }

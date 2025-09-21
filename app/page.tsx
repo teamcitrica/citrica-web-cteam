@@ -1,23 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { Container, Col } from "@/styles/07-objects/objects";
-import Text from "@/shared/components/citrica-ui/atoms/text";
-import Icon from "@/shared/components/citrica-ui/atoms/icon";
-import Button from "@/shared/components/citrica-ui/molecules/button";
+import { Text , Icon, Button} from "@citrica-ui";
 import CurvedLoop from "./versions/yolanda/components/CurvedLoop";
 import { Divider, Link } from "@heroui/react";
 import DotGrid from "./versions/yolanda/components/DotGrid";
-import { addToast } from "@heroui/toast";
-import Navbar from "../shared/components/citrica-ui/organism/navbar";
-import ProjectsGallery from "@/shared/components/project-components/project-gallery";
-
-import {
-  Avatar,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/react";
 
 const CitricaWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -399,6 +386,7 @@ const CitricaWebsite = () => {
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
                 label="Ver Proyectos"
+                color="secondary"
                 className="hidden bg-[#FFFFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8 rounded-[80]"
               />
             </div>

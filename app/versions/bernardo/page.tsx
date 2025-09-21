@@ -103,7 +103,6 @@ export default function CitricaLanding() {
                   onClick={() => { }}
                   label="Ver Portafolio"
                   variant="secondary"
-                  color='secondary'
                 />
               </div>
             </div>
