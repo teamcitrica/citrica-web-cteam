@@ -76,7 +76,7 @@ const LoginPage = () => {
     <Container className='flex justify-center items-center h-screen'>
         <div className="w-[968px] flex justify-center">
           <div className='container-inputs'>
-              <img className='w-[54px] h-[48px]' src="/logo-miollita-hero.png" alt="" />
+              <img className='w-[54px] ' src="/img/citrica-logo.png" alt="" />
               <h2 className='text-login-welcome'>BIENVENIDO</h2>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <Input
