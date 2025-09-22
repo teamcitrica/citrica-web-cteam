@@ -5,6 +5,7 @@ import { Text, Icon, Button } from "@citrica-ui";
 import CurvedLoop from "./versions/yolanda/components/CurvedLoop";
 import { Divider, Link } from "@heroui/react";
 import DotGrid from "./versions/yolanda/components/DotGrid";
+import AnimatedHeadlines from "./home/components/animatedheadlines";
 
 const CitricaWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -360,20 +361,8 @@ const CitricaWebsite = () => {
             className="text-center mx-auto mb-12"
           >
             <div className="mb-14 bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
-              <h2 className="text-balance mb-4">
-                <Text variant="display" weight="bold" color="#FFFFFF">
-                  <span style={{ color: "#FF5B00" }}>
-                    APPS Y SITIOS WEB A MEDIDA
-                  </span>{" "}
-                  PARA TU NEGOCIO
-                </Text>
-              </h2>
-              <p className="text-ch-width text-balance center" >
-                <Text variant="subtitle" color="#FFFFFF">
-                  Transformamos tus ideas en soluciones digitales que impulsan
-                  el crecimiento de tu empresa
-                </Text>
-              </p>
+              <AnimatedHeadlines />
+              
               <Button
                 onClick={() =>
                   document
