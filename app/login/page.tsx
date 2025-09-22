@@ -25,9 +25,8 @@ const LoginPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redireccionar si ya hay sesión activa
+ 
   useEffect(() => {
-    // Solo redirigir cuando no esté cargando y haya sesión
     if (!authLoading && userSession) {
       console.log('Usuario ya autenticado, redirigiendo...');
       router.push('/admin');
@@ -75,7 +74,6 @@ const LoginPage = () => {
     }
   }
 
-  // Mostrar loading mientras verifica la autenticación
   if (authLoading) {
     return (
       <Container className='flex justify-center items-center h-screen'>
@@ -87,7 +85,6 @@ const LoginPage = () => {
     )
   }
 
-  // Si hay sesión activa, no mostrar el formulario (se redirigirá)
   if (userSession) {
     return (
       <Container className='flex justify-center items-center h-screen w-full'>
