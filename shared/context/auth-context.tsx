@@ -208,26 +208,29 @@ export const AuthContextProvider = ({ children }:{children: any}) => {
   }
 
   const checkUser = () => {
-    console.log('Verificando usuario...');
+    console.log('Configurando listener de auth...');
     
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth event:', event, 'Session:', session)
+      console.log('Auth event:', event, 'Session existe:', !!session)
       
-      setIsLoading(true); // Mostrar loading durante la transición
-      
-      if (session !== null) {
-        setUserSession(session);
-        persistSession(session); // Persistir nueva sesión
-        await getUserInfo(session.user.id);
-      } else {
-        setUserSession(null);
-        setUserInfo(null);
-        // Limpiar datos persistidos
-        persistSession(null);
-        persistUserInfo(null);
+      // Solo procesar ciertos eventos para evitar loops
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+        console.log('Procesando evento de auth:', event);
+        
+        if (session !== null) {
+          setUserSession(session);
+          persistSession(session);
+          // Solo obtener userInfo si no lo tenemos o es diferente usuario
+          if (!userInfo || userInfo.id !== session.user.id) {
+            await getUserInfo(session.user.id);
+          }
+        } else {
+          setUserSession(null);
+          setUserInfo(null);
+          persistSession(null);
+          persistUserInfo(null);
+        }
       }
-      
-      setIsLoading(false); // Ocultar loading al finalizar
     })
     
     return () => {
@@ -239,49 +242,45 @@ export const AuthContextProvider = ({ children }:{children: any}) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Si ya tenemos sesión persistida, validarla con Supabase
-        if (userSession) {
-          console.log('Validando sesión persistida...');
-          const { data: { session }, error } = await supabase.auth.getSession();
+        console.log('Inicializando autenticación...');
+        console.log('Sesión persistida:', userSession ? 'Existe' : 'No existe');
+        console.log('UserInfo persistido:', userInfo ? 'Existe' : 'No existe');
+        
+        // SIEMPRE verificar con Supabase primero
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error obteniendo sesión de Supabase:', error);
+          // Limpiar datos inválidos
+          setUserSession(null);
+          setUserInfo(null);
+          persistSession(null);
+          persistUserInfo(null);
+          return;
+        }
+
+        if (session) {
+          console.log('Sesión válida encontrada en Supabase');
+          // Actualizar estado con la sesión válida
+          setUserSession(session);
+          persistSession(session);
           
-          if (error) {
-            console.error('Error validando sesión persistida:', error);
-            // Limpiar datos inválidos
-            setUserSession(null);
-            setUserInfo(null);
-            persistSession(null);
-            persistUserInfo(null);
-          } else if (!session) {
-            // La sesión persistida ya no es válida
-            console.log('Sesión persistida expirada, limpiando...');
-            setUserSession(null);
-            setUserInfo(null);
-            persistSession(null);
-            persistUserInfo(null);
-          } else if (session.access_token !== userSession.access_token) {
-            // Token actualizado
-            console.log('Actualizando token de sesión...');
-            setUserSession(session);
-            persistSession(session);
-            // Si no tenemos userInfo, obtenerlo
-            if (!userInfo) {
-              await getUserInfo(session.user.id);
-            }
+          // Si no tenemos userInfo o es diferente usuario, obtenerlo
+          if (!userInfo || userInfo.id !== session.user.id) {
+            console.log('Obteniendo información del usuario...');
+            await getUserInfo(session.user.id);
+          } else {
+            console.log('Usando userInfo persistido');
           }
         } else {
-          // No hay sesión persistida, verificar con Supabase
-          console.log('No hay sesión persistida, verificando con Supabase...');
-          const { data: { session }, error } = await supabase.auth.getSession();
-          
-          if (error) {
-            console.error('Error obteniendo sesión inicial:', error);
-          } else if (session) {
-            console.log('Sesión encontrada en Supabase');
-            setUserSession(session);
-            persistSession(session);
-            await getUserInfo(session.user.id);
-          }
+          console.log('No hay sesión válida, limpiando datos...');
+          // No hay sesión válida, limpiar todo
+          setUserSession(null);
+          setUserInfo(null);
+          persistSession(null);
+          persistUserInfo(null);
         }
+        
       } catch (error) {
         console.error('Error inicializando auth:', error);
         // En caso de error, limpiar todo
@@ -290,16 +289,23 @@ export const AuthContextProvider = ({ children }:{children: any}) => {
         persistSession(null);
         persistUserInfo(null);
       } finally {
+        console.log('Finalizando inicialización auth');
         setIsLoading(false); // Finalizar carga inicial
       }
     };
 
-    initializeAuth();
+    // Pequeño delay para evitar race conditions
+    const timeoutId = setTimeout(() => {
+      initializeAuth();
+    }, 100);
     
-    // Configurar listener para cambios
+    // Configurar listener para cambios (pero sin interferir con la inicialización)
     const unsubscribe = checkUser();
     
-    return unsubscribe;
+    return () => {
+      clearTimeout(timeoutId);
+      unsubscribe();
+    };
   }, []) // Dependencias vacías para ejecutar solo una vez
 
   return (
