@@ -436,7 +436,7 @@ const CitricaWebsite = () => {
       </section>
 
       <section id="servicios">
-        <Container>
+        <Container noPadding>
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
             className="flex justify-center p-0"
