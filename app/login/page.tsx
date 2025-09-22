@@ -9,6 +9,7 @@ import { UserAuth } from '@/shared/context/auth-context'
 import { useForm } from "react-hook-form";
 import { Divider, Link, CircularProgress } from "@heroui/react";
 import { Eye } from "lucide-react";
+import Button from '@/shared/components/citrica-ui/molecules/button';
 
 type FormValues = {
   firstName: string;
@@ -24,14 +25,28 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [forceShowLogin, setForceShowLogin] = useState(false);
 
- 
+  // Redireccionar si ya hay sesión activa
   useEffect(() => {
+    // Solo redirigir cuando no esté cargando y haya sesión
     if (!authLoading && userSession) {
       console.log('Usuario ya autenticado, redirigiendo...');
       router.push('/admin');
     }
   }, [userSession, authLoading, router]);
+
+  // Timeout de seguridad para evitar loading infinito
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (authLoading) {
+        console.log('Timeout alcanzado, forzando mostrar login');
+        setForceShowLogin(true);
+      }
+    }, 5000); // 5 segundos máximo
+
+    return () => clearTimeout(timeoutId);
+  }, [authLoading]);
 
   const onSubmit = async (data: FormValues) => {
     if (!data.email || !data.password) {
@@ -74,23 +89,24 @@ const LoginPage = () => {
     }
   }
 
-  if (authLoading) {
+  // Mostrar loading mientras verifica la autenticación
+  if (authLoading && !forceShowLogin) {
     return (
       <Container className='flex justify-center items-center h-screen'>
-        <div className="text-center flex justify-center items-center w-full">
+        <div className="text-center">
           <CircularProgress aria-label="Verificando sesión..." size="lg" />
-          {/* <p className="mt-4 text-gray-600">Verificando sesión...</p> */}
         </div>
       </Container>
     )
   }
 
+  // Si hay sesión activa, no mostrar el formulario (se redirigirá)
   if (userSession) {
     return (
-      <Container className='flex justify-center items-center h-screen w-full'>
-        <div className="text-center flex justify-center items-center w-full">
+      <Container className='flex justify-center items-center h-screen'>
+        <div className="text-center">
           <CircularProgress aria-label="Redirigiendo..." size="lg" />
-          {/* <p className="mt-4 text-gray-600">Redirigiendo...</p> */}
+
         </div>
       </Container>
     )
@@ -148,19 +164,16 @@ const LoginPage = () => {
                   />
                 }
               />
-              <Link className="w-full">
-                <button 
-                  type="submit" 
-                  className="bottom-login"
-                  disabled={isLoading}
-                  style={{ 
-                    opacity: isLoading ? 0.6 : 1,
-                    cursor: isLoading ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  {isLoading ? 'Accediendo...' : 'Acceder'}
-                </button>
-              </Link>
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                label={isLoading ? 'Accediendo...' : 'Acceder'}
+                disabled={isLoading}
+                isLoading={isLoading}
+                fullWidth={true}
+                className="max-w-[312px]"
+              />
             </form>
 
             <div className="w-[312px] h-[94px] mt-[24px] flex flex-col justify-center items-center">
