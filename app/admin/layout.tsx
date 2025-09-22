@@ -34,7 +34,7 @@ export default function PanelLayout({
       <div className="h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
         <Container>
           <Col cols={{ lg: 3, md: 3, sm: 4 }} className="mx-auto text-center">
-            <div className="flex gap-4">
+            <div className="h-full w-full flex justify-center items-center">
               <CircularProgress aria-label="Loading..." size="lg" />
             </div>
           </Col>
