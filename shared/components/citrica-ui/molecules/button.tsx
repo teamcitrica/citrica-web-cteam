@@ -22,6 +22,7 @@ type ButtonProps = {
   startContent?: React.ReactNode;
   endContent?: React.ReactNode;
   fullWidth?: boolean;
+  disableAnimation?: boolean;
 };
 
 
@@ -78,7 +79,8 @@ const Button = ({
   isLoading = false,
   startContent,
   endContent,
-  fullWidth = false
+  fullWidth = false,
+  disableAnimation = false
 }: ButtonProps) => {
   const content = children || (label && (
     <Text 
@@ -97,7 +99,7 @@ const Button = ({
         "btn-citrica-ui",
         getBtnClassByVariant(variant), 
         className
-      )} 
+      )}
       // variant={variant}
       size={size}
       radius={"none"}
@@ -107,6 +109,7 @@ const Button = ({
       startContent={startContent}
       endContent={endContent}
       fullWidth={fullWidth}
+      disableAnimation={disableAnimation}
     >
       {content}
     </ButtonHeroUI>

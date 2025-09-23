@@ -330,7 +330,6 @@ const CitricaWebsite = () => {
                 }}
                 label="Hablemos"
                 variant="primary"
-                className="w-full bg-[#E1FF00] text-black rounded-[80]"
               />
             </div>
           </Col>
