@@ -6,6 +6,7 @@ import CurvedLoop from "./versions/yolanda/components/CurvedLoop";
 import { Divider, Link } from "@heroui/react";
 import DotGrid from "./versions/yolanda/components/DotGrid";
 import AnimatedHeadlines from "./home/components/animatedheadlines";
+import GradientText from "@/shared/components/project-components/gradient-text";
 
 const CitricaWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,6 +18,7 @@ const CitricaWebsite = () => {
         "Convierte visitantes en clientes con páginas de aterrizaje de alto impacto.",
       icon: "Globe",
       color: "#E1FF00",
+      gradientColors: ["#40ffaa", "#4079ff", "#40ffaa"],
     },
     {
       title: "Websites",
@@ -24,6 +26,7 @@ const CitricaWebsite = () => {
         "Posiciona tu marca y atrae nuevos clientes con un sitio web profesional.",
       icon: "Monitor",
       color: "#00FFFF",
+      gradientColors: ["#40ffaa", "#4079ff", "#40ffaa"],
     },
     {
       title: "Web Apps",
@@ -31,6 +34,7 @@ const CitricaWebsite = () => {
         "Optimiza tus procesos con aplicaciones web intuitivas y funcionales.",
       icon: "Code",
       color: "#FF5B00",
+      gradientColors: ["#40ffaa", "#4079ff", "#40ffaa"],
     },
     {
       title: "Mobile Apps",
@@ -38,6 +42,7 @@ const CitricaWebsite = () => {
         "Apps móviles para conectar tu negocio con tus clientes, al instante.",
       icon: "Smartphone",
       color: "#FF00D4",
+      gradientColors: ["#40ffaa", "#4079ff", "#40ffaa"],
     },
     {
       title: "Integración de IA",
@@ -45,6 +50,7 @@ const CitricaWebsite = () => {
         "Automatiza procesos y toma decisiones más inteligentes.",
       icon: "Sparkles",
       color: "#E1FF00",
+      gradientColors: ["#40ffaa", "#4079ff", "#40ffaa"],
     },
   ];
 
@@ -330,7 +336,6 @@ const CitricaWebsite = () => {
                 }}
                 label="Hablemos"
                 variant="primary"
-                className="w-full bg-[#E1FF00] text-black rounded-[80]"
               />
             </div>
           </Col>
@@ -362,7 +367,7 @@ const CitricaWebsite = () => {
           >
             <div className="mb-14 bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
               <AnimatedHeadlines />
-              
+
               <Button
                 onClick={() =>
                   document
@@ -416,9 +421,15 @@ const CitricaWebsite = () => {
                   />
                 </div>
                 <h3 className="mb-4">
-                  <Text variant="subtitle" color="#ffffff" weight="bold">
-                    {service.title}
-                  </Text>
+                  <GradientText
+                    colors={service.gradientColors}
+                    animationSpeed={3}
+                    showBorder={false}
+                  >
+                    <Text variant="subtitle" weight="bold">
+                      {service.title}
+                    </Text>
+                  </GradientText>
                 </h3>
                 <Text variant="body" color="#ffffff" className="opacity-60">
                   {service.description}
@@ -458,42 +469,42 @@ const CitricaWebsite = () => {
         <Container>
           {/* Íconos animados con contadores e información */}
           <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-              <div className="text-center mb-10">
-                <div className="w-32 h-32 mx-auto mb-6 bg-color-ct-primary rounded-full flex items-center justify-center animate-spin-slow">
-                  <Icon name="Rocket" color="#FFFFFF" size={48} />
-                </div>
-                <Text variant="title" color="#16141F" weight="bold">
-                  Impulsamos tu crecimiento digital
-                </Text>
+            <div className="text-center mb-10">
+              <div className="w-32 h-32 mx-auto mb-6 bg-color-ct-primary rounded-full flex items-center justify-center animate-spin-slow">
+                <Icon name="Rocket" color="#FFFFFF" size={48} />
               </div>
+              <Text variant="title" color="#16141F" weight="bold">
+                Impulsamos tu crecimiento digital
+              </Text>
+            </div>
 
-              {/* Stats Icons */}
-              <Col
-                cols={{ lg: 12, md: 4, sm: 4 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full"
-              >
-                {stats.map((stat, index) => (
-                  <div
-                    key={index}
-                    className="text-center hover:scale-105 transition-transform duration-300"
-                  >
-                    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-color-ct-secondary flex items-center justify-center">
-                      <Icon
-                        name={stat.icon as any}
-                        className="text-[#16141F]"
-                        size={24}
-                      />
-                    </div>
-                    <div className="text-2xl font-bold text-[#16141F] mb-1">
-                      {stat.number}
-                      {stat.suffix}
-                    </div>
-                    <div className="text-sm text-[#16141F]/80 font-medium">
-                      {stat.label}
-                    </div>
+            {/* Stats Icons */}
+            <Col
+              cols={{ lg: 12, md: 4, sm: 4 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full"
+            >
+              {stats.map((stat, index) => (
+                <div
+                  key={index}
+                  className="text-center hover:scale-105 transition-transform duration-300"
+                >
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-color-ct-secondary flex items-center justify-center">
+                    <Icon
+                      name={stat.icon as any}
+                      className="text-[#16141F]"
+                      size={24}
+                    />
                   </div>
-                ))}
-              </Col>
+                  <div className="text-2xl font-bold text-[#16141F] mb-1">
+                    {stat.number}
+                    {stat.suffix}
+                  </div>
+                  <div className="text-sm text-[#16141F]/80 font-medium">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </Col>
           </Col>
         </Container>
       </section>
@@ -654,7 +665,7 @@ const CitricaWebsite = () => {
                     <Button
                       onClick={() => { }}
                       label="Ver Detalles"
-                      variant="secondary"  
+                      variant="secondary"
                       fullWidth
                     />
                   </Link>
