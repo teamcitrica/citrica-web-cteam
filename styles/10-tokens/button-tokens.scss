@@ -20,6 +20,7 @@ $btn-citrica-ui: (
     transform: none !important;
     box-shadow: inherit !important;
   }
+  @include a-set($btn-citrica-ui);
 }
 
 .btn-primary{
