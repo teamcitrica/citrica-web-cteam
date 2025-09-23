@@ -18,7 +18,7 @@ const CitricaWebsite = () => {
         "Convierte visitantes en clientes con páginas de aterrizaje de alto impacto.",
       icon: "Globe",
       color: "#E1FF00",
-      gradientColors: ["#40ffaa", "#4079ff", "#40ffaa"],
+      gradientColors: ["#E1FF00 , #62FF00"],
     },
     {
       title: "Websites",
@@ -26,7 +26,7 @@ const CitricaWebsite = () => {
         "Posiciona tu marca y atrae nuevos clientes con un sitio web profesional.",
       icon: "Monitor",
       color: "#00FFFF",
-      gradientColors: ["#40ffaa", "#4079ff", "#40ffaa"],
+      gradientColors: ["#00FFFF , #00FF88"],
     },
     {
       title: "Web Apps",
@@ -34,7 +34,7 @@ const CitricaWebsite = () => {
         "Optimiza tus procesos con aplicaciones web intuitivas y funcionales.",
       icon: "Code",
       color: "#FF5B00",
-      gradientColors: ["#40ffaa", "#4079ff", "#40ffaa"],
+      gradientColors: [" #FF5B00 , #FF0400"],
     },
     {
       title: "Mobile Apps",
@@ -42,7 +42,7 @@ const CitricaWebsite = () => {
         "Apps móviles para conectar tu negocio con tus clientes, al instante.",
       icon: "Smartphone",
       color: "#FF00D4",
-      gradientColors: ["#40ffaa", "#4079ff", "#40ffaa"],
+      gradientColors: ["#FF00D4 , #C300FF"],
     },
     {
       title: "Integración de IA",
@@ -50,7 +50,7 @@ const CitricaWebsite = () => {
         "Automatiza procesos y toma decisiones más inteligentes.",
       icon: "Sparkles",
       color: "#E1FF00",
-      gradientColors: ["#40ffaa", "#4079ff", "#40ffaa"],
+      gradientColors: ["#E1FF00 , #62FF00"],
     },
   ];
 
