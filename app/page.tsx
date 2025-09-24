@@ -464,7 +464,7 @@ const CitricaWebsite = () => {
               curveAmount={0}
               direction="right"
               interactive={true}
-              className="custom-text-style opacity-60 text-[#FF5B00]"
+              className="custom-text-style opacity-60"
             />
           </Col>
         </Container>

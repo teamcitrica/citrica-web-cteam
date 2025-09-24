@@ -17,8 +17,13 @@ $btn-citrica-ui: (
     opacity: 1 !important;
     border-color: inherit !important;
     filter: none !important;
-    transform: none !important;
     box-shadow: inherit !important;
+  }
+  // Preserve centering for absolutely positioned buttons
+  &.absolute {
+    &:hover, &:active, &:focus {
+      transform: translateX(-50%) !important;
+    }
   }
   @include a-set($btn-citrica-ui);
 }
