@@ -18,7 +18,7 @@ const CitricaWebsite = () => {
         "Convierte visitantes en clientes con páginas de aterrizaje de alto impacto.",
       icon: "Globe",
       color: "#E1FF00",
-      gradientColors: ["#E1FF00 , #62FF00"],
+      gradientColors: ["#E1FF00 , #62FF00, #E1FF00 , #62FF00, #E1FF00"],
     },
     {
       title: "Websites",
@@ -26,7 +26,7 @@ const CitricaWebsite = () => {
         "Posiciona tu marca y atrae nuevos clientes con un sitio web profesional.",
       icon: "Monitor",
       color: "#00FFFF",
-      gradientColors: ["#00FFFF , #00FF88"],
+      gradientColors: ["#00FFFF , #00FF88, #00FFFF , #00FF88, #00FFFF"],
     },
     {
       title: "Web Apps",
@@ -34,7 +34,7 @@ const CitricaWebsite = () => {
         "Optimiza tus procesos con aplicaciones web intuitivas y funcionales.",
       icon: "Code",
       color: "#FF5B00",
-      gradientColors: [" #FF5B00 , #FF0400"],
+      gradientColors: [" #FF5B00 , #FF0400, #FF5B00 , #FF0400, #FF5B00"],
     },
     {
       title: "Mobile Apps",
@@ -42,15 +42,22 @@ const CitricaWebsite = () => {
         "Apps móviles para conectar tu negocio con tus clientes, al instante.",
       icon: "Smartphone",
       color: "#FF00D4",
-      gradientColors: ["#FF00D4 , #C300FF"],
+      gradientColors: ["#FF00D4 , #C300FF, #FF00D4 , #C300FF, #FF00D4"],
     },
     {
       title: "Integración de IA",
-      description:
-        "Automatiza procesos y toma decisiones más inteligentes.",
+      description: "Automatiza procesos y toma decisiones más inteligentes.",
       icon: "Sparkles",
       color: "#E1FF00",
-      gradientColors: ["#E1FF00 , #62FF00"],
+      gradientColors: ["#E1FF00 , #62FF00, #E1FF00 , #62FF00, #E1FF00"],
+    },
+    {
+      title: "Marketing Digital",
+      description:
+        "Aumenta tu visibilidad y genera más leads con estrategias de marketing digital efectivas.",
+      icon: "Megaphone",
+      color: "#00FFFF",
+      gradientColors: ["#00FFFF , #00FF88, #00FFFF , #00FF88, #00FFFF"],
     },
   ];
 
@@ -278,8 +285,9 @@ const CitricaWebsite = () => {
             </div>
             {/* Mobile Menu - visible on small screens */}
             <div
-              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${isMenuOpen ? "translate-x-0" : "translate-x-full"
-                }`}
+              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${
+                isMenuOpen ? "translate-x-0" : "translate-x-full"
+              }`}
             >
               <button
                 onClick={() => setIsMenuOpen(false)}
@@ -343,10 +351,7 @@ const CitricaWebsite = () => {
       </nav>
 
       {/* Hero Section */}
-      <section
-        id="inicio"
-        className="min-h-screen pt-44 relative overflow-hidden"
-      >
+      <section id="inicio" className="min-h-screen relative overflow-hidden">
         <div className="absolute inset-0 -z-80">
           <DotGrid
             dotSize={4}
@@ -363,27 +368,28 @@ const CitricaWebsite = () => {
         <Container>
           <Col
             cols={{ lg: 10, md: 6, sm: 4 }}
-            className="text-center mx-auto mb-12"
+            className="text-center mx-auto mt-[25vh]"
           >
             <div className="mb-14 bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
               <AnimatedHeadlines />
-
-              <Button
-                onClick={() =>
-                  document
-                    .getElementById("contacto")
-                    ?.scrollIntoView({ behavior: "smooth" })
-                }
-                label="CONÓCENOS AHORA"
-                variant="primary"
-                textVariant="body"
-                className="mt-9"
-              />
             </div>
           </Col>
         </Container>
+        <Button
+          onClick={() =>
+            document
+              .getElementById("contacto")
+              ?.scrollIntoView({ behavior: "smooth" })
+          }
+          label="CONÓCENOS AHORA"
+          variant="primary"
+          textVariant="body"
+          className="absolute bottom-[10vh] left-1/2 -translate-x-1/2"
+        />
+      </section>
 
-        {/* Services Grid */}
+      {/* Services Grid */}
+      <section>
         <Container className="bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
@@ -400,7 +406,7 @@ const CitricaWebsite = () => {
             {services.map((service, index) => (
               <div
                 key={index}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 hover:bg-opacity-10 transition-all duration-300 hover:transform hover:scale-105 flex flex-col items-center text-center"
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 flex flex-col items-center text-center"
               >
                 <div
                   className="mb-4 flex items-center justify-center"
@@ -420,17 +426,17 @@ const CitricaWebsite = () => {
                     size={32}
                   />
                 </div>
-                <h3 className="mb-4">
+                <h2 className="mb-4">
                   <GradientText
                     colors={service.gradientColors}
                     animationSpeed={3}
                     showBorder={false}
                   >
-                    <Text variant="subtitle" weight="bold">
+                    <Text variant="subtitle" weight="bold"> 
                       {service.title}
                     </Text>
                   </GradientText>
-                </h3>
+                </h2>
                 <Text variant="body" color="#ffffff" className="opacity-60">
                   {service.description}
                 </Text>
@@ -521,8 +527,8 @@ const CitricaWebsite = () => {
             <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
               <p className="text-ch-width text-balance">
                 <Text variant="body" color="#FFFFFF" className="opacity-90">
-                  Somos un equipo de desarrolladores y diseñadores apasionados por
-                  crear experiencias digitales excepcionales que transforman
+                  Somos un equipo de desarrolladores y diseñadores apasionados
+                  por crear experiencias digitales excepcionales que transforman
                   negocios.
                 </Text>
               </p>
@@ -663,7 +669,7 @@ const CitricaWebsite = () => {
                   {/* Botón */}
                   <Link href={otherProjects.link} className="w-full">
                     <Button
-                      onClick={() => { }}
+                      onClick={() => {}}
                       label="Ver Detalles"
                       variant="secondary"
                       fullWidth

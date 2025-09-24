@@ -472,6 +472,12 @@ $container-inputs : (sm: (padding: 0px 8px,
   margin: 0 auto;
 }
 
+.center-y {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 .balance-text {
   text-wrap: balance;
 }
