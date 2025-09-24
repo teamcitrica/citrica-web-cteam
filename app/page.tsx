@@ -371,6 +371,11 @@ const CitricaWebsite = () => {
             className="text-center mx-auto mt-[25vh]"
           >
             <div className="mb-14 bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
+            <h1 className="text-balance mb-6">
+              <Text variant="display" color="#FF5B00" weight="bold">
+                APLICACIONES WEB Y MÓVILES A MEDIDA
+              </Text>
+            </h1>
               <AnimatedHeadlines />
             </div>
           </Col>
