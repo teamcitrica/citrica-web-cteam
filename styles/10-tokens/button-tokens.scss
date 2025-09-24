@@ -19,7 +19,7 @@ $btn-citrica-ui: (
     filter: none !important;
     box-shadow: inherit !important;
   }
-  // Preserve centering for absolutely positioned buttons
+  // esta es la modificacion que se hizo para conservar el centrado para los botones posicionados absolutamente.ojito aqui johan
   &.absolute {
     &:hover, &:active, &:focus {
       transform: translateX(-50%) !important;
