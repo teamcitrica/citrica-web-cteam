@@ -17,8 +17,13 @@ $btn-citrica-ui: (
     opacity: 1 !important;
     border-color: inherit !important;
     filter: none !important;
-    transform: none !important;
     box-shadow: inherit !important;
+  }
+  // esta es la modificacion que se hizo para conservar el centrado para los botones posicionados absolutamente.ojito aqui johan
+  &.absolute {
+    &:hover, &:active, &:focus {
+      transform: translateX(-50%) !important;
+    }
   }
   @include a-set($btn-citrica-ui);
 }
