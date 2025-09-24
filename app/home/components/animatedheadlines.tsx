@@ -121,24 +121,24 @@ const AnimatedHeadlines: React.FC = () => {
   const headlines: Headline[] = [
     {
       prefix: "Convertimos visitas en clientes con ",
-      highlight: "Landing Pages de alto impacto",
-      suffix: ".",
+      highlight: "Landing Pages de alto impacto.",
+      suffix: "",
     },
     {
       prefix: "Posicionamos tu marca y atraemos clientes con ",
-      highlight: "Websites profesionales",
-      suffix: ".",
+      highlight: "Websites profesionales.",
+      suffix: "",
     },
     {
       prefix: "Optimizamos tus procesos y mejoramos tu eficiencia con ",
-      highlight: "Web Apps a la medida",
-      suffix: ".",
+      highlight: "Web Apps a la medida.",
+      suffix: "",
     },
     {
       prefix:
         "Fortalecemos tu marca y conectamos con tus clientes a través de ",
-      highlight: "Mobile Apps",
-      suffix: ".",
+      highlight: "Mobile Apps.",
+      suffix: "",
     },
     {
       prefix: "",
@@ -240,8 +240,8 @@ const AnimatedHeadlines: React.FC = () => {
 
   return (
     <div className="flex justify-center">
-      <h2 className="text-balance mb-4">
-        <Text variant="title" className="center">
+      <h2 className="text-balance">
+        <Text variant="subtitle" weight="bold"  className="center">
           <CustomTextType />
         </Text>
       </h2>
