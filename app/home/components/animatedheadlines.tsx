@@ -145,7 +145,7 @@ const AnimatedHeadlines: React.FC = () => {
         timeout = setTimeout(() => {
           setIsPaused(false);
           setIsDeleting(true);
-        }, 3000); // 3 segundos de pausa
+        }, 5000); // 3 segundos de pausa
       } else if (isDeleting) {
         if (currentText.length > 0) {
           timeout = setTimeout(() => {
