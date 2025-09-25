@@ -246,6 +246,7 @@
   justify-content: center;
   width: 100%;
   overflow: hidden;
+  background-color: #FF5B00;
 }
 
 .curved-loop-svg {
@@ -255,8 +256,8 @@
   aspect-ratio: 100 / 12;
   overflow: visible;
   display: block;
-  font-size: 48px;
-  fill: #FF5B00;
+  font-size: 38px;
+  fill: #FFFFFF;
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
@@ -396,6 +397,10 @@ $container-inputs : (sm: (padding: 0px 8px,
   background-color: #003333;
 }
 
+.bg-color-ct-tertiary-darker {
+  background-color: #0A0F0F;
+}
+
 .bg-color-ct-cuaternary {
   background-color: #FF00D4;
 }
@@ -480,4 +485,18 @@ $container-inputs : (sm: (padding: 0px 8px,
 
 .balance-text {
   text-wrap: balance;
+}
+
+.hero-background-image {
+  background: url("../public/img/hero-bkg-img-3.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.hero-background-image-flip {
+  background: url("../public/img/hero-bkg-img-3-flip.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }

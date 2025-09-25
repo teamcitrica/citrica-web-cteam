@@ -210,7 +210,7 @@ const CitricaWebsite = () => {
   ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#16141F" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "#0A0F0F" }}>
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-black/80 bg-opacity-80 backdrop-blur-sm ">
         <Container className="py-2">
@@ -351,7 +351,7 @@ const CitricaWebsite = () => {
       </nav>
 
       {/* Hero Section */}
-      <section id="inicio" className="min-h-screen relative overflow-hidden">
+      <section id="inicio" className="min-h-screen relative overflow-hidden hero-background-image">
         <div className="absolute inset-0 -z-80">
           <DotGrid
             dotSize={4}
@@ -369,8 +369,18 @@ const CitricaWebsite = () => {
           <Col
             cols={{ lg: 10, md: 6, sm: 4 }}
             className="text-center mx-auto mt-[25vh]"
-          >
+          >            
             <div className="mb-14 bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
+              <h1 className="text-balance">
+                <Text variant="display" color="#FF5B00" weight="bold">
+                  APLICACIONES WEB Y MÓVILES A MEDIDA
+                </Text>
+              </h1>
+              <h3 className="text-balance mb-8">
+                <Text variant="headline" color="#FFFFFF" weight="bold">
+                  para impulsar tu negocio
+                </Text>
+              </h3>
               <AnimatedHeadlines />
             </div>
           </Col>
@@ -389,10 +399,10 @@ const CitricaWebsite = () => {
       </section>
 
       {/* Services Grid */}
-      <section>
-        <Container className="bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
+      <section className="hero-background-image-flip">
+        <Container className="py-20">
           <Col
-            cols={{ lg: 12, md: 6, sm: 4 }}
+            cols={{ lg: 12, md: 6, sm: 4 }} 
             className="mb-6 flex items-center justify-center text-center"
           >
             <Text variant="headline" color="#FF5B00" weight="bold">
@@ -401,12 +411,13 @@ const CitricaWebsite = () => {
           </Col>
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
+            noPadding
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4"
           >
             {services.map((service, index) => (
               <div
                 key={index}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 flex flex-col items-center text-center"
+                className="bg-black/20 backdrop-blur-xl border-2 border-[#003333] rounded-2xl p-6 flex flex-col items-center text-center"
               >
                 <div
                   className="mb-4 flex items-center justify-center"
@@ -432,7 +443,7 @@ const CitricaWebsite = () => {
                     animationSpeed={3}
                     showBorder={false}
                   >
-                    <Text variant="subtitle" weight="bold"> 
+                    <Text variant="subtitle" weight="bold">
                       {service.title}
                     </Text>
                   </GradientText>
@@ -456,6 +467,7 @@ const CitricaWebsite = () => {
         <Container noPadding>
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
+            noPadding
             className="flex justify-center p-0"
           >
             <CurvedLoop
@@ -464,14 +476,14 @@ const CitricaWebsite = () => {
               curveAmount={0}
               direction="right"
               interactive={true}
-              className="custom-text-style opacity-60"
+              className="custom-text-style"
             />
           </Col>
         </Container>
       </section>
 
       {/* Value Proposition */}
-      <section id="valores" className="bg-color-ct-white py-12">
+      <section id="valores" className="bg-color-ct-white py-20">
         <Container>
           {/* Íconos animados con contadores e información */}
           <Col cols={{ lg: 12, md: 6, sm: 4 }}>
@@ -516,7 +528,7 @@ const CitricaWebsite = () => {
       </section>
 
       {/* About Us */}
-      <section className="py-20">
+      <section className="py-20 hero-background-image">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <h2 className="mb-6">
@@ -711,7 +723,7 @@ const CitricaWebsite = () => {
       </section>
 
       {/* Technologies Section */}
-      <section id="technologies" className="pb-20 pt-20">
+      <section id="technologies" className="pb-20 pt-20 hero-background-image-flip">
         <Container>
           {/* Título principal */}
           <Col
@@ -735,12 +747,13 @@ const CitricaWebsite = () => {
           {/* Grid de tecnologías */}
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
+            noPadding
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
           >
             {technologies.map((tech, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl p-8 flex flex-col items-center text-center shadow-md border-4 transition-all duration-300 hover:shadow-xl hover:scale-105"
+                className="bg-white rounded-2xl p-4 flex flex-col items-center text-center shadow-md border-4 transition-all duration-300 hover:shadow-xl hover:scale-105"
                 style={{ borderColor: tech.color }}
               >
                 {/* Icono */}
