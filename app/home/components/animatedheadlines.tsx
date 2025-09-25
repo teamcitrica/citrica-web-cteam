@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import Text from '@ui/atoms/text';
+import React, { useState, useEffect } from "react";
+import Text from "@ui/atoms/text";
 
 // Tipos para el componente TextType
 interface TextTypeProps {
@@ -22,19 +22,19 @@ interface Headline {
 }
 
 // Componente TextType basado en React Bits
-const TextType: React.FC<TextTypeProps> = ({ 
-  texts, 
-  typingSpeed = 100, 
-  deletingSpeed = 50, 
+const TextType: React.FC<TextTypeProps> = ({
+  texts,
+  typingSpeed = 100,
+  deletingSpeed = 50,
   pauseDuration = 2000,
   loop = true,
   showCursor = true,
-  cursorChar = '|',
-  className = '',
-  onComplete
+  cursorChar = "|",
+  className = "",
+  onComplete,
 }) => {
   const [currentTextIndex, setCurrentTextIndex] = useState<number>(0);
-  const [currentText, setCurrentText] = useState<string>('');
+  const [currentText, setCurrentText] = useState<string>("");
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isPaused, setIsPaused] = useState<boolean>(false);
 
@@ -73,17 +73,28 @@ const TextType: React.FC<TextTypeProps> = ({
     }
 
     return () => clearTimeout(timeout);
-  }, [currentText, currentTextIndex, isDeleting, isPaused, texts, typingSpeed, deletingSpeed, pauseDuration, loop, onComplete]);
+  }, [
+    currentText,
+    currentTextIndex,
+    isDeleting,
+    isPaused,
+    texts,
+    typingSpeed,
+    deletingSpeed,
+    pauseDuration,
+    loop,
+    onComplete,
+  ]);
 
   return (
     <span className={className}>
       {currentText}
       {showCursor && (
-        <span 
+        <span
           className="animate-pulse"
-          style={{ 
-            animation: 'blink 1s infinite',
-            marginLeft: '2px'
+          style={{
+            animation: "blink 1s infinite",
+            marginLeft: "2px",
           }}
         >
           {cursorChar}
@@ -91,8 +102,14 @@ const TextType: React.FC<TextTypeProps> = ({
       )}
       <style jsx>{`
         @keyframes blink {
-          0%, 50% { opacity: 1; }
-          51%, 100% { opacity: 0; }
+          0%,
+          50% {
+            opacity: 1;
+          }
+          51%,
+          100% {
+            opacity: 0;
+          }
         }
       `}</style>
     </span>
@@ -104,41 +121,45 @@ const AnimatedHeadlines: React.FC = () => {
   const headlines: Headline[] = [
     {
       prefix: "Convertimos visitas en clientes con ",
-      highlight: "Landing Pages de alto impacto",
-      suffix: "."
+      highlight: "Landing Pages de alto impacto.",
+      suffix: "",
     },
     {
       prefix: "Posicionamos tu marca y atraemos clientes con ",
-      highlight: "Websites profesionales", 
-      suffix: "."
+      highlight: "Websites profesionales.",
+      suffix: "",
     },
     {
       prefix: "Optimizamos tus procesos y mejoramos tu eficiencia con ",
-      highlight: "Web Apps a la medida",
-      suffix: "."
+      highlight: "Web Apps a la medida.",
+      suffix: "",
     },
     {
-      prefix: "Fortalecemos tu marca y conectamos con tus clientes a través de ",
-      highlight: "Mobile Apps",
-      suffix: "."
+      prefix:
+        "Fortalecemos tu marca y conectamos con tus clientes a través de ",
+      highlight: "Mobile Apps.",
+      suffix: "",
     },
     {
       prefix: "",
       highlight: "Integramos IA",
-      suffix: " para automatizar tu negocio y tomar mejores decisiones."
-    }
+      suffix: " para automatizar tu negocio y tomar mejores decisiones.",
+    },
   ];
 
   // Componente personalizado que maneje los colores
   const CustomTextType: React.FC = () => {
     const [currentTextIndex, setCurrentTextIndex] = useState<number>(0);
-    const [currentText, setCurrentText] = useState<string>('');
+    const [currentText, setCurrentText] = useState<string>("");
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const [isPaused, setIsPaused] = useState<boolean>(false);
 
     useEffect(() => {
       const currentHeadline = headlines[currentTextIndex];
-      const targetText = currentHeadline.prefix + currentHeadline.highlight + currentHeadline.suffix;
+      const targetText =
+        currentHeadline.prefix +
+        currentHeadline.highlight +
+        currentHeadline.suffix;
       let timeout: NodeJS.Timeout;
 
       if (isPaused) {
@@ -174,7 +195,7 @@ const AnimatedHeadlines: React.FC = () => {
       const prefixLength = currentHeadline.prefix.length;
       const highlightLength = currentHeadline.highlight.length;
       const suffixStart = prefixLength + highlightLength;
-      
+
       const prefix = currentText.slice(0, prefixLength);
       const highlight = currentText.slice(prefixLength, suffixStart);
       const suffix = currentText.slice(suffixStart);
@@ -191,20 +212,26 @@ const AnimatedHeadlines: React.FC = () => {
     return (
       <span>
         {renderColoredText()}
-        <span 
+        <span
           className="cursor"
-          style={{ 
-            color: "#FF5B00", 
+          style={{
+            color: "#FF5B00",
             animation: "blink 1s infinite",
-            marginLeft: '2px'
+            marginLeft: "2px",
           }}
         >
           |
         </span>
         <style jsx>{`
           @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
+            0%,
+            50% {
+              opacity: 1;
+            }
+            51%,
+            100% {
+              opacity: 0;
+            }
           }
         `}</style>
       </span>
@@ -212,13 +239,13 @@ const AnimatedHeadlines: React.FC = () => {
   };
 
   return (
-    <h2 className="text-balance mb-4">
-      <div className="min-h-[120px] flex items-center">
-        <Text variant="display" weight="bold" className="text-4xl md:text-5xl lg:text-6xl leading-tight">
+    <div className="flex justify-center">
+      <h2 className="text-balance">
+        <Text variant="subtitle" weight="bold"  className="center">
           <CustomTextType />
         </Text>
-      </div>
-    </h2>
+      </h2>
+    </div>
   );
 };
 
