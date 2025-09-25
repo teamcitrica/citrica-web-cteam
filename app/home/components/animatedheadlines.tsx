@@ -171,7 +171,7 @@ const AnimatedHeadlines: React.FC = () => {
         if (currentText.length > 0) {
           timeout = setTimeout(() => {
             setCurrentText(currentText.slice(0, -1));
-          }, 30); // Velocidad de borrado
+          }, 10); // Velocidad de borrado
         } else {
           setIsDeleting(false);
           setCurrentTextIndex((prev) => (prev + 1) % headlines.length);
