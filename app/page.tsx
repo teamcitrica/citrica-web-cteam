@@ -370,7 +370,7 @@ const CitricaWebsite = () => {
             cols={{ lg: 10, md: 6, sm: 4 }}
             className="text-center mx-auto mt-[25vh]"
           >            
-            <div className="mb-14 bg-opacity-10 backdrop-blur-sm p-8 rounded-3xl border border-white border-opacity-10">
+            <div className="bg-black/20 backdrop-blur-sm border-2 border-[#003333] rounded-2xl mb-14 p-8">
               <h1 className="text-balance">
                 <Text variant="display" color="#FF5B00" weight="bold">
                   APLICACIONES WEB Y MÓVILES A MEDIDA
