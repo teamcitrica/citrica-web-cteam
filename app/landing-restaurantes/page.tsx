@@ -131,13 +131,12 @@ const LandingRestaurantes = () => {
           >
             <h3 className="mb-4">
               <Text variant="headline" color="#FF5B00" weight="bold">
-                Nuestros servicios
+                Soluciones integrales
               </Text>
             </h3>
             <p>
               <Text variant="body" color="#ffffff">
-                Soluciones integrales diseñadas específicamente para el sector
-                gastronómico
+                Diseñadas específicamente para el sector gastronómico
               </Text>
             </p>
           </Col>
