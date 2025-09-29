@@ -507,3 +507,20 @@ $container-inputs : (sm: (padding: 0px 8px,
   background-position: center;
   background-size: cover;
 }
+
+.img-boton-hero {
+  position: absolute;
+  z-index: 10;
+  animation: glow 2s ease-in-out infinite alternate;
+
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px #ff5b00, 0 0 10px #ff5b00, 0 0 20px #ff5b00;
+  }
+
+  to {
+    box-shadow: 0 0 20px #ff5b00, 0 0 40px #ff5b00, 0 0 60px #ff5b00;
+  }
+}
