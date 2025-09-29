@@ -394,7 +394,7 @@ const CitricaWebsite = () => {
   label="CONÓCENOS AHORA"
   variant="primary"
   textVariant="body"
-  className="absolute bottom-[10vh] left-1/2 -translate-x-1/2 animate-pulse animate-duration-[3500ms] shadow-[0_0_35px_#ff5b00]"
+  className="absolute bottom-[10vh] left-1/2 -translate-x-1/2 img-boton-hero "
 />
       </section>
 
