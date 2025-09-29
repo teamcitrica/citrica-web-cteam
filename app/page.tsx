@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Col } from "@/styles/07-objects/objects";
 import { Text, Icon, Button } from "@citrica-ui";
 import CurvedLoop from "./versions/yolanda/components/CurvedLoop";
@@ -7,207 +7,18 @@ import { Divider, Link } from "@heroui/react";
 import DotGrid from "./versions/yolanda/components/DotGrid";
 import AnimatedHeadlines from "./home/components/animatedheadlines";
 import GradientText from "@/shared/components/project-components/gradient-text";
+import "aos/dist/aos.css";
+import AOS from "aos";
+import { services, projects, otherProjects, technologies, process, stats } from "@/shared/archivos js/citrica-data";
 
 const CitricaWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const services = [
-    {
-      title: "Landing Pages",
-      description:
-        "Convierte visitantes en clientes con páginas de aterrizaje de alto impacto.",
-      icon: "Globe",
-      color: "#E1FF00",
-      gradientColors: ["#E1FF00 , #62FF00, #E1FF00 , #62FF00, #E1FF00"],
-    },
-    {
-      title: "Websites",
-      description:
-        "Posiciona tu marca y atrae nuevos clientes con un sitio web profesional.",
-      icon: "Monitor",
-      color: "#00FFFF",
-      gradientColors: ["#00FFFF , #00FF88, #00FFFF , #00FF88, #00FFFF"],
-    },
-    {
-      title: "Web Apps",
-      description:
-        "Optimiza tus procesos con aplicaciones web intuitivas y funcionales.",
-      icon: "Code",
-      color: "#FF5B00",
-      gradientColors: [" #FF5B00 , #FF0400, #FF5B00 , #FF0400, #FF5B00"],
-    },
-    {
-      title: "Mobile Apps",
-      description:
-        "Apps móviles para conectar tu negocio con tus clientes, al instante.",
-      icon: "Smartphone",
-      color: "#FF00D4",
-      gradientColors: ["#FF00D4 , #C300FF, #FF00D4 , #C300FF, #FF00D4"],
-    },
-    {
-      title: "Integración de IA",
-      description: "Automatiza procesos y toma decisiones más inteligentes.",
-      icon: "Sparkles",
-      color: "#E1FF00",
-      gradientColors: ["#E1FF00 , #62FF00, #E1FF00 , #62FF00, #E1FF00"],
-    },
-    {
-      title: "Marketing Digital",
-      description:
-        "Aumenta tu visibilidad y genera más leads con estrategias de marketing digital efectivas.",
-      icon: "Megaphone",
-      color: "#00FFFF",
-      gradientColors: ["#00FFFF , #00FF88, #00FFFF , #00FF88, #00FFFF"],
-    },
-  ];
+  useEffect(() => {
+    AOS.init({ duration: 1500, once: true });
+  }, []);
 
-  const projects = [
-    {
-      title: "BGood",
-      description:
-        "Plataforma Inteligente para la Gestión Integral de Suministros en Edificios.",
-      tech: "React • Node.js • MongoDB",
-      image: "/e-commerce.png",
-    },
-    {
-      title: "Sistema ERP",
-      description:
-        "Sistema integral de gestión empresarial para medianas empresas",
-      tech: "Vue.js • Laravel • MySQL",
-      image: "/dashboard.png",
-    },
-    {
-      title: "App de Delivery",
-      description: "Aplicación móvil para delivery con tracking en tiempo real",
-      tech: "React Native • Firebase • Google Maps",
-      image: "/delivery.png",
-    },
-  ];
 
-  const otherProjects = [
-    {
-      id: 1,
-      image: "/img/bgood-hero-img.png",
-      title: "BGood",
-      description:
-        "Plataforma Inteligente para la Gestión Integral de Suministros en Edificios.",
-      tech: ["React", "Node.js", "PostgreSQL"],
-      category: "E-commerce",
-      link: "/project-bgood",
-    },
-    {
-      id: 2,
-      image: "/img/miollita-hero-img-lg.png",
-      title: "MiOllita Mobile App",
-      description:
-        "App para ayudar a decidir qué cocinar y planificar las comidas.",
-      tech: ["Vue.js", "Python", "MongoDB"],
-      category: "Mobile App",
-      link: "/project-miollita",
-    },
-    {
-      id: 3,
-      image: "/img/cojones-hero-img.png",
-      title: "Co.Jones",
-      description: "Web Estratégico para Captación de Clientes",
-      tech: ["Next.js", "Express", "MySQL"],
-      category: "Website",
-      link: "/project-cojones",
-    },
-  ];
-
-  const technologies = [
-    {
-      title: "Presentaciones que inspiran",
-      description:
-        "<strong>Figma</strong> permite la colaboración en tiempo real, <strong>prototipos interactivos</strong>, diseños visualmente atractivos y <strong>acceso desde cualquier lugar</strong>, asegurando que tus presentaciones sean tan profesionales y convincentes como tus productos digitales.",
-      icon: "Presentation",
-      color: "#E1FF00",
-    },
-    {
-      title: "Front-end robusto",
-      description:
-        "<strong>HTML5, CSS3 y SASS</strong> para <strong>interfaces modernas y responsivas</strong>. <strong>TypeScript</strong> para un código <strong>más seguro y mantenible</strong>. <strong>ReactJS y Next.js</strong> para aplicaciones <strong>web rápidas y dinámicas.</strong>",
-      icon: "Layers",
-      color: "#00FFFF",
-    },
-    {
-      title: "Desarrollo móvil eficiente",
-      description:
-        "<strong>React Native</strong> para crear aplicaciones nativas para <strong>iOS</strong> y <strong>Android</strong> con un solo código base.",
-      icon: "Smartphone",
-      color: "#FF5B00",
-    },
-    {
-      title: "Back-end potente",
-      description:
-        "<strong>Strapi</strong> para una <strong>gestión de contenido</strong> flexible y escalable. <strong>PostgreSQL</strong> para <strong>bases de datos seguras y confiables.</strong> <strong>AWS S3</strong> para un <strong>almacenamiento</strong> en la nube <strong>seguro.</strong>",
-      icon: "Server",
-      color: "#E1FF00",
-    },
-  ];
-
-  const process = [
-    {
-      step: "01",
-      icon: "ClipboardList",
-      title: "Planificación",
-      description: "Definimos objetivos y estrategia del proyecto",
-      color: "#e1ff00",
-    },
-    {
-      step: "02",
-      icon: "Palette",
-      title: "Diseño",
-      description: "Creamos prototipos y experiencias de usuario",
-      color: "#ff5b00",
-    },
-    {
-      step: "03",
-      icon: "Code",
-      title: "Desarrollo",
-      description: "Construimos tu solución con las mejores tecnologías",
-      color: "#00FFFF",
-    },
-    {
-      step: "04",
-      icon: "TestTube",
-      title: "Pruebas",
-      description: "Validamos calidad y rendimiento exhaustivamente",
-      color: "#FF00D4",
-    },
-    {
-      step: "05",
-      icon: "Rocket",
-      title: "Implementación",
-      description: "Desplegamos tu proyecto de forma segura",
-      color: "#E1FF00",
-    },
-    {
-      step: "06",
-      icon: "Headphones",
-      title: "Soporte",
-      description: "Mantenimiento continuo y evolución constante",
-      color: "#FF5B00",
-    },
-  ];
-
-  const stats = [
-    // { icon: "CheckCircle", number: 150, suffix: "+", label: "Proyectos Entregados" },
-    {
-      icon: "CheckCircle",
-      number: 98,
-      suffix: "%",
-      label: "Clientes Satisfechos",
-    },
-    { icon: "CheckCircle", number: 24, suffix: "/7", label: "Soporte activo" },
-    {
-      icon: "CheckCircle",
-      number: 10,
-      suffix: "x",
-      label: "Velocidad de entrega",
-    },
-  ];
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0A0F0F" }}>
@@ -285,9 +96,8 @@ const CitricaWebsite = () => {
             </div>
             {/* Mobile Menu - visible on small screens */}
             <div
-              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${
-                isMenuOpen ? "translate-x-0" : "translate-x-full"
-              }`}
+              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+                }`}
             >
               <button
                 onClick={() => setIsMenuOpen(false)}
@@ -369,7 +179,7 @@ const CitricaWebsite = () => {
           <Col
             cols={{ lg: 10, md: 6, sm: 4 }}
             className="text-center mx-auto mt-[25vh]"
-          >            
+          >
             <div className="bg-black/20 backdrop-blur-sm border-2 border-[#003333] rounded-2xl mb-14 p-8">
               <h1 className="text-balance">
                 <Text variant="display" color="#FF5B00" weight="bold">
@@ -385,29 +195,40 @@ const CitricaWebsite = () => {
             </div>
           </Col>
         </Container>
-<Button
-  onClick={() =>
-    document
-      .getElementById("contacto")
-      ?.scrollIntoView({ behavior: "smooth" })
-  }
-  label="CONÓCENOS AHORA"
-  variant="primary"
-  textVariant="body"
-  className="absolute bottom-[10vh] left-1/2 -translate-x-1/2 img-boton-hero "
-/>
+        <Button
+          onClick={() =>
+            document
+              .getElementById("contacto")
+              ?.scrollIntoView({ behavior: "smooth" })
+          }
+          label="CONÓCENOS AHORA"
+          variant="primary"
+          textVariant="body"
+          className="absolute bottom-[10vh] left-1/2 -translate-x-1/2 img-boton-hero "
+        />
       </section>
 
       {/* Services Grid */}
       <section className="hero-background-image-flip">
         <Container className="py-20">
           <Col
-            cols={{ lg: 12, md: 6, sm: 4 }} 
+            cols={{ lg: 12, md: 6, sm: 4 }}
             className="mb-6 flex items-center justify-center text-center"
           >
-            <Text variant="headline" color="#FF5B00" weight="bold">
-              Nuestros servicios
-            </Text>
+            <h2
+              data-aos="fade-up"
+              data-aos-duration="1500">
+              <Text
+                variant="headline"
+                color="#FF5B00"
+                weight="bold"
+                data-aos="fade-up"
+                data-aos-duration="1500"
+              >
+                Nuestros servicios
+              </Text>
+            </h2>
+
           </Col>
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
@@ -417,7 +238,9 @@ const CitricaWebsite = () => {
             {services.map((service, index) => (
               <div
                 key={index}
-                className="bg-black/20 backdrop-blur-xl border-2 border-[#003333] rounded-2xl p-6 flex flex-col items-center text-center"
+                data-aos="fade-up"
+                data-aos-duration="1500"
+                className="bg-black/20 backdrop-blur-xl border-2 border-[#003333] rounded-2xl p-6 flex flex-col items-center text-center "
               >
                 <div
                   className="mb-4 flex items-center justify-center"
@@ -430,6 +253,8 @@ const CitricaWebsite = () => {
                     alignItems: "center",
                     justifyContent: "center",
                   }}
+
+
                 >
                   <Icon
                     name={service.icon as any}
@@ -443,7 +268,7 @@ const CitricaWebsite = () => {
                     animationSpeed={3}
                     showBorder={false}
                   >
-                    <Text variant="subtitle" weight="bold">
+                    <Text variant="subtitle" weight="bold" className="">
                       {service.title}
                     </Text>
                   </GradientText>
@@ -464,7 +289,7 @@ const CitricaWebsite = () => {
       </section>
 
       <section id="servicios">
-        <Container noPadding>
+        <Container noPadding noLimit>
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
             noPadding
@@ -488,12 +313,18 @@ const CitricaWebsite = () => {
           {/* Íconos animados con contadores e información */}
           <Col cols={{ lg: 12, md: 6, sm: 4 }}>
             <div className="text-center mb-10">
-              <div className="w-32 h-32 mx-auto mb-6 bg-color-ct-primary rounded-full flex items-center justify-center animate-spin-slow">
+              <div
+                className="w-32 h-32 mx-auto mb-6 bg-color-ct-primary rounded-full flex items-center justify-center animate-spin-slow"
+                data-aos="fade-up"
+                data-aos-duration="1500"
+              >
                 <Icon name="Rocket" color="#FFFFFF" size={48} />
               </div>
-              <Text variant="title" color="#16141F" weight="bold">
-                Impulsamos tu crecimiento digital
-              </Text>
+              <h2 data-aos="fade-up" data-aos-duration="1500">
+                <Text variant="title" color="#16141F" weight="bold" >
+                  Impulsamos tu crecimiento digital
+                </Text>
+              </h2>
             </div>
 
             {/* Stats Icons */}
@@ -506,18 +337,30 @@ const CitricaWebsite = () => {
                   key={index}
                   className="text-center hover:scale-105 transition-transform duration-300"
                 >
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-color-ct-secondary flex items-center justify-center">
+                  <div
+                    className="w-12 h-12 mx-auto mb-3 rounded-full bg-color-ct-secondary flex items-center justify-center"
+                    data-aos="fade-up"
+                    data-aos-duration="1500"
+                  >
                     <Icon
                       name={stat.icon as any}
                       className="text-[#16141F]"
                       size={24}
                     />
                   </div>
-                  <div className="text-2xl font-bold text-[#16141F] mb-1">
+                  <div
+                    className="text-2xl font-bold text-[#16141F] mb-1"
+                    data-aos="fade-up"
+                    data-aos-duration="1500"
+                  >
                     {stat.number}
                     {stat.suffix}
                   </div>
-                  <div className="text-sm text-[#16141F]/80 font-medium">
+                  <div
+                    className="text-sm text-[#16141F]/80 font-medium"
+                    data-aos="fade-up"
+                    data-aos-duration="1500"
+                  >
                     {stat.label}
                   </div>
                 </div>
@@ -531,13 +374,13 @@ const CitricaWebsite = () => {
       <section className="py-20 hero-background-image">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
-            <h2 className="mb-6">
-              <Text variant="headline" color="#FF5B00" weight="bold">
+            <h2 className="mb-6" data-aos="fade-up" data-aos-duration="1500">
+              <Text variant="headline" color="#FF5B00" weight="bold" className="">
                 ¿Quiénes somos?
               </Text>
             </h2>
             <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
-              <p className="text-ch-width text-balance">
+              <p className="text-ch-width text-balance" data-aos="fade-up" data-aos-duration="1500">
                 <Text variant="body" color="#FFFFFF" className="opacity-90">
                   Somos un equipo de desarrolladores y diseñadores apasionados
                   por crear experiencias digitales excepcionales que transforman
@@ -548,7 +391,7 @@ const CitricaWebsite = () => {
           </Col>
 
           <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-            <div className="relative max-w-4xl mx-auto">
+            <div className="relative max-w-4xl mx-auto" data-aos="fade-up" data-aos-duration="1500">
               {/* Línea central */}
               <div className="absolute left-1/2 h-full w-0.5 bg-white opacity-50 -translate-x-1/2"></div>
 
@@ -611,12 +454,12 @@ const CitricaWebsite = () => {
       <section id="proyectos" className="py-20 gradient-project-hero">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
-            <h2 className="mb-6">
+            <h2 className="mb-6" data-aos="fade-up" data-aos-duration="1500">
               <Text variant="headline" color="#FFFFFF" weight="bold">
                 Últimos proyectos
               </Text>
             </h2>
-            <p>
+            <p data-aos="fade-up" data-aos-duration="1500">
               <Text variant="body" color="#E5FFFF">
                 Conoce algunos de nuestros trabajos más recientes
               </Text>
@@ -664,24 +507,10 @@ const CitricaWebsite = () => {
                     </Text>
                   </p>
 
-                  {/* Tecnologías */}
-                  {/* <div className="flex flex-wrap gap-2 mb-4">
-                    {project.tech.map((tech, techIndex) => (
-                      <span
-                        key={techIndex}
-                        className="px-2 py-1 bg-[#00FFFF]/10 border border-[#00FFFF]/20 rounded text-xs"
-                      >
-                        <Text variant="label" color="#00FFFF">
-                          {tech}
-                        </Text>
-                      </span>
-                    ))}
-                  </div> */}
-
                   {/* Botón */}
                   <Link href={otherProjects.link} className="w-full">
                     <Button
-                      onClick={() => {}}
+                      onClick={() => { }}
                       label="Ver Detalles"
                       variant="secondary"
                       fullWidth
@@ -691,34 +520,6 @@ const CitricaWebsite = () => {
               </article>
             ))}
           </div>
-
-          {/* ESTAS SON LAS CARDS ANTIGUAS , COMENTADAS POR SI SE NECESITAN LUEGO  */}
-          {/* <Col cols={{ lg: 12, md: 6, sm: 4 }} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {projects.map((project, index) => (
-              <div key={index} className="bg-[#12111180] backdrop-blur-3xl border border-[#292929e6] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 hover:transform hover:scale-105 hover:-rotate-1 animate-fade-in-up group" style={{ animationDelay: `${index * 150}ms` }}>
-                <div className="h-80 w-full overflow-hidden">
-                  <img src={project.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="image-projects" />
-                </div>
-                <div className="p-6">
-                  <h3 className="mb-2">
-                    <Text variant="body" color="#FF00D4" weight="bold">
-                      {project.title}
-                    </Text>
-                  </h3>
-                  <div className="mb-3">
-                    <Text variant="label" color="#FFFFFF" className="opacity-70">
-                      {project.description}
-                    </Text>
-                  </div>
-                  <div className="bg-[#16141F] px-3 py-2 rounded-lg">
-                    <Text variant="label" color="#bbba9b" weight="bold">
-                      {project.tech}
-                    </Text>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </Col> */}
         </Container>
       </section>
 
@@ -730,17 +531,19 @@ const CitricaWebsite = () => {
             cols={{ lgPush: 2, lg: 8, md: 6, sm: 4 }}
             className="text-center mb-12"
           >
-            <h2 className="mb-6">
+            <h2 className="mb-6" data-aos="fade-up" data-aos-duration="1500">
               <Text variant="headline" color="#FF5B00" weight="bold">
                 Tecnología de punta para resultados excepcionales
               </Text>
             </h2>
             <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
-              <Text variant="body" color="#FFFFFF" className="opacity-90">
-                En Cítrica, utilizamos un conjunto de tecnologías de vanguardia
-                para garantizar que tus productos digitales sean de la más alta
-                calidad:
-              </Text>
+              <p data-aos="fade-up" data-aos-duration="1500">
+                <Text variant="body" color="#FFFFFF" className="opacity-90">
+                  En Cítrica, utilizamos un conjunto de tecnologías de vanguardia
+                  para garantizar que tus productos digitales sean de la más alta
+                  calidad:
+                </Text>
+              </p>
             </Col>
           </Col>
 
@@ -755,6 +558,8 @@ const CitricaWebsite = () => {
                 key={index}
                 className="bg-white rounded-2xl p-4 flex flex-col items-center text-center shadow-md border-4 transition-all duration-300 hover:shadow-xl hover:scale-105"
                 style={{ borderColor: tech.color }}
+                data-aos="fade-up"
+                data-aos-duration="1500"
               >
                 {/* Icono */}
                 <div
@@ -782,7 +587,7 @@ const CitricaWebsite = () => {
 
           {/* Texto final */}
           <div className="text-center mt-10 max-w-3xl mx-auto">
-            <p className="text-white text-sm">
+            <p className="text-white text-sm" data-aos="fade-up" data-aos-duration="1500">
               <Text variant="body" color="#ffffff" weight="bold">
                 Estas herramientas nos permiten crear productos digitales de
                 alto rendimiento, escalables y fáciles de mantener, asegurando
@@ -802,12 +607,12 @@ const CitricaWebsite = () => {
               className="text-center mb-12"
             >
               <div className="text-center space-y-4">
-                <h2>
+                <h2 data-aos="fade-up" data-aos-duration="1500">
                   <Text variant="headline" color="#FF5B00" weight="bold">
                     Nuestro Proceso de Trabajo
                   </Text>
                 </h2>
-                <p>
+                <p data-aos="fade-up" data-aos-duration="1500">
                   <Text variant="body" color="#16141F" className="opacity-90">
                     Seguimos una metodología probada que garantiza la entrega
                     exitosa de tu proyecto, desde la conceptualización hasta el
@@ -817,7 +622,7 @@ const CitricaWebsite = () => {
               </div>
             </Col>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative" data-aos="fade-up" data-aos-duration="1500">
               {process.map((step, index) => (
                 <div key={index} className="relative">
                   <div className="relative p-8 h-full border-2 rounded-xl hover:shadow-xl transition-all duration-500 group-hover:scale-105 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm hover:from-white/20 hover:to-white/10">
@@ -865,7 +670,7 @@ const CitricaWebsite = () => {
                     </div>
 
                     {/* Connection Line for larger screens - solo en desktop */}
-                    {index < process.length - 1 && index % 3 !== 3 && (
+                    {index < process.length - 1 && index % 3 !== 2 && (
                       <div className="hidden lg:block absolute -right-4 top-1/2 transform -translate-y-1/2 z-0">
                         <div className="w-8 h-0.5 bg-gray-300"></div>
                         <div
@@ -878,7 +683,7 @@ const CitricaWebsite = () => {
                     )}
 
                     {/* Connection Line vertical para el layout de 2 columnas */}
-                    {index < process.length - 1 && index % 2 !== 2 && (
+                    {index < process.length - 1 && index % 2 !== 1 && (
                       <div className="hidden md:block lg:hidden absolute -bottom-4 left-1/2 transform -translate-x-1/2 z-0">
                         <div className="h-8 w-0.5 bg-gray-300"></div>
                         <div
@@ -918,18 +723,18 @@ const CitricaWebsite = () => {
       >
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mx-auto">
-            <h2 className="mb-6">
+            <h2 className="mb-6" data-aos="fade-up" data-aos-duration="1500">
               <Text variant="headline" color="#16141F" weight="bold">
                 ¿Listo para transformar tu negocio?
               </Text>
             </h2>
-            <div className="mb-8">
+            <div className="mb-8" data-aos="fade-up" data-aos-duration="1500">
               <Text variant="body" color="#16141F" className="opacity-80">
                 Contáctanos hoy y descubre cómo podemos impulsar tu crecimiento
                 digital
               </Text>
             </div>
-            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8" data-aos="fade-up" data-aos-duration="1500">
               <Button
                 onClick={() =>
                   window.open("mailto:admin@citrica.dev", "_blank")
@@ -945,7 +750,7 @@ const CitricaWebsite = () => {
                 variant="primary"
               />
             </div>
-            <div className="flex flex-col justify-center items-center gap-1">
+            <div className="flex flex-col justify-center items-center gap-1" data-aos="fade-up" data-aos-duration="1500">
               <div className="flex items-center space-x-2">
                 <Icon name="Mail" color="#16141F" size={20} />
                 <Link href="mailto:admin@citrica.dev">
@@ -1004,36 +809,6 @@ const CitricaWebsite = () => {
                   © 2025 Cítrica.
                 </Text>
               </h2>
-              {/* <div className="flex justify-center lg:justify-end space-x-6 mb-8">
-                <Link
-                  href="https://www.facebook.com/citrica"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Icon name="Instagram" color="#E5FFFF" size={24} className="transition-all duration-300" />
-                </Link>
-                <Link
-                  href="https://www.facebook.com/citrica"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Icon name="Twitter" color="#E5FFFF" size={24} className="transition-all duration-300" />
-                </Link>
-                <Link
-                  href="https://www.facebook.com/citrica"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Icon name="Linkedin" color="#E5FFFF" size={24} className="transition-all duration-300" />
-                </Link>
-                <Link
-                  href="https://www.facebook.com/citrica"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Icon name="Github" color="#E5FFFF" size={24} className="transition-all duration-300" />
-                </Link>
-              </div> */}
             </div>
           </Col>
         </Container>
