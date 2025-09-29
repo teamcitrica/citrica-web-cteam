@@ -1,5 +1,7 @@
+"use client";
 import React from "react";
 import { Container, Col } from "@citrica/objects";
+import { Divider, Link } from "@heroui/react";
 import Text from "@ui/atoms/text";
 import Button from "@ui/molecules/button";
 import Icon from "@ui/atoms/icon";
@@ -123,12 +125,9 @@ const LandingRestaurantes = () => {
       </section>
 
       {/* Services Grid */}
-      <section className="hero-background-image-flip">
+      <section className="rest-solucions-background-image">
         <Container className="py-20">
-          <Col
-            cols={{ lg: 12, md: 6, sm: 4 }}
-            className="mb-10 text-center"
-          >
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="mb-10 text-center">
             <h3 className="mb-4">
               <Text variant="headline" color="#FF5B00" weight="bold">
                 Soluciones integrales
@@ -197,7 +196,7 @@ const LandingRestaurantes = () => {
       {/* Why Choose Us Section */}
       <section className="py-[80px] bg-primary-container">
         <Container>
-          <Col cols={{ lg: 6, md: 3, sm: 4 }} className="flex items-center">
+          {/* <Col cols={{ lg: 6, md: 3, sm: 4 }} className="flex items-center">
             <div className="grid grid-cols-2 gap-6 w-full">
               <div className="bg-surface rounded-xl p-6 text-center">
                 <div className="mb-4">
@@ -248,24 +247,26 @@ const LandingRestaurantes = () => {
                 </div>
               </div>
             </div>
-          </Col>
+          </Col> */}
           <Col
             cols={{ lg: 6, md: 3, sm: 4 }}
             className="flex flex-col justify-center"
           >
-            <div className="mb-6">
+            <div className="mb-2">
               <h2>
-                <Text variant="headline" textColor="color-on-primary-container">
+                <Text
+                  variant="headline"
+                  weight="bold"
+                  textColor="color-on-primary-container"
+                >
                   ¿Por Qué Elegir Cítrica?
                 </Text>
               </h2>
             </div>
             <div className="mb-6">
               <p>
-                <Text variant="body" textColor="color-on-primary-container">
-                  Somos especialistas en soluciones digitales para el sector
-                  gastronómico con tecnología de vanguardia y resultados
-                  comprobados.
+                <Text variant="subtitle" textColor="color-on-primary-container">
+                  Especialización y Tecnología para su Rentabilidad.
                 </Text>
               </p>
             </div>
@@ -277,9 +278,10 @@ const LandingRestaurantes = () => {
                 </div>
                 <div>
                   <Text variant="body" textColor="color-on-primary-container">
-                    <strong>Especialización Gastronómica:</strong> Desarrollamos
-                    soluciones digitales específicamente diseñadas para
-                    restaurantes, bares y cafés
+                    <strong>Enfoque 100% Gastronómico:</strong> No somos
+                    generalistas. Cada solución está diseñada para resolver los
+                    desafíos únicos de restaurantes, bares y cafés, no de
+                    cualquier negocio.
                   </Text>
                 </div>
               </div>
@@ -290,9 +292,10 @@ const LandingRestaurantes = () => {
                 </div>
                 <div>
                   <Text variant="body" textColor="color-on-primary-container">
-                    <strong>Tecnología Avanzada:</strong> Integramos IA y las
-                    últimas tecnologías web para maximizar la eficiencia de tu
-                    negocio
+                    <strong>Tecnología que Vende:</strong> Integramos IA y las
+                    últimas tendencias web para maximizar su eficiencia,
+                    minimizar errores y{" "}
+                    <strong>aumentar su ticket promedio.</strong>
                   </Text>
                 </div>
               </div>
@@ -303,9 +306,10 @@ const LandingRestaurantes = () => {
                 </div>
                 <div>
                   <Text variant="body" textColor="color-on-primary-container">
-                    <strong>Soluciones Completas:</strong> Desde el diseño web
-                    hasta apps móviles y marketing digital, cubrimos todas tus
-                    necesidades digitales
+                    <strong>Servicio Integral 360°:</strong> Cubrimos todas sus
+                    necesidades digitales, desde el diseño de su web o app de
+                    pedidos hasta la estrategia de marketing que lo posiciona
+                    como líder.
                   </Text>
                 </div>
               </div>
@@ -433,27 +437,61 @@ const LandingRestaurantes = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-[80px] bg-gradient-to-r from-primary to-secondary">
+      <section
+        id="contacto"
+        className="py-20"
+        style={{ backgroundColor: "#E1FF00" }}
+      >
         <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center">
-            <div className="mb-6">
-              <h2>
-                <Text variant="headline" textColor="color-on-primary">
-                  ¿Listo para Digitalizar tu Negocio Gastronómico?
-                </Text>
-              </h2>
-            </div>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mx-auto">
+            <h2 className="mb-6">
+              <Text variant="headline" color="#16141F" weight="bold">
+                ¿Listo para transformar tu negocio gastronómico?
+              </Text>
+            </h2>
             <div className="mb-8">
-              <p>
-                <Text variant="body" textColor="color-on-primary">
-                  Contáctanos hoy y descubre cómo nuestras soluciones web, apps
-                  móviles e IA pueden transformar tu restaurante
-                </Text>
-              </p>
+              <Text variant="body" color="#16141F" className="opacity-80">
+                Contáctanos hoy y descubre cómo nuestras soluciones pueden
+                transformar tu restaurante
+              </Text>
             </div>
-            <div className="flex justify-center gap-4 flex-wrap">
-              <Button label="Solicitar Demo Gratuita" variant="primary" />
-              <Button label="Ver Nuestro Portfolio" variant="secondary" />
+            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+              <Button
+                onClick={() =>
+                  window.open("mailto:admin@citrica.dev", "_blank")
+                }
+                label="Escribir Email"
+                variant="primary"
+              />
+              <Button
+                onClick={() =>
+                  window.open("https://wa.me/51942627383", "_blank")
+                }
+                label="WhatsApp"
+                variant="primary"
+              />
+            </div>
+            <div className="flex flex-col justify-center items-center gap-1">
+              <div className="flex items-center space-x-2">
+                <Icon name="Mail" color="#16141F" size={20} />
+                <Link href="mailto:admin@citrica.dev">
+                  <Text variant="body" color="#16141F" weight="bold">
+                    contacto@citrica.com
+                  </Text>
+                </Link>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Icon name="Phone" color="#16141F" size={20} />
+                <Link
+                  href="tel:+51942627383"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Text variant="body" color="#16141F" weight="bold">
+                    +51 942 627-383
+                  </Text>
+                </Link>
+              </div>
             </div>
           </Col>
         </Container>
@@ -590,7 +628,43 @@ const LandingRestaurantes = () => {
         </Container>
       </section>
 
-      <Footer />
+      {/* Footer */}
+            <footer
+              className="pt-12"
+              style={{
+                backgroundColor: "#16141F",
+                borderTop: "1px solid rgba(225, 255, 0, 0.2)",
+              }}
+            >
+              <Container>
+                <Col
+                  cols={{ lg: 12, md: 6, sm: 4 }}
+                  className="flex flex-col text-center justify-center gap-2"
+                >
+                  <div className="flex items-center justify-center lg:justify-center space-x-2">
+                    <div className="w-24 h-16">
+                      <img src="/img/citrica-logo.png" alt="Logo Cítrica" />
+                    </div>
+                  </div>
+                  <h2 className="mb-8 lg:text-center md:text-center">
+                    <Text variant="label" color="#FFFFFF" className="opacity-70">
+                      Transformamos ideas en soluciones digitales que impulsan el
+                      crecimiento de tu negocio.
+                    </Text>
+                  </h2>
+                </Col>
+                <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mt-8">
+                  <Divider className="mb-8 bg-gray-800" />
+                  <div className="flex justify-center">
+                    <h2 className="mb-8">
+                      <Text variant="label" color="#FFFFFF" className="opacity-50">
+                        © 2025 Cítrica.
+                      </Text>
+                    </h2>                    
+                  </div>
+                </Col>
+              </Container>
+            </footer>
     </>
   );
 };
