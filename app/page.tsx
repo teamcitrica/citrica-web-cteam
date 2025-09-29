@@ -385,17 +385,17 @@ const CitricaWebsite = () => {
             </div>
           </Col>
         </Container>
-        <Button
-          onClick={() =>
-            document
-              .getElementById("contacto")
-              ?.scrollIntoView({ behavior: "smooth" })
-          }
-          label="CONÓCENOS AHORA"
-          variant="primary"
-          textVariant="body"
-          className="absolute bottom-[10vh] left-1/2 -translate-x-1/2"
-        />
+<Button
+  onClick={() =>
+    document
+      .getElementById("contacto")
+      ?.scrollIntoView({ behavior: "smooth" })
+  }
+  label="CONÓCENOS AHORA"
+  variant="primary"
+  textVariant="body"
+  className="absolute bottom-[10vh] left-1/2 -translate-x-1/2 animate-pulse animate-duration-[3500ms] shadow-[0_0_35px_#ff5b00]"
+/>
       </section>
 
       {/* Services Grid */}
