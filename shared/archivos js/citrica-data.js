@@ -82,7 +82,7 @@ export const otherProjects = [
       "Plataforma Inteligente para la Gestión Integral de Suministros en Edificios.",
     tech: ["React", "Node.js", "PostgreSQL"],
     category: "E-commerce",
-    link: "/project-bgood",
+    link: "/projects/bgood",
   },
   {
     id: 2,
@@ -92,7 +92,7 @@ export const otherProjects = [
       "App para ayudar a decidir qué cocinar y planificar las comidas.",
     tech: ["Vue.js", "Python", "MongoDB"],
     category: "Mobile App",
-    link: "/project-miollita",
+    link: "/projects/miollita",
   },
   {
     id: 3,
@@ -101,7 +101,7 @@ export const otherProjects = [
     description: "Web Estratégico para Captación de Clientes",
     tech: ["Next.js", "Express", "MySQL"],
     category: "Website",
-    link: "/project-cojones",
+    link: "/projects/cojones",
   },
 ];
 
