@@ -1,10 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { Container, Col } from "@citrica/objects";
-import { Text, Icon, Button} from "@citrica-ui";
+import { Text, Icon, Button } from "@citrica-ui";
 import { addToast } from "@heroui/toast";
 import { Divider, Link } from "@heroui/react";
-
+import { projectHero, projectDesafio, projectDescription, projectSolucion, services, technologies, otherProjects } from "@/shared/archivos js/projects-bgood";
 const ProjectTemplate = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -17,82 +17,7 @@ const ProjectTemplate = () => {
     });
   };
 
-  const services = [
-    {
-      title: "Diseño y Estética",
-      description:
-        "Diseño web atractivo y moderno, con un portafolio visualmente impactante que muestra los proyectos y resultados de la agencia.",
-      icon: "Palette",
-      color: "#E1FF00",
-    },
-    {
-      title: "Servicios y Credenciales",
-      description:
-        "Información concisa sobre los servicios de publicidad, una sección Sobre Nosotros que presenta la filosofía y el equipo, y testimonios de clientes para generar confianza.",
-      icon: "Info",
-      color: "#00FFFF",
-    },
-    {
-      title: "Comunicación y Contacto",
-      description:
-        "Formulario de contacto directo y fácil de usar, información de contacto clara y un acceso a la cuenta de Instagram para compartir contenidos e historias relevantes.",
-      icon: "RadioTower",
-      color: "#FF5B00",
-    },
-    {
-      title: "Rendimiento y Optimización",
-      description:
-        "Diseño responsivo y optimización SEO para asegurar una visualización óptima en cualquier dispositivo y mejorar la visibilidad de la agencia.",
-      icon: "Eye",
-      color: "#E1FF00",
-    },    
-  ];
 
-  const technologies = [
-    { name: "HTML 5", icon: "Code", color: "#FF5B00" },
-    { name: "Javascript", icon: "Code", color: "#FF5B00" },
-    { name: "React JS", icon: "Code", color: "#FF5B00" },
-    { name: "Next JS", icon: "Code", color: "#FF5B00" },
-    { name: "CSS 3", icon: "PaintBucket", color: "#FF5B00" },
-    { name: "Sass", icon: "PaintBucket", color: "#FF5B00" },
-    { name: "Node.js", icon: "Server", color: "#FF5B00" },
-    { name: "AWS", icon: "Cloud", color: "#FF5B00" },
-  ];
-
-  const features = [
-    "Sistema de autenticación completo",
-    "Dashboard interactivo con métricas en tiempo real",
-    "API REST escalable y documentada",
-    "Interfaz responsive y moderna",
-    "Integración con servicios de terceros",
-    "Sistema de notificaciones push",
-  ];
-
-  const otherProjects = [
-    {
-      id: 1,
-      title: "E-commerce Fashion",
-      description:
-        "Plataforma completa de comercio electrónico con gestión de inventario avanzada",
-      tech: ["React", "Node.js", "PostgreSQL"],
-      category: "E-commerce",
-    },
-    {
-      id: 2,
-      title: "FinTech Dashboard",
-      description:
-        "Dashboard de análisis financiero en tiempo real con visualizaciones interactivas",
-      tech: ["Vue.js", "Python", "MongoDB"],
-      category: "FinTech",
-    },
-    {
-      id: 3,
-      title: "HealthCare Platform",
-      description: "Sistema integral de gestión médica con telemedicina",
-      tech: ["Next.js", "Express", "MySQL"],
-      category: "HealthTech",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-[#16141F]">
@@ -174,9 +99,8 @@ const ProjectTemplate = () => {
             </div>
             {/* Mobile Menu - visible on small screens */}
             <div
-              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${
-                isMenuOpen ? "translate-x-0" : "translate-x-full"
-              }`}
+              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+                }`}
             >
               <button
                 onClick={() => setIsMenuOpen(false)}
@@ -253,7 +177,7 @@ const ProjectTemplate = () => {
               {/* Categoría */}
               <div className="block w-fit px-5 py-1 bg-[#00FFFF]/20 border border-[#00FFFF]/30 rounded-full mb-5">
                 <Text variant="label" color="#00FFFF">
-                  Website
+                  {projectHero.category}
                 </Text>
               </div>
               <header>
@@ -264,20 +188,20 @@ const ProjectTemplate = () => {
                     color="#FFFFFF"
                     className="leading-tight"
                   >
-                    Co.Jones
+                    {projectHero.title}
                   </Text>
                 </h1>
               </header>
 
               <h2 className="mb-9">
                 <Text variant="title" color="#00FFFF">
-                  Webpage Estratégico para Captación de Clientes.
+                  {projectHero.subtitle}
                 </Text>
               </h2>
 
               <div className="flex gap-4 flex-wrap">
                 <Button
-                  label="Ver Demo"
+                  label={projectHero.buttonLabel}
                   variant="primary"
                   onClick={handleContactClick}
                   className="bg-[#00FFFF] text-[#003333] rounded-full px-5"
@@ -291,7 +215,7 @@ const ProjectTemplate = () => {
               {/* Placeholder para imagen del proyecto */}
               <div className="w-full flex items-center justify-center">
                 <img
-                  src="/img/cojones-hero-img.png"
+                  src={projectHero.image}
                   alt="Project image"
                   className="proyect-page-hero-img-shadow"
                 />
@@ -306,19 +230,19 @@ const ProjectTemplate = () => {
         <Container>
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
-            className="text-center bg-color-ct-tertiary-container border-[2px] border-[#00666633] rounded-xl p-8"
+            className={`text-center ${projectDescription.bgColor} border-[2px] ${projectDescription.borderColor} rounded-xl p-8`}
           >
             <div>
               <h2 className="mb-4">
-                <Text variant="display" weight="bold" color="#006666">
-                  Sobre el Proyecto
+                <Text variant="display" weight="bold" color={projectDescription.titleColor}>
+                  {projectDescription.sectionTitle}
                 </Text>
               </h2>
             </div>
             <div className="flex justify-center">
               <h2 className="text-ch-width">
-                <Text variant="subtitle" weight="bold" color="#16141F">
-                  Sitio web informativo de CoJones, una agencia de publicidad creativa y dinámica con sede en Dallas.
+                <Text variant="subtitle" weight="bold" color={projectDescription.textColor}>
+                  {projectDescription.mainTitle}
                 </Text>
               </h2>
             </div>
@@ -326,30 +250,12 @@ const ProjectTemplate = () => {
               <p className="text-ch-width mt-2">
                 <Text
                   variant="body"
-                  color="#16141F"
+                  color={projectDescription.textColor}
                   className="leading-relaxed"
                 >
-                   El objetivo central del sitio es la captación de nuevos clientes, presentando de forma directa la experiencia, los servicios y el portafolio de CoJones. La interfaz intuitiva y el diseño visual impactante reflejan la identidad de marca de CoJones, facilitando a los potenciales clientes la comprensión de su propuesta de valor y el contacto para futuras colaboraciones.
+                  {projectDescription.description}
                 </Text>
               </p>
-
-              {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                <div className="text-center p-4 bg-[#E1FF00]/10 rounded-xl border border-[#E1FF00]/20">
-                  <Icon name="Users" size={32} color="#E1FF00" className="mx-auto mb-2" />
-                  <Text variant="title" color="#E1FF00" className="mb-2">150+</Text>
-                  <Text variant="label" color="#E5FFFF">Usuarios Activos</Text>
-                </div>
-                <div className="text-center p-4 bg-[#00FFFF]/10 rounded-xl border border-[#00FFFF]/20">
-                  <Icon name="TrendingUp" size={32} color="#00FFFF" className="mx-auto mb-2" />
-                  <Text variant="title" color="#00FFFF" className="mb-2">40%</Text>
-                  <Text variant="label" color="#E5FFFF">Mejora en Eficiencia</Text>
-                </div>
-                <div className="text-center p-4 bg-[#FF5B00]/10 rounded-xl border border-[#FF5B00]/20">
-                  <Icon name="Clock" size={32} color="#FF5B00" className="mx-auto mb-2" />
-                  <Text variant="title" color="#FF5B00" className="mb-2">6</Text>
-                  <Text variant="label" color="#E5FFFF">Meses de Desarrollo</Text>
-                </div>
-              </div> */}
             </div>
           </Col>
         </Container>
@@ -363,7 +269,7 @@ const ProjectTemplate = () => {
               <header>
                 <h2>
                   <Text variant="headline" weight="bold" color="#006666">
-                    El Desafío
+                    {projectDesafio.sectionTitle}
                   </Text>
                 </h2>
               </header>
@@ -374,7 +280,7 @@ const ProjectTemplate = () => {
                   color="#16141F"
                   className="leading-relaxed-[28px]"
                 >
-                  Nuestro principal reto fue crear un sitio web que comunicara eficazmente la creatividad y el profesionalismo de la agencia CoJones, atrayendo así a clientes potenciales en Dallas y más allá. Esto implicó una estructura de navegación simple y clara, un énfasis visual en sus proyectos y los servicios ofrecidos, y la integración de un llamado a la acción prominente. Priorizamos la optimización para diversos dispositivos y la velocidad de carga para una experiencia de usuario fluida.
+                  {projectDesafio.description}
                 </Text>
               </p>
             </div>
@@ -383,7 +289,7 @@ const ProjectTemplate = () => {
           <Col cols={{ lg: 6, md: 6, sm: 4 }} noPadding>
             <div className="w-full h-[475px] rounded-2xl overflow-hidden project-img-shadow">
               <img
-                src="/img/cojones-pitches-culturally.png"
+                src={projectDesafio.image}
                 alt=""
                 className="object-center"
               />
@@ -398,7 +304,7 @@ const ProjectTemplate = () => {
           <Col cols={{ lg: 6, md: 6, sm: 4 }} noPadding>
             <div className="w-full h-full rounded-2xl overflow-hidden project-img-shadow bg-[#F2F2F2]">
               <img
-                src="/img/cojones-projects-grid.png"
+                src={projectSolucion.image}
                 alt="Imagen de detalle de la tabla de productos"
                 className="object-cover"
               />
@@ -410,7 +316,8 @@ const ProjectTemplate = () => {
               <header>
                 <h2>
                   <Text variant="headline" weight="bold" color="#006666">
-                    La Solución
+                    {projectSolucion.sectionTitle}
+
                   </Text>
                 </h2>
               </header>
@@ -421,7 +328,7 @@ const ProjectTemplate = () => {
                   color="#16141F"
                   className="leading-relaxed"
                 >
-                  Ofrecimos un diseño web a medida, centrado en la usabilidad y la estética moderna, que resalta la identidad de marca de CoJones. Implementamos una arquitectura de información clara y una navegación simple e intuitiva para que los visitantes encuentren fácilmente los servicios y el portafolio. Integramos un formulario de contacto estratégico y visible, junto con información de contacto detallada, facilitando la conversión de visitantes en leads. Además, optimizamos el sitio para un rendimiento rápido y una visualización perfecta en todos los dispositivos, asegurando una experiencia positiva para los potenciales clientes.
+                  {projectSolucion.description}
                 </Text>
               </p>
             </div>

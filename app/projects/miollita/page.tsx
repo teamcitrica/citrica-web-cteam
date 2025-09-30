@@ -1,10 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { Container, Col } from "@citrica/objects";
-import { Text, Icon, Button} from "@citrica-ui";
+import { Text, Icon, Button } from "@citrica-ui";
 import { addToast } from "@heroui/toast";
 import { Divider, Link } from "@heroui/react";
-
+import { projectHero, projectDesafio, projectDescription, projectSolucion, services, technologies, otherProjects } from "@/shared/archivos js/projects-miollita"
 const ProjectTemplate = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -17,90 +17,7 @@ const ProjectTemplate = () => {
     });
   };
 
-  const services = [
-    {
-      title: "Gestión de pedidos",
-      description:
-        "Catálogo en línea, carrito de compras, historial y listas de pedidos recurrentes.",
-      icon: "ListCheck",
-      color: "#E1FF00",
-    },
-    {
-      title: "Gestión administrativa",
-      description:
-        "Aprobación de pedidos, límites presupuestarios, administración de perfiles y generación de órdenes de compra.",
-      icon: "FolderKanban",
-      color: "#00FFFF",
-    },
-    {
-      title: "Gestión de inventario",
-      description:
-        "Control de stock con sistema Kardex integrado, registro de entradas y salidas, y preparación de pedidos.",
-      icon: "Blocks",
-      color: "#FF5B00",
-    },
-    {
-      title: "Monitoreo y reportes",
-      description:
-        "Panel de supervisión, seguimiento en tiempo real, reportes de gastos y visualización del cumplimiento presupuestario.",
-      icon: "ScanSearch",
-      color: "#E1FF00",
-    },
-    {
-      title: "Usabilidad y seguridad",
-      description:
-        "Diseño intuitivo, arquitectura escalable y protección de datos.",
-      icon: "Lock",
-      color: "#E1FF00",
-    },
-  ];
 
-  const technologies = [
-    { name: "HTML 5", icon: "Code", color: "#FF5B00" },
-    { name: "TypeScript", icon: "Code", color: "#FF5B00" },
-    { name: "React JS", icon: "Code", color: "#FF5B00" },
-    { name: "Next JS", icon: "Code", color: "#FF5B00" },
-    { name: "CSS 3", icon: "PaintBucket", color: "#FF5B00" },
-    { name: "Sass", icon: "PaintBucket", color: "#FF5B00" },
-    { name: "Node.js", icon: "Server", color: "#FF5B00" },
-    { name: "AWS", icon: "Cloud", color: "#FF5B00" },
-    { name: "MongoDB", icon: "Database", color: "#FF5B00" },
-  ];
-
-  const features = [
-    "Sistema de autenticación completo",
-    "Dashboard interactivo con métricas en tiempo real",
-    "API REST escalable y documentada",
-    "Interfaz responsive y moderna",
-    "Integración con servicios de terceros",
-    "Sistema de notificaciones push",
-  ];
-
-  const otherProjects = [
-    {
-      id: 1,
-      title: "E-commerce Fashion",
-      description:
-        "Plataforma completa de comercio electrónico con gestión de inventario avanzada",
-      tech: ["React", "Node.js", "PostgreSQL"],
-      category: "E-commerce",
-    },
-    {
-      id: 2,
-      title: "FinTech Dashboard",
-      description:
-        "Dashboard de análisis financiero en tiempo real con visualizaciones interactivas",
-      tech: ["Vue.js", "Python", "MongoDB"],
-      category: "FinTech",
-    },
-    {
-      id: 3,
-      title: "HealthCare Platform",
-      description: "Sistema integral de gestión médica con telemedicina",
-      tech: ["Next.js", "Express", "MySQL"],
-      category: "HealthTech",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-[#16141F]">
@@ -182,9 +99,8 @@ const ProjectTemplate = () => {
             </div>
             {/* Mobile Menu - visible on small screens */}
             <div
-              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${
-                isMenuOpen ? "translate-x-0" : "translate-x-full"
-              }`}
+              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+                }`}
             >
               <button
                 onClick={() => setIsMenuOpen(false)}
@@ -261,7 +177,7 @@ const ProjectTemplate = () => {
               {/* Categoría */}
               <div className="block w-fit px-5 py-1 bg-[#00FFFF]/20 border border-[#00FFFF]/30 rounded-full mb-5">
                 <Text variant="label" color="#00FFFF">
-                  E-Commerce
+                  {projectHero.category}
                 </Text>
               </div>
               <header>
@@ -272,24 +188,23 @@ const ProjectTemplate = () => {
                     color="#FFFFFF"
                     className="leading-tight"
                   >
-                    BGood
+                    {projectHero.title}
                   </Text>
                 </h1>
               </header>
 
               <h2 className="mb-9">
                 <Text variant="title" color="#00FFFF">
-                  Plataforma Inteligente para la Gestión Integral de Suministros
-                  en Edificios.
+                  {projectHero.subtitle}
                 </Text>
               </h2>
 
               <div className="flex gap-4 flex-wrap">
                 <Button
-                  label="Ver Demo"
+                  label={projectHero.buttonLabel}
                   variant="primary"
                   onClick={handleContactClick}
-                  className="bg-[#00FFFF] text-[#003333] rounded-full px-5"
+                  className="btn-primary-color-2"
                 />
               </div>
             </div>
@@ -300,7 +215,7 @@ const ProjectTemplate = () => {
               {/* Placeholder para imagen del proyecto */}
               <div className="w-full flex items-center justify-center">
                 <img
-                  src="/img/bgood-hero-img.png"
+                  src={projectHero.image}
                   alt="Project image"
                   className="proyect-page-hero-img-shadow"
                 />
@@ -315,20 +230,19 @@ const ProjectTemplate = () => {
         <Container>
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
-            className="text-center bg-color-ct-tertiary-container border-[2px] border-[#00666633] rounded-xl p-8"
+            className={`text-center ${projectDescription.bgColor} border-[2px] ${projectDescription.borderColor} rounded-xl p-8`}
           >
             <div>
               <h2 className="mb-4">
-                <Text variant="display" weight="bold" color="#006666">
-                  Sobre el Proyecto
+                <Text variant="display" weight="bold" color={projectDescription.titleColor}>
+                  {projectDescription.sectionTitle}
                 </Text>
               </h2>
             </div>
             <div className="flex justify-center">
               <h2 className="text-ch-width">
-                <Text variant="subtitle" weight="bold" color="#16141F">
-                  BGood es una plataforma web desarrollada para optimizar la
-                  gestión de suministros en edificios.
+                <Text variant="subtitle" weight="bold" color={projectDescription.textColor}>
+                  {projectDescription.mainTitle}
                 </Text>
               </h2>
             </div>
@@ -336,16 +250,10 @@ const ProjectTemplate = () => {
               <p className="text-ch-width mt-2">
                 <Text
                   variant="body"
-                  color="#16141F"
+                  color={projectDescription.textColor}
                   className="leading-relaxed"
                 >
-                  A través de una tienda en línea, los administradores pueden
-                  facilitar a los conserjes la adquisición de productos
-                  esenciales, simplificando el proceso desde la solicitud hasta
-                  la entrega. La plataforma integra un sistema de control de
-                  inventario, gestión de presupuestos y herramientas de
-                  supervisión para garantizar un flujo de trabajo eficiente y
-                  transparente.
+                  {projectDescription.description}
                 </Text>
               </p>
 
@@ -379,7 +287,7 @@ const ProjectTemplate = () => {
               <header>
                 <h2>
                   <Text variant="headline" weight="bold" color="#006666">
-                    El Desafío
+                    {projectDesafio.sectionTitle}
                   </Text>
                 </h2>
               </header>
@@ -390,24 +298,16 @@ const ProjectTemplate = () => {
                   color="#16141F"
                   className="leading-relaxed-[28px]"
                 >
-                  El principal desafío fue crear una solución que, además de
-                  simplificar la compra y aprobación de suministros, permitiera
-                  un control exhaustivo del inventario. Esto implicó la
-                  implementación de un sistema Kardex para el seguimiento de
-                  entradas y salidas de cada artículo, previniendo
-                  desabastecimientos. Adicionalmente, se necesitaba un flujo de
-                  trabajo intuitivo para múltiples roles, una gestión
-                  presupuestaria descentralizada por edificio y herramientas de
-                  supervisión efectivas.
+              {projectDesafio.description}
                 </Text>
               </p>
             </div>
           </Col>
 
           <Col cols={{ lg: 6, md: 6, sm: 4 }} noPadding>
-            <div className="w-full h-[475px] rounded-2xl overflow-hidden project-img-shadow">
+            <div className="w-full rounded-2xl overflow-hidden">
               <img
-                src="/img/shopping-cart.jpg"
+                src={projectDesafio.image}
                 alt=""
                 className="object-center"
               />
@@ -420,9 +320,9 @@ const ProjectTemplate = () => {
       <section id="solucion" className="pt-20 bg-[#FFFFFF]">
         <Container>
           <Col cols={{ lg: 6, md: 6, sm: 4 }} noPadding>
-            <div className="w-full h-full rounded-2xl overflow-hidden project-img-shadow bg-[#F2F2F2]">
+            <div className="w-full h-full rounded-2xl overflow-hidden  bg-[#F2F2F2]">
               <img
-                src="/img/super-user-products.jpg"
+                src={projectSolucion.image}
                 alt="Imagen de detalle de la tabla de productos"
                 className="object-cover"
               />
@@ -434,7 +334,7 @@ const ProjectTemplate = () => {
               <header>
                 <h2>
                   <Text variant="headline" weight="bold" color="#006666">
-                    La Solución
+                   {projectSolucion.sectionTitle}
                   </Text>
                 </h2>
               </header>
@@ -445,15 +345,7 @@ const ProjectTemplate = () => {
                   color="#16141F"
                   className="leading-relaxed"
                 >
-                  Se desarrolló una web app modular y escalable con interfaces
-                  personalizadas para cada usuario. Los conserjes realizan
-                  pedidos a través de un catálogo, los cuales son aprobados por
-                  los administradores, quienes también gestionan sus
-                  presupuestos. El sistema Kardex permite al personal de almacén
-                  mantener un control preciso del stock. Los supervisores tienen
-                  una visión global del proceso y del cumplimiento
-                  presupuestario, mientras que las notificaciones mantienen a
-                  todos informados sobre el estado de los pedidos.
+              {projectSolucion.description}
                 </Text>
               </p>
             </div>
@@ -584,8 +476,10 @@ const ProjectTemplate = () => {
             </header>
             <p className="text-ch-width center">
               <Text variant="subtitle" color="#16141F" className="opacity-80">
-                La plataforma fue construida con un stack tecnológico moderno
-                para garantizar el máximo rendimiento y escalabilidad.
+                La aplicación fue desarrollada con tecnologías modernas y
+                versátiles que nos permitió crear una experiencia fluida y
+                optimizada. Esto asegura que la app funcione de manera rápida y
+                eficiente en dispositivos Android.
               </Text>
             </p>
           </Col>
@@ -662,57 +556,48 @@ const ProjectTemplate = () => {
       </section>
 
       {/* Otros Proyectos */}
-      <section id="otros-proyectos" className="py-20 bg-[#16141F]">
+      <section id="otros-proyectos" className="py-20 gradient-project-hero">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
-            <header>
-              <h2 className="mb-6">
-                <Text variant="headline" weight="bold" color="#FF5B00">
-                  Otros Proyectos
-                </Text>
-              </h2>
-            </header>
+            <h2 className="mb-6">
+              <Text variant="headline" weight="bold" color="#FFFFFF">
+                Otros Proyectos
+              </Text>
+            </h2>
             <p>
-              <Text variant="body" color="#FFFFFF" className="opacity-80">
+              <Text variant="body" color="#E5FFFF">
                 Explora más de nuestros trabajos y casos de éxito
               </Text>
             </p>
           </Col>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {otherProjects.map((project, index) => (
+            {otherProjects.map((otherProject, index) => (
               <article
-                key={project.id}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-[#E1FF00]/30 transition-all duration-300 hover:transform hover:scale-105"
+                key={otherProject.id}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border-[2px] border-[#E1FF0022]"
               >
                 {/* Imagen placeholder */}
-                <div className="h-48 bg-gradient-to-br from-[#E1FF00]/20 to-[#FF5B00]/20 flex items-center justify-center">
-                  <div className="text-center">
-                    <Icon name="Image" size={48} color="#E1FF00" />
-                    <div className="mt-2">
-                      <Text
-                        variant="label"
-                        color="#E5FFFF"
-                        className="opacity-50"
-                      >
-                        [{project.category}]
-                      </Text>
-                    </div>
-                  </div>
+                <div className="h-48 gradient-project-hero flex items-center justify-center">
+                  <img
+                    src={otherProject.image}
+                    alt={otherProject.title}
+                    className="object-contain h-full"
+                  />
                 </div>
 
                 <div className="p-6">
                   {/* Categoría */}
-                  <div className="inline-block px-3 py-1 bg-[#FF5B00]/20 border border-[#FF5B00]/30 rounded-full mb-4">
-                    <Text variant="label" color="#FF5B00">
-                      {project.category}
+                  <div className="inline-block px-3 py-1 bg-[#E1FF00]/20 border border-[#E1FF00]/30 rounded-full mb-4">
+                    <Text variant="label" color="#E1FF00">
+                      {otherProject.category}
                     </Text>
                   </div>
 
                   {/* Título */}
                   <h3 className="mb-3">
                     <Text variant="subtitle" color="#FFFFFF">
-                      {project.title}
+                      {otherProject.title}
                     </Text>
                   </h3>
 
@@ -723,7 +608,7 @@ const ProjectTemplate = () => {
                       color="#FFFFFF"
                       className="opacity-70 leading-relaxed"
                     >
-                      {project.description}
+                      {otherProject.description}
                     </Text>
                   </p>
 
@@ -746,7 +631,7 @@ const ProjectTemplate = () => {
                     onClick={() => {
                       addToast({
                         title: "Proyecto seleccionado",
-                        description: `Viendo detalles de ${project.title}`,
+                        description: `Viendo detalles de ${otherProject.title}`,
                         color: "success",
                       });
                     }}
