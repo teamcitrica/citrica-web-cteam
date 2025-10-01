@@ -104,6 +104,7 @@ export const projectDescription = {
         "Plataforma completa de comercio electrónico con gestión de inventario avanzada",
       tech: ["React", "Node.js", "PostgreSQL"],
       category: "E-commerce",
+      link: "/projects/miollita",
     },
     {
       id: 2,
@@ -112,6 +113,7 @@ export const projectDescription = {
         "Dashboard de análisis financiero en tiempo real con visualizaciones interactivas",
       tech: ["Vue.js", "Python", "MongoDB"],
       category: "FinTech",
+      link: "/projects/cojones",
     },
     {
       id: 3,
@@ -119,5 +121,6 @@ export const projectDescription = {
       description: "Sistema integral de gestión médica con telemedicina",
       tech: ["Next.js", "Express", "MySQL"],
       category: "HealthTech",
+      link: "/projects/miollita",
     },
   ];
