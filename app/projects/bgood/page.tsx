@@ -6,6 +6,7 @@ import { addToast } from "@heroui/toast";
 import { Divider, Link } from "@heroui/react";
 import { projectHero, projectDesafio, projectDescription, projectSolucion, services, technologies, otherProjects } from "@/shared/archivos js/projects-bgood";
 import { CompletedProjects } from "@/shared/components/project-components/other-projects";
+import { CtaSection } from "@/shared/components/project-components/cta-section";
 const ProjectTemplate = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -22,151 +23,6 @@ const ProjectTemplate = () => {
 
   return (
     <div className="min-h-screen bg-[#16141F]">
-      {/* Header/Navigation */}
-      <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-black/80 bg-opacity-80 backdrop-blur-sm ">
-        <Container className="py-2">
-          <Col
-            cols={{ lg: 12, md: 6, sm: 4 }}
-            noPadding
-            className="flex justify-between items-center pt-4"
-          >
-            <Link href="/">
-              <div className="flex items-center space-x-2">
-                <div className="w-24 h-17">
-                  <img
-                    src="/img/citrica-logo.png"
-                    alt="Logo Cítrica"
-                    className="h-12"
-                  />
-                </div>
-              </div>
-            </Link>
-            <div className="hidden lg:flex space-x-8">
-              <a href="#inicio" className="hover:opacity-80 transition-opacity">
-                <Text variant="body" color="#E5FFFF">
-                  Inicio
-                </Text>
-              </a>
-              <a
-                href="#descripcion"
-                className="hover:opacity-80 transition-opacity"
-              >
-                <Text variant="body" color="#E5FFFF">
-                  Sobre el Proyecto
-                </Text>
-              </a>
-              <a
-                href="#solucion"
-                className="hover:opacity-80 transition-opacity"
-              >
-                <Text variant="body" color="#E5FFFF">
-                  La Solución
-                </Text>
-              </a>
-              <a
-                href="#otros-proyectos"
-                className="hover:opacity-80 transition-opacity"
-              >
-                <Text variant="body" color="#E5FFFF">
-                  Otros Proyectos
-                </Text>
-              </a>
-            </div>
-            {/* Right side - action button + hamburger on small screens only */}
-            <div className="flex items-center md:justify-end">
-              <div className="hidden md:block">
-                <Link href="/">
-                  <Button
-                    onClick={() =>
-                      document
-                        .getElementById("contacto")
-                        ?.scrollIntoView({ behavior: "smooth" })
-                    }
-                    label="Regresar"
-                    variant="primary"
-                    className="px-8 bg-[#E1FF00] rounded-[80]"
-                  />
-                </Link>
-              </div>
-              <div className="md:hidden ml-4">
-                <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                  <Icon
-                    name={isMenuOpen ? "X" : "Menu"}
-                    color="#E5FFFF"
-                    size={24}
-                  />
-                </button>
-              </div>
-            </div>
-            {/* Mobile Menu - visible on small screens */}
-            <div
-              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${isMenuOpen ? "translate-x-0" : "translate-x-full"
-                }`}
-            >
-              <button
-                onClick={() => setIsMenuOpen(false)}
-                className="absolute top-6 right-6"
-                aria-label="Cerrar menú"
-              >
-                <Icon name="X" color="#E5FFFF" size={28} />
-              </button>
-
-              <a
-                href="#inicio"
-                className="text-white text-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Text variant="body" color="#E5FFFF">
-                  Inicio
-                </Text>
-              </a>
-              <a
-                href="#descripcion"
-                className="text-white text-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Text variant="body" color="#E5FFFF">
-                  Sobre el Proyecto
-                </Text>
-              </a>
-              <a
-                href="#solucion"
-                className="text-white text-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Text variant="body" color="#E5FFFF">
-                  La Solución
-                </Text>
-              </a>
-              <a
-                href="#otros-proyectos"
-                className="text-white text-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Text variant="body" color="#E5FFFF">
-                  Otros Proyectos
-                </Text>
-              </a>
-
-              {/* Botón CTA */}
-              <Link href="/">
-                <Button
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    document
-                      .getElementById("contacto")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                  label="Hablemos"
-                  variant="primary"
-                  className="px-8 mt-[10px] bg-[#E1FF00] text-black rounded-[80]"
-                />
-              </Link>
-            </div>
-          </Col>
-        </Container>
-      </nav>
-
       {/* Hero Banner */}
       <section
         id="inicio"
@@ -493,92 +349,14 @@ const ProjectTemplate = () => {
         className="py-20"
         style={{ backgroundColor: "#E1FF00" }}
       >
-        <Container>
-          <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto text-center">
-            <header>
-              <h2 className="mb-6">
-                <Text
-                  variant="headline"
-                  weight="bold"
-                  color="#16141F"
-                  className="mb-6"
-                >
-                  ¿Te Interesa un Proyecto Similar?
-                </Text>
-              </h2>
-            </header>
-
-            <p className="mb-8">
-              <Text variant="body" color="#16141F" className="opacity-80">
-                Podemos ayudarte a transformar tu negocio con soluciones
-                digitales personalizadas. Conversemos sobre tu próximo proyecto.
-              </Text>
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                onClick={() =>
-                  window.open("mailto:admin@citrica.dev", "_blank")
-                }
-                label="Solicitar Cotización"
-                variant="primary"
-                className="bg-[#FFFFFF] text-[#16141F] rounded-full px-8"
-              />
-              <Button
-                onClick={() =>
-                  window.open("https://wa.me/51942627383", "_blank")
-                }
-                label="Contactar por WhatsApp"
-                variant="primary"
-                className="bg-[#FFFFFF] text-[#16141F] rounded-full px-8"
-              />
-            </div>
-          </Col>
-        </Container>
+        <CtaSection />
       </section>
 
       {/* Otros Proyectos */}
       <section id="otros-proyectos" className="py-20 gradient-project-hero">
-        <CompletedProjects/>
+        <CompletedProjects />
       </section>
 
-      {/* Footer */}
-      <footer
-        className="pt-12"
-        style={{
-          backgroundColor: "#16141F",
-          borderTop: "1px solid rgba(225, 255, 0, 0.2)",
-        }}
-      >
-        <Container>
-          <Col
-            cols={{ lg: 12, md: 6, sm: 4 }}
-            className="flex flex-col text-center justify-center gap-2"
-          >
-            <div className="flex items-center justify-center lg:justify-center space-x-2">
-              <div className="w-24 h-16">
-                <img src="/img/citrica-logo.png" alt="Logo Cítrica" />
-              </div>
-            </div>
-            <h2 className="mb-8 lg:text-center md:text-center">
-              <Text variant="label" color="#E5FFFF" className="opacity-70">
-                Transformamos ideas en soluciones digitales que impulsan el
-                crecimiento de tu negocio.
-              </Text>
-            </h2>
-          </Col>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mt-8">
-            <Divider className="mb-8 bg-gray-800" />
-            <div className="flex justify-center">
-              <h2 className="mb-8">
-                <Text variant="label" color="#E5FFFF" className="opacity-50">
-                  © 2025 Cítrica.
-                </Text>
-              </h2>
-            </div>
-          </Col>
-        </Container>
-      </footer>
     </div>
   );
 };
