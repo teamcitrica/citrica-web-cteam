@@ -538,7 +538,7 @@ const ProjectTemplate = () => {
       </section>
 
       {/* Otros Proyectos */}
-      <section id="otros-proyectos" className="py-20 bg-[#16141F]">
+      <section id="otros-proyectos" className="py-20 gradient-project-hero">
         <CompletedProjects/>
       </section>
 
