@@ -5,6 +5,7 @@ import { Text, Icon, Button } from "@citrica-ui";
 import { addToast } from "@heroui/toast";
 import { Divider, Link } from "@heroui/react";
 import { projectHero, projectDesafio, projectDescription, projectSolucion, services, technologies, otherProjects } from "@/shared/archivos js/projects-miollita"
+import { CompletedProjects } from "@/shared/components/project-components/other-projects";
 const ProjectTemplate = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -557,93 +558,7 @@ const ProjectTemplate = () => {
 
       {/* Otros Proyectos */}
       <section id="otros-proyectos" className="py-20 gradient-project-hero">
-        <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
-            <h2 className="mb-6">
-              <Text variant="headline" weight="bold" color="#FFFFFF">
-                Otros Proyectos
-              </Text>
-            </h2>
-            <p>
-              <Text variant="body" color="#E5FFFF">
-                Explora más de nuestros trabajos y casos de éxito
-              </Text>
-            </p>
-          </Col>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {otherProjects.map((otherProject, index) => (
-              <article
-                key={otherProject.id}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border-[2px] border-[#E1FF0022]"
-              >
-                {/* Imagen placeholder */}
-                <div className="h-48 gradient-project-hero flex items-center justify-center">
-                  <img
-                    src={otherProject.image}
-                    alt={otherProject.title}
-                    className="object-contain h-full"
-                  />
-                </div>
-
-                <div className="p-6">
-                  {/* Categoría */}
-                  <div className="inline-block px-3 py-1 bg-[#E1FF00]/20 border border-[#E1FF00]/30 rounded-full mb-4">
-                    <Text variant="label" color="#E1FF00">
-                      {otherProject.category}
-                    </Text>
-                  </div>
-
-                  {/* Título */}
-                  <h3 className="mb-3">
-                    <Text variant="subtitle" color="#FFFFFF">
-                      {otherProject.title}
-                    </Text>
-                  </h3>
-
-                  {/* Descripción */}
-                  <p className="mb-4">
-                    <Text
-                      variant="body"
-                      color="#FFFFFF"
-                      className="opacity-70 leading-relaxed"
-                    >
-                      {otherProject.description}
-                    </Text>
-                  </p>
-
-                  {/* Tecnologías */}
-                  {/* <div className="flex flex-wrap gap-2 mb-4">
-                    {project.tech.map((tech, techIndex) => (
-                      <span
-                        key={techIndex}
-                        className="px-2 py-1 bg-[#00FFFF]/10 border border-[#00FFFF]/20 rounded text-xs"
-                      >
-                        <Text variant="label" color="#00FFFF">
-                          {tech}
-                        </Text>
-                      </span>
-                    ))}
-                  </div> */}
-
-                  {/* Botón */}
-                  <Button
-                    onClick={() => {
-                      addToast({
-                        title: "Proyecto seleccionado",
-                        description: `Viendo detalles de ${otherProject.title}`,
-                        color: "success",
-                      });
-                    }}
-                    label="Ver Detalles"
-                    variant="secondary"
-                    className="w-full bg-[#E1FF00] text-[#E1FF00] hover:bg-[#E1FF00]/10 rounded-full"
-                  />
-                </div>
-              </article>
-            ))}
-          </div>
-        </Container>
+        <CompletedProjects/>
       </section>
 
       {/* Footer */}

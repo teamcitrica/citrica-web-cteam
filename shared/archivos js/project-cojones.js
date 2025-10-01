@@ -83,6 +83,7 @@ export const services = [
         "Plataforma completa de comercio electrónico con gestión de inventario avanzada",
       tech: ["React", "Node.js", "PostgreSQL"],
       category: "E-commerce",
+      link: "/projects/bgood",
     },
     {
       id: 2,
@@ -91,6 +92,7 @@ export const services = [
         "Dashboard de análisis financiero en tiempo real con visualizaciones interactivas",
       tech: ["Vue.js", "Python", "MongoDB"],
       category: "FinTech",
+      link: "/projects/miollita",
     },
     {
       id: 3,
@@ -98,5 +100,6 @@ export const services = [
       description: "Sistema integral de gestión médica con telemedicina",
       tech: ["Next.js", "Express", "MySQL"],
       category: "HealthTech",
+      link: "/projects/bgood",
     },
   ];
