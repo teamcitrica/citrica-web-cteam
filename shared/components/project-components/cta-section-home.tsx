@@ -28,13 +28,13 @@ export const CtaSectionHome = () => {
         label="Escribir Email"
         variant="primary"
       />
-      <Button
+      {/* <Button
         onClick={() =>
           window.open("https://wa.me/51942627383", "_blank")
         }
         label="WhatsApp"
         variant="primary"
-      />
+      /> */}
     </div>
   </Col>
 </Container>
