@@ -77,15 +77,12 @@ export const DynamicNavbar = () => {
                   />
                 </Link>
               ) : (
-                <Button
-                  onClick={() =>
-                    document
-                      .getElementById("contacto")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
-                  label="Hablemos"
-                  variant="primary"
-                />
+                <a href="mailto:contacto@citrica.dev">
+                  <Button
+                    label="Hablemos"
+                    variant="primary"
+                  />
+                </a>
               )}
             </div>
             <div className="md:hidden ml-4">
@@ -137,16 +134,13 @@ export const DynamicNavbar = () => {
                 />
               </Link>
             ) : (
-              <Button
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  document
-                    .getElementById("contacto")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-                label="Hablemos"
-                variant="primary"
-              />
+              <a href="mailto:contacto@citrica.dev">
+                <Button
+                  onClick={() => setIsMenuOpen(false)}
+                  label="Hablemos"
+                  variant="primary"
+                />
+              </a>
             )}
           </div>
         </Col>

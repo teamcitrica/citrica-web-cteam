@@ -11,6 +11,7 @@ import AOS from "aos";
 import { services, projects, otherProjects, technologies, process, stats } from "@/shared/archivos js/citrica-data";
 import { CompletedProjects } from "@/shared/components/project-components/other-projects";
 import { CtaSection } from "@/shared/components/project-components/cta-section";
+import { CtaSectionHome } from "@/shared/components/project-components/cta-section-home";
 
 const CitricaWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -58,17 +59,14 @@ const CitricaWebsite = () => {
             </div>
           </Col>
         </Container>
-        <Button
-          onClick={() =>
-            document
-              .getElementById("contacto")
-              ?.scrollIntoView({ behavior: "smooth" })
-          }
-          label="CONÓCENOS AHORA"
-          variant="primary"
-          textVariant="body"
-          className="absolute bottom-[10vh] left-1/2 -translate-x-1/2 img-boton-hero "
-        />
+        <a href="mailto:contacto@citrica.dev">
+          <Button
+            label="CONÓCENOS AHORA"
+            variant="primary"
+            textVariant="body"
+            className="absolute bottom-[10vh] left-1/2 -translate-x-1/2 img-boton-hero "
+          />
+        </a>
       </section>
 
       {/* Services Grid */}
@@ -315,7 +313,7 @@ const CitricaWebsite = () => {
 
       {/* Latest Projects */}
       <section id="proyectos" className="py-20 gradient-project-hero">
-        <CompletedProjects/>
+        <CompletedProjects />
       </section>
 
       {/* Technologies Section */}
@@ -512,11 +510,11 @@ const CitricaWebsite = () => {
 
       {/* CTA Section */}
       <section
-        id="cta"
+        id="contacto"
         className="py-20"
         style={{ backgroundColor: "#E1FF00" }}
       >
-        <CtaSection />
+        <CtaSectionHome />
       </section>
     </div>
   );
