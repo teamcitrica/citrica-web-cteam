@@ -3,12 +3,33 @@ import React, { useState } from "react";
 import { Container, Col } from "@citrica/objects";
 import { Text, Icon, Button } from "@citrica-ui";
 import { addToast } from "@heroui/toast";
-import { Divider, Link } from "@heroui/react";
-import { projectHero, projectDesafio, projectDescription, projectSolucion, services, technologies, otherProjects } from "@/shared/archivos js/projects-miollita"
 import { CompletedProjects } from "@/shared/components/project-components/other-projects";
 import { CtaSection } from "@/shared/components/project-components/cta-section";
-const ProjectTemplate = () => {
+
+interface ProjectData {
+  projectHero: any;
+  projectDescription: any;
+  projectDesafio: any;
+  projectSolucion: any;
+  services: any[];
+  technologies: any[];
+}
+
+interface ProjectTemplateProps {
+  project: ProjectData;
+}
+
+const ProjectTemplate = ({ project }: ProjectTemplateProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const {
+    projectHero,
+    projectDescription,
+    projectDesafio,
+    projectSolucion,
+    services,
+    technologies,
+  } = project;
 
   const handleContactClick = () => {
     addToast({
@@ -18,8 +39,6 @@ const ProjectTemplate = () => {
       radius: "sm",
     });
   };
-
-
 
   return (
     <div className="min-h-screen bg-[#16141F]">
@@ -61,7 +80,7 @@ const ProjectTemplate = () => {
                   label={projectHero.buttonLabel}
                   variant="primary"
                   onClick={handleContactClick}
-                  className="btn-primary-color-2"
+                  className="bg-[#00FFFF] text-[#003333] rounded-full px-5"
                 />
               </div>
             </div>
@@ -113,24 +132,6 @@ const ProjectTemplate = () => {
                   {projectDescription.description}
                 </Text>
               </p>
-
-              {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                <div className="text-center p-4 bg-[#E1FF00]/10 rounded-xl border border-[#E1FF00]/20">
-                  <Icon name="Users" size={32} color="#E1FF00" className="mx-auto mb-2" />
-                  <Text variant="title" color="#E1FF00" className="mb-2">150+</Text>
-                  <Text variant="label" color="#E5FFFF">Usuarios Activos</Text>
-                </div>
-                <div className="text-center p-4 bg-[#00FFFF]/10 rounded-xl border border-[#00FFFF]/20">
-                  <Icon name="TrendingUp" size={32} color="#00FFFF" className="mx-auto mb-2" />
-                  <Text variant="title" color="#00FFFF" className="mb-2">40%</Text>
-                  <Text variant="label" color="#E5FFFF">Mejora en Eficiencia</Text>
-                </div>
-                <div className="text-center p-4 bg-[#FF5B00]/10 rounded-xl border border-[#FF5B00]/20">
-                  <Icon name="Clock" size={32} color="#FF5B00" className="mx-auto mb-2" />
-                  <Text variant="title" color="#FF5B00" className="mb-2">6</Text>
-                  <Text variant="label" color="#E5FFFF">Meses de Desarrollo</Text>
-                </div>
-              </div> */}
             </div>
           </Col>
         </Container>
@@ -155,14 +156,14 @@ const ProjectTemplate = () => {
                   color="#16141F"
                   className="leading-relaxed-[28px]"
                 >
-              {projectDesafio.description}
+                  {projectDesafio.description}
                 </Text>
               </p>
             </div>
           </Col>
 
           <Col cols={{ lg: 6, md: 6, sm: 4 }} noPadding>
-            <div className="w-full rounded-2xl overflow-hidden">
+            <div className="w-full h-[475px] rounded-2xl overflow-hidden project-img-shadow">
               <img
                 src={projectDesafio.image}
                 alt=""
@@ -177,7 +178,7 @@ const ProjectTemplate = () => {
       <section id="solucion" className="pt-20 bg-[#FFFFFF]">
         <Container>
           <Col cols={{ lg: 6, md: 6, sm: 4 }} noPadding>
-            <div className="w-full h-full rounded-2xl overflow-hidden  bg-[#F2F2F2]">
+            <div className="w-full h-full rounded-2xl overflow-hidden project-img-shadow bg-[#F2F2F2]">
               <img
                 src={projectSolucion.image}
                 alt="Imagen de detalle de la tabla de productos"
@@ -191,7 +192,8 @@ const ProjectTemplate = () => {
               <header>
                 <h2>
                   <Text variant="headline" weight="bold" color="#006666">
-                   {projectSolucion.sectionTitle}
+                    {projectSolucion.sectionTitle}
+
                   </Text>
                 </h2>
               </header>
@@ -202,7 +204,7 @@ const ProjectTemplate = () => {
                   color="#16141F"
                   className="leading-relaxed"
                 >
-              {projectSolucion.description}
+                  {projectSolucion.description}
                 </Text>
               </p>
             </div>
@@ -260,65 +262,11 @@ const ProjectTemplate = () => {
                 <Text variant="body" color="#003333" className="opacity-60">
                   {service.description}
                 </Text>
-                {/* <div
-                  className="mt-8 h-1 w-full rounded-full"
-                  style={{
-                    background: `linear-gradient(90deg, #00666600, #006666, #00666600)`,
-                  }}
-                /> */}
               </div>
             ))}
           </Col>
         </Container>
       </section>
-
-      {/* Características */}
-      {/* <section className="pt-20 bg-[#FFFFFF]">
-        <Container>
-          <Col
-            cols={{ lg: 12, md: 6, sm: 4 }}
-            className="mb-12 space-y-6 bg-color-ct-tertiary-container rounded-xl py-8"
-          >
-            <header>
-              <h2 className="text-center">
-                <Text variant="headline" color="#006666" weight="bold">
-                  Características Principales
-                </Text>
-              </h2>
-            </header>
-
-            <div className="flex justify-center gap-10 px-10">              
-              <ul className="list-disc text-ch-width-md">
-                <li>
-                  <span className="font-bold">Gestión de pedidos:</span>{" "}
-                  Catálogo en línea, carrito de compras, historial y listas de
-                  pedidos recurrentes.
-                </li>
-                <li>
-                  <span className="font-bold">Gestión administrativa:</span>{" "}
-                  Aprobación de pedidos, límites presupuestarios, administración
-                  de perfiles y generación de órdenes de compra.
-                </li>
-                <li>
-                  <span className="font-bold">Gestión de inventario:</span>{" "}
-                  Control de stock con sistema Kardex integrado, registro de
-                  entradas y salidas, y preparación de pedidos.
-                </li>
-                <li>
-                  <span className="font-bold">Monitoreo y reportes:</span> Panel
-                  de supervisión, seguimiento en tiempo real, reportes de gastos
-                  y visualización del cumplimiento presupuestario.
-                </li>
-                <li>
-                  <span className="font-bold">Usabilidad y seguridad:</span>{" "}
-                  Diseño intuitivo, arquitectura escalable y protección de
-                  datos.
-                </li>
-              </ul>
-            </div>
-          </Col>
-        </Container>
-      </section> */}
 
       {/* Tecnologías */}
       <section id="tecnologias" className="pt-10 pb-20 bg-[#FFFFFF]">
@@ -333,10 +281,8 @@ const ProjectTemplate = () => {
             </header>
             <p className="text-ch-width center">
               <Text variant="subtitle" color="#16141F" className="opacity-80">
-                La aplicación fue desarrollada con tecnologías modernas y
-                versátiles que nos permitió crear una experiencia fluida y
-                optimizada. Esto asegura que la app funcione de manera rápida y
-                eficiente en dispositivos Android.
+                La plataforma fue construida con un stack tecnológico moderno
+                para garantizar el máximo rendimiento y escalabilidad.
               </Text>
             </p>
           </Col>
@@ -373,7 +319,7 @@ const ProjectTemplate = () => {
 
       {/* Otros Proyectos */}
       <section id="otros-proyectos" className="py-20 gradient-project-hero">
-        <CompletedProjects/>
+        <CompletedProjects />
       </section>
 
     </div>
