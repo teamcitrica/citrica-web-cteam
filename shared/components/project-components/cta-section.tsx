@@ -30,7 +30,7 @@ export const CtaSection = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 onClick={() =>
-                  window.open("mailto:admin@citrica.dev", "_blank")
+                  window.open("mailto:contacto@citrica.dev", "_blank")
                 }
                 label="Solicitar Cotización"
                 variant="primary"
