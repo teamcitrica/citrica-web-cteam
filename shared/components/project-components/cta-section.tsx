@@ -36,14 +36,14 @@ export const CtaSection = () => {
                 variant="primary"
                 className="bg-[#FFFFFF] text-[#16141F] rounded-full px-8"
               />
-              <Button
+              {/* <Button
                 onClick={() =>
                   window.open("https://wa.me/51942627383", "_blank")
                 }
                 label="Contactar por WhatsApp"
                 variant="primary"
                 className="bg-[#FFFFFF] text-[#16141F] rounded-full px-8"
-              />
+              /> */}
             </div>
           </Col>
         </Container>
