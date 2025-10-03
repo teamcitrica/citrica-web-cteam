@@ -67,7 +67,10 @@ const LandingRestaurantes = () => {
               </p>
             </div>
             <div className="flex gap-4 flex-wrap">
+                      <a href="mailto:contacto@citrica.dev">
               <Button label="Comenzar Ahora" variant="primary" />
+                      </a>
+
               <Button label="Conocer Más" variant="secondary" />
             </div>
           </Col>
@@ -341,7 +344,7 @@ const LandingRestaurantes = () => {
             <div className="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
               <Button
                 onClick={() =>
-                  window.open("mailto:admin@citrica.dev", "_blank")
+                  window.open("mailto:contacto@citrica.dev", "_blank")
                 }
                 label="Escribir Email"
                 variant="primary"
