@@ -20,7 +20,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound();
   }
 
-  return <ProjectTemplate project={project} />;
+  return <ProjectTemplate project={project} slug={slug} />;
 }
 
 // Función para generar los paths estáticos en build time
