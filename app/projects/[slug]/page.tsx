@@ -31,3 +31,6 @@ export async function generateStaticParams() {
     slug: slug,
   }));
 }
+
+// Evitar loops infinitos en rutas no válidas
+export const dynamicParams = false;
