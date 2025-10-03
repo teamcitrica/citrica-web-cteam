@@ -7,62 +7,12 @@ import Button from "@ui/molecules/button";
 import Icon from "@ui/atoms/icon";
 import Footer from "@ui/organism/footer";
 import GradientText from "@/shared/components/project-components/gradient-text";
+import { restaurantServices, solucionesNegocios } from "@/shared/archivos js/landing-restaurant-data";
 
 // export const dynamic = "force-dynamic";
 
 // export default async function Home() {
 const LandingRestaurantes = () => {
-  const services = [
-    {
-      title: "Transforme Clicks en Comensales",
-      description:
-        "Landing pages diseñadas para convertir visitantes en reservas confirmadas y pedidos directos, con menús irresistibles y ofertas exclusivas.",
-      icon: "Globe",
-      color: "#E1FF00",
-      gradientColors: ["#E1FF00 , #62FF00, #E1FF00 , #62FF00, #E1FF00"],
-    },
-    {
-      title: "Su Restaurante, Abierto 24/7 en la Web",
-      description:
-        "Un sitio web elegante y funcional que muestra su carta, galería, sistema de reservas y atrae a nuevos clientes que buscan la mejor experiencia gastronómica.",
-      icon: "Monitor",
-      color: "#00FFFF",
-      gradientColors: ["#00FFFF , #00FF88, #00FFFF , #00FF88, #00FFFF"],
-    },
-    {
-      title: "Agilice su Operación, Reduzca Costos",
-      description:
-        "Desarrollamos aplicaciones web intuitivas para gestión de mesas, inventario, pedidos o personal, optimizando cada proceso de su negocio.",
-      icon: "Code",
-      color: "#FF5B00",
-      gradientColors: [" #FF5B00 , #FF0400, #FF5B00 , #FF0400, #FF5B00"],
-    },
-    {
-      title: "Su Restaurante, Directo al Bolsillo de sus Clientes",
-      description:
-        "Apps móviles personalizadas para pedidos a domicilio/recogida, programas de fidelidad y reservas instantáneas, creando una conexión directa y recurrente.",
-      icon: "Smartphone",
-      color: "#FF00D4",
-      gradientColors: ["#FF00D4 , #C300FF, #FF00D4 , #C300FF, #FF00D4"],
-    },
-    {
-      title: "Inteligencia Artificial para un Servicio Excepcional",
-      description:
-        "Implemente IA para chatbots de reserva y atención 24/7, recomendaciones personalizadas de platos y automatización que eleva la experiencia del cliente y la eficiencia.",
-      icon: "Sparkles",
-      color: "#E1FF00",
-      gradientColors: ["#E1FF00 , #62FF00, #E1FF00 , #62FF00, #E1FF00"],
-    },
-    {
-      title: "Llene sus Mesas con Estrategias que Convierten",
-      description:
-        "Campañas de marketing digital enfocadas en atraer comensales locales, aumentar su visibilidad online y generar reservas y pedidos constantes para su negocio.",
-      icon: "Megaphone",
-      color: "#00FFFF",
-      gradientColors: ["#00FFFF , #00FF88, #00FFFF , #00FF88, #00FFFF"],
-    },
-  ];
-
   return (
     <>
       {/* Hero Section */}
@@ -144,7 +94,7 @@ const LandingRestaurantes = () => {
             noPadding
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4"
           >
-            {services.map((service, index) => (
+            {restaurantServices.map((service, index) => (
               <div
                 key={index}
                 className="bg-black/20 backdrop-blur-xl border-2 border-[#003333] rounded-2xl p-6 flex flex-col items-center text-center"
@@ -194,7 +144,7 @@ const LandingRestaurantes = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-[80px] bg-primary-container">
+      <section className="py-[80px]">
         <Container>
           {/* <Col cols={{ lg: 6, md: 3, sm: 4 }} className="flex items-center">
             <div className="grid grid-cols-2 gap-6 w-full">
@@ -319,119 +269,52 @@ const LandingRestaurantes = () => {
       </section>
 
       {/* Client Types Section */}
-      <section className="py-[80px] bg-surface">
+      <section className="py-[80px] bg-surface rest-solucions-background-image">
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
-            <div className="mb-4">
-              <h2>
-                <Text variant="headline" textColor="color-on-surface">
-                  Trabajamos Con Todo Tipo de Negocios
-                </Text>
-              </h2>
-            </div>
-            <div>
-              <p>
-                <Text variant="body" textColor="color-on-surface-var">
-                  Desde pequeños cafés hasta grandes cadenas de restaurantes
-                </Text>
-              </p>
-            </div>
+            <h2>
+              <Text variant="headline" weight="bold" textColor="color-primary">
+                Soluciones Digitales a la Medida de Cada Negocio
+              </Text>
+            </h2>
           </Col>
 
-          <Col cols={{ lg: 3, md: 3, sm: 2 }} className="text-center mb-8">
-            <div className="mb-6">
-              <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center mx-auto">
-                <Icon name="Coffee" size={40} className="text-on-primary" />
-              </div>
-            </div>
-            <div className="mb-4">
-              <h3>
-                <Text variant="title" textColor="color-on-surface">
-                  Cafés y Salas de Té
-                </Text>
-              </h3>
-            </div>
-            <div>
-              <p>
-                <Text variant="body" textColor="color-on-surface-var">
-                  Websites profesionales, apps de pedidos y chatbots con IA para
-                  crear experiencias digitales únicas
-                </Text>
-              </p>
-            </div>
-          </Col>
+          {/* Grid de Soluciones Negocios */}
+          <Col
+            cols={{ lg: 12, md: 6, sm: 4 }}
+            noPadding
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+          >
+            {solucionesNegocios.map((tech, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-2xl p-4 flex flex-col items-center text-center shadow-md border-4 transition-all duration-300 hover:shadow-xl hover:scale-105"
+                style={{ borderColor: tech.color }}
+                data-aos="fade-up"
+                data-aos-duration="1500"
+              >
+                {/* Icono */}
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
+                  style={{ backgroundColor: tech.color }}
+                >
+                  <Icon name={tech.icon as any} color="#16141F" size={24} />
+                </div>
 
-          <Col cols={{ lg: 3, md: 3, sm: 2 }} className="text-center mb-8">
-            <div className="mb-6">
-              <div className="w-20 h-20 bg-secondary rounded-2xl flex items-center justify-center mx-auto">
-                <Icon
-                  name="UtensilsCrossed"
-                  size={40}
-                  className="text-on-secondary"
-                />
-              </div>
-            </div>
-            <div className="mb-4">
-              <h3>
-                <Text variant="title" textColor="color-on-surface">
-                  Restaurantes
-                </Text>
-              </h3>
-            </div>
-            <div>
-              <p>
-                <Text variant="body" textColor="color-on-surface-var">
-                  Sistemas de reservas online, menús digitales, apps de delivery
-                  y marketing digital para aumentar ventas
-                </Text>
-              </p>
-            </div>
-          </Col>
+                {/* Título */}
+                <h3 className="text-lg font-bold text-gray-900 mb-3">
+                  <Text variant="body" color="#16141F" weight="bold">
+                    {tech.title}
+                  </Text>
+                </h3>
 
-          <Col cols={{ lg: 3, md: 3, sm: 2 }} className="text-center mb-8">
-            <div className="mb-6">
-              <div className="w-20 h-20 bg-tertiary rounded-2xl flex items-center justify-center mx-auto">
-                <Icon name="Wine" size={40} className="text-on-tertiary" />
+                {/* Descripción */}
+                <p
+                  className="text-description text-gray-600 text-sm leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: tech.description }}
+                ></p>
               </div>
-            </div>
-            <div className="mb-4">
-              <h3>
-                <Text variant="title" textColor="color-on-surface">
-                  Bares y Pubs
-                </Text>
-              </h3>
-            </div>
-            <div>
-              <p>
-                <Text variant="body" textColor="color-on-surface-var">
-                  Landing pages atractivas, sistemas de eventos online y
-                  marketing en redes sociales para aumentar el tráfico
-                </Text>
-              </p>
-            </div>
-          </Col>
-
-          <Col cols={{ lg: 3, md: 3, sm: 2 }} className="text-center mb-8">
-            <div className="mb-6">
-              <div className="w-20 h-20 bg-cuaternary rounded-2xl flex items-center justify-center mx-auto">
-                <Icon name="Store" size={40} className="text-on-cuaternary" />
-              </div>
-            </div>
-            <div className="mb-4">
-              <h3>
-                <Text variant="title" textColor="color-on-surface">
-                  Cadenas y Franquicias
-                </Text>
-              </h3>
-            </div>
-            <div>
-              <p>
-                <Text variant="body" textColor="color-on-surface-var">
-                  Plataformas escalables, apps corporativas y sistemas de
-                  gestión digital para múltiples ubicaciones
-                </Text>
-              </p>
-            </div>
+            ))}
           </Col>
         </Container>
       </section>
@@ -444,53 +327,67 @@ const LandingRestaurantes = () => {
       >
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mx-auto">
-            <h2 className="mb-6">
+            <h2 className="mb-2">
               <Text variant="headline" color="#16141F" weight="bold">
                 ¿Listo para transformar tu negocio gastronómico?
               </Text>
             </h2>
-            <div className="mb-8">
-              <Text variant="body" color="#16141F" className="opacity-80">
+            <p className="text-ch-width center text-balance">
+              <Text variant="subtitle" color="#16141F" className="opacity-80">
                 Contáctanos hoy y descubre cómo nuestras soluciones pueden
-                transformar tu restaurante
+                transformar tu restaurante.
               </Text>
-            </div>
-            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
               <Button
                 onClick={() =>
                   window.open("mailto:admin@citrica.dev", "_blank")
                 }
                 label="Escribir Email"
                 variant="primary"
+                textVariant="body"
               />
-              <Button
+              {/* <Button
                 onClick={() =>
                   window.open("https://wa.me/51942627383", "_blank")
                 }
                 label="WhatsApp"
                 variant="primary"
-              />
+              /> */}
             </div>
             <div className="flex flex-col justify-center items-center gap-1">
               <div className="flex items-center space-x-2">
                 <Icon name="Mail" color="#16141F" size={20} />
-                <Link href="mailto:admin@citrica.dev">
+                <Link href="mailto:contacto@citrica.dev">
                   <Text variant="body" color="#16141F" weight="bold">
-                    contacto@citrica.com
+                    contacto@citrica.dev
                   </Text>
                 </Link>
               </div>
-              <div className="flex items-center space-x-2">
-                <Icon name="Phone" color="#16141F" size={20} />
-                <Link
-                  href="tel:+51942627383"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Text variant="body" color="#16141F" weight="bold">
-                    +51 942 627-383
-                  </Text>
-                </Link>
+              <div className="flex gap-4">
+                <div className="flex items-center space-x-2">
+                  <Icon name="Phone" color="#16141F" size={20} />
+                  <Link
+                    href="tel:+51942627383"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Text variant="body" color="#16141F" weight="bold">
+                      Perú: +51 942 627 383
+                    </Text>
+                  </Link>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Link
+                    href="tel:+59892041487"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Text variant="body" color="#16141F" weight="bold">
+                      Uruguay: +598 92 041487
+                    </Text>
+                  </Link>
+                </div>
               </div>
             </div>
           </Col>
@@ -503,7 +400,11 @@ const LandingRestaurantes = () => {
           <Col cols={{ lg: 6, md: 3, sm: 4 }}>
             <div className="mb-6">
               <h2>
-                <Text variant="headline" textColor="color-on-surface">
+                <Text
+                  variant="headline"
+                  weight="bold"
+                  textColor="color-on-surface"
+                >
                   Ponte en Contacto
                 </Text>
               </h2>
