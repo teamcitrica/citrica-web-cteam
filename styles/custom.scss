@@ -246,7 +246,7 @@
   justify-content: center;
   width: 100%;
   overflow: hidden;
-  background-color: #FF5B00;
+  background-color:  #E1FF00 ;
 }
 
 .curved-loop-svg {
@@ -257,7 +257,7 @@
   overflow: visible;
   display: block;
   font-size: 38px;
-  fill: #FFFFFF;
+  fill: #0A0F0F;
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
@@ -521,5 +521,110 @@ $container-inputs : (sm: (padding: 0px 8px,
 
   to {
     box-shadow: 0 0 20px #ff5b00, 0 0 40px #ff5b00;
+  }
+}
+
+// Estilos para el carrusel de otros proyectos
+.other-projects-swiper {
+  width: 90%;
+  padding-bottom: 60px !important;
+  padding-left: 160px !important;
+  padding-right: 160px !important;
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+
+  // sm y md: 320px - 1279px
+  @media (max-width: 1279px) {
+    padding-left: 70px !important;
+    padding-right: 70px !important;
+  }
+
+  // sm: 320px - 767px
+  @media (max-width: 767px) {
+    padding-left: 60px !important;
+    padding-right: 60px !important;
+  }
+
+  .swiper-wrapper {
+    overflow-y: visible !important;
+  }
+
+  .swiper-slide {
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+
+    article {
+      width: 100%;
+      max-width: 400px;
+    }
+  }
+
+  // Botones de navegación
+  .swiper-button-next,
+  .swiper-button-prev {
+    color: #E1FF00;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid rgba(225, 255, 0, 0.3);
+    transition: all 0.3s ease;
+    z-index: 10;
+
+    &::after {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    &:hover {
+      background-color: #E1FF00;
+      color: #003333;
+      border-color: #E1FF00;
+      transform: scale(1.1);
+    }
+  }
+
+  .swiper-button-next {
+    right: 10px;
+
+    // lg: 1280px - 1920px
+    @media (min-width: 1280px) {
+      right: -24px;
+    }
+  }
+
+  .swiper-button-prev {
+    left: 10px;
+
+    // lg: 1280px - 1920px
+    @media (min-width: 1280px) {
+      left: -24px;
+    }
+  }
+
+  // Paginación
+  .swiper-pagination {
+    bottom: 20px !important;
+
+    .swiper-pagination-bullet {
+      width: 12px;
+      height: 12px;
+      background-color: rgba(255, 255, 255, 0.3);
+      opacity: 1;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    .swiper-pagination-bullet-active {
+      background-color: #E1FF00;
+      width: 32px;
+      border-radius: 6px;
+    }
   }
 }

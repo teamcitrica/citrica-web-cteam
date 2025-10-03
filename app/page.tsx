@@ -3,13 +3,15 @@ import React, { useEffect, useState } from "react";
 import { Container, Col } from "@/styles/07-objects/objects";
 import { Text, Icon, Button } from "@citrica-ui";
 import CurvedLoop from "./versions/yolanda/components/CurvedLoop";
-import { Divider, Link } from "@heroui/react";
 import DotGrid from "./versions/yolanda/components/DotGrid";
 import AnimatedHeadlines from "./home/components/animatedheadlines";
 import GradientText from "@/shared/components/project-components/gradient-text";
 import "aos/dist/aos.css";
 import AOS from "aos";
 import { services, projects, otherProjects, technologies, process, stats } from "@/shared/archivos js/citrica-data";
+import { CompletedProjects } from "@/shared/components/project-components/other-projects";
+import { CtaSection } from "@/shared/components/project-components/cta-section";
+import { CtaSectionHome } from "@/shared/components/project-components/cta-section-home";
 
 const CitricaWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,144 +24,6 @@ const CitricaWebsite = () => {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0A0F0F" }}>
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 transition-all duration-300 bg-black/80 bg-opacity-80 backdrop-blur-sm ">
-        <Container className="py-2">
-          <Col
-            cols={{ lg: 12, md: 6, sm: 4 }}
-            noPadding
-            className="flex justify-between items-center pt-4"
-          >
-            <div className="flex items-center space-x-2">
-              <div className="w-24 h-17">
-                <img
-                  src="/img/citrica-logo.png"
-                  alt="Logo Cítrica"
-                  className="h-12"
-                />
-              </div>
-            </div>
-
-            <div className="hidden lg:flex space-x-8">
-              <a href="#inicio" className="hover:opacity-80 transition-opacity">
-                <Text variant="body" color="#FFFFFF">
-                  Inicio
-                </Text>
-              </a>
-              <a
-                href="#servicios"
-                className="hover:opacity-80 transition-opacity"
-              >
-                <Text variant="body" color="#FFFFFF">
-                  Servicios
-                </Text>
-              </a>
-              <a
-                href="#proyectos"
-                className="hover:opacity-80 transition-opacity"
-              >
-                <Text variant="body" color="#FFFFFF">
-                  Proyectos
-                </Text>
-              </a>
-              <a
-                href="#contacto"
-                className="hover:opacity-80 transition-opacity"
-              >
-                <Text variant="body" color="#FFFFFF">
-                  Contacto
-                </Text>
-              </a>
-            </div>
-            {/* Right side - action button + hamburger on small screens only */}
-            <div className="flex items-center md:justify-end">
-              <div className="hidden md:block">
-                <Button
-                  onClick={() =>
-                    document
-                      .getElementById("contacto")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
-                  label="Hablemos"
-                  variant="primary"
-                />
-              </div>
-              <div className="md:hidden ml-4">
-                <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                  <Icon
-                    name={isMenuOpen ? "X" : "Menu"}
-                    color="#FFFFFF"
-                    size={24}
-                  />
-                </button>
-              </div>
-            </div>
-            {/* Mobile Menu - visible on small screens */}
-            <div
-              className={`fixed top-0 right-0 h-screen w-64 bg-black/90 backdrop-blur-lg p-6 flex flex-col items-start gap-6 transform transition-transform duration-500 ease-in-out z-50 ${isMenuOpen ? "translate-x-0" : "translate-x-full"
-                }`}
-            >
-              <button
-                onClick={() => setIsMenuOpen(false)}
-                className="absolute top-6 right-6"
-                aria-label="Cerrar menú"
-              >
-                <Icon name="X" color="#FFFFFF" size={28} />
-              </button>
-
-              <a
-                href="#inicio"
-                className="text-white text-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Text variant="body" color="#FFFFFF">
-                  Inicio
-                </Text>
-              </a>
-              <a
-                href="#servicios"
-                className="text-white text-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Text variant="body" color="#FFFFFF">
-                  Servicios
-                </Text>
-              </a>
-              <a
-                href="#proyectos"
-                className="text-white text-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Text variant="body" color="#FFFFFF">
-                  Proyectos
-                </Text>
-              </a>
-              <a
-                href="#contacto"
-                className="text-white text-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Text variant="body" color="#FFFFFF">
-                  Contacto
-                </Text>
-              </a>
-
-              {/* Botón CTA */}
-              <Button
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  document
-                    .getElementById("contacto")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-                label="Hablemos"
-                variant="primary"
-              />
-            </div>
-          </Col>
-        </Container>
-      </nav>
-
       {/* Hero Section */}
       <section id="inicio" className="min-h-screen relative overflow-hidden hero-background-image">
         <div className="absolute inset-0 -z-80">
@@ -195,17 +59,14 @@ const CitricaWebsite = () => {
             </div>
           </Col>
         </Container>
-        <Button
-          onClick={() =>
-            document
-              .getElementById("contacto")
-              ?.scrollIntoView({ behavior: "smooth" })
-          }
-          label="CONÓCENOS AHORA"
-          variant="primary"
-          textVariant="body"
-          className="absolute bottom-[10vh] left-1/2 -translate-x-1/2 img-boton-hero "
-        />
+        <a href="mailto:contacto@citrica.dev">
+          <Button
+            label="CONÓCENOS AHORA"
+            variant="primary"
+            textVariant="body"
+            className="absolute bottom-[10vh] left-1/2 -translate-x-1/2 img-boton-hero "
+          />
+        </a>
       </section>
 
       {/* Services Grid */}
@@ -452,75 +313,7 @@ const CitricaWebsite = () => {
 
       {/* Latest Projects */}
       <section id="proyectos" className="py-20 gradient-project-hero">
-        <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
-            <h2 className="mb-6" data-aos="fade-up" data-aos-duration="1500">
-              <Text variant="headline" color="#FFFFFF" weight="bold">
-                Últimos proyectos
-              </Text>
-            </h2>
-            <p data-aos="fade-up" data-aos-duration="1500">
-              <Text variant="body" color="#E5FFFF">
-                Conoce algunos de nuestros trabajos más recientes
-              </Text>
-            </p>
-          </Col>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {otherProjects.map((otherProjects, index) => (
-              <article
-                key={otherProjects.id}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border-[2px] border-[#E1FF0022]"
-              >
-                {/* Imagen placeholder */}
-                <div className="h-48 gradient-project-hero flex items-center justify-center">
-                  <img
-                    src={otherProjects.image}
-                    alt={otherProjects.title}
-                    className="object-contain h-full"
-                  />
-                </div>
-
-                <div className="p-6">
-                  {/* Categoría */}
-                  <div className="inline-block px-3 py-1 bg-[#E1FF00]/20 border border-[#E1FF00]/30 rounded-full mb-4">
-                    <Text variant="label" color="#E1FF00">
-                      {otherProjects.category}
-                    </Text>
-                  </div>
-
-                  {/* Título */}
-                  <h3 className="mb-3">
-                    <Text variant="subtitle" color="#FFFFFF">
-                      {otherProjects.title}
-                    </Text>
-                  </h3>
-
-                  {/* Descripción */}
-                  <p className="mb-4">
-                    <Text
-                      variant="body"
-                      color="#FFFFFFBB"
-                      className="leading-relaxed"
-                    >
-                      {otherProjects.description}
-                    </Text>
-                  </p>
-
-                  {/* Botón */}
-                  <Link href={otherProjects.link} className="w-full">
-                    <Button
-                      onClick={() => { }}
-                      label="Ver Detalles"
-                      variant="secondary"
-                      fullWidth
-                    />
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
-        </Container>
+        <CompletedProjects />
       </section>
 
       {/* Technologies Section */}
@@ -721,98 +514,8 @@ const CitricaWebsite = () => {
         className="py-20"
         style={{ backgroundColor: "#E1FF00" }}
       >
-        <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mx-auto">
-            <h2 className="mb-6" data-aos="fade-up" data-aos-duration="1500">
-              <Text variant="headline" color="#16141F" weight="bold">
-                ¿Listo para transformar tu negocio?
-              </Text>
-            </h2>
-            <div className="mb-8" data-aos="fade-up" data-aos-duration="1500">
-              <Text variant="body" color="#16141F" className="opacity-80">
-                Contáctanos hoy y descubre cómo podemos impulsar tu crecimiento
-                digital
-              </Text>
-            </div>
-            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8" data-aos="fade-up" data-aos-duration="1500">
-              <Button
-                onClick={() =>
-                  window.open("mailto:admin@citrica.dev", "_blank")
-                }
-                label="Escribir Email"
-                variant="primary"
-              />
-              <Button
-                onClick={() =>
-                  window.open("https://wa.me/51942627383", "_blank")
-                }
-                label="WhatsApp"
-                variant="primary"
-              />
-            </div>
-            <div className="flex flex-col justify-center items-center gap-1" data-aos="fade-up" data-aos-duration="1500">
-              <div className="flex items-center space-x-2">
-                <Icon name="Mail" color="#16141F" size={20} />
-                <Link href="mailto:admin@citrica.dev">
-                  <Text variant="body" color="#16141F" weight="bold">
-                    contacto@citrica.com
-                  </Text>
-                </Link>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Icon name="Phone" color="#16141F" size={20} />
-                <Link
-                  href="tel:+51942627383"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Text variant="body" color="#16141F" weight="bold">
-                    +51 942 627-383
-                  </Text>
-                </Link>
-              </div>
-            </div>
-          </Col>
-        </Container>
+        <CtaSectionHome />
       </section>
-
-      {/* Footer */}
-      <footer
-        className="pt-12"
-        style={{
-          backgroundColor: "#16141F",
-          borderTop: "1px solid rgba(225, 255, 0, 0.2)",
-        }}
-      >
-        <Container>
-          <Col
-            cols={{ lg: 12, md: 6, sm: 4 }}
-            className="flex flex-col text-center justify-center gap-2"
-          >
-            <div className="flex items-center justify-center lg:justify-center space-x-2">
-              <div className="w-24 h-16">
-                <img src="/img/citrica-logo.png" alt="Logo Cítrica" />
-              </div>
-            </div>
-            <h2 className="mb-8 lg:text-center md:text-center">
-              <Text variant="label" color="#FFFFFF" className="opacity-70">
-                Transformamos ideas en soluciones digitales que impulsan el
-                crecimiento de tu negocio.
-              </Text>
-            </h2>
-          </Col>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mt-8">
-            <Divider className="mb-8 bg-gray-800" />
-            <div className="flex justify-center">
-              <h2 className="mb-8">
-                <Text variant="label" color="#FFFFFF" className="opacity-50">
-                  © 2025 Cítrica.
-                </Text>
-              </h2>
-            </div>
-          </Col>
-        </Container>
-      </footer>
     </div>
   );
 };
