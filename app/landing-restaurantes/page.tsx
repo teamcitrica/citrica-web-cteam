@@ -341,7 +341,7 @@ const LandingRestaurantes = () => {
                 transformar tu restaurante.
               </Text>
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+            <div className="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
               <Button
                 onClick={() =>
                   window.open("mailto:contacto@citrica.dev", "_blank")
@@ -358,7 +358,7 @@ const LandingRestaurantes = () => {
                 variant="primary"
               /> */}
             </div>
-            <div className="flex flex-col justify-center items-center gap-1">
+            {/* <div className="flex flex-col justify-center items-center gap-1">
               <div className="flex items-center space-x-2">
                 <Icon name="Mail" color="#16141F" size={20} />
                 <Link href="mailto:contacto@citrica.dev">
@@ -392,7 +392,7 @@ const LandingRestaurantes = () => {
                   </Link>
                 </div>
               </div>
-            </div>
+            </div> */}
           </Col>
         </Container>
       </section>
