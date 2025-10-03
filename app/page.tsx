@@ -273,7 +273,7 @@ const CitricaWebsite = () => {
                     </Text>
                   </GradientText>
                 </h2>
-                <Text variant="body" color="#ffffff" className="opacity-60">
+                <Text variant="body" color="#ffffff" className="opacity-80">
                   {service.description}
                 </Text>
                 <div
