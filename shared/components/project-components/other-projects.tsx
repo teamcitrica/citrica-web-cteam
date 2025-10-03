@@ -4,7 +4,15 @@ import { Button, Text } from '../citrica-ui'
 import { otherProjects } from "@/shared/archivos js/citrica-data";
 import { Link } from '@heroui/react';
 
-export const CompletedProjects = () => {
+interface CompletedProjectsProps {
+  currentProjectSlug?: string;
+}
+
+export const CompletedProjects = ({ currentProjectSlug }: CompletedProjectsProps) => {
+  const filteredProjects = currentProjectSlug
+    ? otherProjects.filter(project => !project.link.includes(currentProjectSlug))
+    : otherProjects;
+
   return (
 <>
         <Container>
@@ -22,7 +30,7 @@ export const CompletedProjects = () => {
           </Col>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {otherProjects.map((otherProjects, index) => (
+            {filteredProjects.map((otherProjects, index) => (
               <article
                 key={otherProjects.id}
                 className="bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden border-[2px] border-[#E1FF0022]"
