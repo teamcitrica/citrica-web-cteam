@@ -508,6 +508,13 @@ $container-inputs : (sm: (padding: 0px 8px,
   background-size: cover;
 }
 
+.rest-technology-bkg-img {
+  background: url("../public/img/technology-img.jpg");
+  background-repeat: no-repeat;
+  background-position: right;
+  background-size: cover;
+}
+
 .img-boton-hero {
   position: absolute;
   z-index: 10;
