@@ -369,7 +369,7 @@ $container-inputs: (
     padding: 0px 8px,
   ),
   md: (
-    padding: 0px px,  
+    padding: 0px px,
   ),
   lg: (
     padding: 0px 0px,
@@ -552,11 +552,20 @@ $container-inputs: (
   background-size: cover;
 }
 
-.rest-technology-bkg-img {
-  background: url("../public/img/technology-img.jpg");
-  background-repeat: no-repeat;
-  background-position: right;
-  background-size: cover;
+$rest-technology-img-container: (
+  sm: (),
+  md: (),
+  lg: (
+    position: absolute,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    z-index: 0,
+    width: 50vw,    
+  ),
+);
+.rest-technology-img-container {
+  @include a-set($rest-technology-img-container);
 }
 
 .img-boton-hero {
@@ -575,11 +584,9 @@ $container-inputs: (
   }
 }
 
-
 // =============
 // THIRD PARTIES
 // =============
-
 
 // Estilos para el carrusel de otros proyectos
 .other-projects-swiper {
@@ -643,7 +650,7 @@ $container-inputs: (
       transform: scale(1.1);
     }
   }
-  
+
   .swiper-button-next {
     right: 10px;
 

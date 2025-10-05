@@ -152,7 +152,7 @@ const LandingRestaurantes = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-[80px] rest-technology-bkg-img">
+      <section className="py-[80px] relative bg-white">
         <Container>
           {/* <Col cols={{ lg: 6, md: 3, sm: 4 }} className="flex items-center">
             <div className="grid grid-cols-2 gap-6 w-full">
@@ -210,7 +210,7 @@ const LandingRestaurantes = () => {
             cols={{ lg: 6, md: 3, sm: 4 }}
             className="flex flex-col justify-center"
           >
-            <div className="mb-2">
+            {/* <div className="mb-2">
               <h2>
                 <Text
                   variant="headline"
@@ -220,13 +220,17 @@ const LandingRestaurantes = () => {
                   ¿Por Qué Elegir Cítrica?
                 </Text>
               </h2>
-            </div>
+            </div> */}
             <div className="mb-6">
-              <p>
-                <Text variant="subtitle" textColor="ct-color-black">
+              <h3>
+                <Text
+                  variant="headline"
+                  weight="bold"
+                  textColor="  color-primary"
+                >
                   Especialización y Tecnología para su Rentabilidad.
                 </Text>
-              </p>
+              </h3>
             </div>
 
             <div className="space-y-4">
@@ -250,11 +254,9 @@ const LandingRestaurantes = () => {
                 </div>
                 <p>
                   <Text variant="body" textColor="color-text-black">
-                    <strong>
-                      Tecnología que Vende:
-                    </strong>{" "}
-                    Integramos IA y las últimas tendencias web para maximizar su
-                    eficiencia, minimizar errores y{" "}
+                    <strong>Tecnología que Vende:</strong> Integramos IA y las
+                    últimas tendencias web para maximizar su eficiencia,
+                    minimizar errores y{" "}
                     <strong>aumentar su ticket promedio.</strong>
                   </Text>
                 </p>
@@ -275,6 +277,9 @@ const LandingRestaurantes = () => {
               </div>
             </div>
           </Col>
+          <div className="rest-technology-img-container">
+            <img src="/img/technology-img.jpg" alt="Imagen tecnologeia" className="block"/>
+          </div>
         </Container>
       </section>
 
