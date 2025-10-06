@@ -1,52 +1,38 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Container, Col } from '@citrica/objects'
-import Text from '@ui/atoms/text'
+import { Container } from '@citrica/objects'
 import { Input } from "@heroui/input"
 import { addToast } from "@heroui/toast"
 import { UserAuth } from '@/shared/context/auth-context'
-import { useForm } from "react-hook-form";
-import { Divider, Link, CircularProgress } from "@heroui/react";
-import { Eye } from "lucide-react";
-import Button from '@/shared/components/citrica-ui/molecules/button';
+import { useForm } from "react-hook-form"
+import { Divider, Link } from "@heroui/react"
+import { Eye } from "lucide-react"
+import Button from '@/shared/components/citrica-ui/molecules/button'
 
 type FormValues = {
-  firstName: string;
-  lastName: string;
   password: string;
   email: string;
-  message: string;
 };
 
 const LoginPage = () => {
   const { register, handleSubmit } = useForm<FormValues>();
-  const { signInWithPassword, userSession, isLoading: authLoading } = UserAuth();
+  const { signInWithPassword, userSession, isInitializing } = UserAuth();
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [forceShowLogin, setForceShowLogin] = useState(false);
 
-  // Redireccionar si ya hay sesión activa
+  // Redirigir a admin si ya está autenticado
   useEffect(() => {
-    // Solo redirigir cuando no esté cargando y haya sesión
-    if (!authLoading && userSession) {
-      console.log('Usuario ya autenticado, redirigiendo...');
+    if (!isInitializing && userSession) {
       router.push('/admin');
     }
-  }, [userSession, authLoading, router]);
+  }, [userSession, isInitializing, router]);
 
-  // Timeout de seguridad para evitar loading infinito
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (authLoading) {
-        console.log('Timeout alcanzado, forzando mostrar login');
-        setForceShowLogin(true);
-      }
-    }, 5000); // 5 segundos máximo
-
-    return () => clearTimeout(timeoutId);
-  }, [authLoading]);
+  // Si está inicializando o ya hay sesión, no mostrar el formulario
+  if (isInitializing || userSession) {
+    return null;
+  }
 
   const onSubmit = async (data: FormValues) => {
     if (!data.email || !data.password) {
@@ -59,10 +45,10 @@ const LoginPage = () => {
     }
 
     setIsLoading(true)
-    
+
     try {
       const { respData, respError } = await signInWithPassword(data.email, data.password)
-      
+
       if (respError) {
         addToast({
           title: "Error de autenticación",
@@ -89,29 +75,6 @@ const LoginPage = () => {
     }
   }
 
-  // Mostrar loading mientras verifica la autenticación
-  if (authLoading && !forceShowLogin) {
-    return (
-      <Container className='flex justify-center items-center h-screen'>
-        <div className="text-center">
-          <CircularProgress aria-label="Verificando sesión..." size="lg" />
-        </div>
-      </Container>
-    )
-  }
-
-  // Si hay sesión activa, no mostrar el formulario (se redirigirá)
-  if (userSession) {
-    return (
-      <Container className='flex justify-center items-center h-screen'>
-        <div className="text-center">
-          <CircularProgress aria-label="Redirigiendo..." size="lg" />
-
-        </div>
-      </Container>
-    )
-  }
-
   return (
     <>
       <Container className='flex justify-center items-center h-screen'>
@@ -127,7 +90,7 @@ const LoginPage = () => {
                 {...register("email")}
                 disabled={isLoading}
                 classNames={{
-                  base: "!w-full !max-w-[312px]", 
+                  base: "!w-full !max-w-[312px]",
                   input: ["!shadow-none", "placeholder:text-[#999999]"],
                   inputWrapper: [
                     "h-[56px]",
