@@ -9,6 +9,11 @@ export const DynamicNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  // No mostrar navbar en rutas de admin
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   // aqui se detecta si estamos en una pagina de proyectos(bgood, o algosi) asi que pendiente aqui johan
   const isProjectPage = pathname?.startsWith("/projects/");
 
