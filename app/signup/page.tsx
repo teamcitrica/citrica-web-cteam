@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Container, Col } from '@citrica/objects'
 import Text from '@ui/atoms/text'
@@ -7,7 +7,7 @@ import Button from '@ui/molecules/button'
 import { Input } from "@heroui/input"
 import { Card, CardBody } from "@heroui/card"
 import { addToast } from "@heroui/toast"
-import { useSupabase } from '@/shared/context/supabase-context'
+import { UserAuth } from '@/shared/context/auth-context'
 
 const SignupPage = () => {
   const [email, setEmail] = useState('')
@@ -16,8 +16,20 @@ const SignupPage = () => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { supabase } = useSupabase()
+  const { signUpWithPassword, userSession, isInitializing } = UserAuth()
   const router = useRouter()
+
+  // Redirigir a admin si ya está autenticado
+  useEffect(() => {
+    if (!isInitializing && userSession) {
+      router.push('/admin');
+    }
+  }, [userSession, isInitializing, router]);
+
+  // Si está inicializando o ya hay sesión, no mostrar el formulario
+  if (isInitializing || userSession) {
+    return null;
+  }
 
   const handleSignup = async () => {
     if (!email || !password || !firstName || !lastName) {
@@ -48,41 +60,29 @@ const SignupPage = () => {
     }
 
     setIsLoading(true)
-    
+
     try {
-      // Registrar usuario (sin confirmación de email)
-      const { data, error } = await supabase.auth.signUp({
+      const { respData, respError } = await signUpWithPassword(
         email,
         password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            role_id: 2 // rol user por defecto
-          }
-        }
-      })
-      
-      if (error) {
+        { first_name: firstName, last_name: lastName }
+      )
+
+      if (respError) {
         addToast({
           title: "Error de registro",
-          description: error.message,
+          description: respError.message,
           color: "danger",
         })
-      } else if (data.user) {
-        // Verificar si el usuario está confirmado automáticamente
-        if (data.session) {
-          // Usuario logueado automáticamente
+      } else if (respData?.user) {
+        if (respData.session) {
           addToast({
             title: "¡Registro exitoso!",
             description: "Bienvenido a la plataforma",
             color: "success",
           })
-          
-          // Redirigir a /admin inmediatamente
           router.push('/admin')
         } else {
-          // Si por alguna razón no hay sesión automática
           addToast({
             title: "Registro completado",
             description: "Ahora puedes iniciar sesión",
@@ -186,7 +186,7 @@ const SignupPage = () => {
               <div className="text-center">
                 <Text variant="label" textColor="color-on-container">
                   ¿Ya tienes cuenta?{" "}
-                  <span 
+                  <span
                     className="text-blue-500 cursor-pointer hover:underline"
                     onClick={() => router.push('/login')}
                   >
