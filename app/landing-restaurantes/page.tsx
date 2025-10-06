@@ -226,7 +226,7 @@ const LandingRestaurantes = () => {
                 <Text
                   variant="headline"
                   weight="bold"
-                  textColor="  color-primary"
+                  textColor="color-primary"
                 >
                   Especialización y Tecnología para su Rentabilidad.
                 </Text>
@@ -278,7 +278,7 @@ const LandingRestaurantes = () => {
             </div>
           </Col>
           <div className="rest-technology-img-container">
-            <img src="/img/technology-img.jpg" alt="Imagen tecnologeia" className="block"/>
+            <img src="/img/technology-img.jpg" alt="Imagen tecnologeia" className="rest-technology-img"/>
           </div>
         </Container>
       </section>

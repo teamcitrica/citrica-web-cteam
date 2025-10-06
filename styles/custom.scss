@@ -553,7 +553,10 @@ $container-inputs: (
 }
 
 $rest-technology-img-container: (
-  sm: (),
+  sm: (
+    
+   
+  ),
   md: (),
   lg: (
     position: absolute,
@@ -561,11 +564,29 @@ $rest-technology-img-container: (
     right: 0,
     bottom: 0,
     z-index: 0,
-    width: 50vw,    
+    width: 50vw,
+    overflow: hidden,
   ),
 );
 .rest-technology-img-container {
   @include a-set($rest-technology-img-container);
+}
+
+$rest-technology-img: (
+  sm: (
+    
+   
+  ),
+  md: (),
+  lg: (
+    display: block,
+    height: 130%,
+    object-fit: cover,
+    object-position: right,
+  ),
+);
+.rest-technology-img {
+  @include a-set($rest-technology-img);
 }
 
 .img-boton-hero {
