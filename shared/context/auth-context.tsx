@@ -150,10 +150,36 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
     return { respData, respError };
   };
 
-  // Función para cerrar sesión
+  // Función para cerrar sesión con manejo de errores mejorado
   const signOut = async () => {
-    console.log("LOGOUT");
-    await supabase.auth.signOut();
+    console.log("LOGOUT - Iniciando proceso de cierre de sesión");
+
+    try {
+      // Intentar logout con scope global primero
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
+
+      if (error) {
+        console.warn("Error en logout global:", error);
+
+        // Si falla el global (403 u otro error), intentar local
+        const { error: localError } = await supabase.auth.signOut({ scope: 'local' });
+
+        if (localError) {
+          console.error("Error en logout local:", localError);
+        } else {
+          console.log("✅ Logout local exitoso");
+        }
+      } else {
+        console.log("✅ Logout global exitoso");
+      }
+    } catch (error) {
+      console.error("Error inesperado en signOut:", error);
+    } finally {
+      // SIEMPRE limpiar el estado local, incluso si el logout falla
+      setUserSession(null);
+      setUserInfo(null);
+      console.log("✅ Estado local limpiado");
+    }
   };
 
   // Función para obtener la información del usuario
