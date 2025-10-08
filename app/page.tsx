@@ -8,7 +8,14 @@ import AnimatedHeadlines from "./home/components/animatedheadlines";
 import GradientText from "@/shared/components/project-components/gradient-text";
 import "aos/dist/aos.css";
 import AOS from "aos";
-import { services, projects, otherProjects, technologies, process, stats } from "@/shared/archivos js/citrica-data";
+import {
+  services,
+  projects,
+  otherProjects,
+  technologies,
+  process,
+  stats,
+} from "@/shared/archivos js/citrica-data";
 import { CompletedProjects } from "@/shared/components/project-components/other-projects";
 import { CtaSection } from "@/shared/components/project-components/cta-section";
 import { CtaSectionHome } from "@/shared/components/project-components/cta-section-home";
@@ -20,12 +27,13 @@ const CitricaWebsite = () => {
     AOS.init({ duration: 1500, once: true });
   }, []);
 
-
-
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0A0F0F" }}>
       {/* Hero Section */}
-      <section id="inicio" className="min-h-screen relative overflow-hidden hero-background-image">
+      <section
+        id="inicio"
+        className="min-h-screen relative overflow-hidden hero-background-image"
+      >
         <div className="absolute inset-0 -z-80">
           <DotGrid
             dotSize={4}
@@ -76,9 +84,7 @@ const CitricaWebsite = () => {
             cols={{ lg: 12, md: 6, sm: 4 }}
             className="mb-6 flex items-center justify-center text-center"
           >
-            <h2
-              data-aos="fade-up"
-              data-aos-duration="1500">
+            <h2 data-aos="fade-up" data-aos-duration="1500">
               <Text
                 variant="headline"
                 color="#FF5B00"
@@ -89,7 +95,6 @@ const CitricaWebsite = () => {
                 Nuestros servicios
               </Text>
             </h2>
-
           </Col>
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
@@ -114,8 +119,6 @@ const CitricaWebsite = () => {
                     alignItems: "center",
                     justifyContent: "center",
                   }}
-
-
                 >
                   <Icon
                     name={service.icon as any}
@@ -182,7 +185,7 @@ const CitricaWebsite = () => {
                 <Icon name="Rocket" color="#FFFFFF" size={48} />
               </div>
               <h2 data-aos="fade-up" data-aos-duration="1500">
-                <Text variant="title" color="#16141F" weight="bold" >
+                <Text variant="title" color="#16141F" weight="bold">
                   Impulsamos tu crecimiento digital
                 </Text>
               </h2>
@@ -236,12 +239,21 @@ const CitricaWebsite = () => {
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
             <h2 className="mb-6" data-aos="fade-up" data-aos-duration="1500">
-              <Text variant="headline" color="#FF5B00" weight="bold" className="">
+              <Text
+                variant="headline"
+                color="#FF5B00"
+                weight="bold"
+                className=""
+              >
                 ¿Quiénes somos?
               </Text>
             </h2>
             <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
-              <p className="text-ch-width text-balance" data-aos="fade-up" data-aos-duration="1500">
+              <p
+                className="text-ch-width text-balance"
+                data-aos="fade-up"
+                data-aos-duration="1500"
+              >
                 <Text variant="body" color="#FFFFFF" className="opacity-90">
                   Somos un equipo de desarrolladores y diseñadores apasionados
                   por crear experiencias digitales excepcionales que transforman
@@ -252,7 +264,11 @@ const CitricaWebsite = () => {
           </Col>
 
           <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-            <div className="relative max-w-4xl mx-auto" data-aos="fade-up" data-aos-duration="1500">
+            <div
+              className="relative max-w-4xl mx-auto"
+              data-aos="fade-up"
+              data-aos-duration="1500"
+            >
               {/* Línea central */}
               <div className="absolute left-1/2 h-full w-0.5 bg-white opacity-50 -translate-x-1/2"></div>
 
@@ -317,7 +333,10 @@ const CitricaWebsite = () => {
       </section>
 
       {/* Technologies Section */}
-      <section id="technologies" className="pb-20 pt-20 hero-background-image-flip">
+      <section
+        id="technologies"
+        className="pb-20 pt-20 hero-background-image-flip"
+      >
         <Container>
           {/* Título principal */}
           <Col
@@ -332,9 +351,9 @@ const CitricaWebsite = () => {
             <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
               <p data-aos="fade-up" data-aos-duration="1500">
                 <Text variant="body" color="#FFFFFF" className="opacity-90">
-                  En Cítrica, utilizamos un conjunto de tecnologías de vanguardia
-                  para garantizar que tus productos digitales sean de la más alta
-                  calidad:
+                  En Cítrica, utilizamos un conjunto de tecnologías de
+                  vanguardia para garantizar que tus productos digitales sean de
+                  la más alta calidad:
                 </Text>
               </p>
             </Col>
@@ -380,7 +399,11 @@ const CitricaWebsite = () => {
 
           {/* Texto final */}
           <div className="text-center mt-10 max-w-3xl mx-auto">
-            <p className="text-white text-sm" data-aos="fade-up" data-aos-duration="1500">
+            <p
+              className="text-white text-sm"
+              data-aos="fade-up"
+              data-aos-duration="1500"
+            >
               <Text variant="body" color="#ffffff" weight="bold">
                 Estas herramientas nos permiten crear productos digitales de
                 alto rendimiento, escalables y fáciles de mantener, asegurando
@@ -415,7 +438,11 @@ const CitricaWebsite = () => {
               </div>
             </Col>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative" data-aos="fade-up" data-aos-duration="1500">
+            <div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative"
+              data-aos="fade-up"
+              data-aos-duration="1500"
+            >
               {process.map((step, index) => (
                 <div key={index} className="relative">
                   <div className="relative p-8 h-full border-2 rounded-xl hover:shadow-xl transition-all duration-500 group-hover:scale-105 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm hover:from-white/20 hover:to-white/10">
@@ -509,12 +536,147 @@ const CitricaWebsite = () => {
       </section>
 
       {/* CTA Section */}
-      <section
+      {/* <section
         id="contacto"
         className="py-20"
         style={{ backgroundColor: "#E1FF00" }}
       >
         <CtaSectionHome />
+      </section> */}
+      {/* Contact Section */}
+      <section className="py-[80px] bg-color-ct-secondary">
+        <Container>
+          <Col cols={{ lg: 6, md: 3, sm: 4 }}>
+            <div className="mb-6">
+              <h2>
+                <Text
+                  variant="headline"
+                  weight="bold"
+                  textColor="color-text-black"
+                >
+                  ¿Listo para transformar tu negocio?
+                </Text>
+              </h2>
+            </div>
+            <div className="mb-8">
+              <p>
+                <Text variant="body" textColor="color-on-surface-var">
+                  Contáctanos hoy y descubre cómo podemos impulsar tu
+                  crecimiento digital
+                </Text>
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-color-ct-primary rounded-xl flex items-center justify-center">
+                  <Icon
+                    name="Mail"
+                    size={24}
+                    className="bg-color-ct-primary ct-color-white"
+                  />
+                </div>
+                <div>
+                  <Text variant="body" textColor="color-on-surface">
+                    contacto@citrica.dev
+                  </Text>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-color-ct-primary rounded-xl flex items-center justify-center">
+                  <Icon
+                    name="Phone"
+                    size={24}
+                    className="bg-color-ct-primary ct-color-white"
+                  />
+                </div>
+                <p>
+                  <Text variant="body" textColor="color-on-surface">
+                    Perú +51 942 627 383
+                  </Text>
+                </p>
+                <p>
+                  <Text variant="body" textColor="color-on-surface">
+                    Uruguay +598 92 041 487
+                  </Text>
+                </p>
+              </div>
+            </div>
+          </Col>
+
+          <Col cols={{ lg: 6, md: 3, sm: 4 }}>
+            <div className="bg-color-ct-white rounded-2xl p-8">
+              <div className="mb-6">
+                <h3>
+                  <Text variant="title" textColor="color-primary">
+                    Envíanos un Mensaje
+                  </Text>
+                </h3>
+              </div>
+
+              <form className="space-y-6">
+                <div>
+                  <label className="block mb-2">
+                    <Text variant="label" textColor="color-on-surface">
+                      Nombre *
+                    </Text>
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full p-3 border border-outline rounded-lg bg-surface-container text-on-surface"
+                    placeholder="Tu nombre completo"
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-2">
+                    <Text variant="label" textColor="color-on-surface">
+                      Email *
+                    </Text>
+                  </label>
+                  <input
+                    type="email"
+                    className="w-full p-3 border border-outline rounded-lg bg-surface-container text-on-surface"
+                    placeholder="tu@email.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-2">
+                    <Text variant="label" textColor="color-on-surface">
+                      Servicio de Interés
+                    </Text>
+                  </label>
+                  <select className="w-full p-3 border border-outline rounded-lg bg-surface-container text-on-surface">
+                    <option>Selecciona el servicio que te interesa</option>
+                    <option>Landing Page / Website</option>
+                    <option>Aplicación Web</option>
+                    <option>Aplicación Móvil</option>
+                    <option>Marketing Digital</option>
+                    <option>Integración de IA</option>
+                    <option>Paquete Completo</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block mb-2">
+                    <Text variant="label" textColor="color-on-surface">
+                      Mensaje
+                    </Text>
+                  </label>
+                  <textarea
+                    rows={4}
+                    className="w-full p-3 border border-outline rounded-lg bg-surface-container text-on-surface"
+                    placeholder="Cuéntanos sobre tu negocio y qué solución digital necesitas (website, app, marketing, IA, etc.)"
+                  ></textarea>
+                </div>
+
+                <Button label="Enviar Mensaje" variant="primary" />
+              </form>
+            </div>
+          </Col>
+        </Container>
       </section>
     </div>
   );

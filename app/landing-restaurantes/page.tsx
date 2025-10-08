@@ -409,7 +409,7 @@ const LandingRestaurantes = () => {
         </Container>
       </section>
 
-      {/* Contact Section
+      {/* Contact Section */}
       <section className="py-[80px] bg-surface-container">
         <Container>
           <Col cols={{ lg: 6, md: 3, sm: 4 }}>
@@ -540,7 +540,7 @@ const LandingRestaurantes = () => {
             </div>
           </Col>
         </Container>
-      </section> */}
+      </section>
     </>
   );
 };
