@@ -4,8 +4,6 @@ import { useRouter } from "next/navigation";
 import { Sidebar } from "@/shared/components/citrica-ui/organism/sidebar";
 import { siteConfig } from "@/config/site";
 import { UserAuth } from "@/shared/context/auth-context";
-import { CircularProgress } from "@heroui/react";
-import { Container, Col } from '@citrica/objects'
 import Navbar from "@/shared/components/citrica-ui/organism/navbar";
 import "@/styles/globals.scss";
 
@@ -14,33 +12,19 @@ export default function PanelLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { userSession, userInfo, signOut, checkUser } = UserAuth();
+  const { userSession, userInfo, isInitializing } = UserAuth();
   const router = useRouter();
 
   useEffect(() => {
-    checkUser();
-  }, []);
-
-  useEffect(() => {
-    if (userSession === null) {
+    // Solo redirigir si ya terminó de inicializar y no hay sesión
+    if (!isInitializing && userSession === null) {
       router.push('/login');
-      return;
     }
-  }, [userSession, router]);
+  }, [userSession, isInitializing, router]);
 
-
-  if (userInfo === null) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
-        <Container>
-          <Col cols={{ lg: 3, md: 3, sm: 4 }} className="mx-auto text-center">
-            <div className="h-full w-full flex justify-center items-center">
-              <CircularProgress aria-label="Loading..." size="lg" />
-            </div>
-          </Col>
-        </Container>
-      </div>
-    );
+  // Si está inicializando o no hay sesión/info, no renderizar nada
+  if (isInitializing || userSession === null || userInfo === null) {
+    return null;
   }
 
   return (
