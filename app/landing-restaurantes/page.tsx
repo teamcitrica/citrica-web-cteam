@@ -207,7 +207,7 @@ const LandingRestaurantes = () => {
                 <Text
                   variant="headline"
                   weight="bold"
-                  textColor="color-on-primary-container"
+                  textColor="color-primary"
                 >
                   ¿Por Qué Elegir Cítrica?
                 </Text>
@@ -223,7 +223,7 @@ const LandingRestaurantes = () => {
 
             <div className="space-y-4">
               <div className="flex items-start gap-4">
-                <div className="w-6 h-6 bg-success rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-6 h-6 bg-color-ct-secondary rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                   <Icon name="Check" size={16} className="text-on-success" />
                 </div>
                 <div>
@@ -237,7 +237,7 @@ const LandingRestaurantes = () => {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-6 h-6 bg-success rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-6 h-6 bg-color-ct-secondary rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                   <Icon name="Check" size={16} className="text-on-success" />
                 </div>
                 <div>
@@ -251,7 +251,7 @@ const LandingRestaurantes = () => {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-6 h-6 bg-success rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-6 h-6 bg-color-ct-secondary rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                   <Icon name="Check" size={16} className="text-on-success" />
                 </div>
                 <div>
