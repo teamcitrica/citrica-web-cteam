@@ -13,13 +13,15 @@ interface ProjectData {
   projectSolucion: any;
   services: any[];
   technologies: any[];
+  slug?: string;
 }
 
 interface ProjectTemplateProps {
   project: ProjectData;
+  slug?: string;
 }
 
-const ProjectTemplate = ({ project }: ProjectTemplateProps) => {
+const ProjectTemplate = ({ project, slug }: ProjectTemplateProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const {
@@ -319,7 +321,7 @@ const ProjectTemplate = ({ project }: ProjectTemplateProps) => {
 
       {/* Otros Proyectos */}
       <section id="otros-proyectos" className="py-20 gradient-project-hero">
-        <CompletedProjects />
+        <CompletedProjects currentProjectSlug={slug} />
       </section>
 
     </div>

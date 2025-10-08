@@ -7,7 +7,10 @@ import Button from "@ui/molecules/button";
 import Icon from "@ui/atoms/icon";
 import Footer from "@ui/organism/footer";
 import GradientText from "@/shared/components/project-components/gradient-text";
-import { restaurantServices, solucionesNegocios } from "@/shared/archivos js/landing-restaurant-data";
+import {
+  restaurantServices,
+  solucionesNegocios,
+} from "@/shared/archivos js/landing-restaurant-data";
 
 // export const dynamic = "force-dynamic";
 
@@ -67,7 +70,10 @@ const LandingRestaurantes = () => {
               </p>
             </div>
             <div className="flex gap-4 flex-wrap">
-              <Button label="Comenzar Ahora" variant="primary" />
+              <a href="mailto:contacto@citrica.dev">
+                <Button label="Comenzar Ahora" variant="primary" />
+              </a>
+
               <Button label="Conocer Más" variant="secondary" />
             </div>
           </Col>
@@ -128,9 +134,11 @@ const LandingRestaurantes = () => {
                     </Text>
                   </GradientText>
                 </h2>
-                <Text variant="body" color="#ffffff" className="opacity-60">
-                  {service.description}
-                </Text>
+                <p>
+                  <Text variant="body" color="#ffffff" className="opacity-80">
+                    {service.description}
+                  </Text>
+                </p>
                 <div
                   className="mt-8 h-1 w-full rounded-full"
                   style={{
@@ -144,7 +152,7 @@ const LandingRestaurantes = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-[80px]">
+      <section className="py-[80px] relative bg-white">
         <Container>
           {/* <Col cols={{ lg: 6, md: 3, sm: 4 }} className="flex items-center">
             <div className="grid grid-cols-2 gap-6 w-full">
@@ -202,7 +210,7 @@ const LandingRestaurantes = () => {
             cols={{ lg: 6, md: 3, sm: 4 }}
             className="flex flex-col justify-center"
           >
-            <div className="mb-2">
+            {/* <div className="mb-2">
               <h2>
                 <Text
                   variant="headline"
@@ -212,22 +220,26 @@ const LandingRestaurantes = () => {
                   ¿Por Qué Elegir Cítrica?
                 </Text>
               </h2>
-            </div>
+            </div> */}
             <div className="mb-6">
-              <p>
-                <Text variant="subtitle" textColor="color-on-primary-container">
+              <h3>
+                <Text
+                  variant="headline"
+                  weight="bold"
+                  textColor="color-primary"
+                >
                   Especialización y Tecnología para su Rentabilidad.
                 </Text>
-              </p>
+              </h3>
             </div>
 
             <div className="space-y-4">
               <div className="flex items-start gap-4">
-                <div className="w-6 h-6 bg-color-ct-secondary rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-6 h-6 bg-success rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                   <Icon name="Check" size={16} className="text-on-success" />
                 </div>
                 <div>
-                  <Text variant="body" textColor="color-on-primary-container">
+                  <Text variant="body" textColor="color-text-black">
                     <strong>Enfoque 100% Gastronómico:</strong> No somos
                     generalistas. Cada solución está diseñada para resolver los
                     desafíos únicos de restaurantes, bares y cafés, no de
@@ -237,25 +249,25 @@ const LandingRestaurantes = () => {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-6 h-6 bg-color-ct-secondary rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-6 h-6 bg-success rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                   <Icon name="Check" size={16} className="text-on-success" />
                 </div>
-                <div>
-                  <Text variant="body" textColor="color-on-primary-container">
+                <p>
+                  <Text variant="body" textColor="color-text-black">
                     <strong>Tecnología que Vende:</strong> Integramos IA y las
                     últimas tendencias web para maximizar su eficiencia,
                     minimizar errores y{" "}
                     <strong>aumentar su ticket promedio.</strong>
                   </Text>
-                </div>
+                </p>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-6 h-6 bg-color-ct-secondary rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-6 h-6 bg-success rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                   <Icon name="Check" size={16} className="text-on-success" />
                 </div>
                 <div>
-                  <Text variant="body" textColor="color-on-primary-container">
+                  <Text variant="body" textColor="color-text-black">
                     <strong>Servicio Integral 360°:</strong> Cubrimos todas sus
                     necesidades digitales, desde el diseño de su web o app de
                     pedidos hasta la estrategia de marketing que lo posiciona
@@ -265,6 +277,9 @@ const LandingRestaurantes = () => {
               </div>
             </div>
           </Col>
+          <div className="rest-technology-img-container">
+            <img src="/img/technology-img.jpg" alt="Imagen tecnologeia" className="rest-technology-img"/>
+          </div>
         </Container>
       </section>
 
@@ -338,10 +353,10 @@ const LandingRestaurantes = () => {
                 transformar tu restaurante.
               </Text>
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
+            <div className="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
               <Button
                 onClick={() =>
-                  window.open("mailto:admin@citrica.dev", "_blank")
+                  window.open("mailto:contacto@citrica.dev", "_blank")
                 }
                 label="Escribir Email"
                 variant="primary"
@@ -355,7 +370,7 @@ const LandingRestaurantes = () => {
                 variant="primary"
               /> */}
             </div>
-            <div className="flex flex-col justify-center items-center gap-1">
+            {/* <div className="flex flex-col justify-center items-center gap-1">
               <div className="flex items-center space-x-2">
                 <Icon name="Mail" color="#16141F" size={20} />
                 <Link href="mailto:contacto@citrica.dev">
@@ -389,12 +404,12 @@ const LandingRestaurantes = () => {
                   </Link>
                 </div>
               </div>
-            </div>
+            </div> */}
           </Col>
         </Container>
       </section>
 
-      {/* Contact Section */}
+      {/* Contact Section
       <section className="py-[80px] bg-surface-container">
         <Container>
           <Col cols={{ lg: 6, md: 3, sm: 4 }}>
@@ -403,7 +418,7 @@ const LandingRestaurantes = () => {
                 <Text
                   variant="headline"
                   weight="bold"
-                  textColor="color-on-surface"
+                  textColor="color-primary"
                 >
                   Ponte en Contacto
                 </Text>
@@ -421,45 +436,43 @@ const LandingRestaurantes = () => {
 
             <div className="space-y-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
-                  <Icon name="Mail" size={24} className="text-on-primary" />
+                <div className="w-12 h-12 bg-color-ct-primary rounded-xl flex items-center justify-center">
+                  <Icon name="Mail" size={24} className="bg-color-ct-primary ct-color-white" />
                 </div>
                 <div>
                   <Text variant="body" textColor="color-on-surface">
-                    contacto@citrica.com
+                    contacto@citrica.dev
                   </Text>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
-                  <Icon name="Phone" size={24} className="text-on-primary" />
+                <div className="w-12 h-12 bg-color-ct-primary rounded-xl flex items-center justify-center">
+                  <Icon name="Phone" size={24} className="bg-color-ct-primary ct-color-white" />
                 </div>
-                <div>
+                <p>
                   <Text variant="body" textColor="color-on-surface">
-                    +1 (555) 123-4567
+                    Perú +51 942 627 383
+
                   </Text>
-                </div>
+                </p>
+                 <p>
+                  <Text variant="body" textColor="color-on-surface">
+                    Uruguay +598 92 041 487
+                  </Text>
+                </p>
+                
               </div>
 
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
-                  <Icon name="MapPin" size={24} className="text-on-primary" />
-                </div>
-                <div>
-                  <Text variant="body" textColor="color-on-surface">
-                    123 Calle Principal, Ciudad, País
-                  </Text>
-                </div>
-              </div>
+              
             </div>
           </Col>
 
           <Col cols={{ lg: 6, md: 3, sm: 4 }}>
-            <div className="bg-surface rounded-2xl p-8">
+            <div className="bg-color-ct-white rounded-2xl p-8">
               <div className="mb-6">
                 <h3>
-                  <Text variant="title" textColor="color-on-surface">
+                  <Text variant="title" textColor="color-primary">
                     Envíanos un Mensaje
                   </Text>
                 </h3>
@@ -527,7 +540,7 @@ const LandingRestaurantes = () => {
             </div>
           </Col>
         </Container>
-      </section>
+      </section> */}
     </>
   );
 };
