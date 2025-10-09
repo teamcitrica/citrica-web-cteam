@@ -155,6 +155,7 @@ export default function CardUsersSuper({
     setSelectedUser(user);
     setIsEditModalOpen(true);
   }, []);
+
   // esta es la funcion que me filtra el buscador anotar pendiente
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -254,7 +255,7 @@ export default function CardUsersSuper({
         </div>
 
         <Button
-          className="bg-[#3E688E] text-white py-[6px] px-[6px] rounded-lg  border-2 border-white"
+          className="bg-[#ff5b00] mt-[10px] text-white py-[6px] px-[6px] rounded-lg  border-2 border-white"
           startContent={<Icon className="w-4 h-4" name="Plus" />}
           onClick={handleOpenModal}
         >
@@ -276,6 +277,11 @@ export default function CardUsersSuper({
         onSortChange={(descriptor) =>
           setSortDescriptor(descriptor as LocalSortDescriptor)
         }
+        classNames={{
+          wrapper: "bg-transparent", // quita fondo del contenedor
+          th: "bg-[#ff5b00] text-[#fff] font-semibold text-center", // encabezados
+          td: "text-gray-700 text-center", // celdas
+        }}
       >
         <TableHeader columns={headerColumns}>
           {(column) => (
@@ -309,7 +315,7 @@ export default function CardUsersSuper({
           showControls
           showShadow
           classNames={{
-            cursor: "!bg-[#3E688E] text-white",
+            cursor: "!bg-[#ff5b00] text-white",
           }}
           page={page}
           total={totalPages}

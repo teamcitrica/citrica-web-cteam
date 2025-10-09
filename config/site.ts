@@ -25,7 +25,7 @@ export const siteConfig = {
 		{
 			title: "Usuarios de Sistema",
 			icon: "Settings",
-			href: "admin/users",
+			href: "/admin/users",
 		},
 		{
 			title: "Reuniones",
@@ -47,7 +47,7 @@ export const siteConfig = {
 		{
 			title: "CMR	",
 			icon: "Users",
-			href: "/users",
+			href: "/",
 		},
 	],
 	links: {

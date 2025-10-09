@@ -19,6 +19,7 @@ export type UserType = {
 export type NewUserType = {
   first_name: string;
   last_name: string;
+  full_name: string;
   email: string;
   password: string;
   is_switchable: boolean;

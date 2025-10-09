@@ -1,25 +1,9 @@
-import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState, useCallback } from "react";
 
 import { useUserCRUD } from "./use-users";
 
 import { useSupabase } from "@/shared/context/supabase-context";
 import { UserType, NewUserType } from "@/shared/types/types";
-
-const supabase_url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const service_role_key = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE;
-let adminAuthClient: any = null;
-
-if (supabase_url && service_role_key) {
-  const supabase = createClient(supabase_url, service_role_key, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-
-  adminAuthClient = supabase.auth.admin;
-}
 
 export const useAdminUser = () => {
   const [error, setError] = useState("");
@@ -70,70 +54,46 @@ export const useAdminUser = () => {
     async (user_data: NewUserType, role_id: string) => {
       setIsLoading(true);
       try {
-        console.log(
-          "Creating user with role_id:",
-          role_id,
-          "type:",
-          typeof role_id,
-        );
+        console.log("Creating user with role_id:", role_id);
 
-        const payload = {
+        // Registrar usuario con signUp - el trigger de Supabase insertará automáticamente en public.users
+        const { data: authData, error: signUpError } = await supabase.auth.signUp({
           email: user_data.email,
           password: user_data.password,
-          email_confirm: true,
-          user_metadata: {
-            name: `${user_data.first_name} ${user_data.last_name}`,
-            first_name: user_data.first_name,
-            last_name: user_data.last_name,
-            role_id: Number(role_id),
-            is_switchable: user_data.is_switchable || false,
-            email_verified: true,
-          },
-        };
-
-        console.log("Auth payload:", JSON.stringify(payload, null, 2));
-
-        const info = await adminAuthClient?.createUser(payload);
-        const { data, error: createError } = info || {};
-
-        if (createError) {
-          console.error("Error creating user in auth:", createError);
-          setError(createError.message || "Error al crear usuario");
-
-          return { data: null, error: createError };
-        }
-
-        console.log("User created in auth.users:", data?.user?.id);
-
-        // Insertar o actualizar en la tabla public.users
-        if (data?.user?.id) {
-          const { error: insertError } = await supabase
-            .from("users")
-            .upsert({
-              id: data.user.id,
-              email: user_data.email,
+          options: {
+            emailRedirectTo: undefined,
+            data: {
               first_name: user_data.first_name,
               last_name: user_data.last_name,
-              full_name: `${user_data.first_name} ${user_data.last_name}`,
               role_id: Number(role_id),
-              is_active: true,
-              is_switchable: user_data.is_switchable || false,
-            });
+            },
+          },
+        });
 
-          if (insertError) {
-            console.error("Error inserting into public.users:", insertError);
-          } else {
-            console.log("User inserted into public.users successfully");
-          }
+        // Verificar si hay error crítico (no el de email validation que es solo advertencia)
+        if (signUpError && !signUpError.message?.includes("validate email")) {
+          console.error("Error creating user in auth:", signUpError);
+          setError(signUpError.message || "Error al crear usuario");
+          setIsLoading(false);
+
+          return { data: null, error: signUpError };
         }
 
-        // Esperar un momento y refrescar
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Si hay error de validación de email pero el usuario fue creado, solo advertir
+        if (signUpError) {
+          console.warn("Email validation warning (user was created):", signUpError.message);
+        }
+
+        console.log("User created in auth.users:", authData?.user?.id);
+        console.log("Trigger will insert user into public.users automatically");
+
+        // Esperar a que el trigger inserte el registro en public.users
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
         setIsLoading(false);
         refreshUsers();
 
-        return { data, error: createError };
+        return { data: authData, error: null };
       } catch (err) {
         console.error("Error en createUserByRole:", err);
         setError("Error inesperado al crear usuario");
@@ -142,7 +102,7 @@ export const useAdminUser = () => {
         return { data: null, error: err };
       }
     },
-    [refreshUsers],
+    [refreshUsers, supabase],
   );
 
   // Update user and refresh list
@@ -150,59 +110,31 @@ export const useAdminUser = () => {
     async (user_id?: string, user_data?: UserType, role_id?: string) => {
       setIsLoading(true);
       try {
-        let updatePayload: any = {
-          user_metadata: {
-            role_id: Number(role_id), // Convertir a número
-          },
+        if (!user_id) {
+          return { data: null, error: new Error("user_id es requerido") };
+        }
+
+        // Actualizar en public.users
+        const publicPayload: Partial<UserType> = {
+          role_id: Number(role_id),
+          updated_at: new Date().toISOString(),
         };
 
         if (user_data) {
-          updatePayload = {
+          Object.assign(publicPayload, {
+            first_name: user_data.first_name,
+            last_name: user_data.last_name,
             email: user_data.email,
-            user_metadata: {
-              name: `${user_data.first_name} ${user_data.last_name}`,
-              first_name: user_data.first_name,
-              last_name: user_data.last_name,
-              role_id: Number(role_id), // Convertir a número
-            },
-          };
+            full_name: `${user_data.first_name} ${user_data.last_name}`,
+          });
         }
 
-        console.log("Updating user with payload:", updatePayload);
+        console.log("Updating user with payload:", publicPayload);
 
-        const result = await adminAuthClient?.updateUserById(
-          user_id,
-          updatePayload,
-        );
-        const { data, error: updateError } = result || {};
+        await updateUser(user_id, publicPayload);
+        refreshUsers();
 
-        if (updateError) {
-          setError(updateError.message || "Error al actualizar usuario");
-
-          return { data: null, error: updateError };
-        }
-
-        // Actualizar en public.users (esto activará el trigger)
-        if (data?.user && user_id) {
-          const publicPayload: Partial<UserType> = {
-            role_id: Number(role_id),
-            updated_at: new Date().toISOString(),
-          };
-
-          if (user_data) {
-            Object.assign(publicPayload, {
-              first_name: user_data.first_name,
-              last_name: user_data.last_name,
-              email: user_data.email,
-              name: `${user_data.first_name} ${user_data.last_name}`,
-            });
-          }
-
-          await updateUser(data.user.id, publicPayload);
-          refreshUsers();
-        }
-
-        return { data, error: null };
+        return { data: null, error: null };
       } catch (err) {
         console.error("Error en updateUserByRole:", err);
 

@@ -21,10 +21,10 @@ const CreateUserModal = ({
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
+    full_name: "",
     email: "",
     password: "contraseña",
     role_id: "",
-    is_switchable: false,
   });
 
   useEffect(() => {
@@ -47,6 +47,7 @@ const CreateUserModal = ({
     if (
       !formData.first_name ||
       !formData.last_name ||
+      !formData.full_name ||
       !formData.email ||
       !formData.role_id
     ) {
@@ -58,23 +59,25 @@ const CreateUserModal = ({
     const newUser = {
       first_name: formData.first_name,
       last_name: formData.last_name,
+      full_name: formData.full_name,
       email: formData.email,
       password: formData.password,
-      is_switchable: formData.is_switchable,
-      role_id: formData.role_id,
+      is_switchable: false,
     };
 
     try {
       const { data, error } = await createUserByRole(newUser, formData.role_id);
 
       if (error) {
-        switch (error.status) {
-          case 422:
-            alert("El email ya está registrado. Intente con otro.");
-            break;
-          default:
-            alert("Ocurrió un error al crear el usuario. Intente nuevamente.");
-            console.error("Error no manejado:", error);
+        console.error("Error al crear el usuario:", error);
+
+        // Verificar si el error es de email duplicado
+        const errorMessage = (error as any)?.message || "";
+
+        if (errorMessage.includes("already") || errorMessage.includes("duplicate") || errorMessage.includes("User already registered")) {
+          alert("El email ya está registrado. Intente con otro.");
+        } else {
+          alert(`Ocurrió un error al crear el usuario: ${errorMessage || "Intente nuevamente."}`);
         }
 
         return;
@@ -84,10 +87,10 @@ const CreateUserModal = ({
       setFormData({
         first_name: "",
         last_name: "",
+        full_name: "",
         email: "",
         password: "contraseña",
         role_id: "",
-        is_switchable: false,
       });
       // Cerrar el modal tras crear el usuario
       onClose();
@@ -122,6 +125,13 @@ const CreateUserModal = ({
             onChange={handleChange}
           />
           <Input
+            name="full_name"
+            placeholder="Nombre completo"
+            type="text"
+            value={formData.full_name}
+            onChange={handleChange}
+          />
+          <Input
             name="email"
             placeholder="Email"
             type="email"
@@ -148,19 +158,6 @@ const CreateUserModal = ({
               </option>
             ))}
           </select>
-
-          {(formData.role_id === "4" || formData.role_id === "7") && (
-            <label className="flex items-center gap-2 text-black">
-              <input
-                checked={formData.is_switchable}
-                className="w-4 h-4"
-                name="is_switchable"
-                type="checkbox"
-                onChange={handleChange}
-              />
-              ¿Este usuario podrá alternar entre Cajero y Mesero?
-            </label>
-          )}
 
           <button
             className="mt-4 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700"

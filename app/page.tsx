@@ -20,6 +20,7 @@ import { CompletedProjects } from "@/shared/components/project-components/other-
 import { CtaSection } from "@/shared/components/project-components/cta-section";
 import { CtaSectionHome } from "@/shared/components/project-components/cta-section-home";
 import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";
+import {ContactSectionLanding } from "@/shared/components/project-components/contact-section";
 
 const CitricaWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -552,106 +553,7 @@ const CitricaWebsite = () => {
       </section>
 
       {/* Contact Section */}
-      <section className="py-[80px] bg-color-ct-surface-container">
-        <Container>
-          <Col cols={{ lg: 6, md: 3, sm: 4 }}>
-            <div className="mb-6">
-              <h2>
-                <Text
-                  variant="headline"
-                  weight="bold"
-                  textColor="color-primary"
-                >
-                  ¿Listo para transformar tu negocio?
-                </Text>
-              </h2>
-            </div>
-            <div className="mb-8">
-              <p>
-                <Text variant="subtitle" textColor="color-on-surface-var">
-                  Contáctanos hoy y descubre cómo podemos impulsar tu
-                  crecimiento digital
-                </Text>
-              </p>
-            </div>
-
-            <div className="space-y-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-color-ct-primary rounded-xl flex items-center justify-center">
-                  <Icon
-                    name="Mail"
-                    size={24}
-                    className="bg-color-ct-primary ct-color-white"
-                  />
-                </div>
-                <div>
-                  <Text variant="body" textColor="color-on-surface">
-                    contacto@citrica.dev
-                  </Text>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-color-ct-primary rounded-xl flex items-center justify-center">
-                  <Icon
-                    name="Phone"
-                    size={24}
-                    className="bg-color-ct-primary ct-color-white"
-                  />
-                </div>
-                <p>
-                  <Text variant="body" textColor="color-on-surface">
-                    Perú +51 942 627 383
-                  </Text>
-                </p>
-                <p>
-                  <Text variant="body" textColor="color-on-surface">
-                    Uruguay +598 92 041 487
-                  </Text>
-                </p>
-              </div>
-            </div>
-          </Col>
-
-          <Col cols={{ lg: 5, md: 3, sm: 4 }}>
-            <div className="bg-color-ct-white rounded-2xl p-4">              
-
-              <form className="flex flex-col items-center gap-4">
-                <Input
-                  label="Nombre"
-                  placeholder="Tu nombre"
-                  type="text"
-                  variant="bordered"
-                  color="primary"
-                  radius="sm"
-                  fullWidth
-                />
-
-                <Input
-                  label="Email"
-                  placeholder="Tu email"
-                  type="email"
-                  variant="bordered"
-                  color="primary"
-                  radius="sm"
-                  fullWidth
-                />
-
-                <Textarea 
-                  label="Mensaje"
-                  placeholder="Cuéntanos sobre tu negocio y qué solución digital necesitas"
-                  variant="bordered"
-                  color="primary"
-                  radius="sm"
-                  fullWidth
-                />                
-
-                <Button label="Enviar Mensaje" variant="primary" fullWidth className="max-w-[380px]" />
-              </form>
-            </div>
-          </Col>
-        </Container>
-      </section>
+      <ContactSectionLanding/>
 
       {/* CTA Section */}
       {/* <section
