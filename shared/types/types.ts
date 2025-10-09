@@ -1,3 +1,30 @@
+export type UserType = {
+  id?: string;
+  name?: string; // Alias para full_name (retrocompatibilidad)
+  full_name?: string; // Nombre completo en la BD
+  avatar_url?: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role?: { name: string };
+  role_id: number;
+  is_active?: boolean;
+  updated_at?: string;
+  created_at?: string;
+  phone?: string;
+  is_switchable: boolean;
+  user_metadata?: any;
+};
+
+export type NewUserType = {
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  email: string;
+  password: string;
+  is_switchable: boolean;
+};
+
 export type Customer = {
   id: string;
   full_name: string;
