@@ -725,3 +725,11 @@ $rest-technology-img: (
     }
   }
 }
+
+// Sections styles
+.cta-section {
+  background-image: url(/img/handshake.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
