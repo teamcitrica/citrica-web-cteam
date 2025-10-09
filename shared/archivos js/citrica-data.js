@@ -34,19 +34,28 @@ export const services = [
     gradientColors: ["#FF00D4 , #C300FF, #FF00D4 , #C300FF, #FF00D4"],
   },
   {
-    title: "Integración de IA",
-    description: "Automatiza procesos y toma decisiones más inteligentes.",
-    icon: "Sparkles",
+    title: "Plataformas SAAS",
+    description:
+      "Construcción de software como servicio escalable y seguro.",
+    icon: "CloudCog",
     color: "#E1FF00",
     gradientColors: ["#E1FF00 , #62FF00, #E1FF00 , #62FF00, #E1FF00"],
   },
+  {
+    title: "Integración de IA",
+    description: "Automatiza procesos y toma decisiones más inteligentes.",
+    icon: "Sparkles",
+    color: "#00FFFF",
+    gradientColors: ["#00FFFF , #00FF88, #00FFFF , #00FF88, #00FFFF"],
+  },
+  
   {
     title: "Marketing Digital",
     description:
       "Aumenta tu visibilidad y genera más leads con estrategias de marketing digital efectivas.",
     icon: "Megaphone",
-    color: "#00FFFF",
-    gradientColors: ["#00FFFF , #00FF88, #00FFFF , #00FF88, #00FFFF"],
+    color: "#FF5B00",
+    gradientColors: [" #FF5B00 , #FF0400, #FF5B00 , #FF0400, #FF5B00"],
   },
 ];
 

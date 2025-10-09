@@ -1,5 +1,5 @@
-@import './webpages-styles/sections.scss';
-@import './webpages-styles/home.scss';
+@import "./webpages-styles/sections.scss";
+@import "./webpages-styles/home.scss";
 
 // SOLO ESTILOS GLOBALES DE LA WEB
 
@@ -8,7 +8,32 @@
 }
 
 :root {
-  --linear-ease: linear(0, 0.068, 0.19 2.7%, 0.804 8.1%, 1.037, 1.199 13.2%, 1.245, 1.27 15.8%, 1.274, 1.272 17.4%, 1.249 19.1%, 0.996 28%, 0.949, 0.928 33.3%, 0.926, 0.933 36.8%, 1.001 45.6%, 1.013, 1.019 50.8%, 1.018 54.4%, 1 63.1%, 0.995 68%, 1.001 85%, 1);
+  --linear-ease: linear(
+    0,
+    0.068,
+    0.19 2.7%,
+    0.804 8.1%,
+    1.037,
+    1.199 13.2%,
+    1.245,
+    1.27 15.8%,
+    1.274,
+    1.272 17.4%,
+    1.249 19.1%,
+    0.996 28%,
+    0.949,
+    0.928 33.3%,
+    0.926,
+    0.933 36.8%,
+    1.001 45.6%,
+    1.013,
+    1.019 50.8%,
+    1.018 54.4%,
+    1 63.1%,
+    0.995 68%,
+    1.001 85%,
+    1
+  );
 }
 
 // CSS DE GOOEY VAY
@@ -30,7 +55,7 @@
   margin: 0;
   position: relative;
   z-index: 3;
-  color: #FFFFFF;
+  color: #ffffff;
   /* texto blanco */
   text-shadow: none;
   /* quitamos sombra */
@@ -41,7 +66,7 @@
   position: relative;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
-  color: #FFFFFF;
+  color: #ffffff;
   /* texto blanco por defecto */
   box-shadow: none;
   /* quitamos sombra */
@@ -54,14 +79,13 @@
   transition: color 0.3s ease;
 }
 
-
 .gooey-nav-container nav ul li a:hover {
-  color: #E1FF00;
+  color: #e1ff00;
   /* hover amarillo */
 }
 
 .gooey-nav-container nav ul li.active {
-  color: #E1FF00;
+  color: #e1ff00;
   /* activo amarillo */
 }
 
@@ -92,7 +116,7 @@
 }
 
 .gooey-nav-container .effect.text {
-  color: #FFFFFF;
+  color: #ffffff;
   transition: color 0.3s ease;
 }
 
@@ -115,7 +139,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: #E1FF00;
+  background: #e1ff00;
   /* amarillo en el efecto */
   transform: scale(0);
   opacity: 0;
@@ -153,7 +177,7 @@
 }
 
 .point {
-  background: #E1FF00;
+  background: #e1ff00;
   /* partículas amarillas */
   opacity: 1;
   animation: point calc(var(--time)) ease 1 -350ms;
@@ -161,24 +185,28 @@
 
 @keyframes particle {
   0% {
-    transform: rotate(0deg) translate(calc(var(--start-x)), calc(var(--start-y)));
+    transform: rotate(0deg)
+      translate(calc(var(--start-x)), calc(var(--start-y)));
     opacity: 1;
     animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
   }
 
   70% {
-    transform: rotate(calc(var(--rotate) * 0.5)) translate(calc(var(--end-x) * 1.2), calc(var(--end-y) * 1.2));
+    transform: rotate(calc(var(--rotate) * 0.5))
+      translate(calc(var(--end-x) * 1.2), calc(var(--end-y) * 1.2));
     opacity: 1;
     animation-timing-function: ease;
   }
 
   85% {
-    transform: rotate(calc(var(--rotate) * 0.66)) translate(calc(var(--end-x)), calc(var(--end-y)));
+    transform: rotate(calc(var(--rotate) * 0.66))
+      translate(calc(var(--end-x)), calc(var(--end-y)));
     opacity: 1;
   }
 
   100% {
-    transform: rotate(calc(var(--rotate) * 1.2)) translate(calc(var(--end-x) * 0.5), calc(var(--end-y) * 0.5));
+    transform: rotate(calc(var(--rotate) * 1.2))
+      translate(calc(var(--end-x) * 0.5), calc(var(--end-y) * 0.5));
     opacity: 1;
   }
 }
@@ -215,11 +243,14 @@
   }
 }
 
-
 .aurora {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 20% 20%, rgba(0, 255, 200, 0.5), transparent 60%),
+  background: radial-gradient(
+      circle at 20% 20%,
+      rgba(0, 255, 200, 0.5),
+      transparent 60%
+    ),
     radial-gradient(circle at 80% 30%, rgba(0, 150, 255, 0.4), transparent 60%),
     radial-gradient(circle at 50% 80%, rgba(255, 0, 200, 0.4), transparent 70%);
   filter: blur(100px);
@@ -246,18 +277,18 @@
   justify-content: center;
   width: 100%;
   overflow: hidden;
-  background-color:  #E1FF00 ;
+  background-color: #e1ff00;
 }
 
 .curved-loop-svg {
   user-select: none;
   width: 100%;
-   height: 80px; 
+  height: 80px;
   aspect-ratio: 100 / 12;
   overflow: visible;
   display: block;
   font-size: 38px;
-  fill: #0A0F0F;
+  fill: #0a0f0f;
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
@@ -306,7 +337,7 @@
   font-family: $font-family-b;
   font-weight: 400;
   font-size: 14px;
-  color: #1D192B;
+  color: #1d192b;
 }
 
 // styles del user box
@@ -318,7 +349,7 @@
   color: #414141;
 }
 
-// styles login 
+// styles login
 .bg-login {
   background: url("https://citrica-websites.s3.us-east-1.amazonaws.com/miollita-cteeam/bg-login.jpg");
   background-repeat: no-repeat;
@@ -327,18 +358,23 @@
   width: 100%;
   max-width: 484px;
   height: 473px;
-  border: 1px solid #E9E8DD;
+  border: 1px solid #e9e8dd;
   border-top-right-radius: 12px;
   border-bottom-right-radius: 12px;
   box-shadow: 8px 8px 24px rgba(102, 102, 102, 0.3);
 }
 
-$container-inputs : (sm: (padding: 0px 8px,
+$container-inputs: (
+  sm: (
+    padding: 0px 8px,
   ),
-  md: (padding: 0px px,
+  md: (
+    padding: 0px px,
   ),
-  lg: (padding: 0px 0px,
-  ));
+  lg: (
+    padding: 0px 0px,
+  ),
+);
 
 .container-inputs {
   width: 100%;
@@ -348,12 +384,12 @@ $container-inputs : (sm: (padding: 0px 8px,
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 1px solid #E9E8DD;
+  border: 1px solid #e9e8dd;
   border-top-left-radius: 12px;
   border-bottom-left-radius: 12px;
   box-shadow: 8px 8px 24px rgba(102, 102, 102, 0.3);
-  background: #FFFFFF;
-  @include a-set($container-inputs );
+  background: #ffffff;
+  @include a-set($container-inputs);
 }
 
 .bottom-login {
@@ -365,32 +401,40 @@ $container-inputs : (sm: (padding: 0px 8px,
   padding-bottom: 10px;
   padding-top: 10px;
   border-radius: 12px;
-  background: #E9E8DD;
+  background: #e9e8dd;
   color: #666666;
 }
 
 .bg-color-ct-black {
-  background-color: #16141F;
+  background-color: #16141f;
 }
 
 .bg-color-ct-white {
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 }
 
 .bg-color-ct-primary {
-  background-color: #FF5B00;
+  background-color: #ff5b00;
 }
 
 .bg-color-ct-secondary {
-  background-color: #E1FF00;
+  background-color: #e1ff00;
+}
+
+.bg-color-ct-on-secondary {
+  background-color: #{$color-light-on-secondary};;
+}
+
+.bg-color-ct-secondary-container {
+  background-color: #{$color-light-secondary-container};
 }
 
 .bg-color-ct-tertiary {
-  background-color: #00FFFF;
+  background-color: #00ffff;
 }
 
 .bg-color-ct-tertiary-container {
-  background-color: #E6F4F4;
+  background-color: #e6f4f4;
 }
 
 .bg-color-ct-on-tertiary {
@@ -398,35 +442,39 @@ $container-inputs : (sm: (padding: 0px 8px,
 }
 
 .bg-color-ct-tertiary-darker {
-  background-color: #0A0F0F;
+  background-color: #0a0f0f;
 }
 
 .bg-color-ct-cuaternary {
-  background-color: #FF00D4;
+  background-color: #ff00d4;
+}
+
+.bg-color-ct-surface-container {
+  background-color: #{$color-light-surface-container};
 }
 
 .text-dark-bkg {
-  background-color: #16141FCC;
+  background-color: #16141fcc;
 }
 
 .ct-color-white {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .ct-color-primary {
-  color: #FF5B00;
+  color: #ff5b00;
 }
 
 .ct-color-secondary {
-  color: #E1FF00;
+  color: #e1ff00;
 }
 
 .ct-color-on-secondary {
-  color: #2D3300;
+  color: #2d3300;
 }
 
 .ct-color-tertiary {
-  color: #00FFFF;
+  color: #00ffff;
 }
 
 .ct-color-on-tertiary {
@@ -438,25 +486,33 @@ $container-inputs : (sm: (padding: 0px 8px,
 }
 
 .ct-color-tertiary-container {
-  color: #CCFFFF;
+  color: #ccffff;
 }
 
 .ct-color-cuaternary {
-  color: #FF00D4;
+  color: #ff00d4;
 }
 
 .proyect-page-hero-img-shadow {
-  filter: drop-shadow(-29px 72px 30 #000000AA);
+  filter: drop-shadow(-29px 72px 30 #000000aa);
 }
 
 .gradient-project-hero {
   background: #003333;
-  background: linear-gradient(44deg, rgba(0, 51, 51, 1) 41%, rgba(0, 130, 130, 1) 100%);
+  background: linear-gradient(
+    44deg,
+    rgba(0, 51, 51, 1) 41%,
+    rgba(0, 130, 130, 1) 100%
+  );
 }
 
 .gradient-1-project-section {
   background: #dff0ee;
-  background: linear-gradient(44deg, rgba(223, 240, 238, 1) 41%, rgba(237, 255, 251, 1) 100%);
+  background: linear-gradient(
+    44deg,
+    rgba(223, 240, 238, 1) 41%,
+    rgba(237, 255, 251, 1) 100%
+  );
 }
 
 .text-ch-width {
@@ -468,9 +524,9 @@ $container-inputs : (sm: (padding: 0px 8px,
 }
 
 .project-img-shadow {
-  box-shadow: -26px 26px 30px 0px rgba(0, 51, 51, 0.20);
-  -webkit-box-shadow: -26px 26px 30px 0px rgba(0, 51, 51, 0.20);
-  -moz-box-shadow: -26px 26px 30px 0px rgba(0, 0, 51, 51.20);
+  box-shadow: -26px 26px 30px 0px rgba(0, 51, 51, 0.2);
+  -webkit-box-shadow: -26px 26px 30px 0px rgba(0, 51, 51, 0.2);
+  -moz-box-shadow: -26px 26px 30px 0px rgba(0, 0, 51, 51.2);
 }
 
 .center {
@@ -508,11 +564,41 @@ $container-inputs : (sm: (padding: 0px 8px,
   background-size: cover;
 }
 
-.rest-technology-bkg-img {
-  background: url("../public/img/technology-img.jpg");
-  background-repeat: no-repeat;
-  background-position: right;
-  background-size: cover;
+$rest-technology-img-container: (
+  sm: (
+    
+   
+  ),
+  md: (),
+  lg: (
+    position: absolute,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    z-index: 0,
+    width: 50vw,
+    overflow: hidden,
+  ),
+);
+.rest-technology-img-container {
+  @include a-set($rest-technology-img-container);
+}
+
+$rest-technology-img: (
+  sm: (
+    
+   
+  ),
+  md: (),
+  lg: (
+    display: block,
+    height: 130%,
+    object-fit: cover,
+    object-position: right,
+  ),
+);
+.rest-technology-img {
+  @include a-set($rest-technology-img);
 }
 
 .img-boton-hero {
@@ -530,6 +616,10 @@ $container-inputs : (sm: (padding: 0px 8px,
     box-shadow: 0 0 20px #ff5b00, 0 0 40px #ff5b00;
   }
 }
+
+// =============
+// THIRD PARTIES
+// =============
 
 // Estilos para el carrusel de otros proyectos
 .other-projects-swiper {
@@ -571,7 +661,7 @@ $container-inputs : (sm: (padding: 0px 8px,
   // Botones de navegación
   .swiper-button-next,
   .swiper-button-prev {
-    color: #E1FF00;
+    color: #e1ff00;
     background-color: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     width: 48px;
@@ -587,9 +677,9 @@ $container-inputs : (sm: (padding: 0px 8px,
     }
 
     &:hover {
-      background-color: #E1FF00;
+      background-color: #e1ff00;
       color: #003333;
-      border-color: #E1FF00;
+      border-color: #e1ff00;
       transform: scale(1.1);
     }
   }
@@ -629,7 +719,7 @@ $container-inputs : (sm: (padding: 0px 8px,
     }
 
     .swiper-pagination-bullet-active {
-      background-color: #E1FF00;
+      background-color: #e1ff00;
       width: 32px;
       border-radius: 6px;
     }

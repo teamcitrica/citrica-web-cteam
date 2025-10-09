@@ -326,7 +326,7 @@ const Header = ({
         } ${className}`}
       >
         <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="flex justify-between items-center py-4">
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="flex justify-between items-center py-2">
             
             {/* Logo */}
             <a href="#home" className="flex items-center">
@@ -342,12 +342,12 @@ const Header = ({
             </a>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-5">
+            <div className="hidden md:flex items-center space-x-8">
               {navItems.map((item, index) => (
                 <button
                   key={index}
                   onClick={() => scrollToSection(item.href)}
-                  className="transition-colors duration-200 hover:text-[#964f20] text-[#222222]"
+                  className="transition-colors duration-200 hover:text-[#964f20] text-[#FFFFFF]"
                 >
                   <Text variant="body" className="font-medium">
                     {item.title}
