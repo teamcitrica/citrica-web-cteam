@@ -564,7 +564,7 @@ const CitricaWebsite = () => {
         <CtaSectionHome />
       </section> */}
       {/* Contact Section */}
-     
+
       <FooterCitrica />
     </div>
   );
