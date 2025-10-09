@@ -5,6 +5,7 @@ import { Text, Icon, Button } from "@citrica-ui";
 import { addToast } from "@heroui/toast";
 import { CompletedProjects } from "@/shared/components/project-components/other-projects";
 import { CtaSection } from "@/shared/components/project-components/cta-section";
+import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";
 
 interface ProjectData {
   projectHero: any;
@@ -323,7 +324,7 @@ const ProjectTemplate = ({ project, slug }: ProjectTemplateProps) => {
       <section id="otros-proyectos" className="py-20 gradient-project-hero">
         <CompletedProjects currentProjectSlug={slug} />
       </section>
-
+      <FooterCitrica />
     </div>
   );
 };

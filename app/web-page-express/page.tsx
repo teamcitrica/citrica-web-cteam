@@ -7,6 +7,7 @@ import Button from '@ui/molecules/button'
 import { addToast } from "@heroui/toast"
 import DotGrid from '../versions/yolanda/components/DotGrid'
 import { Divider, Link } from '@heroui/react'
+import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";
 
 
 const CitricaLanding = () => {
@@ -482,7 +483,7 @@ const CitricaLanding = () => {
       </section>
 
       {/* Footer */}
-      <footer className="pt-12" style={{ backgroundColor: '#16141F', borderTop: '1px solid rgba(225, 255, 0, 0.2)' }}>
+      {/* <footer className="pt-12" style={{ backgroundColor: '#16141F', borderTop: '1px solid rgba(225, 255, 0, 0.2)' }}>
         <Container>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className='flex flex-col text-center justify-center gap-2'>
             <div className="flex items-center justify-center lg:justify-center space-x-2">
@@ -507,7 +508,7 @@ const CitricaLanding = () => {
                   © 2025 Cítrica.
                 </Text>
               </h2>
-              {/* <div className="flex justify-center lg:justify-end space-x-6 mb-8">
+              <div className="flex justify-center lg:justify-end space-x-6 mb-8">
                 <Link
                   href="https://www.facebook.com/citrica"
                   target="_blank"
@@ -536,11 +537,12 @@ const CitricaLanding = () => {
                 >
                   <Icon name="Github" color="#E5FFFF" size={24} className="transition-all duration-300" />
                 </Link>
-              </div> */}
+              </div>
             </div>
           </Col>
         </Container>
-      </footer>
+      </footer> */}
+      <FooterCitrica />
     </div>
   )
 }

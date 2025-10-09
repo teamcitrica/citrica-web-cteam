@@ -241,7 +241,7 @@ const AnimatedHeadlines: React.FC = () => {
   return (
     <div className="flex justify-center">
       <h2 className="text-balance">
-        <Text variant="subtitle" weight="bold"  className="center">
+        <Text variant="body" weight="bold"  className="center">
           <CustomTextType />
         </Text>
       </h2>

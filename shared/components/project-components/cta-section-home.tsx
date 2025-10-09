@@ -20,6 +20,7 @@ export const CtaSectionHome = () => {
         digital
       </Text>
     </div>
+    
     <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
       <Button
         onClick={() =>
