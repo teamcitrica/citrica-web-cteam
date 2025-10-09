@@ -20,6 +20,7 @@ import { CompletedProjects } from "@/shared/components/project-components/other-
 import { CtaSection } from "@/shared/components/project-components/cta-section";
 import { CtaSectionHome } from "@/shared/components/project-components/cta-section-home";
 import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";
+import {ContactSectionLanding } from "@/shared/components/project-components/contact-section";
 
 const CitricaWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -551,119 +552,8 @@ const CitricaWebsite = () => {
         </Container>
       </section>
 
-      {/* CTA Section */}
-      <section className="cta-section py-[80px]">
-        <Container>
-          <Col cols={{ lg: 6, md: 3, sm: 4 }}>
-            <div className="mb-6" data-aos="fade-up" data-aos-duration="1500">
-              <h2>
-                <Text
-                  variant="headline"
-                  weight="bold"
-                  textColor="color-primary"
-                >
-                  ¿Listo para transformar tu negocio?
-                </Text>
-              </h2>
-            </div>
-            <div className="mb-8" data-aos="fade-up" data-aos-duration="1500">
-              <p>
-                <Text variant="subtitle" textColor="color-on-surface-var">
-                  Contáctanos hoy y descubre cómo podemos impulsar tu
-                  crecimiento digital
-                </Text>
-              </p>
-            </div>
-
-            <div
-              className="space-y-6"
-              data-aos="fade-up"
-              data-aos-duration="1500"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-color-ct-primary rounded-xl flex items-center justify-center">
-                  <Icon
-                    name="Mail"
-                    size={24}
-                    className="bg-color-ct-primary ct-color-white"
-                  />
-                </div>
-                <div>
-                  <Text variant="body" textColor="color-on-surface">
-                    contacto@citrica.dev
-                  </Text>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-color-ct-primary rounded-xl flex items-center justify-center">
-                  <Icon
-                    name="Phone"
-                    size={24}
-                    className="bg-color-ct-primary ct-color-white"
-                  />
-                </div>
-                <p>
-                  <Text variant="body" textColor="color-on-surface">
-                    Perú +51 942 627 383
-                  </Text>
-                </p>
-                <p>
-                  <Text variant="body" textColor="color-on-surface">
-                    Uruguay +598 92 041 487
-                  </Text>
-                </p>
-              </div>
-            </div>
-          </Col>
-
-          <Col cols={{ lg: 5, md: 3, sm: 4 }}>
-            <div
-              className="bg-color-ct-white border-3 border-[##a3a3a3] rounded-2xl p-4 w-fit shadow-xl"
-              data-aos="fade-up"
-              data-aos-duration="1500"
-            >
-              <form className="w-[400px] flex flex-col items-center gap-4">
-                <Input
-                  label="Nombre"
-                  placeholder="Tu nombre"
-                  type="text"
-                  variant="bordered"
-                  color="primary"
-                  radius="sm"
-                  fullWidth
-                />
-
-                <Input
-                  label="Email"
-                  placeholder="Tu email"
-                  type="email"
-                  variant="bordered"
-                  color="primary"
-                  radius="sm"
-                  fullWidth
-                />
-
-                <Textarea
-                  label="Mensaje"
-                  placeholder="Cuéntanos sobre tu negocio y qué solución digital necesitas"
-                  variant="bordered"
-                  color="primary"
-                  radius="sm"
-                  fullWidth
-                />
-
-                <Button
-                  label="Enviar Mensaje"
-                  variant="primary"
-                  fullWidth
-                  className="max-w-[380px]"
-                />
-              </form>
-            </div>
-          </Col>
-        </Container>
-      </section>
+      {/* Contact Section */}
+      <ContactSectionLanding/>
 
       {/* CTA Section */}
       {/* <section

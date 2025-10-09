@@ -23,48 +23,31 @@ export const siteConfig = {
 	subItemSearchParam: SUBITEM_SEARCH_PARAM, // FOR SUBSECTIONS IN SIDEBAR
 	sidebarItems: [
 		{
-			title: "Home",
+			title: "Usuarios de Sistema",
 			icon: "Settings",
-			href: "/",
+			href: "/admin/users",
 		},
 		{
-			title: "Tareas",
+			title: "Reuniones",
 			icon: "ClipboardCheck",
 			href: "/panel/tareas",
 		},
 		{
-			title: "Configuración de la app",
+			title: "CMS",
 			icon: "Settings",
 			href: "/panel/config-app", // ONLY TO DETERMINE ACTIVE, IS NOT LINKING
 			subItems: [
 				{
-					title: "Básica",
+					title: "Proyectos",
 					href: "/panel/config-app?" + SUBITEM_SEARCH_PARAM + "=basic",
 				},
-				{
-					title: "Avanzada",
-					href: "/panel/config-app?" + SUBITEM_SEARCH_PARAM + "=advanced",
-				},
-				{
-					title: "Mejorada",
-					href: "/panel/config-app?" + SUBITEM_SEARCH_PARAM + "=best",
-				},
+
 			],
 		},
 		{
-			title: "Roles de la app",
+			title: "CMR	",
 			icon: "Users",
-			href: "/users",
-		},
-		{
-			title: "Alertas",
-			icon: "Bell",
-			href: "/alerts",
-		},
-		{
-			title: "Seguridad",
-			icon: "ShieldCheck",
-			href: "/secutiry",
+			href: "/",
 		},
 	],
 	links: {
