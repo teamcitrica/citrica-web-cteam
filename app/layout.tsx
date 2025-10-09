@@ -36,7 +36,6 @@ export default function RootLayout({
 			>
 				{/* <Toaster/>  SE CAMBIÓ POR HEROUI TOAST*/}
 				<SupabaseProvider>
-					<DynamicNavbar/>
 					<AuthContextProvider>
 						<Providers themeProps={{ attribute: "data-theme", defaultTheme: "light" }}>
 							{/* <Navbar /> */}
@@ -44,7 +43,7 @@ export default function RootLayout({
 						</Providers>
 					</AuthContextProvider>
 				</SupabaseProvider>
-				 <FooterCitrica/>
+				 
 			</body>
 		</html>
 	);

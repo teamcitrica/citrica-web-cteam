@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Container, Col } from "@/styles/07-objects/objects";
-import { Text, Icon, Button } from "@citrica-ui";
+import { Text, Icon, Button, Header, Input, Textarea } from "@citrica-ui";
 import CurvedLoop from "./versions/yolanda/components/CurvedLoop";
 import DotGrid from "./versions/yolanda/components/DotGrid";
 import AnimatedHeadlines from "./home/components/animatedheadlines";
@@ -19,6 +19,7 @@ import {
 import { CompletedProjects } from "@/shared/components/project-components/other-projects";
 import { CtaSection } from "@/shared/components/project-components/cta-section";
 import { CtaSectionHome } from "@/shared/components/project-components/cta-section-home";
+import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";
 
 const CitricaWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,8 +28,22 @@ const CitricaWebsite = () => {
     AOS.init({ duration: 1500, once: true });
   }, []);
 
+  const logo = (
+    <div className="flex items-center space-x-2">
+      <img src="/img/citrica-logo.png" alt="Cítrica Logo" className="h-10" />
+    </div>
+  );
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0A0F0F" }}>
+      <Header
+        logo={logo}
+        variant="standard"
+        className="bg-color-ct-black"
+        showButton={true}
+        buttonText="Contáctanos"
+      />
+
       {/* Hero Section */}
       <section
         id="inicio"
@@ -53,16 +68,17 @@ const CitricaWebsite = () => {
             className="text-center mx-auto mt-[25vh]"
           >
             <div className="bg-black/20 backdrop-blur-sm border-2 border-[#003333] rounded-2xl mb-14 p-8">
-              <h1 className="text-balance">
+              <h3 className="text-balance mb-4">
                 <Text variant="display" color="#FF5B00" weight="bold">
-                  APLICACIONES WEB Y MÓVILES A MEDIDA
-                </Text>
-              </h1>
-              <h3 className="text-balance mb-8">
-                <Text variant="headline" color="#FFFFFF" weight="bold">
-                  para impulsar tu negocio
+                  INNOVACIÓN DIGITAL A TU MEDIDA
                 </Text>
               </h3>
+              <h1 className="text-balance mb-8">
+                <Text variant="title" color="#FFFFFF" weight="bold">
+                  Software, SAAS y Aplicaciones de Vanguardia para un Negocio
+                  Imparable
+                </Text>
+              </h1>
               <AnimatedHeadlines />
             </div>
           </Col>
@@ -92,7 +108,7 @@ const CitricaWebsite = () => {
                 data-aos="fade-up"
                 data-aos-duration="1500"
               >
-                Nuestros servicios
+                Innovando en cada Solución
               </Text>
             </h2>
           </Col>
@@ -160,7 +176,7 @@ const CitricaWebsite = () => {
             className="flex justify-center p-0"
           >
             <CurvedLoop
-              marqueeText="Tiendas en línea • Mercados • Aplicaciones de streaming • Sitios web a medida • Landing pages • Implementación de IA • CRM • ERP • Herramientas de gestión de proyectos •"
+              marqueeText="Tiendas en línea • Mercados • Aplicaciones de streaming • Sitios web a medida • Landing pages • Plataformas SAAS • Implementación de IA • CRM • ERP • Herramientas de gestión de proyectos •"
               speed={1}
               curveAmount={0}
               direction="right"
@@ -535,16 +551,8 @@ const CitricaWebsite = () => {
         </Container>
       </section>
 
-      {/* CTA Section */}
-      {/* <section
-        id="contacto"
-        className="py-20"
-        style={{ backgroundColor: "#E1FF00" }}
-      >
-        <CtaSectionHome />
-      </section> */}
       {/* Contact Section */}
-      <section className="py-[80px] bg-color-ct-secondary">
+      <section className="py-[80px] bg-color-ct-surface-container">
         <Container>
           <Col cols={{ lg: 6, md: 3, sm: 4 }}>
             <div className="mb-6">
@@ -552,7 +560,7 @@ const CitricaWebsite = () => {
                 <Text
                   variant="headline"
                   weight="bold"
-                  textColor="color-text-black"
+                  textColor="color-primary"
                 >
                   ¿Listo para transformar tu negocio?
                 </Text>
@@ -560,7 +568,7 @@ const CitricaWebsite = () => {
             </div>
             <div className="mb-8">
               <p>
-                <Text variant="body" textColor="color-on-surface-var">
+                <Text variant="subtitle" textColor="color-on-surface-var">
                   Contáctanos hoy y descubre cómo podemos impulsar tu
                   crecimiento digital
                 </Text>
@@ -605,79 +613,57 @@ const CitricaWebsite = () => {
             </div>
           </Col>
 
-          <Col cols={{ lg: 6, md: 3, sm: 4 }}>
-            <div className="bg-color-ct-white rounded-2xl p-8">
-              <div className="mb-6">
-                <h3>
-                  <Text variant="title" textColor="color-primary">
-                    Envíanos un Mensaje
-                  </Text>
-                </h3>
-              </div>
+          <Col cols={{ lg: 5, md: 3, sm: 4 }}>
+            <div className="bg-color-ct-white rounded-2xl p-4">              
 
-              <form className="space-y-6">
-                <div>
-                  <label className="block mb-2">
-                    <Text variant="label" textColor="color-on-surface">
-                      Nombre *
-                    </Text>
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full p-3 border border-outline rounded-lg bg-surface-container text-on-surface"
-                    placeholder="Tu nombre completo"
-                  />
-                </div>
+              <form className="flex flex-col items-center gap-4">
+                <Input
+                  label="Nombre"
+                  placeholder="Tu nombre"
+                  type="text"
+                  variant="bordered"
+                  color="primary"
+                  radius="sm"
+                  fullWidth
+                />
 
-                <div>
-                  <label className="block mb-2">
-                    <Text variant="label" textColor="color-on-surface">
-                      Email *
-                    </Text>
-                  </label>
-                  <input
-                    type="email"
-                    className="w-full p-3 border border-outline rounded-lg bg-surface-container text-on-surface"
-                    placeholder="tu@email.com"
-                  />
-                </div>
+                <Input
+                  label="Email"
+                  placeholder="Tu email"
+                  type="email"
+                  variant="bordered"
+                  color="primary"
+                  radius="sm"
+                  fullWidth
+                />
 
-                <div>
-                  <label className="block mb-2">
-                    <Text variant="label" textColor="color-on-surface">
-                      Servicio de Interés
-                    </Text>
-                  </label>
-                  <select className="w-full p-3 border border-outline rounded-lg bg-surface-container text-on-surface">
-                    <option>Selecciona el servicio que te interesa</option>
-                    <option>Landing Page / Website</option>
-                    <option>Aplicación Web</option>
-                    <option>Aplicación Móvil</option>
-                    <option>Marketing Digital</option>
-                    <option>Integración de IA</option>
-                    <option>Paquete Completo</option>
-                  </select>
-                </div>
+                <Textarea 
+                  label="Mensaje"
+                  placeholder="Cuéntanos sobre tu negocio y qué solución digital necesitas"
+                  variant="bordered"
+                  color="primary"
+                  radius="sm"
+                  fullWidth
+                />                
 
-                <div>
-                  <label className="block mb-2">
-                    <Text variant="label" textColor="color-on-surface">
-                      Mensaje
-                    </Text>
-                  </label>
-                  <textarea
-                    rows={4}
-                    className="w-full p-3 border border-outline rounded-lg bg-surface-container text-on-surface"
-                    placeholder="Cuéntanos sobre tu negocio y qué solución digital necesitas (website, app, marketing, IA, etc.)"
-                  ></textarea>
-                </div>
-
-                <Button label="Enviar Mensaje" variant="primary" />
+                <Button label="Enviar Mensaje" variant="primary" fullWidth className="max-w-[380px]" />
               </form>
             </div>
           </Col>
         </Container>
       </section>
+
+      {/* CTA Section */}
+      {/* <section
+        id="contacto"
+        className="py-20"
+        style={{ backgroundColor: "#E1FF00" }}
+      >
+        <CtaSectionHome />
+      </section> */}
+      {/* Contact Section */}
+     
+      <FooterCitrica />
     </div>
   );
 };

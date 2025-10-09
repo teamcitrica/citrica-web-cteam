@@ -421,6 +421,14 @@ $container-inputs: (
   background-color: #e1ff00;
 }
 
+.bg-color-ct-on-secondary {
+  background-color: #{$color-light-on-secondary};;
+}
+
+.bg-color-ct-secondary-container {
+  background-color: #{$color-light-secondary-container};
+}
+
 .bg-color-ct-tertiary {
   background-color: #00ffff;
 }
@@ -439,6 +447,10 @@ $container-inputs: (
 
 .bg-color-ct-cuaternary {
   background-color: #ff00d4;
+}
+
+.bg-color-ct-surface-container {
+  background-color: #{$color-light-surface-container};
 }
 
 .text-dark-bkg {

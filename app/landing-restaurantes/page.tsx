@@ -1,23 +1,35 @@
 "use client";
 import React from "react";
 import { Container, Col } from "@citrica/objects";
-import { Divider, Link } from "@heroui/react";
-import Text from "@ui/atoms/text";
-import Button from "@ui/molecules/button";
-import Icon from "@ui/atoms/icon";
+import { Text, Icon, Button, Header, Input } from "@citrica-ui";
 import Footer from "@ui/organism/footer";
 import GradientText from "@/shared/components/project-components/gradient-text";
 import {
   restaurantServices,
   solucionesNegocios,
 } from "@/shared/archivos js/landing-restaurant-data";
+import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";
 
 // export const dynamic = "force-dynamic";
 
 // export default async function Home() {
 const LandingRestaurantes = () => {
+
+  const logo = (
+    <div className="flex items-center space-x-2">
+      <img src="/img/citrica-logo.png" alt="Cítrica Logo" className="h-10" />
+    </div>
+  );
+  
   return (
     <>
+     <Header
+            logo={logo}
+            variant="standard"
+            className="bg-color-ct-black"
+            showButton={true}
+            buttonText="Contáctanos"
+          />
       {/* Hero Section */}
       <section className="pt-[80px] pb-[80px] h-[700px]">
         <div className="absolute inset-0 overflow-hidden">
@@ -541,6 +553,7 @@ const LandingRestaurantes = () => {
           </Col>
         </Container>
       </section>
+      <FooterCitrica />
     </>
   );
 };
