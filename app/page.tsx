@@ -551,11 +551,11 @@ const CitricaWebsite = () => {
         </Container>
       </section>
 
-      {/* Contact Section */}
-      <section className="py-[80px] bg-color-ct-surface-container">
+      {/* CTA Section */}
+      <section className="cta-section py-[80px]">
         <Container>
           <Col cols={{ lg: 6, md: 3, sm: 4 }}>
-            <div className="mb-6">
+            <div className="mb-6" data-aos="fade-up" data-aos-duration="1500">
               <h2>
                 <Text
                   variant="headline"
@@ -566,7 +566,7 @@ const CitricaWebsite = () => {
                 </Text>
               </h2>
             </div>
-            <div className="mb-8">
+            <div className="mb-8" data-aos="fade-up" data-aos-duration="1500">
               <p>
                 <Text variant="subtitle" textColor="color-on-surface-var">
                   Contáctanos hoy y descubre cómo podemos impulsar tu
@@ -575,7 +575,11 @@ const CitricaWebsite = () => {
               </p>
             </div>
 
-            <div className="space-y-6">
+            <div
+              className="space-y-6"
+              data-aos="fade-up"
+              data-aos-duration="1500"
+            >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-color-ct-primary rounded-xl flex items-center justify-center">
                   <Icon
@@ -614,9 +618,12 @@ const CitricaWebsite = () => {
           </Col>
 
           <Col cols={{ lg: 5, md: 3, sm: 4 }}>
-            <div className="bg-color-ct-white rounded-2xl p-4">              
-
-              <form className="flex flex-col items-center gap-4">
+            <div
+              className="bg-color-ct-white border-3 border-[##a3a3a3] rounded-2xl p-4 w-fit shadow-xl"
+              data-aos="fade-up"
+              data-aos-duration="1500"
+            >
+              <form className="w-[400px] flex flex-col items-center gap-4">
                 <Input
                   label="Nombre"
                   placeholder="Tu nombre"
@@ -637,16 +644,21 @@ const CitricaWebsite = () => {
                   fullWidth
                 />
 
-                <Textarea 
+                <Textarea
                   label="Mensaje"
                   placeholder="Cuéntanos sobre tu negocio y qué solución digital necesitas"
                   variant="bordered"
                   color="primary"
                   radius="sm"
                   fullWidth
-                />                
+                />
 
-                <Button label="Enviar Mensaje" variant="primary" fullWidth className="max-w-[380px]" />
+                <Button
+                  label="Enviar Mensaje"
+                  variant="primary"
+                  fullWidth
+                  className="max-w-[380px]"
+                />
               </form>
             </div>
           </Col>
@@ -662,7 +674,7 @@ const CitricaWebsite = () => {
         <CtaSectionHome />
       </section> */}
       {/* Contact Section */}
-     
+
       <FooterCitrica />
     </div>
   );
