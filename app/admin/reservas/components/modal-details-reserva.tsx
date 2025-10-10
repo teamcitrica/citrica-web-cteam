@@ -1,0 +1,178 @@
+"use client";
+import React from "react";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@heroui/react";
+import { Button } from "@heroui/react";
+import Text from "@/shared/components/citrica-ui/atoms/text";
+import { Reserva, ReservaEstado } from "@/hooks/reservas/use-reservas";
+
+interface ReservaDetailModalProps {
+  reserva: Reserva;
+  onClose: () => void;
+}
+
+export default function ReservaDetailModal({
+  reserva,
+  onClose,
+}: ReservaDetailModalProps) {
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "Sin fecha";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("es-ES", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch {
+      return "Fecha inválida";
+    }
+  };
+
+  const formatDateTime = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleString("es-ES", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return "Fecha inválida";
+    }
+  };
+
+  const getStatusColor = (status: ReservaEstado) => {
+    switch (status) {
+      case 'confirmada':
+        return 'text-green-600 bg-green-100';
+      case 'pendiente':
+        return 'text-yellow-600 bg-yellow-100';
+      case 'cancelada':
+        return 'text-red-600 bg-red-100';
+      default:
+        return 'text-gray-600 bg-gray-100';
+    }
+  };
+
+  const getStatusLabel = (status: ReservaEstado) => {
+    switch (status) {
+      case 'confirmada':
+        return 'Confirmada';
+      case 'pendiente':
+        return 'Pendiente';
+      case 'cancelada':
+        return 'Cancelada';
+      default:
+        return 'Desconocido';
+    }
+  };
+
+  return (
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      size="2xl"
+      scrollBehavior="inside"
+      classNames={{
+        backdrop: "bg-black/50",
+        base: "bg-white",
+      }}
+    >
+      <ModalContent>
+        <ModalHeader className="flex flex-col gap-1 border-b border-gray-200">
+          <Text variant="title" weight="bold" textColor="color-primary">
+            Detalles de la Reserva
+          </Text>
+        </ModalHeader>
+        <ModalBody className="py-6">
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Text variant="label" weight="bold" textColor="color-on-surface">
+                  Nombre
+                </Text>
+                <Text variant="body" textColor="color-on-surface-var">
+                  {reserva.name}
+                </Text>
+              </div>
+              <div>
+                <Text variant="label" weight="bold" textColor="color-on-surface">
+                  Email
+                </Text>
+                <Text variant="body" textColor="color-on-surface-var">
+                  {reserva.email}
+                </Text>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Text variant="label" weight="bold" textColor="color-on-surface">
+                  Fecha de Reunión
+                </Text>
+                <Text variant="body" textColor="color-on-surface-var">
+                  {formatDate(reserva.date)}
+                </Text>
+              </div>
+              <div>
+                <Text variant="label" weight="bold" textColor="color-on-surface">
+                  Horario
+                </Text>
+                <Text variant="body" textColor="color-on-surface-var">
+                  {reserva.time_slot || "Sin horario"}
+                </Text>
+              </div>
+            </div>
+
+            <div>
+              <Text variant="label" weight="bold" textColor="color-on-surface">
+                Estado
+              </Text>
+              <div className="mt-2">
+                <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(reserva.status || 'pendiente')}`}>
+                  {getStatusLabel(reserva.status || 'pendiente')}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <Text variant="label" weight="bold" textColor="color-on-surface">
+                Mensaje
+              </Text>
+              <div className="mt-2 p-4 bg-gray-50 rounded-lg">
+                <Text variant="body" textColor="color-on-surface-var">
+                  {reserva.message || "Sin mensaje"}
+                </Text>
+              </div>
+            </div>
+
+            <div>
+              <Text variant="label" weight="bold" textColor="color-on-surface">
+                Fecha de Creación
+              </Text>
+              <Text variant="body" textColor="color-on-surface-var">
+                {formatDateTime(reserva.created_at)}
+              </Text>
+            </div>
+          </div>
+        </ModalBody>
+        <ModalFooter className="border-t border-gray-200">
+          <Button
+            className="bg-[#ff5b00] text-white"
+            onPress={onClose}
+          >
+            Cerrar
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}

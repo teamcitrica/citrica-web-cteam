@@ -28,6 +28,11 @@ export const siteConfig = {
 			href: "/admin/users",
 		},
 		{
+			title: "Reservas",
+			icon: "ClipboardCheck",
+			href: "/admin/reservas",
+		},
+		{
 			title: "Reuniones",
 			icon: "ClipboardCheck",
 			href: "/panel/tareas",
