@@ -67,7 +67,8 @@ export const useContact = () => {
             email: formData.email,
             message: formData.message,
             date: formData.date ? formData.date.toString() : null,
-            time_slot: formData.timeSlot
+            time_slot: formData.timeSlot,
+            status: 'pendiente'
           }
         ])
 

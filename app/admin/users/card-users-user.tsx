@@ -278,9 +278,9 @@ export default function CardUsersSuper({
           setSortDescriptor(descriptor as LocalSortDescriptor)
         }
         classNames={{
-          wrapper: "bg-transparent", // quita fondo del contenedor
-          th: "bg-[#ff5b00] text-[#fff] font-semibold text-center", // encabezados
-          td: "text-gray-700 text-center", // celdas
+          wrapper: "bg-transparent", 
+          th: "bg-[#ff5b00] text-[#fff] font-semibold text-center",
+          td: "text-gray-700 text-center", 
         }}
       >
         <TableHeader columns={headerColumns}>
