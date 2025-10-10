@@ -461,6 +461,10 @@ $container-inputs: (
   color: #ffffff;
 }
 
+.ct-color-black {
+  color: #{$color-text-black};
+}
+
 .ct-color-primary {
   color: #ff5b00;
 }

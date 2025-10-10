@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import { Col, Container } from '@/styles/07-objects/objects'
-import React from 'react'
-import { Button, Icon, Input, Text, Textarea } from '../citrica-ui'
-import { useContact } from '@/hooks/contact/use-contact'
-import AnimatedContent from './animated-content'
-import CalendarComponent from './calendar'
+import { Col, Container } from "@/styles/07-objects/objects";
+import React from "react";
+import { Button, Icon, Input, Text, Textarea } from "../citrica-ui";
+import { useContact } from "@/hooks/contact/use-contact";
+import AnimatedContent from "./animated-content";
+import CalendarComponent from "./calendar";
 
 export const ContactSectionLanding = () => {
   const {
@@ -18,44 +18,49 @@ export const ContactSectionLanding = () => {
     handleTimeSlotChange,
     handleSubmit,
     nextStep,
-    prevStep
-  } = useContact()
+    prevStep,
+  } = useContact();
 
   // Generar horarios de 8:00 AM a 6:00 PM
   const timeSlots = [
-    '8:00 AM - 9:00 AM',
-    '9:00 AM - 10:00 AM',
-    '10:00 AM - 11:00 AM',
-    '11:00 AM - 12:00 PM',
-    '12:00 PM - 1:00 PM',
-    '1:00 PM - 2:00 PM',
-    '2:00 PM - 3:00 PM',
-    '3:00 PM - 4:00 PM',
-    '4:00 PM - 5:00 PM',
-    '5:00 PM - 6:00 PM'
-  ]
+    "8:00 AM - 9:00 AM",
+    "9:00 AM - 10:00 AM",
+    "10:00 AM - 11:00 AM",
+    "11:00 AM - 12:00 PM",
+    "12:00 PM - 1:00 PM",
+    "1:00 PM - 2:00 PM",
+    "2:00 PM - 3:00 PM",
+    "3:00 PM - 4:00 PM",
+    "4:00 PM - 5:00 PM",
+    "5:00 PM - 6:00 PM",
+  ];
 
   return (
     <>
-          <section className="py-[80px] bg-color-ct-surface-container">
+      <section className="py-[80px] cta-section">
         <Container>
           <Col cols={{ lg: 6, md: 3, sm: 4 }}>
             <div className="mb-6">
-              <h2>
+              <h3>
                 <Text
                   variant="headline"
                   weight="bold"
                   textColor="color-primary"
                 >
-                  ¿Listo para transformar tu negocio?
+                  ¿Listo para Innovar y llevar tu negocio al siguiente nivel?
                 </Text>
-              </h2>
+              </h3>
             </div>
             <div className="mb-8">
+              <p className="mb-4">
+                <Text variant="title" weight="bold" textColor="color-on-surface-var">
+                  Agenda tu cita estratégica hoy.
+                </Text>
+              </p>
               <p>
                 <Text variant="subtitle" textColor="color-on-surface-var">
-                  Contáctanos hoy y descubre cómo podemos impulsar tu
-                  crecimiento digital
+                  Elige una fecha y hora para conversar sobre tu proyecto de
+                  crecimiento digital.
                 </Text>
               </p>
             </div>
@@ -99,43 +104,81 @@ export const ContactSectionLanding = () => {
           </Col>
 
           <Col cols={{ lg: 5, md: 3, sm: 4 }}>
-            <div className="bg-color-ct-white rounded-2xl p-4">
-              <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
-
+            <div className="bg-color-ct-white rounded-2xl shadow-xl border-3 border-[757575] p-4">
+              <form
+                onSubmit={handleSubmit}
+                className="flex flex-col items-center gap-4"
+              >
                 {/* Mensaje de éxito */}
-                {status === 'success' && (
-                  <AnimatedContent key="success" direction="vertical" distance={20}>
+                {status === "success" && (
+                  <AnimatedContent
+                    key="success"
+                    direction="vertical"
+                    distance={20}
+                  >
                     <div className="flex flex-col items-center justify-center gap-6 w-full py-12">
-                      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-                        <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <div className="w-20 h-20 bg-color-ct-secondary rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-12 h-12 ct-color-black"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       </div>
                       <div className="text-center">
-                        <Text variant="headline" weight="bold" textColor="color-primary">
-                          ¡Mensaje enviado con éxito!
+                        <Text
+                          variant="headline"
+                          weight="bold"
+                          textColor="color-primary"
+                        >
+                          ¡Enviado con éxito!
                         </Text>
-                        <div className="mt-2">
+                        {/* <div className="mt-2">
                           <Text variant="body" textColor="color-on-surface-var">
                             Nos pondremos en contacto contigo pronto.
                           </Text>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </AnimatedContent>
                 )}
 
                 {/* Mensaje de error */}
-                {status === 'error' && (
-                  <AnimatedContent key="error" direction="vertical" distance={20}>
+                {status === "error" && (
+                  <AnimatedContent
+                    key="error"
+                    direction="vertical"
+                    distance={20}
+                  >
                     <div className="flex flex-col items-center justify-center gap-6 w-full py-12">
                       <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
-                        <svg className="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        <svg
+                          className="w-12 h-12 text-red-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
                         </svg>
                       </div>
                       <div className="text-center">
-                        <Text variant="headline" weight="bold" textColor="color-error">
+                        <Text
+                          variant="headline"
+                          weight="bold"
+                          textColor="color-error"
+                        >
                           Error al enviar el mensaje
                         </Text>
                         <div className="mt-2">
@@ -149,13 +192,13 @@ export const ContactSectionLanding = () => {
                 )}
 
                 {/* Paso 1: Nombre y Email */}
-                {currentStep === 1 && status === 'idle' && (
-                  <AnimatedContent key="step1" direction="horizontal" distance={50}>
+                {currentStep === 1 && status === "idle" && (
+                  <AnimatedContent
+                    key="step1"
+                    direction="horizontal"
+                    distance={50}
+                  >
                     <div className="flex flex-col gap-4 w-full">
-                      <Text variant="title" weight="bold" textColor="color-primary">
-                        Información de Contacto
-                      </Text>
-
                       <Input
                         name="name"
                         label="Nombre"
@@ -198,11 +241,19 @@ export const ContactSectionLanding = () => {
                 )}
 
                 {/* Paso 2: Seleccionar Fecha */}
-                {currentStep === 2 && status === 'idle' && (
-                  <AnimatedContent key="step2" direction="horizontal" distance={50}>
+                {currentStep === 2 && status === "idle" && (
+                  <AnimatedContent
+                    key="step2"
+                    direction="horizontal"
+                    distance={50}
+                  >
                     <div className="flex flex-col items-center gap-4 w-full">
-                      <Text variant="title" weight="bold" textColor="color-primary">
-                        Seleccionar Fecha
+                      <Text
+                        variant="subtitle"
+                        weight="bold"
+                        textColor="color-primary"
+                      >
+                        Selecciona una fecha
                       </Text>
 
                       <div className="flex justify-center w-full">
@@ -210,6 +261,7 @@ export const ContactSectionLanding = () => {
                           value={formData.date}
                           onChange={handleDateChange}
                           variant="primary"
+                          className="mb-4"
                         />
                       </div>
 
@@ -235,10 +287,18 @@ export const ContactSectionLanding = () => {
                 )}
 
                 {/* Paso 3: Seleccionar Horario */}
-                {currentStep === 3 && status === 'idle' && (
-                  <AnimatedContent key="step3" direction="horizontal" distance={50}>
+                {currentStep === 3 && status === "idle" && (
+                  <AnimatedContent
+                    key="step3"
+                    direction="horizontal"
+                    distance={50}
+                  >
                     <div className="flex flex-col items-center gap-4 w-full">
-                      <Text variant="title" weight="bold" textColor="color-primary">
+                      <Text
+                        variant="subtitle"
+                        weight="bold"
+                        textColor="color-primary"
+                      >
                         Seleccionar Horario
                       </Text>
 
@@ -250,15 +310,20 @@ export const ContactSectionLanding = () => {
                             onClick={() => handleTimeSlotChange(slot)}
                             className={`
                               px-4 py-3 rounded-lg border-2 transition-all duration-200
-                              ${formData.timeSlot === slot
-                                ? 'border-color-ct-primary bg-color-ct-primary text-white'
-                                : 'border-color-ct-outline bg-white text-color-ct-on-surface hover:border-color-ct-tertiary hover:bg-color-ct-tertiary hover:bg-opacity-10'
+                              ${
+                                formData.timeSlot === slot
+                                  ? "border-color-ct-primary bg-color-ct-primary text-white"
+                                  : "border-color-ct-outline bg-white text-color-ct-on-surface hover:border-color-ct-tertiary hover:bg-color-ct-tertiary hover:bg-opacity-10"
                               }
                             `}
                           >
                             <Text
                               variant="body"
-                              textColor={formData.timeSlot === slot ? 'color-white' : 'color-on-surface'}
+                              textColor={
+                                formData.timeSlot === slot
+                                  ? "color-white"
+                                  : "color-on-surface"
+                              }
                             >
                               {slot}
                             </Text>
@@ -288,10 +353,18 @@ export const ContactSectionLanding = () => {
                 )}
 
                 {/* Paso 4: Mensaje */}
-                {currentStep === 4 && status === 'idle' && (
-                  <AnimatedContent key="step4" direction="horizontal" distance={50}>
+                {currentStep === 4 && status === "idle" && (
+                  <AnimatedContent
+                    key="step4"
+                    direction="horizontal"
+                    distance={50}
+                  >
                     <div className="flex flex-col gap-4 w-full">
-                      <Text variant="title" weight="bold" textColor="color-primary">
+                      <Text
+                        variant="subtitle"
+                        weight="bold"
+                        textColor="color-primary"
+                      >
                         Tu Mensaje
                       </Text>
 
@@ -333,5 +406,5 @@ export const ContactSectionLanding = () => {
         </Container>
       </section>
     </>
-  )
-}
+  );
+};
