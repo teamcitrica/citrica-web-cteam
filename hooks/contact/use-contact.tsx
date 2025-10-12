@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useSupabase } from '@/shared/context/supabase-context'
+import { useBookingsAvailability } from '@/hooks/disponibilidad/use-bookings-availability'
 
 interface ContactFormData {
   name: string
@@ -13,6 +14,13 @@ interface ContactFormData {
 
 export const useContact = () => {
   const { supabase } = useSupabase()
+  const {
+    getOccupiedSlots,
+    getAvailableSlots,
+    isDateFullyBooked,
+    allTimeSlots
+  } = useBookingsAvailability()
+
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
@@ -59,16 +67,22 @@ export const useContact = () => {
     setStatus('idle')
 
     try {
+      // Convertir la fecha a formato YYYY-MM-DD
+      const dateStr = formData.date
+        ? new Date(formData.date.toString()).toISOString().split('T')[0]
+        : null
+
       const { error } = await supabase
-        .from('contact')
+        .from('bookings')
         .insert([
           {
+            booking_date: dateStr,
+            time_slots: formData.timeSlot ? [formData.timeSlot] : [],
+            type_id: 1, // type_id 1 = reserva de cliente
+            status: 'confirmed',
             name: formData.name,
             email: formData.email,
-            message: formData.message,
-            date: formData.date ? formData.date.toString() : null,
-            time_slot: formData.timeSlot,
-            status: 'pendiente'
+            message: formData.message
           }
         ])
 
@@ -112,6 +126,11 @@ export const useContact = () => {
     handleSubmit,
     resetForm,
     nextStep,
-    prevStep
+    prevStep,
+    // Funciones de disponibilidad
+    getOccupiedSlots,
+    getAvailableSlots,
+    isDateFullyBooked,
+    allTimeSlots
   }
 }

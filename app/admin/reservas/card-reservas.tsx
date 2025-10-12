@@ -164,11 +164,11 @@ export default function CardReservas({
 
   const getStatusColor = (status: ReservaEstado) => {
     switch (status) {
-      case 'confirmada':
+      case 'confirmed':
         return 'text-green-600 bg-green-100';
-      case 'pendiente':
+      case 'pending':
         return 'text-[#fff] bg-[#FFA05A]';
-      case 'cancelada':
+      case 'cancelled':
         return 'text-red-600 bg-red-100';
       default:
         return 'text-gray-600 bg-gray-100';
@@ -177,11 +177,11 @@ export default function CardReservas({
 
   const getStatusLabel = (status: ReservaEstado) => {
     switch (status) {
-      case 'confirmada':
+      case 'confirmed':
         return 'Confirmada';
-      case 'pendiente':
+      case 'pending':
         return 'Pendiente';
-      case 'cancelada':
+      case 'cancelled':
         return 'Cancelada';
       default:
         return 'Desconocido';
@@ -217,17 +217,21 @@ export default function CardReservas({
           );
         case "fecha":
           return (
-            <p className="text-sm text-black">{formatDate(reserva.date)}</p>
+            <p className="text-sm text-black">{formatDate(reserva.booking_date)}</p>
           );
         case "horario":
           return (
-            <p className="text-sm text-black">{reserva.time_slot || "Sin horario"}</p>
+            <p className="text-sm text-black">
+              {reserva.time_slots && reserva.time_slots.length > 0
+                ? reserva.time_slots.join(', ')
+                : "Sin horario"}
+            </p>
           );
         case "estado":
           return (
             <div className="flex justify-center">
-              <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(reserva.status || 'pendiente')}`}>
-                {getStatusLabel(reserva.status || 'pendiente')}
+              <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(reserva.status || 'pending')}`}>
+                {getStatusLabel(reserva.status || 'pending')}
               </span>
             </div>
           );
@@ -241,7 +245,7 @@ export default function CardReservas({
                   trigger: "!h-9 min-h-9",
                   value: "text-sm",
                 }}
-                selectedKeys={reserva.status ? [reserva.status] : ['pendiente']}
+                selectedKeys={reserva.status ? [reserva.status] : ['pending']}
                 size="sm"
                 onSelectionChange={(keys) => {
                   const selectedKey = Array.from(keys)[0] as ReservaEstado;
@@ -250,13 +254,13 @@ export default function CardReservas({
                   }
                 }}
               >
-                <SelectItem key="pendiente" textValue="Pendiente">
+                <SelectItem key="pending" textValue="Pendiente">
                   Pendiente
                 </SelectItem>
-                <SelectItem key="confirmada" textValue="Confirmada">
+                <SelectItem key="confirmed" textValue="Confirmada">
                   Confirmada
                 </SelectItem>
-                <SelectItem key="cancelada" textValue="Cancelada">
+                <SelectItem key="cancelled" textValue="Cancelada">
                   Cancelada
                 </SelectItem>
               </Select>

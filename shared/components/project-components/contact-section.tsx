@@ -18,22 +18,20 @@ export const ContactSectionLanding = () => {
     handleTimeSlotChange,
     handleSubmit,
     nextStep,
-    prevStep
+    prevStep,
+    getOccupiedSlots,
+    getAvailableSlots,
+    isDateFullyBooked,
+    allTimeSlots
   } = useContact()
 
-  // Generar horarios de 8:00 AM a 6:00 PM
-  const timeSlots = [
-    '8:00 AM - 9:00 AM',
-    '9:00 AM - 10:00 AM',
-    '10:00 AM - 11:00 AM',
-    '11:00 AM - 12:00 PM',
-    '12:00 PM - 1:00 PM',
-    '1:00 PM - 2:00 PM',
-    '2:00 PM - 3:00 PM',
-    '3:00 PM - 4:00 PM',
-    '4:00 PM - 5:00 PM',
-    '5:00 PM - 6:00 PM'
-  ]
+  // Usar los horarios definidos en el hook
+  const timeSlots = allTimeSlots
+
+  // Obtener horarios ocupados para la fecha seleccionada
+  const occupiedSlots = formData.date
+    ? getOccupiedSlots(formData.date.toString())
+    : []
 
   return (
     <>
@@ -210,6 +208,7 @@ export const ContactSectionLanding = () => {
                           value={formData.date}
                           onChange={handleDateChange}
                           variant="primary"
+                          isDateFullyBooked={isDateFullyBooked}
                         />
                       </div>
 
@@ -243,27 +242,40 @@ export const ContactSectionLanding = () => {
                       </Text>
 
                       <div className="grid grid-cols-2 gap-3 w-full">
-                        {timeSlots.map((slot) => (
-                          <button
-                            key={slot}
-                            type="button"
-                            onClick={() => handleTimeSlotChange(slot)}
-                            className={`
-                              px-4 py-3 rounded-lg border-2 transition-all duration-200
-                              ${formData.timeSlot === slot
-                                ? 'border-color-ct-primary bg-color-ct-primary text-white'
-                                : 'border-color-ct-outline bg-white text-color-ct-on-surface hover:border-color-ct-tertiary hover:bg-color-ct-tertiary hover:bg-opacity-10'
-                              }
-                            `}
-                          >
-                            <Text
-                              variant="body"
-                              textColor={formData.timeSlot === slot ? 'color-white' : 'color-on-surface'}
+                        {timeSlots.map((slot) => {
+                          const isOccupied = occupiedSlots.includes(slot)
+                          return (
+                            <button
+                              key={slot}
+                              type="button"
+                              onClick={() => !isOccupied && handleTimeSlotChange(slot)}
+                              disabled={isOccupied}
+                              className={`
+                                px-4 py-3 rounded-lg border-2 transition-all duration-200
+                                ${isOccupied
+                                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                                  : formData.timeSlot === slot
+                                  ? 'border-color-ct-primary bg-color-ct-primary text-white'
+                                  : 'border-color-ct-outline bg-white text-color-ct-on-surface hover:border-color-ct-tertiary hover:bg-color-ct-tertiary hover:bg-opacity-10'
+                                }
+                              `}
                             >
-                              {slot}
-                            </Text>
-                          </button>
-                        ))}
+                              <Text
+                                variant="body"
+                                textColor={
+                                  isOccupied
+                                    ? 'color-on-surface-var'
+                                    : formData.timeSlot === slot
+                                    ? 'color-white'
+                                    : 'color-on-surface'
+                                }
+                              >
+                                {slot}
+                                {isOccupied && ' (Ocupado)'}
+                              </Text>
+                            </button>
+                          )
+                        })}
                       </div>
 
                       <div className="flex gap-4 w-full max-w-[380px] mx-auto">
