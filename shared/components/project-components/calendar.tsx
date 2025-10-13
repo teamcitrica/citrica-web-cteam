@@ -29,8 +29,11 @@ export default function CalendarComponent({
     const jsDate = date.toDate(getLocalTimeZone());
     const isSunday = jsDate.getDay() === 0; // 0 = Domingo en JavaScript
 
-    // Verificar si la fecha tiene todos los horarios ocupados
-    const dateString = jsDate.toISOString().split('T')[0];
+    // Obtener fecha directamente del objeto CalendarDate (sin conversión)
+    const year = date.year
+    const month = String(date.month).padStart(2, '0')
+    const day = String(date.day).padStart(2, '0')
+    const dateString = `${year}-${month}-${day}`
     const isFullyBooked = isDateFullyBooked ? isDateFullyBooked(dateString) : false;
 
     return (

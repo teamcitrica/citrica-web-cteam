@@ -30,6 +30,8 @@ const UnifiedAvailabilityManager = () => {
   const [blockedSlots, setBlockedSlots] = useState<string[]>([]);
   const [reservedSlots, setReservedSlots] = useState<string[]>([]);
   const [weeklyActiveSlots, setWeeklyActiveSlots] = useState<string[]>([]);
+  const [dayBookings, setDayBookings] = useState<any[]>([]); // Todas las reservas del día
+  const [slotStatusMap, setSlotStatusMap] = useState<Record<string, 'confirmed' | 'pending' | 'cancelled' | 'blocked'>>({}); // Mapa de estado por slot
 
   // Configuración de horario de oficina
   const [officeStartHour, setOfficeStartHour] = useState(9);
@@ -122,41 +124,124 @@ const UnifiedAvailabilityManager = () => {
 
       setWeeklyActiveSlots(Array.from(weeklyAvailableSlots));
 
-      // 3. Obtener reservas para esta fecha
+      // 3. Obtener TODAS las reservas para esta fecha (confirmadas, pendientes, canceladas)
       const { data: bookings, error: bookingsError } = await supabase
         .from('bookings')
         .select('*')
         .eq('booking_date', dateStr)
-        .eq('status', 'confirmed');
+        .in('status', ['confirmed', 'pending', 'cancelled']); // Incluir todos los estados
 
       if (bookingsError) {
         console.error('Error loading bookings:', bookingsError);
       }
 
-      // 4. Separar slots bloqueados y reservados
+      // 4. Separar slots bloqueados y reservados, y crear mapa de estados
       const blocked: string[] = [];
       const reserved: string[] = [];
+      const statusMap: Record<string, 'confirmed' | 'pending' | 'cancelled' | 'blocked'> = {};
+
+      // Función helper para convertir slots de formato usuario a formato interno
+      const convertUserSlotToInternal = (userSlot: string): string[] => {
+        // "1:00 PM - 2:00 PM" -> ["13:00", "13:30"]
+        const match = userSlot.match(/(\d+):(\d+)\s+(AM|PM)/)
+        if (!match) {
+          // Si ya está en formato interno (ej: "13:00"), devolverlo como está
+          if (/^\d{1,2}:\d{2}$/.test(userSlot)) {
+            return [userSlot]
+          }
+          return []
+        }
+
+        const hours = parseInt(match[1])
+        const minutes = parseInt(match[2])
+        const period = match[3]
+
+        let hour24 = hours
+        if (period === 'PM' && hours !== 12) {
+          hour24 = hours + 12
+        } else if (period === 'AM' && hours === 12) {
+          hour24 = 0
+        }
+
+        // Siempre generar ambos slots de 30 minutos para una hora completa
+        return [
+          `${String(hour24).padStart(2, '0')}:00`,
+          `${String(hour24).padStart(2, '0')}:30`
+        ]
+      }
 
       bookings?.forEach((booking: any) => {
+        console.log('🔍 Procesando booking:', {
+          id: booking.id,
+          name: booking.name,
+          type_id: booking.type_id,
+          status: booking.status,
+          time_slots: booking.time_slots
+        });
+
         if (booking.time_slots && Array.isArray(booking.time_slots)) {
-          const slots = booking.time_slots;
+          // Convertir todos los slots a formato interno
+          const internalSlots: string[] = []
+          booking.time_slots.forEach((slot: string) => {
+            const converted = convertUserSlotToInternal(slot)
+            internalSlots.push(...converted)
+          })
+
+          console.log('🔄 Slots convertidos de', booking.time_slots, 'a', internalSlots);
+
+          const slots = internalSlots;
 
           if (booking.type_id === 2) {
             // Es un bloqueo administrativo
             if (slots.includes('00:00') || slots.length === 0) {
               blocked.push(...allTimeSlots); // Bloqueo completo del día
+              allTimeSlots.forEach(slot => {
+                statusMap[slot] = 'blocked';
+              });
+              console.log('🔒 Bloqueo completo del día');
             } else {
               blocked.push(...slots); // Bloqueo específico
+              slots.forEach((slot: string) => {
+                statusMap[slot] = 'blocked';
+                console.log(`🔒 Bloqueado slot: ${slot}`);
+              });
             }
-          } else {
-            // Es una reserva normal
+          } else if (booking.status === 'confirmed' || booking.status === 'pending') {
+            // Es una reserva confirmada o pendiente (ocupan el slot)
             reserved.push(...slots);
+            slots.forEach((slot: string) => {
+              // Si no está bloqueado, asignar el estado de la reserva
+              if (!statusMap[slot]) {
+                statusMap[slot] = booking.status as 'confirmed' | 'pending';
+                console.log(`✅ Marcado slot ${slot} como ${booking.status}`);
+              }
+            });
+          } else if (booking.status === 'cancelled') {
+            // Las reservas canceladas se marcan pero no ocupan
+            console.log('📅 Procesando reserva cancelada con slots:', slots);
+            slots.forEach((slot: string) => {
+              // Marcar como cancelada incluso si hay otro estado (para visualizar)
+              // Las canceladas no bloquean, solo informan
+              if (!statusMap[slot] || statusMap[slot] === 'cancelled') {
+                statusMap[slot] = 'cancelled';
+                console.log(`❌ Marcado slot ${slot} como cancelled`);
+              } else {
+                console.log(`⚠️ Slot ${slot} ya tiene estado ${statusMap[slot]}, no se marca como cancelled`);
+              }
+            });
           }
         }
       });
 
       setBlockedSlots(Array.from(new Set(blocked)));
       setReservedSlots(Array.from(new Set(reserved)));
+      setSlotStatusMap(statusMap);
+      setDayBookings(bookings?.filter((b: any) => b.type_id === 1) || []); // Solo reservas de clientes
+
+      // Debug: ver el mapa de estados
+      console.log('📅 Status Map para fecha:', dateStr);
+      console.log('🗺️ Slot Status Map:', statusMap);
+      console.log('📋 Bookings encontrados:', bookings);
 
     } catch (error) {
       console.error('Error loading day data:', error);
@@ -551,11 +636,22 @@ const UnifiedAvailabilityManager = () => {
   };
 
   const getSlotState = (timeSlot: string) => {
-    // Si está reservado, no se puede cambiar
-    if (reservedSlots.includes(timeSlot)) return 'reserved';
+    // Verificar si tiene un estado específico de reserva
+    const bookingStatus = slotStatusMap[timeSlot];
 
-    // Si está bloqueado, se puede desbloquear
-    if (blockedSlots.includes(timeSlot)) return 'blocked';
+    // Debug para el slot 13:00 y 13:30
+    if (timeSlot === '13:00' || timeSlot === '13:30') {
+      console.log(`🔍 Debug slot ${timeSlot}:`, {
+        bookingStatus,
+        inWeeklyActive: weeklyActiveSlots.includes(timeSlot),
+        weeklyActiveSlots: weeklyActiveSlots.length > 0 ? weeklyActiveSlots.slice(0, 5) : []
+      });
+    }
+
+    if (bookingStatus === 'blocked') return 'blocked';
+    if (bookingStatus === 'confirmed') return 'reserved-confirmed';
+    if (bookingStatus === 'pending') return 'reserved-pending';
+    if (bookingStatus === 'cancelled') return 'reserved-cancelled';
 
     // Si está en la configuración semanal, está disponible
     if (weeklyActiveSlots.includes(timeSlot)) return 'available';
@@ -575,8 +671,12 @@ const UnifiedAvailabilityManager = () => {
     switch (state) {
       case 'available':
         return 'bg-green-500 hover:bg-green-600 text-white border-green-600 cursor-pointer';
-      case 'reserved':
-        return 'bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-600 cursor-not-allowed';
+      case 'reserved-confirmed':
+        return 'bg-orange-500 hover:bg-orange-600 text-white border-orange-600 cursor-not-allowed'; // Naranja para confirmadas
+      case 'reserved-pending':
+        return 'bg-yellow-500 hover:bg-yellow-600 text-white border-yellow-600 cursor-not-allowed'; // Amarillo para pendientes
+      case 'reserved-cancelled':
+        return 'bg-gray-400 hover:bg-gray-500 text-white border-gray-400 cursor-pointer'; // Gris para canceladas
       case 'blocked':
         return 'bg-red-500 hover:bg-red-600 text-white border-red-600 cursor-pointer';
       case 'inactive':
@@ -738,8 +838,16 @@ const UnifiedAvailabilityManager = () => {
                 <Text variant="body" color="color-on-surface">Disponible</Text>
               </div>
               <div className="flex items-center gap-1">
+                <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                <Text variant="body" color="color-on-surface">Confirmada</Text>
+              </div>
+              <div className="flex items-center gap-1">
                 <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                <Text variant="body" color="color-on-surface">Reservado</Text>
+                <Text variant="body" color="color-on-surface">Pendiente</Text>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                <Text variant="body" color="color-on-surface">Cancelada</Text>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 bg-red-500 rounded-full"></div>
@@ -823,7 +931,29 @@ const UnifiedAvailabilityManager = () => {
               <div className="grid grid-cols-6 gap-2 max-h-96 overflow-y-auto">
                 {allTimeSlots.map((timeSlot) => {
                   const state = getSlotState(timeSlot);
-                  const isClickable = state !== 'reserved';
+                  const isReserved = state === 'reserved-confirmed' || state === 'reserved-pending';
+                  const isClickable = !isReserved;
+
+                  const getTooltip = () => {
+                    switch (state) {
+                      case 'available':
+                        return 'Click para bloquear este horario';
+                      case 'blocked':
+                        return 'Click para desbloquear';
+                      case 'reserved-confirmed':
+                        return 'Reserva confirmada - no modificable';
+                      case 'reserved-pending':
+                        return 'Reserva pendiente - no modificable';
+                      case 'reserved-cancelled':
+                        return 'Reserva cancelada - Click para limpiar';
+                      case 'inactive':
+                        return 'Click para activar permanentemente';
+                      case 'outside_office':
+                        return 'Fuera de horario - Click para activar';
+                      default:
+                        return 'No disponible';
+                    }
+                  };
 
                   return (
                     <button
@@ -834,13 +964,7 @@ const UnifiedAvailabilityManager = () => {
                         p-2 text-xs rounded border transition-all
                         ${getSlotButtonStyle(state)}
                       `}
-                      title={
-                        state === 'available' ? 'Click: OK=Bloquear hoy | Cancelar=Desactivar permanentemente' :
-                          state === 'blocked' ? 'Click para desbloquear' :
-                            state === 'inactive' ? 'Click para activar permanentemente' :
-                              state === 'outside_office' ? 'Click para activar (fuera de horario)' :
-                                'Reservado - no modificable'
-                      }
+                      title={getTooltip()}
                     >
                       {timeSlot}
                     </button>
@@ -884,6 +1008,74 @@ const UnifiedAvailabilityManager = () => {
                 </Text>
               </div>
             </div>
+          </div>
+        </Card>
+      </Col>
+
+      {/* Nueva sección: Lista de reservas del día */}
+      <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+        <Card className="p-6">
+          <div className="space-y-4">
+            <Text variant="subtitle" color="#ff6b35">
+              Reservas del día {selectedDate && formatDateForDisplay(selectedDate)}
+            </Text>
+
+            {dayBookings.length === 0 ? (
+              <div className="text-center py-4">
+                <Text variant="body" color="color-on-surface-var">
+                  No hay reservas para este día
+                </Text>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {dayBookings.map((booking: any) => {
+                  const statusColors = {
+                    confirmed: 'bg-green-100 border-green-300 text-green-800',
+                    pending: 'bg-yellow-100 border-yellow-300 text-yellow-800',
+                    cancelled: 'bg-red-100 border-red-300 text-red-800'
+                  };
+
+                  const statusLabels = {
+                    confirmed: 'Confirmada',
+                    pending: 'Pendiente',
+                    cancelled: 'Cancelada'
+                  };
+
+                  return (
+                    <div
+                      key={booking.id}
+                      className={`p-4 rounded-lg border-2 ${statusColors[booking.status as keyof typeof statusColors] || 'bg-gray-100'}`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Text variant="body" color="color-on-surface" className="font-semibold">
+                              {booking.name}
+                            </Text>
+                            <span className={`px-2 py-1 text-xs rounded ${statusColors[booking.status as keyof typeof statusColors]}`}>
+                              {statusLabels[booking.status as keyof typeof statusLabels]}
+                            </span>
+                          </div>
+                          <div className="space-y-1">
+                            <Text variant="body" color="color-on-surface" className="text-sm">
+                              📧 {booking.email}
+                            </Text>
+                            <Text variant="body" color="color-on-surface" className="text-sm">
+                              🕐 Horarios: {booking.time_slots?.join(', ') || 'N/A'}
+                            </Text>
+                            {booking.message && (
+                              <Text variant="body" color="color-on-surface" className="text-sm">
+                                💬 {booking.message}
+                              </Text>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </Card>
       </Col>

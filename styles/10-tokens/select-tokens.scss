@@ -12,23 +12,25 @@ $select-citrica-ui: (
 );
 
 .select-citrica-ui{
-  min-width: 140px !important;
-  width: 380px !important;
   @include a-set($select-citrica-ui);
-  
-  &[data-slot="base"] {
-    min-width: 140px !important;
-    max-width: 380px !important;
-  }
-  
-  [data-slot="trigger"] {
-    min-width: 140px !important;
-    max-width: 380px !important;
-  }
-  
-  [data-slot="mainWrapper"] {
-    min-width: 140px !important;
-    max-width: 380px !important;
+
+  // Solo aplicar ancho por defecto si no tiene clase personalizada de ancho
+  &:not([class*="!w-"]) {
+    min-width: 140px;
+    width: 100%;
+    max-width: 380px;
+
+    &[data-slot="base"] {
+      width: 100%;
+    }
+
+    [data-slot="trigger"] {
+      width: 100%;
+    }
+
+    [data-slot="mainWrapper"] {
+      width: 100%;
+    }
   }
 }
 .select-item-citrica-ui{

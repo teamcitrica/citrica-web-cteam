@@ -2,10 +2,11 @@
 
 import { Col, Container } from '@/styles/07-objects/objects'
 import React from 'react'
-import { Button, Icon, Input, Text, Textarea } from '../citrica-ui'
+import { Button, Icon, Input, Select, Text, Textarea } from '../citrica-ui'
 import { useContact } from '@/hooks/contact/use-contact'
 import AnimatedContent from './animated-content'
 import CalendarComponent from './calendar'
+import { PHONE_CODES } from '@/shared/archivos js/phone-codes'
 
 export const ContactSectionLanding = () => {
   const {
@@ -14,28 +15,45 @@ export const ContactSectionLanding = () => {
     status,
     currentStep,
     handleChange,
+    updateField,
     handleDateChange,
     handleTimeSlotChange,
     handleSubmit,
     nextStep,
     prevStep,
     getOccupiedSlots,
-    getAvailableSlots,
-    isDateFullyBooked,
-    allTimeSlots
+    isDateFullyBookedSync,
+    availableTimeSlots,
+    selectedTimeSlots,
+    studioConfig
   } = useContact()
 
-  // Usar los horarios definidos en el hook
-  const timeSlots = allTimeSlots
+  // Usar los horarios cargados dinámicamente según la configuración y fecha
+  const timeSlots = availableTimeSlots
 
   // Obtener horarios ocupados para la fecha seleccionada
-  const occupiedSlots = formData.date
-    ? getOccupiedSlots(formData.date.toString())
-    : []
+  const occupiedSlots = (() => {
+    if (!formData.date) return []
+
+    // Convertir CalendarDate a string YYYY-MM-DD
+    let dateStr: string
+    if (formData.date.year && formData.date.month && formData.date.day) {
+      // Es un objeto CalendarDate de @internationalized/date
+      const year = formData.date.year
+      const month = String(formData.date.month).padStart(2, '0')
+      const day = String(formData.date.day).padStart(2, '0')
+      dateStr = `${year}-${month}-${day}`
+    } else {
+      // Fallback
+      dateStr = formData.date.toString()
+    }
+
+    return getOccupiedSlots(dateStr)
+  })()
 
   return (
     <>
-          <section className="py-[80px] bg-color-ct-surface-container">
+      <section className="py-[80px] bg-color-ct-surface-container">
         <Container>
           <Col cols={{ lg: 6, md: 3, sm: 4 }}>
             <div className="mb-6">
@@ -147,8 +165,8 @@ export const ContactSectionLanding = () => {
                 )}
 
                 {/* Paso 1: Nombre y Email */}
-                {currentStep === 1 && status === 'idle' && (
-                  <AnimatedContent key="step1" direction="horizontal" distance={50}>
+                {currentStep === 3 && status === 'idle' && (
+                  <AnimatedContent key="step3" direction="horizontal" distance={50}>
                     <div className="flex flex-col gap-4 w-full">
                       <Text variant="title" weight="bold" textColor="color-primary">
                         Información de Contacto
@@ -181,23 +199,43 @@ export const ContactSectionLanding = () => {
                         onChange={handleChange}
                         required
                       />
+                      <div className="flex flex-col gap-4 w-full">
+                        <Textarea
+                          name="message"
+                          label="Mensaje"
+                          placeholder="Cuéntanos sobre tu negocio y qué solución digital necesitas"
+                          variant="bordered"
+                          color="primary"
+                          radius="sm"
+                          fullWidth
+                          value={formData.message}
+                          onChange={handleChange}
+                        />
 
-                      <Button
-                        type="button"
-                        label="Siguiente"
-                        variant="primary"
-                        fullWidth
-                        className="max-w-[380px] mx-auto"
-                        onClick={nextStep}
-                        disabled={!formData.name || !formData.email}
-                      />
+                        <div className="flex gap-4 w-full max-w-[380px] mx-auto">
+                          <Button
+                            type="button"
+                            label="Anterior"
+                            variant="secondary"
+                            fullWidth
+                            onClick={prevStep}
+                          />
+                          <Button
+                            type="submit"
+                            label={isLoading ? "Enviando..." : "Enviar Mensaje"}
+                            variant="primary"
+                            fullWidth
+                            disabled={isLoading || !formData.message}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </AnimatedContent>
                 )}
 
                 {/* Paso 2: Seleccionar Fecha */}
-                {currentStep === 2 && status === 'idle' && (
-                  <AnimatedContent key="step2" direction="horizontal" distance={50}>
+                {currentStep === 1 && status === 'idle' && (
+                  <AnimatedContent key="step1" direction="horizontal" distance={50}>
                     <div className="flex flex-col items-center gap-4 w-full">
                       <Text variant="title" weight="bold" textColor="color-primary">
                         Seleccionar Fecha
@@ -208,7 +246,7 @@ export const ContactSectionLanding = () => {
                           value={formData.date}
                           onChange={handleDateChange}
                           variant="primary"
-                          isDateFullyBooked={isDateFullyBooked}
+                          isDateFullyBooked={isDateFullyBookedSync}
                         />
                       </div>
 
@@ -234,49 +272,69 @@ export const ContactSectionLanding = () => {
                 )}
 
                 {/* Paso 3: Seleccionar Horario */}
-                {currentStep === 3 && status === 'idle' && (
-                  <AnimatedContent key="step3" direction="horizontal" distance={50}>
+                {currentStep === 2 && status === 'idle' && (
+                  <AnimatedContent key="step2" direction="horizontal" distance={50}>
                     <div className="flex flex-col items-center gap-4 w-full">
                       <Text variant="title" weight="bold" textColor="color-primary">
                         Seleccionar Horario
                       </Text>
 
-                      <div className="grid grid-cols-2 gap-3 w-full">
-                        {timeSlots.map((slot) => {
-                          const isOccupied = occupiedSlots.includes(slot)
-                          return (
-                            <button
-                              key={slot}
-                              type="button"
-                              onClick={() => !isOccupied && handleTimeSlotChange(slot)}
-                              disabled={isOccupied}
-                              className={`
-                                px-4 py-3 rounded-lg border-2 transition-all duration-200
-                                ${isOccupied
-                                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                                  : formData.timeSlot === slot
-                                  ? 'border-color-ct-primary bg-color-ct-primary text-white'
-                                  : 'border-color-ct-outline bg-white text-color-ct-on-surface hover:border-color-ct-tertiary hover:bg-color-ct-tertiary hover:bg-opacity-10'
-                                }
-                              `}
-                            >
-                              <Text
-                                variant="body"
-                                textColor={
-                                  isOccupied
-                                    ? 'color-on-surface-var'
-                                    : formData.timeSlot === slot
-                                    ? 'color-white'
-                                    : 'color-on-surface'
-                                }
+                      {studioConfig.allow_multiple_time_slots && (
+                        <div className="text-center">
+                          <Text variant="body" textColor="color-on-surface-var" className="text-sm">
+                            Puedes seleccionar múltiples horarios
+                          </Text>
+                        </div>
+                      )}
+
+                      {timeSlots.length === 0 ? (
+                        <div className="text-center py-8">
+                          <Text variant="body" textColor="color-on-surface-var">
+                            No hay horarios disponibles para esta fecha
+                          </Text>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-3 w-full max-h-96 overflow-y-auto">
+                          {timeSlots.map((slot) => {
+                            const isOccupied = occupiedSlots.includes(slot)
+                            const isSelected = studioConfig.allow_multiple_time_slots
+                              ? selectedTimeSlots.includes(slot)
+                              : formData.timeSlot === slot
+
+                            return (
+                              <button
+                                key={slot}
+                                type="button"
+                                onClick={() => !isOccupied && handleTimeSlotChange(slot)}
+                                disabled={isOccupied}
+                                className={`
+                                  px-4 py-3 rounded-lg border-2 transition-all duration-200
+                                  ${isOccupied
+                                    ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                                    : isSelected
+                                      ? 'border-color-ct-primary bg-color-ct-primary text-white'
+                                      : 'border-color-ct-outline bg-white text-color-ct-on-surface hover:border-color-ct-tertiary hover:bg-color-ct-tertiary hover:bg-opacity-10'
+                                  }
+                                `}
                               >
-                                {slot}
-                                {isOccupied && ' (Ocupado)'}
-                              </Text>
-                            </button>
-                          )
-                        })}
-                      </div>
+                                <Text
+                                  variant="body"
+                                  textColor={
+                                    isOccupied
+                                      ? 'color-on-surface-var'
+                                      : isSelected
+                                        ? 'color-white'
+                                        : 'color-on-surface'
+                                  }
+                                >
+                                  {slot}
+                                  {isOccupied && ' (Ocupado)'}
+                                </Text>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
 
                       <div className="flex gap-4 w-full max-w-[380px] mx-auto">
                         <Button
@@ -292,53 +350,18 @@ export const ContactSectionLanding = () => {
                           variant="primary"
                           fullWidth
                           onClick={nextStep}
-                          disabled={!formData.timeSlot}
+                          disabled={
+                            studioConfig.allow_multiple_time_slots
+                              ? selectedTimeSlots.length === 0
+                              : !formData.timeSlot
+                          }
                         />
                       </div>
                     </div>
                   </AnimatedContent>
                 )}
 
-                {/* Paso 4: Mensaje */}
-                {currentStep === 4 && status === 'idle' && (
-                  <AnimatedContent key="step4" direction="horizontal" distance={50}>
-                    <div className="flex flex-col gap-4 w-full">
-                      <Text variant="title" weight="bold" textColor="color-primary">
-                        Tu Mensaje
-                      </Text>
-
-                      <Textarea
-                        name="message"
-                        label="Mensaje"
-                        placeholder="Cuéntanos sobre tu negocio y qué solución digital necesitas"
-                        variant="bordered"
-                        color="primary"
-                        radius="sm"
-                        fullWidth
-                        value={formData.message}
-                        onChange={handleChange}
-                        required
-                      />
-
-                      <div className="flex gap-4 w-full max-w-[380px] mx-auto">
-                        <Button
-                          type="button"
-                          label="Anterior"
-                          variant="secondary"
-                          fullWidth
-                          onClick={prevStep}
-                        />
-                        <Button
-                          type="submit"
-                          label={isLoading ? "Enviando..." : "Enviar Mensaje"}
-                          variant="primary"
-                          fullWidth
-                          disabled={isLoading || !formData.message}
-                        />
-                      </div>
-                    </div>
-                  </AnimatedContent>
-                )}
+                {/* Paso 4: Teléfono y Mensaje */}
               </form>
             </div>
           </Col>

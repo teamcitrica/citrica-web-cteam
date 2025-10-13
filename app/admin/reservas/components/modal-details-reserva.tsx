@@ -23,7 +23,10 @@ export default function ReservaDetailModal({
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "Sin fecha";
     try {
-      const date = new Date(dateString);
+      // Parsear la fecha manualmente para evitar problemas de zona horaria
+      // dateString viene en formato YYYY-MM-DD
+      const [year, month, day] = dateString.split('-').map(Number);
+      const date = new Date(year, month - 1, day); // month es 0-indexed en Date
       return date.toLocaleDateString("es-ES", {
         year: "numeric",
         month: "long",
