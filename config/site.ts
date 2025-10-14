@@ -37,6 +37,10 @@ export const siteConfig = {
 					href: "/admin/reservas",
 				},
 				{
+					title: "Calendario",
+					href: "/admin/reservas/calendario",
+				},
+				{
 					title: "Gestión de disponibilidad",
 					href: "/admin/reservas/disponibilidad",
 				},
