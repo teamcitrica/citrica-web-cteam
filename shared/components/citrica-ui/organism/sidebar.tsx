@@ -109,7 +109,7 @@ export function Sidebar({ items }: SidebarProps) {
       </div>
 
       {/* Desktop Sidebar */}
-      <div className="hidden h-screen w-72 border-r bg-background md:block">
+      <div className="hidden h-screen w-72 border-r bg-background md:block sticky top-0">
         <NavItems />
       </div>
 

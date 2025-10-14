@@ -9,11 +9,11 @@ export const siteConfig = {
 	navLinks: [
 		{
 			title: "Inicio",
-			href: "/",
+			href: "#inicio",
 		},
 		{
 			title: "Proyectos",
-			href: "#proyect",
+			href: "#proyectos",
 		},
 		{
 			title: "Panel",
@@ -31,6 +31,16 @@ export const siteConfig = {
 			title: "Reservas",
 			icon: "ClipboardCheck",
 			href: "/admin/reservas",
+			subItems: [
+				{
+					title: "Ver reservas",
+					href: "/admin/reservas",
+				},
+				{
+					title: "Gestión de disponibilidad",
+					href: "/admin/reservas/disponibilidad",
+				},
+			],
 		},
 		{
 			title: "Reuniones",

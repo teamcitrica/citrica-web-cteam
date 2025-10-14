@@ -9,6 +9,7 @@ interface CalendarComponentProps {
   variant?: 'primary' | 'secondary';
   minValue?: any;
   disabledRanges?: Array<[any, any]>;
+  isDateFullyBooked?: (date: string) => boolean;
 }
 
 export default function CalendarComponent({
@@ -18,6 +19,7 @@ export default function CalendarComponent({
   variant = 'primary',
   minValue = today(getLocalTimeZone()),
   disabledRanges = [],
+  isDateFullyBooked,
 }: CalendarComponentProps) {
   let { locale } = useLocale();
 
@@ -27,8 +29,16 @@ export default function CalendarComponent({
     const jsDate = date.toDate(getLocalTimeZone());
     const isSunday = jsDate.getDay() === 0; // 0 = Domingo en JavaScript
 
+    // Obtener fecha directamente del objeto CalendarDate (sin conversión)
+    const year = date.year
+    const month = String(date.month).padStart(2, '0')
+    const day = String(date.day).padStart(2, '0')
+    const dateString = `${year}-${month}-${day}`
+    const isFullyBooked = isDateFullyBooked ? isDateFullyBooked(dateString) : false;
+
     return (
       isSunday ||
+      isFullyBooked ||
       disabledRanges.some(
         (interval) =>
           date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0,
