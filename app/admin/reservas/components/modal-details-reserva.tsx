@@ -23,7 +23,10 @@ export default function ReservaDetailModal({
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "Sin fecha";
     try {
-      const date = new Date(dateString);
+      // Parsear la fecha manualmente para evitar problemas de zona horaria
+      // dateString viene en formato YYYY-MM-DD
+      const [year, month, day] = dateString.split('-').map(Number);
+      const date = new Date(year, month - 1, day); // month es 0-indexed en Date
       return date.toLocaleDateString("es-ES", {
         year: "numeric",
         month: "long",
@@ -51,11 +54,11 @@ export default function ReservaDetailModal({
 
   const getStatusColor = (status: ReservaEstado) => {
     switch (status) {
-      case 'confirmada':
+      case 'confirmed':
         return 'text-green-600 bg-green-100';
-      case 'pendiente':
+      case 'pending':
         return 'text-yellow-600 bg-yellow-100';
-      case 'cancelada':
+      case 'cancelled':
         return 'text-red-600 bg-red-100';
       default:
         return 'text-gray-600 bg-gray-100';
@@ -64,11 +67,11 @@ export default function ReservaDetailModal({
 
   const getStatusLabel = (status: ReservaEstado) => {
     switch (status) {
-      case 'confirmada':
+      case 'confirmed':
         return 'Confirmada';
-      case 'pendiente':
+      case 'pending':
         return 'Pendiente';
-      case 'cancelada':
+      case 'cancelled':
         return 'Cancelada';
       default:
         return 'Desconocido';
@@ -119,7 +122,7 @@ export default function ReservaDetailModal({
                   Fecha de Reunión
                 </Text>
                 <Text variant="body" textColor="color-on-surface-var">
-                  {formatDate(reserva.date)}
+                  {formatDate(reserva.booking_date)}
                 </Text>
               </div>
               <div>
@@ -127,7 +130,9 @@ export default function ReservaDetailModal({
                   Horario
                 </Text>
                 <Text variant="body" textColor="color-on-surface-var">
-                  {reserva.time_slot || "Sin horario"}
+                  {reserva.time_slots && reserva.time_slots.length > 0
+                    ? reserva.time_slots.join(', ')
+                    : "Sin horario"}
                 </Text>
               </div>
             </div>
@@ -137,8 +142,8 @@ export default function ReservaDetailModal({
                 Estado
               </Text>
               <div className="mt-2">
-                <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(reserva.status || 'pendiente')}`}>
-                  {getStatusLabel(reserva.status || 'pendiente')}
+                <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(reserva.status || 'pending')}`}>
+                  {getStatusLabel(reserva.status || 'pending')}
                 </span>
               </div>
             </div>

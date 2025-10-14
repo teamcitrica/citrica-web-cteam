@@ -3,16 +3,17 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useSupabase } from '@/shared/context/supabase-context'
 
-export type ReservaEstado = 'pendiente' | 'confirmada' | 'cancelada'
+export type ReservaEstado = 'confirmed' | 'cancelled' | 'pending'
 
 export interface Reserva {
   id: string
   name: string
   email: string
   message: string
-  date: string | null
-  time_slot: string | null
+  booking_date: string | null
+  time_slots: string[]
   status: ReservaEstado
+  type_id: number
   created_at: string
 }
 
@@ -31,8 +32,9 @@ export const useReservas = () => {
     try {
       setIsLoading(true)
       const { data, error: fetchError } = await supabase
-        .from('contact')
+        .from('bookings')
         .select('*')
+        .eq('type_id', 1) // Solo reservas de clientes (no bloqueos administrativos)
         .order('created_at', { ascending: false })
 
       if (fetchError) {
@@ -63,7 +65,7 @@ export const useReservas = () => {
       try {
         setIsLoading(true)
         const { error } = await supabase
-          .from('contact')
+          .from('bookings')
           .delete()
           .eq('id', id)
 
@@ -88,7 +90,7 @@ export const useReservas = () => {
     async (id: string, status: ReservaEstado) => {
       try {
         const { error } = await supabase
-          .from('contact')
+          .from('bookings')
           .update({ status })
           .eq('id', id)
 
