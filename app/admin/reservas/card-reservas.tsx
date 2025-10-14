@@ -10,8 +10,11 @@ import {
   Spinner,
   Pagination,
   Input,
-  Select,
-  SelectItem,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Button,
 } from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import Text from "@/shared/components/citrica-ui/atoms/text";
@@ -25,10 +28,9 @@ const columns = [
   { name: "HORARIO", uid: "horario" },
   { name: "ESTADO", uid: "estado", sortable: true },
   { name: "CAMBIAR ESTADO", uid: "cambiar_estado" },
-  { name: "ACCIONES", uid: "actions" },
 ];
 
-const INITIAL_VISIBLE_COLUMNS = ["nombre", "email", "fecha", "horario", "estado", "cambiar_estado", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["nombre", "email", "fecha", "horario", "estado", "cambiar_estado"];
 const ITEMS_PER_PAGE = 15;
 
 interface CardReservasProps {
@@ -239,55 +241,72 @@ export default function CardReservas({
             </div>
           );
         case "cambiar_estado":
+          const getDropdownItems = () => {
+            if (reserva.status === 'confirmed') {
+              return (
+                <>
+                  <DropdownItem key="cancelar" className="text-orange-600">
+                    Cancelar
+                  </DropdownItem>
+                  <DropdownItem key="eliminar" className="text-red-600">
+                    Eliminar
+                  </DropdownItem>
+                </>
+              );
+            } else if (reserva.status === 'cancelled') {
+              return (
+                <DropdownItem key="eliminar" className="text-red-600">
+                  Eliminar
+                </DropdownItem>
+              );
+            } else {
+              // pending
+              return (
+                <>
+                  <DropdownItem key="confirmar" className="text-green-600">
+                    Confirmar
+                  </DropdownItem>
+                  <DropdownItem key="cancelar" className="text-orange-600">
+                    Cancelar
+                  </DropdownItem>
+                  <DropdownItem key="eliminar" className="text-red-600">
+                    Eliminar
+                  </DropdownItem>
+                </>
+              );
+            }
+          };
+
           return (
             <div className="flex justify-center">
-              <Select
-                aria-label="Cambiar estado"
-                className="max-w-[180px]"
-                classNames={{
-                  trigger: "!h-9 min-h-9",
-                  value: "text-sm",
-                }}
-                selectedKeys={reserva.status ? [reserva.status] : ['pending']}
-                size="sm"
-                onSelectionChange={(keys) => {
-                  const selectedKey = Array.from(keys)[0] as ReservaEstado;
-                  if (selectedKey) {
-                    handleStatusChange(reserva.id, selectedKey);
-                  }
-                }}
-              >
-                <SelectItem key="pending" textValue="Pendiente">
-                  Pendiente
-                </SelectItem>
-                <SelectItem key="confirmed" textValue="Confirmada">
-                  Confirmada
-                </SelectItem>
-                <SelectItem key="cancelled" textValue="Cancelada">
-                  Cancelada
-                </SelectItem>
-              </Select>
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="light"
+                    className="text-gray-600 hover:text-gray-800"
+                  >
+                    <Icon name="MoreVertical" className="w-5 h-5" />
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="Acciones de reserva"
+                  onAction={(key) => {
+                    if (key === 'confirmar') {
+                      handleStatusChange(reserva.id, 'confirmed');
+                    } else if (key === 'cancelar') {
+                      handleStatusChange(reserva.id, 'cancelled');
+                    } else if (key === 'eliminar') {
+                      handleDeleteReserva(reserva);
+                    }
+                  }}
+                >
+                  {getDropdownItems()}
+                </DropdownMenu>
+              </Dropdown>
             </div>
           );
-        case "actions":
-          return (
-            <div className="flex items-end justify-center w-full gap-2">
-              <button
-                className="text-blue-500 hover:text-blue-700"
-                onClick={() => handleViewReserva(reserva)}
-              >
-                <Icon className="w-5 h-5" name="Eye" />
-              </button>
-              <button
-                className="text-red-500 hover:text-red-700"
-                onClick={() => handleDeleteReserva(reserva)}
-              >
-                <Icon className="w-5 h-5" name="Trash2" />
-              </button>
-            </div>
-          );
-        default:
-          return null;
       }
     },
     [handleViewReserva, handleDeleteReserva, handleStatusChange],
