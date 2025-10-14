@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { Col, Container } from '@/styles/07-objects/objects'
 import React from 'react'
@@ -6,7 +6,7 @@ import { Button, Icon, Input, Select, Text, Textarea } from '../citrica-ui'
 import { useContact } from '@/hooks/contact/use-contact'
 import AnimatedContent from './animated-content'
 import CalendarComponent from './calendar'
-import { PHONE_CODES } from '@/shared/archivos js/phone-codes'
+
 
 export const ContactSectionLanding = () => {
   const {
@@ -57,21 +57,26 @@ export const ContactSectionLanding = () => {
         <Container>
           <Col cols={{ lg: 6, md: 3, sm: 4 }}>
             <div className="mb-6">
-              <h2>
+              <h3>
                 <Text
                   variant="headline"
                   weight="bold"
                   textColor="color-primary"
                 >
-                  ¿Listo para transformar tu negocio?
+                  ¿Listo para Innovar y llevar tu negocio al siguiente nivel?
                 </Text>
-              </h2>
+              </h3>
             </div>
             <div className="mb-8">
+              <p className="mb-4">
+                <Text variant="title" weight="bold" textColor="color-on-surface-var">
+                  Agenda tu cita estratégica hoy.
+                </Text>
+              </p>
               <p>
                 <Text variant="subtitle" textColor="color-on-surface-var">
-                  Contáctanos hoy y descubre cómo podemos impulsar tu
-                  crecimiento digital
+                  Elige una fecha y hora para conversar sobre tu proyecto de
+                  crecimiento digital.
                 </Text>
               </p>
             </div>
@@ -115,43 +120,81 @@ export const ContactSectionLanding = () => {
           </Col>
 
           <Col cols={{ lg: 5, md: 3, sm: 4 }}>
-            <div className="bg-color-ct-white rounded-2xl p-4">
-              <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
-
+            <div className="bg-color-ct-white rounded-2xl shadow-xl border-3 border-[757575] p-4">
+              <form
+                onSubmit={handleSubmit}
+                className="flex flex-col items-center gap-4"
+              >
                 {/* Mensaje de éxito */}
-                {status === 'success' && (
-                  <AnimatedContent key="success" direction="vertical" distance={20}>
+                {status === "success" && (
+                  <AnimatedContent
+                    key="success"
+                    direction="vertical"
+                    distance={20}
+                  >
                     <div className="flex flex-col items-center justify-center gap-6 w-full py-12">
-                      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-                        <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <div className="w-20 h-20 bg-color-ct-secondary rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-12 h-12 ct-color-black"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       </div>
                       <div className="text-center">
-                        <Text variant="headline" weight="bold" textColor="color-primary">
-                          ¡Mensaje enviado con éxito!
+                        <Text
+                          variant="headline"
+                          weight="bold"
+                          textColor="color-primary"
+                        >
+                          ¡Enviado con éxito!
                         </Text>
-                        <div className="mt-2">
+                        {/* <div className="mt-2">
                           <Text variant="body" textColor="color-on-surface-var">
                             Nos pondremos en contacto contigo pronto.
                           </Text>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </AnimatedContent>
                 )}
 
                 {/* Mensaje de error */}
-                {status === 'error' && (
-                  <AnimatedContent key="error" direction="vertical" distance={20}>
+                {status === "error" && (
+                  <AnimatedContent
+                    key="error"
+                    direction="vertical"
+                    distance={20}
+                  >
                     <div className="flex flex-col items-center justify-center gap-6 w-full py-12">
                       <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
-                        <svg className="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        <svg
+                          className="w-12 h-12 text-red-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
                         </svg>
                       </div>
                       <div className="text-center">
-                        <Text variant="headline" weight="bold" textColor="color-error">
+                        <Text
+                          variant="headline"
+                          weight="bold"
+                          textColor="color-error"
+                        >
                           Error al enviar el mensaje
                         </Text>
                         <div className="mt-2">
@@ -167,11 +210,16 @@ export const ContactSectionLanding = () => {
                 {/* Paso 1: Nombre y Email */}
                 {currentStep === 3 && status === 'idle' && (
                   <AnimatedContent key="step3" direction="horizontal" distance={50}>
+              <h3 className='mb-[10px]'>
+                <Text
+                  variant="subtitle"
+                  weight="bold"
+                  textColor="color-primary"
+                >
+                  Tus datos
+                </Text>
+              </h3>
                     <div className="flex flex-col gap-4 w-full">
-                      <Text variant="title" weight="bold" textColor="color-primary">
-                        Información de Contacto
-                      </Text>
-
                       <Input
                         name="name"
                         label="Nombre"
@@ -222,7 +270,7 @@ export const ContactSectionLanding = () => {
                           />
                           <Button
                             type="submit"
-                            label={isLoading ? "Enviando..." : "Enviar Mensaje"}
+                            label={isLoading ? "Enviando..." : "Agendar cita"}
                             variant="primary"
                             fullWidth
                             disabled={isLoading || !formData.message}
@@ -237,8 +285,12 @@ export const ContactSectionLanding = () => {
                 {currentStep === 1 && status === 'idle' && (
                   <AnimatedContent key="step1" direction="horizontal" distance={50}>
                     <div className="flex flex-col items-center gap-4 w-full">
-                      <Text variant="title" weight="bold" textColor="color-primary">
-                        Seleccionar Fecha
+                      <Text
+                        variant="subtitle"
+                        weight="bold"
+                        textColor="color-primary"
+                      >
+                        Selecciona una fecha
                       </Text>
 
                       <div className="flex justify-center w-full">
@@ -275,7 +327,11 @@ export const ContactSectionLanding = () => {
                 {currentStep === 2 && status === 'idle' && (
                   <AnimatedContent key="step2" direction="horizontal" distance={50}>
                     <div className="flex flex-col items-center gap-4 w-full">
-                      <Text variant="title" weight="bold" textColor="color-primary">
+                      <Text
+                        variant="subtitle"
+                        weight="bold"
+                        textColor="color-primary"
+                      >
                         Seleccionar Horario
                       </Text>
 
@@ -368,5 +424,5 @@ export const ContactSectionLanding = () => {
         </Container>
       </section>
     </>
-  )
-}
+  );
+};

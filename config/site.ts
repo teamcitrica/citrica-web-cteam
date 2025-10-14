@@ -9,11 +9,11 @@ export const siteConfig = {
 	navLinks: [
 		{
 			title: "Inicio",
-			href: "/",
+			href: "#inicio",
 		},
 		{
 			title: "Proyectos",
-			href: "#proyect",
+			href: "#proyectos",
 		},
 		{
 			title: "Panel",
