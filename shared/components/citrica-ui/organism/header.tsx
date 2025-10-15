@@ -4,6 +4,11 @@ import { Col, Container } from '@citrica/objects';
 import { Text, Button, Icon } from '@citrica-ui';
 import { siteConfig } from '@/config/site';
 
+interface NavLink {
+  title: string;
+  href: string;
+}
+
 interface HeaderProps {
   logo?: React.ReactNode;
   variant?: 'floating' | 'split' | 'standard'; // Nueva prop para las variantes
@@ -11,15 +16,17 @@ interface HeaderProps {
   showButton?: boolean; // Prop para mostrar/ocultar el botón
   buttonText?: string; // Texto personalizable del botón
   onButtonClick?: () => void; // Función personalizable para el botón
+  navLinks?: NavLink[]; // Enlaces personalizados (opcional)
 }
 
-const Header = ({ 
-  logo, 
-  variant = 'floating', 
-  className = '', 
-  showButton = false, 
+const Header = ({
+  logo,
+  variant = 'floating',
+  className = '',
+  showButton = false,
   buttonText = 'GET STARTED',
-  onButtonClick 
+  onButtonClick,
+  navLinks
 }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -33,7 +40,7 @@ const Header = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navItems = siteConfig.navLinks;
+  const navItems = navLinks || siteConfig.navLinks;
 
   const scrollToSection = (href: string) => {
     if (href.startsWith('#')) {

@@ -9,6 +9,7 @@ import {
   solucionesNegocios,
 } from "@/shared/archivos js/landing-restaurant-data";
 import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";
+import { ContactSectionLanding } from "@/shared/components/project-components/contact-section";
 
 // export const dynamic = "force-dynamic";
 
@@ -20,7 +21,18 @@ const LandingRestaurantes = () => {
       <img src="/img/citrica-logo.png" alt="Cítrica Logo" className="h-10" />
     </div>
   );
-  
+
+  const navLinksRestaurantes = [
+    {
+      title: "Inicio",
+      href: "#inicio",
+    },
+    {
+      title: "Contacto",
+      href: "#contact",
+    },
+  ];
+
   return (
     <>
      <Header
@@ -29,14 +41,16 @@ const LandingRestaurantes = () => {
             className="bg-color-ct-black"
             showButton={true}
             buttonText="Contáctanos"
+            navLinks={navLinksRestaurantes}
           />
       {/* Hero Section */}
-      <section className="pt-[80px] pb-[80px] h-[700px]">
+      <section id="inicio" className="pt-[80px] pb-[80px] h-[700px]">
         <div className="absolute inset-0 overflow-hidden">
           <video
             autoPlay
             loop
             muted
+
             playsInline
             className="w-full h-[700px] object-cover"
           >
@@ -347,83 +361,11 @@ const LandingRestaurantes = () => {
       </section>
 
       {/* CTA Section */}
-      <section
-        id="contacto"
-        className="py-20"
-        style={{ backgroundColor: "#E1FF00" }}
-      >
-        <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mx-auto">
-            <h2 className="mb-2">
-              <Text variant="headline" color="#16141F" weight="bold">
-                ¿Listo para transformar tu negocio gastronómico?
-              </Text>
-            </h2>
-            <p className="text-ch-width center text-balance">
-              <Text variant="subtitle" color="#16141F" className="opacity-80">
-                Contáctanos hoy y descubre cómo nuestras soluciones pueden
-                transformar tu restaurante.
-              </Text>
-            </p>
-            <div className="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <Button
-                onClick={() =>
-                  window.open("mailto:contacto@citrica.dev", "_blank")
-                }
-                label="Escribir Email"
-                variant="primary"
-                textVariant="body"
-              />
-              {/* <Button
-                onClick={() =>
-                  window.open("https://wa.me/51942627383", "_blank")
-                }
-                label="WhatsApp"
-                variant="primary"
-              /> */}
-            </div>
-            {/* <div className="flex flex-col justify-center items-center gap-1">
-              <div className="flex items-center space-x-2">
-                <Icon name="Mail" color="#16141F" size={20} />
-                <Link href="mailto:contacto@citrica.dev">
-                  <Text variant="body" color="#16141F" weight="bold">
-                    contacto@citrica.dev
-                  </Text>
-                </Link>
-              </div>
-              <div className="flex gap-4">
-                <div className="flex items-center space-x-2">
-                  <Icon name="Phone" color="#16141F" size={20} />
-                  <Link
-                    href="tel:+51942627383"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Text variant="body" color="#16141F" weight="bold">
-                      Perú: +51 942 627 383
-                    </Text>
-                  </Link>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Link
-                    href="tel:+59892041487"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Text variant="body" color="#16141F" weight="bold">
-                      Uruguay: +598 92 041487
-                    </Text>
-                  </Link>
-                </div>
-              </div>
-            </div> */}
-          </Col>
-        </Container>
-      </section>
 
       {/* Contact Section */}
-      <section className="py-[80px] bg-surface-container">
-        <Container>
+      <section id="contact" className="py-[80px] bg-surface-container">
+          <ContactSectionLanding variant="landingrestaurante"/>
+        {/* <Container>
           <Col cols={{ lg: 6, md: 3, sm: 4 }}>
             <div className="mb-6">
               <h2>
@@ -551,8 +493,9 @@ const LandingRestaurantes = () => {
               </form>
             </div>
           </Col>
-        </Container>
+        </Container> */}
       </section>
+     
       <FooterCitrica />
     </>
   );

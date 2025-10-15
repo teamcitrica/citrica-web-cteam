@@ -58,7 +58,7 @@ const DisponibilidadAdminPage = () => {
             <Button
               size="sm"
               variant={activeTab === "disponibilidad" ? "primary" : "secondary"}
-              onClick={() => router.push("/admin/disponibilidad?page=disponibilidad")}
+              onClick={() => router.push("/admin/reservas/disponibilidad?page=disponibilidad")}
               startContent={<Icon name="Calendar" size={16} />}
             >
               Gestión de Disponibilidad
@@ -66,7 +66,7 @@ const DisponibilidadAdminPage = () => {
             <Button
               size="sm"
               variant={activeTab === "semanal" ? "primary" : "secondary"}
-              onClick={() => router.push("/admin/disponibilidad?page=semanal")}
+              onClick={() => router.push("/admin/reservas/disponibilidad?page=semanal")}
               startContent={<Icon name="Clock" size={16} />}
             >
               Configuración Semanal
