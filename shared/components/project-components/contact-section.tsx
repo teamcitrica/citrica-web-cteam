@@ -6,9 +6,24 @@ import { Button, Icon, Input, Select, Text, Textarea } from '../citrica-ui'
 import { useContact } from '@/hooks/contact/use-contact'
 import AnimatedContent from './animated-content'
 import CalendarComponent from './calendar'
+import { ctaSectionVariants } from '@/shared/archivos js/cta-section-data'
 
+// Tipos para las variantes disponibles
+export type ContactVariant = keyof typeof ctaSectionVariants;
 
-export const ContactSectionLanding = () => {
+interface ContactSectionProps {
+  variant?: ContactVariant;
+  customContent?: {
+    title?: string;
+    subtitle?: string;
+    description?: string;
+  };
+}
+
+export const ContactSectionLanding = ({
+  variant = 'home',
+  customContent
+}: ContactSectionProps) => {
   const {
     formData,
     isLoading,
@@ -27,6 +42,12 @@ export const ContactSectionLanding = () => {
     selectedTimeSlots,
     studioConfig
   } = useContact()
+
+  // Obtener el contenido según la variante seleccionada
+  const content = {
+    ...ctaSectionVariants[variant],
+    ...customContent // Permite override personalizado
+  };
 
   // Usar los horarios cargados dinámicamente según la configuración y fecha
   const timeSlots = availableTimeSlots
@@ -63,20 +84,19 @@ export const ContactSectionLanding = () => {
                   weight="bold"
                   textColor="color-primary"
                 >
-                  ¿Listo para Innovar y llevar tu negocio al siguiente nivel?
+                  {content.title}
                 </Text>
               </h3>
             </div>
             <div className="mb-8">
               <p className="mb-4">
                 <Text variant="title" weight="bold" textColor="color-on-surface-var">
-                  Agenda tu cita estratégica hoy.
+                  {content.subtitle}
                 </Text>
               </p>
               <p>
                 <Text variant="subtitle" textColor="color-on-surface-var">
-                  Elige una fecha y hora para conversar sobre tu proyecto de
-                  crecimiento digital.
+                  {content.description}
                 </Text>
               </p>
             </div>

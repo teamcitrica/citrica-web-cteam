@@ -10,15 +10,11 @@ import "aos/dist/aos.css";
 import AOS from "aos";
 import {
   services,
-  projects,
-  otherProjects,
   technologies,
   process,
   stats,
 } from "@/shared/archivos js/citrica-data";
 import { CompletedProjects } from "@/shared/components/project-components/other-projects";
-import { CtaSection } from "@/shared/components/project-components/cta-section";
-import { CtaSectionHome } from "@/shared/components/project-components/cta-section-home";
 import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";
 import {ContactSectionLanding } from "@/shared/components/project-components/contact-section";
 
@@ -35,6 +31,29 @@ const CitricaWebsite = () => {
     </div>
   );
 
+  const navLinksHome = [
+    {
+      title: "Inicio",
+      href: "#inicio",
+    },
+        {
+      title: "Servicios",
+      href: "#servicios",
+    },
+    {
+      title: "Proyectos",
+      href: "#proyectos",
+    },
+        {
+      title: "Contacto",
+      href: "#contacto",
+    },
+    {
+      title: "Área clientes",
+      href: "/panel",
+    },
+  ];
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0A0F0F" }}>
       <Header
@@ -43,6 +62,7 @@ const CitricaWebsite = () => {
         className="bg-color-ct-black"
         showButton={true}
         buttonText="Contáctanos"
+        navLinks={navLinksHome}
       />
 
       {/* Hero Section */}
@@ -95,7 +115,7 @@ const CitricaWebsite = () => {
       </section>
 
       {/* Services Grid */}
-      <section className="hero-background-image-flip">
+      <section id="servicios" className="hero-background-image-flip">
         <Container className="py-20">
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
@@ -553,18 +573,10 @@ const CitricaWebsite = () => {
       </section>
 
       {/* Contact Section */}
-      <ContactSectionLanding/>
+      <section id="contacto">
+       <ContactSectionLanding variant="home"/>
 
-      {/* CTA Section */}
-      {/* <section
-        id="contacto"
-        className="py-20"
-        style={{ backgroundColor: "#E1FF00" }}
-      >
-        <CtaSectionHome />
-      </section> */}
-      {/* Contact Section */}
-
+      </section>
       <FooterCitrica />
     </div>
   );
