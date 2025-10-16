@@ -8,11 +8,8 @@ export type UserType = {
   email: string;
   role?: { name: string };
   role_id: number;
-  is_active?: boolean;
   updated_at?: string;
   created_at?: string;
-  phone?: string;
-  is_switchable: boolean;
   user_metadata?: any;
 };
 
@@ -22,7 +19,6 @@ export type NewUserType = {
   full_name: string;
   email: string;
   password: string;
-  is_switchable: boolean;
 };
 
 export type Customer = {

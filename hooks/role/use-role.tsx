@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 import { useSupabase } from "@/shared/context/supabase-context";
 
@@ -16,7 +16,7 @@ export const useUserRole = () => {
   const [roles, setRoles] = useState<RoleType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchRoles = async () => {
+  const fetchRoles = useCallback(async () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase.from("roles").select("*");
@@ -38,7 +38,7 @@ export const useUserRole = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [supabase]);
 
   return {
     roles,

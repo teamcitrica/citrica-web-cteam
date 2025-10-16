@@ -7,15 +7,8 @@ import type { SidebarProps, MenuItem } from "../../../types/sidebar"
 import { Icon, Text } from "@citrica-ui"
 import { IconName } from "@/shared/components/citrica-ui/atoms/icon"
 import { usePathname } from 'next/navigation';
-import { useSearchParams } from 'next/navigation'
-import { getParamFromPath } from "@/shared/utils/general"
-import { siteConfig } from "@/config/site";
-
-const SUBLINK_SEARCH_PARAM = siteConfig.subItemSearchParam;
 
 function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boolean; onToggle: () => void }) {
-  const searchParams = useSearchParams();
-  const queryParam = searchParams.get(SUBLINK_SEARCH_PARAM) || "";
   return (
     <div>
       <Button
@@ -37,7 +30,7 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
               as={Link}
               href={subItem.href}
               variant="light"
-              className={`justify-start px-4 py-2 transition-colors hover:bg-gray-100 ${ getParamFromPath(subItem.href, SUBLINK_SEARCH_PARAM) === queryParam ? "bg-gray-100" : ""}`}
+              className={`justify-start px-4 py-2 transition-colors hover:bg-gray-100 focus:bg-gray-100`}
             >
             <Text variant="label">{subItem.title}</Text>
             </Button>
