@@ -14,15 +14,17 @@ import {
   SelectItem,
 } from "@heroui/react";
 import { Button } from "@heroui/react";
+import { addToast } from "@heroui/toast";
 import Icon from "@ui/atoms/icon";
 
 import CreateUserModal from "../test-crud/create-user-modal";
 
 import UserDetailModal from "./components/modal-details-users";
 import EditUserModal from "./components/modal-edit-users";
+import ModalDeleteUser from "./components/modal-delete-user";
 
 import { UserType } from "@/shared/types/types";
-import { useAdminUser } from "@/hooks/users/use-admin-user";
+import { useUserCRUD } from "@/hooks/users/use-users";
 import Text from "@/shared/components/citrica-ui/atoms/text";
 import { useUserRole } from "@/hooks/role/use-role";
 
@@ -58,7 +60,9 @@ export default function CardUsersSuper({
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { refreshUsers } = useAdminUser();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<UserType | null>(null);
+  const { refreshUsers, deleteUser } = useUserCRUD();
 
   type LocalSortDescriptor = {
     column: string;
@@ -76,10 +80,6 @@ export default function CardUsersSuper({
       setIsLoading(false);
     }
   }, [users, refresh]);
-
-  useEffect(() => {
-    refreshUsers();
-  }, [refreshUsers]);
 
   const handleOpenModal = () => setIsModalOpen(true);
 
@@ -156,6 +156,61 @@ export default function CardUsersSuper({
     setIsEditModalOpen(true);
   }, []);
 
+  const handleDeleteUser = useCallback((user: UserType) => {
+    setUserToDelete(user);
+    setIsDeleteModalOpen(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!userToDelete?.id) return;
+
+    const userName =
+      userToDelete.full_name ||
+      userToDelete.name ||
+      `${userToDelete.first_name} ${userToDelete.last_name}`;
+
+    try {
+      setIsLoading(true);
+      setIsDeleteModalOpen(false);
+
+      console.log("🟣 Eliminando usuario:", userToDelete.id);
+
+      // Llamar al hook para eliminar el usuario
+      await deleteUser(userToDelete.id);
+
+      console.log("🟣 Usuario eliminado, refrescando lista...");
+
+      // Refrescar la lista del componente padre
+      await refresh();
+
+      console.log("🟣 Lista refrescada");
+
+      // Mostrar toast de éxito
+      addToast({
+        title: "Usuario eliminado",
+        description: `El usuario ${userName} ha sido eliminado correctamente`,
+        color: "success",
+      });
+    } catch (error) {
+      console.error("Error al eliminar usuario:", error);
+
+      // Mostrar toast de error
+      addToast({
+        title: "Error",
+        description: "Hubo un error al eliminar el usuario",
+        color: "danger",
+      });
+    } finally {
+      setIsLoading(false);
+      setUserToDelete(null);
+    }
+  }, [userToDelete, deleteUser, refresh]);
+
+  const handleCancelDelete = useCallback(() => {
+    setIsDeleteModalOpen(false);
+    setUserToDelete(null);
+  }, []);
+
   // esta es la funcion que me filtra el buscador anotar pendiente
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -189,7 +244,10 @@ export default function CardUsersSuper({
               >
                 <Icon className="w-5 h-5" name="SquarePen" />
               </button>
-              <button className="text-red-500 hover:text-red-700">
+              <button
+                className="text-red-500 hover:text-red-700"
+                onClick={() => handleDeleteUser(user)}
+              >
                 <Icon className="w-5 h-5" name="Trash2" />
               </button>
             </div>
@@ -198,7 +256,7 @@ export default function CardUsersSuper({
           return null;
       }
     },
-    [handleViewUser, handleEditUser],
+    [handleViewUser, handleEditUser, handleDeleteUser],
   );
 
   return isLoading ? (
@@ -344,6 +402,15 @@ export default function CardUsersSuper({
             setSelectedUser(null);
             refresh();
           }}
+        />
+      )}
+
+      {/* Modal de eliminación */}
+      {isDeleteModalOpen && userToDelete && (
+        <ModalDeleteUser
+          user={userToDelete}
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
         />
       )}
 

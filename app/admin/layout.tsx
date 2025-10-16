@@ -16,11 +16,11 @@ export default function PanelLayout({
   const router = useRouter();
 
   useEffect(() => {
-    // Solo redirigir si ya terminó de inicializar y no hay sesión
-    if (!isInitializing && userSession === null) {
+    // Solo redirigir si ya terminó de inicializar y no hay sesión o no hay info de usuario
+    if (!isInitializing && (userSession === null || userInfo === null)) {
       router.push('/login');
     }
-  }, [userSession, isInitializing, router]);
+  }, [userSession, userInfo, isInitializing, router]);
 
   // Si está inicializando o no hay sesión/info, no renderizar nada
   if (isInitializing || userSession === null || userInfo === null) {

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import { addToast } from "@heroui/toast";
 
 import { useUserRole } from "@/hooks/role/use-role";
-import { useAdminUser } from "@/hooks/users/use-admin-user";
+import { useUserCRUD } from "@/hooks/users/use-users";
 import { UserType } from "@/shared/types/types";
 import { Input } from "@/shared/components/citrica-ui";
 
@@ -15,34 +15,28 @@ type EditUserModalProps = {
 };
 
 const EditUserModal = ({ isOpen, onClose, user }: EditUserModalProps) => {
-  const { updateUserByRole } = useAdminUser();
+  const { updateUserByRole } = useUserCRUD();
   const { roles, fetchRoles } = useUserRole();
 
   const [formData, setFormData] = useState({
-    name: user.name,
     first_name: user.first_name || "",
     last_name: user.last_name || "",
     email: user.email || "",
-    password: "",
     role_id: user.role_id.toString() || "",
-    is_switchable: user.is_switchable || false,
   });
 
   // Cargar los roles al montar el componente
   useEffect(() => {
     fetchRoles();
-  }, []);
+  }, [fetchRoles]);
 
   // Actualizar el formulario si la información del usuario cambia
   useEffect(() => {
     setFormData({
-      name: user.name,
       first_name: user.first_name || "",
       last_name: user.last_name || "",
       email: user.email || "",
-      password: "",
       role_id: user.role_id.toString() || "",
-      is_switchable: user.is_switchable || false,
     });
   }, [user]);
 
@@ -65,36 +59,55 @@ const EditUserModal = ({ isOpen, onClose, user }: EditUserModalProps) => {
       !formData.email ||
       !formData.role_id
     ) {
-      alert("Todos los campos son obligatorios");
+      addToast({
+        title: "Campos requeridos",
+        description: "Todos los campos son obligatorios",
+        color: "warning",
+      });
 
       return;
     }
 
-    // Construir el objeto actualizado según la definición de NewUserType
-    const updatedUser: UserType = {
-      name: `${formData.first_name} ${formData.last_name}`,
+    // Construir el objeto actualizado
+    const updatedUser: Partial<UserType> = {
       first_name: formData.first_name,
       last_name: formData.last_name,
       email: formData.email,
-      user_metadata: {
-        name: `${formData.first_name} ${formData.last_name}`,
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        role_id: formData.role_id,
-      },
       role_id: Number(formData.role_id),
-      ...(formData.password && { password: formData.password }),
-      is_switchable: formData.is_switchable,
     };
 
+    console.log("Datos a actualizar:", updatedUser);
+    console.log("ID del usuario:", user.id);
+    console.log("Role ID:", formData.role_id);
+
     try {
-      // Llamada a la función updateUserByRole, pasando user.id, updatedUser, company_id ("1") y el role_id
-      await updateUserByRole(user.id, updatedUser, formData.role_id);
-      alert("Usuario actualizado correctamente");
+      // Llamada a la función updateUserByRole, pasando user.id, updatedUser y el role_id
+      const result = await updateUserByRole(user.id!, updatedUser as UserType, formData.role_id);
+
+      console.log("Resultado de la actualización:", result);
+
+      if (result?.error) {
+        addToast({
+          title: "Error al actualizar",
+          description: "No se pudo actualizar el usuario. Por favor, intente nuevamente.",
+          color: "danger",
+        });
+        return;
+      }
+
+      addToast({
+        title: "Usuario actualizado",
+        description: "El usuario ha sido actualizado correctamente",
+        color: "success",
+      });
       onClose();
     } catch (error) {
       console.error("Error inesperado al editar el usuario:", error);
-      alert("Error inesperado. Por favor, intente nuevamente.");
+      addToast({
+        title: "Error inesperado",
+        description: "Por favor, intente nuevamente.",
+        color: "danger",
+      });
     }
   };
 
@@ -130,13 +143,6 @@ const EditUserModal = ({ isOpen, onClose, user }: EditUserModalProps) => {
             value={formData.email}
             onChange={handleChange}
           />
-          <Input
-            name="password"
-            placeholder="Contraseña (dejar en blanco para mantener actual)"
-            type="text"
-            value={formData.password}
-            onChange={handleChange}
-          />
           <select
             className="border rounded-md p-2 text-black"
             name="role_id"
@@ -150,19 +156,6 @@ const EditUserModal = ({ isOpen, onClose, user }: EditUserModalProps) => {
               </option>
             ))}
           </select>
-
-          {(formData.role_id === "4" || formData.role_id === "7") && (
-            <label className="flex items-center gap-2 text-black">
-              <input
-                checked={formData.is_switchable}
-                className="w-4 h-4"
-                name="is_switchable"
-                type="checkbox"
-                onChange={handleChange}
-              />
-              ¿Este usuario podrá alternar entre Cajero y Mesero?
-            </label>
-          )}
 
           <button
             className="mt-4 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700"
