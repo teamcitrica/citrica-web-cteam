@@ -199,7 +199,12 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         console.log("DATA USER ****", userData[0]);
         setUserInfo(userData[0]);
       } else {
-        console.log('No se encontró información del usuario');
+        console.log('No se encontró información del usuario - cerrando sesión');
+        // Si el usuario fue eliminado de la base de datos, cerrar la sesión
+        setUserInfo(null);
+        setUserSession(null);
+        // Cerrar sesión en Supabase también
+        await supabase.auth.signOut({ scope: 'local' });
       }
 
     } catch (error) {

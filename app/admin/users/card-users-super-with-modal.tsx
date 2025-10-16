@@ -1,20 +1,16 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import CreateUserModal from "../test-crud/create-user-modal";
 
 import CardUsersSuper from "./card-users-user";
 
-import { useAdminUser } from "@/hooks/users/use-admin-user";
+import { useUserCRUD } from "@/hooks/users/use-users";
 import { Col, Container } from "@/styles/07-objects/objects";
 
 export default function CardUsersSuperWithModal() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { users, isLoading, refreshUsers } = useAdminUser();
-
-  useEffect(() => {
-    refreshUsers();
-  }, [refreshUsers]);
+  const { users, isLoading, refreshUsers } = useUserCRUD();
 
   const handleOpenModal = () => setIsModalOpen(true);
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { useUserRole } from "@/hooks/role/use-role";
-import { useAdminUser } from "@/hooks/users/use-admin-user";
+import { useUserCRUD } from "@/hooks/users/use-users";
 import { Input } from "@/shared/components/citrica-ui";
 
 type CreateUserModalProps = {
@@ -15,13 +15,12 @@ const CreateUserModal = ({
   isOpen,
   onClose,
 }: CreateUserModalProps) => {
-  const { createUserByRole, isLoading } = useAdminUser();
+  const { createUserByRole, isLoading } = useUserCRUD();
   const { roles, fetchRoles } = useUserRole();
 
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
-    full_name: "",
     email: "",
     password: "contraseña",
     role_id: "",
@@ -47,7 +46,6 @@ const CreateUserModal = ({
     if (
       !formData.first_name ||
       !formData.last_name ||
-      !formData.full_name ||
       !formData.email ||
       !formData.role_id
     ) {
@@ -59,44 +57,36 @@ const CreateUserModal = ({
     const newUser = {
       first_name: formData.first_name,
       last_name: formData.last_name,
-      full_name: formData.full_name,
       email: formData.email,
       password: formData.password,
-      is_switchable: false,
     };
 
     try {
-      const { data, error } = await createUserByRole(newUser, formData.role_id);
-
-      if (error) {
-        console.error("Error al crear el usuario:", error);
-
-        // Verificar si el error es de email duplicado
-        const errorMessage = (error as any)?.message || "";
-
-        if (errorMessage.includes("already") || errorMessage.includes("duplicate") || errorMessage.includes("User already registered")) {
-          alert("El email ya está registrado. Intente con otro.");
-        } else {
-          alert(`Ocurrió un error al crear el usuario: ${errorMessage || "Intente nuevamente."}`);
-        }
-
-        return;
-      }
+      await createUserByRole(newUser, formData.role_id);
 
       alert("Usuario agregado correctamente");
       setFormData({
         first_name: "",
         last_name: "",
-        full_name: "",
         email: "",
         password: "contraseña",
         role_id: "",
       });
-      // Cerrar el modal tras crear el usuario
+      // Cerrar el modal tras crear el usuario (esto ejecutará el refresh en el componente padre)
       onClose();
-    } catch (error) {
-      console.error("Error inesperado al crear el usuario:", error);
-      alert("Error inesperado. Por favor, intente nuevamente.");
+    } catch (error: any) {
+      console.error("Error al crear el usuario:", error);
+
+      // Verificar si el error es de email duplicado
+      const errorMessage = error?.message || String(error);
+
+      if (errorMessage.includes("already") ||
+          errorMessage.includes("duplicate") ||
+          errorMessage.includes("already been registered")) {
+        alert("El email ya está registrado. Por favor, intente con otro email.");
+      } else {
+        alert(`Ocurrió un error al crear el usuario: ${errorMessage}`);
+      }
     }
   };
 
@@ -122,13 +112,6 @@ const CreateUserModal = ({
             placeholder="Apellido"
             type="text"
             value={formData.last_name}
-            onChange={handleChange}
-          />
-          <Input
-            name="full_name"
-            placeholder="Nombre completo"
-            type="text"
-            value={formData.full_name}
             onChange={handleChange}
           />
           <Input
