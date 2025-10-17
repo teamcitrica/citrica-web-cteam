@@ -18,7 +18,6 @@ const WeeklyScheduleManager = () => {
     toggleTimeSlot
   } = useAdminBookings();
 
-  const [hasChanges, setHasChanges] = useState(false);
   const [showStandardHoursModal, setShowStandardHoursModal] = useState(false);
   const [showCloseAllModal, setShowCloseAllModal] = useState(false);
   const [isOpeningAll, setIsOpeningAll] = useState(false);
@@ -41,8 +40,8 @@ const WeeklyScheduleManager = () => {
   const generateTimeSlots = () => {
     const slots = [];
     for (let hour = 0; hour < 24; hour++) {
-      slots.push(`${String(hour).padStart(2, '0')}:00`);
-      slots.push(`${String(hour).padStart(2, '0')}:30`);
+      slots.push(`${String(hour).padStart(2, "0")}:00`);
+      slots.push(`${String(hour).padStart(2, "0")}:30`);
     }
     return slots;
   };
@@ -50,24 +49,19 @@ const WeeklyScheduleManager = () => {
   const timeSlots = generateTimeSlots();
 
   const handleDayToggle = async (dayOfWeek: number, isActive: boolean) => {
-    // Actualización optimista del estado local primero
-    setHasChanges(true);
-
     // Llamar al hook que ya tiene actualización optimista integrada
     const result = await updateDayAvailability(dayOfWeek, isActive);
 
     if (!result.success) {
-      console.error('Error updating day availability:', result.error);
+      console.error("Error updating day availability:", result.error);
     }
   };
 
   const handleTimeSlotToggle = async (dayOfWeek: number, timeSlot: string, isActive: boolean) => {
     const result = await toggleTimeSlot(dayOfWeek, timeSlot, isActive);
 
-    if (result.success) {
-      setHasChanges(true);
-    } else {
-      console.error('Error toggling slot:', result.error);
+    if (!result.success) {
+      console.error("Error toggling slot:", result.error);
     }
   };
 
@@ -75,14 +69,14 @@ const WeeklyScheduleManager = () => {
     const dayConfig = weeklyAvailability.find(day => day.day_of_week === dayOfWeek);
     if (!dayConfig) return;
 
-    const startHour = parseInt(startTime.split(':')[0]);
-    const startMin = parseInt(startTime.split(':')[1]);
-    const endHour = parseInt(endTime.split(':')[0]);
-    const endMin = parseInt(endTime.split(':')[1]);
+    const startHour = parseInt(startTime.split(":")[0]);
+    const startMin = parseInt(startTime.split(":")[1]);
+    const endHour = parseInt(endTime.split(":")[0]);
+    const endMin = parseInt(endTime.split(":")[1]);
 
     const updatedSlots = dayConfig.time_slots.map(slot => {
-      const slotHour = parseInt(slot.slot.split(':')[0]);
-      const slotMin = parseInt(slot.slot.split(':')[1]);
+      const slotHour = parseInt(slot.slot.split(":")[0]);
+      const slotMin = parseInt(slot.slot.split(":")[1]);
 
       const slotTime = slotHour * 60 + slotMin;
       const startTimeMin = startHour * 60 + startMin;
@@ -95,7 +89,6 @@ const WeeklyScheduleManager = () => {
     });
 
     await updateDayAvailability(dayOfWeek, dayConfig.is_active, updatedSlots);
-    setHasChanges(true);
   };
 
   const getDayConfig = (dayOfWeek: number): WeeklyAvailability | undefined => {
@@ -258,7 +251,7 @@ const WeeklyScheduleManager = () => {
                     <div className="grid grid-cols-6 md:grid-cols-12 gap-2">
                       {timeSlots.map((timeSlot) => {
                         const isActive = getTimeSlotStatus(day.id, timeSlot);
-                        const hour = parseInt(timeSlot.split(':')[0]);
+                        const hour = parseInt(timeSlot.split(":")[0]);
                         const isBusinessHour = hour >= 8 && hour < 20;
 
                         return (
@@ -267,16 +260,16 @@ const WeeklyScheduleManager = () => {
                             className={`
                               p-2 text-center text-xs rounded cursor-pointer transition-colors
                               ${isActive
-                                ? 'bg-green-500 hover:bg-green-600 text-white'
+                                ? "bg-green-500 hover:bg-green-600 text-white"
                                 : isBusinessHour
-                                ? 'bg-red-300 hover:bg-red-400 text-white'
-                                : 'bg-gray-600 hover:bg-gray-700 text-white'
+                                  ? "bg-red-300 hover:bg-red-400 text-white"
+                                  : "bg-gray-600 hover:bg-gray-700 text-white"
                               }
                             `}
+                            title={`${timeSlot} - ${String(hour + (timeSlot.includes(":30") ? 1 : 0)).padStart(2, "0")}:${timeSlot.includes(":30") ? "00" : "30"}`}
                             onClick={() => {
                               handleTimeSlotToggle(day.id, timeSlot, !isActive);
                             }}
-                            title={`${timeSlot} - ${String(hour + (timeSlot.includes(':30') ? 1 : 0)).padStart(2, '0')}:${timeSlot.includes(':30') ? '00' : '30'}`}
                           >
                             {timeSlot}
                           </div>
@@ -394,9 +387,9 @@ const WeeklyScheduleManager = () => {
         footer={
           <div className="flex justify-end gap-2 w-full">
             <Button
+              startContent={<Icon name={isOpeningAll ? "Check" : "X"} size={20} />}
               variant={isOpeningAll ? "primary" : "danger"}
               onClick={handleToggleAllDays}
-              startContent={<Icon name={isOpeningAll ? "Check" : "X"} size={20} />}
             >
               {isOpeningAll ? "Sí, abrir todos los días" : "Sí, cerrar todos los días"}
             </Button>
@@ -410,31 +403,43 @@ const WeeklyScheduleManager = () => {
         }
       >
         <div className="space-y-4">
-          <div className={`flex items-start gap-2 ${isOpeningAll ? 'bg-green-50 border-green-200' : 'bg-orange-50 border-orange-200'} border rounded-lg p-3`}>
-            <Icon name="AlertCircle" size={20} className={`${isOpeningAll ? 'text-green-600' : 'text-orange-600'} mt-0.5`} />
+          <div
+            className={`flex items-start gap-2 ${isOpeningAll ? "bg-green-50 border-green-200" : "bg-orange-50 border-orange-200"} border rounded-lg p-3`}
+          >
+            <Icon
+              className={`${isOpeningAll ? "text-green-600" : "text-orange-600"} mt-0.5`}
+              name="AlertCircle"
+              size={20}
+            />
             <div>
               <p>
-                <Text variant="body" color={isOpeningAll ? "#16a34a" : "#ea580c"} className="font-bold">
+                <Text
+                  className="font-bold"
+                  color={isOpeningAll ? "#16a34a" : "#ea580c"}
+                  variant="body"
+                >
                   {isOpeningAll ? "Abrir Disponibilidad" : "⚠️ Cerrar Disponibilidad"}
                 </Text>
               </p>
               <p>
-                <Text variant="body" color={isOpeningAll ? "#15803d" : "#c2410c"} className="text-sm mt-1">
+                <Text
+                  className="text-sm mt-1"
+                  color={isOpeningAll ? "#15803d" : "#c2410c"}
+                  variant="body"
+                >
                   {isOpeningAll
                     ? "Esta acción activará todos los días de la semana. Podrás configurar los horarios específicos después."
-                    : "Esta acción cerrará todos los días de la semana. Los usuarios no podrán realizar reservas hasta que vuelvas a activar al menos un día."
-                  }
+                    : "Esta acción cerrará todos los días de la semana. Los usuarios no podrán realizar reservas hasta que vuelvas a activar al menos un día."}
                 </Text>
               </p>
             </div>
           </div>
 
           <p>
-            <Text variant="body" color="#964f20" className="font-semibold">
+            <Text className="font-semibold" color="#964f20" variant="body">
               {isOpeningAll
                 ? "¿Deseas abrir todos los días de la semana?"
-                : "¿Confirmas que deseas cerrar todos los días de la semana?"
-              }
+                : "¿Confirmas que deseas cerrar todos los días de la semana?"}
             </Text>
           </p>
         </div>
