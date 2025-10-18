@@ -56,9 +56,9 @@ $btn-citrica-ui: (
 
 
 .btn-secondary{
-  background-color: none;
+  background-color: var(--color-secondary-btn);
   color: var(--color-secondary-btn-text);
-  border: 2px solid var(--color-primary-btn);
+  border: none;
   &:hover{
     background-color: var(--color-secondary-btn-hover);
     .text-component {
