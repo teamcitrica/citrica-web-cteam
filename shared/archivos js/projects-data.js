@@ -227,7 +227,84 @@ export const projectsData = {
       { name: "AWS", icon: "Cloud", color: "#FF5B00" },
       { name: "MongoDB", icon: "Database", color: "#FF5B00" },
     ]
-  }
+  },
+
+  lienzo: {
+    slug: "lienzo",
+    projectHero: {
+      category: "SAAS",
+      title: "Lienzo",
+      subtitle: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi.",
+      buttonLabel: "Ver Demo",
+      image: "/img/lienzo-hero-img.png"
+    },
+    projectDescription: {
+      sectionTitle: "Sobre el Proyecto",
+      mainTitle: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Proin dictum.",
+      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Proin dictum, tortor sed malesuada cursus, lacus lacus blandit leo, nec laoreet tortor nisi a sapien. Curabitur volutpat, nisl at malesuada semper, velit odio malesuada purus, a hendrerit arcu risus in sem. Maecenas et quam et urna facilisis dictum.",
+      titleColor: "#006666",
+      textColor: "#16141F",
+      bgColor: "bg-color-ct-tertiary-container",
+      borderColor: "border-[#00666633]"
+    },
+    projectDesafio: {
+      sectionTitle: "El Desafío",
+      image:"/img/shopping-cart.jpg",
+      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Proin dictum, tortor sed malesuada cursus, lacus lacus blandit leo, nec laoreet tortor nisi a sapien. Curabitur volutpat, nisl at malesuada semper, velit odio malesuada purus, a hendrerit arcu risus in sem. Maecenas et quam et urna facilisis dictum.",
+      titleColor: "#006666",
+      textColor: "#16141F",
+    },
+    projectSolucion: {
+      sectionTitle: " La Solución",
+      image:"/img/super-user-products.jpg",
+      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Proin dictum, tortor sed malesuada cursus, lacus lacus blandit leo, nec laoreet tortor nisi a sapien. Curabitur volutpat, nisl at malesuada semper, velit odio malesuada purus, a hendrerit arcu risus in sem. Maecenas et quam et urna facilisis dictum.",
+      titleColor: "#006666",
+      textColor: "#16141F",
+    },
+    services: [
+      {
+        title: "Gestión de pedidos",
+        description: "Catálogo en línea, carrito de compras, historial y listas de pedidos recurrentes.",
+        icon: "ListCheck",
+        color: "#E1FF00",
+      },
+      {
+        title: "Gestión administrativa",
+        description: "Aprobación de pedidos, límites presupuestarios, administración de perfiles y generación de órdenes de compra.",
+        icon: "FolderKanban",
+        color: "#00FFFF",
+      },
+      {
+        title: "Gestión de inventario",
+        description: "Control de stock con sistema Kardex integrado, registro de entradas y salidas, y preparación de pedidos.",
+        icon: "Blocks",
+        color: "#FF5B00",
+      },
+      {
+        title: "Monitoreo y reportes",
+        description: "Panel de supervisión, seguimiento en tiempo real, reportes de gastos y visualización del cumplimiento presupuestario.",
+        icon: "ScanSearch",
+        color: "#E1FF00",
+      },
+      {
+        title: "Usabilidad y seguridad",
+        description: "Diseño intuitivo, arquitectura escalable y protección de datos.",
+        icon: "Lock",
+        color: "#E1FF00",
+      },
+    ],
+    technologies: [
+      { name: "HTML 5", icon: "Code", color: "#FF5B00" },
+      { name: "TypeScript", icon: "Code", color: "#FF5B00" },
+      { name: "React JS", icon: "Code", color: "#FF5B00" },
+      { name: "Next JS", icon: "Code", color: "#FF5B00" },
+      { name: "CSS 3", icon: "PaintBucket", color: "#FF5B00" },
+      { name: "Sass", icon: "PaintBucket", color: "#FF5B00" },
+      { name: "Node.js", icon: "Server", color: "#FF5B00" },
+      { name: "AWS", icon: "Cloud", color: "#FF5B00" },
+      { name: "MongoDB", icon: "Database", color: "#FF5B00" },
+    ]
+  },
 };
 
 // Helper function para obtener un proyecto por slug

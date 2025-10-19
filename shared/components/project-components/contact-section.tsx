@@ -95,7 +95,7 @@ export const ContactSectionLanding = ({
                 </Text>
               </p>
               <p>
-                <Text variant="subtitle" textColor="color-on-surface-var">
+                <Text variant="body" textColor="color-on-surface-var">
                   {content.description}
                 </Text>
               </p>
