@@ -21,13 +21,7 @@ const Navbar = ({ session }: { session: Session | null }) => {
   const [active, setActive] = useState("Inicio");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const pathname = usePathname();
-  const { signOut, getUserInfo, userInfo } = UserAuth();
-
-  useEffect(() => {
-    if (session) {
-      getUserInfo(session.user.id);
-    }
-  }, []);
+  const { signOut, userInfo } = UserAuth();
 
   // Scroll background change
   const [colorbg, setcolorbg] = useState(false);

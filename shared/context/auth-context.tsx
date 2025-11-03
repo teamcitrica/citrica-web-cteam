@@ -63,6 +63,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
   const [userSession, setUserSession] = useState<Session | null>(null);
   const [userInfo, setUserInfo] = useState<any>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [isLoadingUserInfo, setIsLoadingUserInfo] = useState(false);
 
   const changeRole = (newrole: number) => {
     const newUser = {
@@ -184,7 +185,14 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
 
   // Función para obtener la información del usuario
   const getUserInfo = async (id: string) => {
+    // Evitar llamadas duplicadas
+    if (isLoadingUserInfo) {
+      console.log("getUserInfo ya está en ejecución, ignorando llamada duplicada");
+      return;
+    }
+
     console.log("llamando..");
+    setIsLoadingUserInfo(true);
 
     try {
       const { data: userData, error } = await supabase
@@ -209,6 +217,8 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
 
     } catch (error) {
       console.error('Error general obteniendo usuario:', error);
+    } finally {
+      setIsLoadingUserInfo(false);
     }
   };
 
