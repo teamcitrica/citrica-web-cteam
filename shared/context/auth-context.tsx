@@ -254,9 +254,17 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
           return;
         }
 
+        // SIGNED_IN ya es manejado por signInWithPassword, no hacer nada aquí
+        if (event === 'SIGNED_IN') {
+          return;
+        }
+
         if (session !== null) {
           setUserSession(session);
-          getUserInfo(session.user.id);
+          // Solo llamar getUserInfo en eventos como TOKEN_REFRESHED
+          if (event === 'TOKEN_REFRESHED' && !userInfo) {
+            getUserInfo(session.user.id);
+          }
         } else {
           setUserSession(null);
           setUserInfo(null);
