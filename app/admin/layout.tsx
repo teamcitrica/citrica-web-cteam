@@ -12,18 +12,18 @@ export default function PanelLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { userSession, userInfo, isInitializing } = UserAuth();
+  const { userSession, isInitializing } = UserAuth();
   const router = useRouter();
 
   useEffect(() => {
-    // Solo redirigir si ya terminó de inicializar y no hay sesión o no hay info de usuario
-    if (!isInitializing && (userSession === null || userInfo === null)) {
-      router.replace('/login');
+    // Solo redirigir si ya terminó de inicializar y no hay sesión
+    if (!isInitializing && userSession === null) {
+      router.push('/login');
     }
-  }, [userSession, userInfo, isInitializing, router]);
+  }, [userSession, isInitializing, router]);
 
-  // Si está inicializando o no hay sesión/info, no renderizar nada
-  if (isInitializing || userSession === null || userInfo === null) {
+  // Si está inicializando o no hay sesión, no renderizar nada
+  if (isInitializing || userSession === null) {
     return null;
   }
 
