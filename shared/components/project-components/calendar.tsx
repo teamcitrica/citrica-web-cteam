@@ -29,6 +29,10 @@ export default function CalendarComponent({
     const jsDate = date.toDate(getLocalTimeZone());
     const isSunday = jsDate.getDay() === 0; // 0 = Domingo en JavaScript
 
+    // Verificar si la fecha es anterior a hoy
+    const todayDate = today(getLocalTimeZone());
+    const isPastDate = date.compare(todayDate) < 0;
+
     // Obtener fecha directamente del objeto CalendarDate (sin conversión)
     const year = date.year
     const month = String(date.month).padStart(2, '0')
@@ -37,6 +41,7 @@ export default function CalendarComponent({
     const isFullyBooked = isDateFullyBooked ? isDateFullyBooked(dateString) : false;
 
     return (
+      isPastDate ||
       isSunday ||
       isFullyBooked ||
       disabledRanges.some(

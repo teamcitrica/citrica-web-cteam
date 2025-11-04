@@ -55,13 +55,6 @@ const LoginPage = () => {
           description: respError.message || "Credenciales incorrectas",
           color: "danger",
         })
-      } else if (respData?.user) {
-        addToast({
-          title: "Bienvenido",
-          description: "Has iniciado sesión correctamente",
-          color: "success",
-        })
-        // El useEffect se encargará de la redirección
       }
     } catch (error) {
       console.error('Login error:', error)
