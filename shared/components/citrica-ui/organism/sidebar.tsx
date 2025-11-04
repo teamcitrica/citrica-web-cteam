@@ -1,14 +1,16 @@
 "use client"
 import React from "react"
 import { Suspense } from 'react';
-import { Button, Link } from "@heroui/react"
+import { Button } from "@heroui/react"
 import { ChevronDown, Menu } from "lucide-react"
 import type { SidebarProps, MenuItem } from "../../../types/sidebar"
 import { Icon, Text } from "@citrica-ui"
 import { IconName } from "@/shared/components/citrica-ui/atoms/icon"
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boolean; onToggle: () => void }) {
+  const router = useRouter();
+
   return (
     <div>
       <Button
@@ -27,10 +29,9 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
           {item.subItems.map((subItem) => (
             <Button
               key={subItem.title}
-              as={Link}
-              href={subItem.href}
               variant="light"
               className={`justify-start px-4 py-2 transition-colors hover:bg-gray-100 focus:bg-gray-100`}
+              onPress={() => router.push(subItem.href)}
             >
             <Text variant="label">{subItem.title}</Text>
             </Button>
@@ -45,6 +46,13 @@ export function Sidebar({ items }: SidebarProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const [openItems, setOpenItems] = React.useState<Record<string, boolean>>({})
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Verificar si alguna subopción está activa para mantener el acordeón abierto
+  const isSubItemActive = (item: MenuItem): boolean => {
+    if (!item.subItems) return false;
+    return item.subItems.some(subItem => pathname.startsWith(subItem.href));
+  }
 
   const toggleItem = (title: string) => {
     setOpenItems((prev) => ({ ...prev, [title]: !prev[title] }))
@@ -58,16 +66,19 @@ export function Sidebar({ items }: SidebarProps) {
             <Suspense fallback={<div>Cargando...</div>}>
               <AccordionItem
                 item={item}
-                isOpen={openItems[item.title] || item.href == pathname || false}
+                isOpen={openItems[item.title] !== undefined ? openItems[item.title] : isSubItemActive(item)}
                 onToggle={() => toggleItem(item.title)}
               />
             </Suspense>
           ) : (
             <Button
-              as={Link}
-              href={item.href || "#"}
               variant="light"
               className= {`w-full justify-start gap-2 px-4 py-2 transition-colors hover:bg-gray-100 ${item.href=== pathname ? "bg-gray-100" : ""}`}
+              onPress={() => {
+                if (item.href && item.href !== "#") {
+                  router.push(item.href);
+                }
+              }}
             >
               <Icon name={item.icon as IconName} size={20} />
               <Text variant="label" color="on-primary">{item.title}</Text>
