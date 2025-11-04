@@ -64,6 +64,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
   const [userInfo, setUserInfo] = useState<any>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [isLoadingUserInfo, setIsLoadingUserInfo] = useState(false);
+  const [lastUserIdFetched, setLastUserIdFetched] = useState<string | null>(null);
 
   const changeRole = (newrole: number) => {
     const newUser = {
@@ -179,20 +180,22 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
       // SIEMPRE limpiar el estado local, incluso si el logout falla
       setUserSession(null);
       setUserInfo(null);
+      setLastUserIdFetched(null);
       console.log("✅ Estado local limpiado");
     }
   };
 
   // Función para obtener la información del usuario
   const getUserInfo = async (id: string) => {
-    // Evitar llamadas duplicadas
-    if (isLoadingUserInfo) {
-      console.log("getUserInfo ya está en ejecución, ignorando llamada duplicada");
+    // Evitar llamadas duplicadas - verificar si ya se está cargando O si ya se cargó este usuario
+    if (isLoadingUserInfo || lastUserIdFetched === id) {
+      console.log("getUserInfo - ignorando llamada duplicada para usuario:", id);
       return;
     }
 
     console.log("llamando..");
     setIsLoadingUserInfo(true);
+    setLastUserIdFetched(id);
 
     try {
       const { data: userData, error } = await supabase
@@ -200,6 +203,7 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
 
       if (error) {
         console.error('Error con función get_user_with_role:', error);
+        setLastUserIdFetched(null);
         return;
       }
 
@@ -211,12 +215,14 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         // Si el usuario fue eliminado de la base de datos, cerrar la sesión
         setUserInfo(null);
         setUserSession(null);
+        setLastUserIdFetched(null);
         // Cerrar sesión en Supabase también
         await supabase.auth.signOut({ scope: 'local' });
       }
 
     } catch (error) {
       console.error('Error general obteniendo usuario:', error);
+      setLastUserIdFetched(null);
     } finally {
       setIsLoadingUserInfo(false);
     }
@@ -248,9 +254,17 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
           return;
         }
 
+        // SIGNED_IN ya es manejado por signInWithPassword, no hacer nada aquí
+        if (event === 'SIGNED_IN') {
+          return;
+        }
+
         if (session !== null) {
           setUserSession(session);
-          getUserInfo(session.user.id);
+          // Solo llamar getUserInfo en eventos como TOKEN_REFRESHED
+          if (event === 'TOKEN_REFRESHED' && !userInfo) {
+            getUserInfo(session.user.id);
+          }
         } else {
           setUserSession(null);
           setUserInfo(null);

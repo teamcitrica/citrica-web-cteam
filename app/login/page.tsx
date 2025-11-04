@@ -22,10 +22,10 @@ const LoginPage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirigir a admin si ya está autenticado
+  // Redirigir a admin si ya está autenticado (solo una vez)
   useEffect(() => {
     if (!isInitializing && userSession) {
-      router.push('/admin');
+      router.replace('/admin');
     }
   }, [userSession, isInitializing, router]);
 
@@ -61,7 +61,7 @@ const LoginPage = () => {
           description: "Has iniciado sesión correctamente",
           color: "success",
         })
-        router.push('/admin')
+        // El useEffect se encargará de la redirección
       }
     } catch (error) {
       console.error('Login error:', error)
