@@ -7,9 +7,11 @@ import type { SidebarProps, MenuItem } from "../../../types/sidebar"
 import { Icon, Text } from "@citrica-ui"
 import { IconName } from "@/shared/components/citrica-ui/atoms/icon"
 import { usePathname, useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boolean; onToggle: () => void }) {
   const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <div>
@@ -20,22 +22,25 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
       >
         <span className="flex items-center gap-2">
           <Icon name={item.icon as IconName} size={20} />
-          <Text variant="label">{item.title}</Text>
+          <Text variant="label" color="#FFF">{item.title}</Text>
         </span>
         <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
       </Button>
       {isOpen && item.subItems && (
         <div className="ml-6 mt-2 flex flex-col gap-2">
-          {item.subItems.map((subItem) => (
-            <Button
-              key={subItem.title}
-              variant="light"
-              className={`justify-start px-4 py-2 transition-colors hover:bg-gray-100 focus:bg-gray-100`}
-              onPress={() => router.push(subItem.href)}
-            >
-            <Text variant="label">{subItem.title}</Text>
-            </Button>
-          ))}
+          {item.subItems.map((subItem) => {
+            const isActive = pathname.startsWith(subItem.href);
+            return (
+              <Button
+                key={subItem.title}
+                variant="light"
+                className={`justify-start px-4 py-2 transition-colors hover:bg-gray-100 ${isActive ? "bg-gray-100" : ""}`}
+                onPress={() => router.push(subItem.href)}
+              >
+                <Text variant="label" color={isActive ? "#000" : "#fff"}>{subItem.title}</Text>
+              </Button>
+            );
+          })}
         </div>
       )}
     </div>
@@ -60,6 +65,16 @@ export function Sidebar({ items }: SidebarProps) {
 
   const NavItems = () => (
     <div className="h-[100svh] w-full overflow-y-auto px-2 py-4 bg-sidebar">
+      {/* Logo - solo visible en pantallas grandes */}
+      <div className="hidden lg:flex justify-center items-center mb-6 px-4">
+        <Image
+          src="/img/citrica-logo.png"
+          alt="Citrica Logo"
+          width={150}
+          height={50}
+          className="object-contain"
+        />
+      </div>
       {items.map((item) => (
         <div key={item.title} className="mb-2">
           {item.subItems ? (
@@ -73,7 +88,7 @@ export function Sidebar({ items }: SidebarProps) {
           ) : (
             <Button
               variant="light"
-              className= {`w-full justify-start gap-2 px-4 py-2 transition-colors hover:bg-gray-100 ${item.href=== pathname ? "bg-gray-100" : ""}`}
+              className= {`w-full justify-start gap-2 px-4 py-2 transition-colors hover:bg-gray-100 ${item.href === pathname ? "bg-gray-100" : ""}`}
               onPress={() => {
                 if (item.href && item.href !== "#") {
                   router.push(item.href);
@@ -81,7 +96,7 @@ export function Sidebar({ items }: SidebarProps) {
               }}
             >
               <Icon name={item.icon as IconName} size={20} />
-              <Text variant="label" color="on-primary">{item.title}</Text>
+              <Text variant="label" color={item.href === pathname ? "#000" : "#fff"}>{item.title}</Text>
             </Button>
           )}
         </div>

@@ -24,13 +24,12 @@ import ReservaDetailModal from "./components/modal-details-reserva";
 const columns = [
   { name: "NOMBRE", uid: "nombre", sortable: true },
   { name: "EMAIL", uid: "email", sortable: true },
-  { name: "FECHA", uid: "fecha", sortable: true },
-  { name: "HORARIO", uid: "horario" },
+  { name: "FECHA Y HORA", uid: "fecha_hora", sortable: true },
   { name: "ESTADO", uid: "estado", sortable: true },
-  { name: "CAMBIAR ESTADO", uid: "cambiar_estado" },
+  { name: "ACCIONES", uid: "acciones" },
 ];
 
-const INITIAL_VISIBLE_COLUMNS = ["nombre", "email", "fecha", "horario", "estado", "cambiar_estado"];
+const INITIAL_VISIBLE_COLUMNS = ["nombre", "email", "fecha_hora", "estado", "acciones"];
 const ITEMS_PER_PAGE = 15;
 
 interface CardReservasProps {
@@ -72,7 +71,7 @@ export default function CardReservas({
   }, [refreshReservas]);
 
   const [sortDescriptor, setSortDescriptor] = useState<LocalSortDescriptor>({
-    column: "fecha",
+    column: "fecha_hora",
     direction: "descending",
   });
 
@@ -114,7 +113,7 @@ export default function CardReservas({
       } else if (sortDescriptor.column === "email") {
         first = (a.email || "").toLowerCase();
         second = (b.email || "").toLowerCase();
-      } else if (sortDescriptor.column === "fecha") {
+      } else if (sortDescriptor.column === "fecha_hora") {
         first = new Date(a.created_at).getTime();
         second = new Date(b.created_at).getTime();
       } else {
@@ -220,17 +219,16 @@ export default function CardReservas({
           return (
             <p className="text-sm text-black">{reserva.email}</p>
           );
-        case "fecha":
+        case "fecha_hora":
           return (
-            <p className="text-sm text-black">{formatDate(reserva.booking_date)}</p>
-          );
-        case "horario":
-          return (
-            <p className="text-sm text-black">
-              {reserva.time_slots && reserva.time_slots.length > 0
-                ? reserva.time_slots.join(', ')
-                : "Sin horario"}
-            </p>
+            <div className="flex flex-col items-center text-black">
+              <span className="text-sm font-medium">{formatDate(reserva.booking_date)}</span>
+              <span className="text-xs text-gray-600 mt-1">
+                {reserva.time_slots && reserva.time_slots.length > 0
+                  ? reserva.time_slots.join(', ')
+                  : "Sin horario"}
+              </span>
+            </div>
           );
         case "estado":
           return (
@@ -240,7 +238,7 @@ export default function CardReservas({
               </span>
             </div>
           );
-        case "cambiar_estado":
+        case "acciones":
           const getDropdownItems = () => {
             if (reserva.status === 'confirmed') {
               return (
@@ -307,6 +305,8 @@ export default function CardReservas({
               </Dropdown>
             </div>
           );
+        default:
+          return null;
       }
     },
     [handleViewReserva, handleDeleteReserva, handleStatusChange],

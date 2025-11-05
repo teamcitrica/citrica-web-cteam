@@ -10,6 +10,7 @@ interface CalendarComponentProps {
   minValue?: any;
   disabledRanges?: Array<[any, any]>;
   isDateFullyBooked?: (date: string) => boolean;
+  serverToday?: any; // Nueva prop para la fecha del servidor
 }
 
 export default function CalendarComponent({
@@ -17,11 +18,16 @@ export default function CalendarComponent({
   onChange,
   className = "",
   variant = 'primary',
-  minValue = today(getLocalTimeZone()),
+  minValue,
   disabledRanges = [],
   isDateFullyBooked,
+  serverToday,
 }: CalendarComponentProps) {
   let { locale } = useLocale();
+
+  // Usar serverToday si está disponible, sino usar la fecha del cliente
+  const effectiveToday = serverToday || today(getLocalTimeZone());
+  const effectiveMinValue = minValue !== undefined ? minValue : effectiveToday;
 
   let isDateUnavailable = (date: any) => {
     // Verificar si es domingo específicamente
@@ -29,9 +35,8 @@ export default function CalendarComponent({
     const jsDate = date.toDate(getLocalTimeZone());
     const isSunday = jsDate.getDay() === 0; // 0 = Domingo en JavaScript
 
-    // Verificar si la fecha es anterior a hoy
-    const todayDate = today(getLocalTimeZone());
-    const isPastDate = date.compare(todayDate) < 0;
+    // Verificar si la fecha es anterior a hoy (usando la fecha del servidor si está disponible)
+    const isPastDate = date.compare(effectiveToday) < 0;
 
     // Obtener fecha directamente del objeto CalendarDate (sin conversión)
     const year = date.year
@@ -58,7 +63,7 @@ export default function CalendarComponent({
       aria-label="Seleccionar fecha"
       className={`calendar-citrica-ui ${calendarClass} ${className}`}
       isDateUnavailable={isDateUnavailable}
-      minValue={minValue}
+      minValue={effectiveMinValue}
       value={value}
       onChange={onChange}
     />

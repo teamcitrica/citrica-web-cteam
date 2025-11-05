@@ -40,7 +40,9 @@ export const ContactSectionLanding = ({
     isDateFullyBookedSync,
     availableTimeSlots,
     selectedTimeSlots,
-    studioConfig
+    studioConfig,
+    serverToday,
+    isLoadingServerTime
   } = useContact()
 
   // Obtener el contenido según la variante seleccionada
@@ -319,17 +321,11 @@ export const ContactSectionLanding = ({
                           onChange={handleDateChange}
                           variant="primary"
                           isDateFullyBooked={isDateFullyBookedSync}
+                          serverToday={serverToday}
                         />
                       </div>
 
                       <div className="flex gap-4 w-full max-w-[380px] mx-auto">
-                        <Button
-                          type="button"
-                          label="Anterior"
-                          variant="secondary"
-                          fullWidth
-                          onClick={prevStep}
-                        />
                         <Button
                           type="button"
                           label="Siguiente"

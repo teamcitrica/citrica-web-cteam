@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form"
 import { Divider, Link } from "@heroui/react"
 import { Eye } from "lucide-react"
 import Button from '@/shared/components/citrica-ui/molecules/button'
+import { Text } from '@/shared/components/citrica-ui'
 
 type FormValues = {
   password: string;
@@ -70,11 +71,11 @@ const LoginPage = () => {
 
   return (
     <>
-      <Container className='flex justify-center items-center h-screen'>
+      <Container noPadding noLimit className='flex justify-center items-center h-screen bg-[#0F172A]'>
         <div className="w-[968px] flex justify-center">
           <div className='container-inputs'>
             <img className='w-[54px] ' src="/img/citrica-logo.png" alt="" />
-            <h2 className='text-login-welcome'>BIENVENIDO</h2>
+            <h2 className='text-login-welcome mt-3'>BIENVENIDO</h2>
             <form onSubmit={handleSubmit(onSubmit)}>
               <Input
                 type="text"
@@ -134,7 +135,7 @@ const LoginPage = () => {
 
             <div className="w-[312px] h-[94px] mt-[24px] flex flex-col justify-center items-center">
               <Link href="/forgot-password">
-                <span className='text-forgot-password'>¿Olvidaste tu contraseña?</span>
+                <Text variant='label' color='#0F172A' >¿Olvidaste tu contraseña?</Text>
               </Link>
               <Divider className="w-[210px] h-[1px] bg-[#E5E7EB] mt-[14px]"></Divider>
             </div>
