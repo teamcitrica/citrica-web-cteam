@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useSupabase } from '@/shared/context/supabase-context'
 import { useBookingsAvailability } from '@/hooks/disponibilidad/use-bookings-availability'
+import { useServerTime } from '@/hooks/use-server-time'
 
 interface ContactFormData {
   name: string
@@ -23,6 +24,9 @@ export const useContact = () => {
     studioConfig,
     convertUserFormatToSlots
   } = useBookingsAvailability()
+
+  // Obtener la fecha y hora del servidor
+  const { serverToday, serverCurrentTime, serverHours, serverMinutes, isLoading: isLoadingServerTime } = useServerTime()
 
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState<ContactFormData>({
@@ -78,7 +82,42 @@ export const useContact = () => {
           dateStr = date.toString()
         }
 
-        const slots = await getAvailableSlots(dateStr)
+        let slots = await getAvailableSlots(dateStr)
+
+        // Filtrar horarios pasados si la fecha seleccionada es HOY
+        if (serverToday && serverHours !== null) {
+          // Comparar si la fecha seleccionada es hoy
+          const isToday = date.year === serverToday.year &&
+                         date.month === serverToday.month &&
+                         date.day === serverToday.day
+
+          if (isToday) {
+            // Filtrar horarios que ya pasaron
+            slots = slots.filter(slot => {
+              // Extraer la hora de inicio del slot (formato: "10:00 AM - 11:00 AM")
+              const match = slot.match(/(\d+):(\d+)\s+(AM|PM)/)
+              if (!match) return true
+
+              const hours = parseInt(match[1])
+              const minutes = parseInt(match[2])
+              const period = match[3]
+
+              // Convertir a formato 24 horas
+              let hour24 = hours
+              if (period === 'PM' && hours !== 12) {
+                hour24 = hours + 12
+              } else if (period === 'AM' && hours === 12) {
+                hour24 = 0
+              }
+
+              // Comparar con la hora actual del servidor
+              if (hour24 > serverHours) return true
+              if (hour24 === serverHours && minutes > serverMinutes!) return true
+              return false
+            })
+          }
+        }
+
         setAvailableTimeSlots(slots)
 
         // Actualizar cache de fechas completamente reservadas
@@ -238,6 +277,9 @@ export const useContact = () => {
     // Nuevos estados y configuración
     availableTimeSlots,
     selectedTimeSlots,
-    studioConfig
+    studioConfig,
+    // Fecha del servidor
+    serverToday,
+    isLoadingServerTime
   }
 }
