@@ -29,7 +29,7 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
       {isOpen && item.subItems && (
         <div className="ml-6 mt-2 flex flex-col gap-2">
           {item.subItems.map((subItem) => {
-            const isActive = pathname.startsWith(subItem.href);
+            const isActive = pathname === subItem.href;
             return (
               <Button
                 key={subItem.title}

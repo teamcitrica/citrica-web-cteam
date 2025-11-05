@@ -708,7 +708,7 @@ const UnifiedAvailabilityManager = () => {
         </Card>
       </Col>
       {/* Lado izquierdo: Calendario */}
-      <Col cols={{ lg: 6, md: 3, sm: 4 }}>
+      <Col cols={{ lg: 6, md: 3, sm: 4 }} className="mb-4">
         <Card className="p-6">
           <div className="space-y-4">
             <p>
@@ -865,7 +865,7 @@ const UnifiedAvailabilityManager = () => {
           </div>
         </Card>
       </Col>
-      <Col cols={{ lg: 6, md: 3, sm: 4 }}>
+      <Col cols={{ lg: 6, md: 3, sm: 4 }} >
         {/* Lado derecho: Gestión de slots */}
         <Card className="p-6">
           <div className="space-y-4">
