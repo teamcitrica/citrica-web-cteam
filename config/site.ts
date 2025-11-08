@@ -69,6 +69,14 @@ export const siteConfig = {
 		// 	href: "/",
 		// },
 	],
+	// Sidebar items para rol 4 (solo CMS)
+	sidebarItemsRole4: [
+		{
+			title: "CMS",
+			icon: "Settings",
+			href: "/admin/tambo",
+		},
+	],
 	links: {
 		github: "https://github.com/nextui-org/nextui",
 		twitter: "https://twitter.com/getnextui",

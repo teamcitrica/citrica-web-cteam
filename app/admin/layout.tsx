@@ -12,7 +12,7 @@ export default function PanelLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { userSession, isInitializing } = UserAuth();
+  const { userSession, userInfo, isInitializing } = UserAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -27,11 +27,16 @@ export default function PanelLayout({
     return null;
   }
 
+  // Determinar qué items del sidebar mostrar según el rol
+  const sidebarItems = userInfo?.role_id === 4
+    ? siteConfig.sidebarItemsRole4
+    : siteConfig.sidebarItems;
+
   return (
     <div className="container-general-pase-admin w-full flex justify-center">
       <div className="w-full max-w-[1920px]">
         <div className="h-full bg-[#FFFFFF] flex flex-row justify-start min-h-full">
-          <Sidebar items={siteConfig.sidebarItems} session={userSession} />
+          <Sidebar items={sidebarItems} session={userSession} />
           <div className="bg-[#FAF9F6] flex-1 text-white w-[80%] ">
             <Navbar session={userSession} />
             <div className="pt-3">
