@@ -7,24 +7,12 @@ $btn-citrica-ui: (
     padding: 10px 20px,
   ),
   lg: (
-    padding: 10px 30px,
+    padding: 20px 50px,
   )
 );
 .btn-citrica-ui{
   border-radius: var(--form-radius-btn);
   min-width: 140px;
-  &:hover, &:active, &:focus { // AVOID DEFAULT OPACITY CHANGE
-    opacity: 1 !important;
-    border-color: inherit !important;
-    filter: none !important;
-    box-shadow: inherit !important;
-  }
-  // esta es la modificacion que se hizo para conservar el centrado para los botones posicionados absolutamente.ojito aqui johan
-  &.absolute {
-    &:hover, &:active, &:focus {
-      transform: translateX(-50%) !important;
-    }
-  }
   @include a-set($btn-citrica-ui);
 }
 
@@ -39,26 +27,10 @@ $btn-citrica-ui: (
     }
   }
 }
-
-.btn-primary-color-2{
-  background-color: var(--color-tertiary) !important;
-  border: none;
-  &:hover{
-    background-color: var(--color-tertiary-btn-hover) !important;
-    .text-component {
-      color: var(--color-tertiary-btn-text-hover) !important;
-    }
-  }
-}
-.btn-primary-color-2 .text-component{
-  color: var(--color-on-tertiary) !important;
-}
-
-
 .btn-secondary{
-  background-color: none;
+  background-color: var(--color-secondary-btn);
   color: var(--color-secondary-btn-text);
-  border: 2px solid var(--color-primary-btn);
+  border: none;
   &:hover{
     background-color: var(--color-secondary-btn-hover);
     .text-component {
@@ -66,44 +38,14 @@ $btn-citrica-ui: (
     }
   }
 }
-
-.btn-secondary-color-2{
-  background-color: var(--color-on-secondary) !important;
+.btn-flat{
+  background-color: transparent;
+  color: var(--color-flat-btn-text);
   border: none;
   &:hover{
-    background-color: var(--color-tertiary-btn-hover) !important;
-    .text-component {
-      color: var(--color-tertiary-btn-text-hover) !important;
-    }
-  }
-}
-.btn-secondary-color-2 .text-component{
-  color: var(--color-on-tertiary) !important;
-}
-
-.btn-citrica-ui.btn-flat{
-  background-color: transparent !important;
-  color: var(--color-flat-btn-text) !important;
-  border: none !important;
-  padding: 0px !important;
-  &:hover{
-    background-color: var(--color-flat-btn-hover) !important;
+    background-color: var(--color-flat-btn-hover);
     .text-component {
       color: var(--color-flat-btn-text-hover) !important;
     }
   }
 }
-
-// .btn-flat-color-2{
-//   background-color: var(--color-tertiary) !important;
-//   border: none;
-//   &:hover{
-//     background-color: var(--color-tertiary-btn-hover) !important;
-//     .text-component {
-//       color: var(--color-tertiary-btn-text-hover) !important;
-//     }
-//   }
-// }
-// .btn-flat-color-2 .text-component{
-//   color: var(--color-on-tertiary) !important;
-// }

@@ -66,13 +66,11 @@ export function Sidebar({ items }: SidebarProps) {
   const NavItems = () => (
     <div className="h-[100svh] w-full overflow-y-auto px-2 py-4 bg-sidebar">
       {/* Logo - solo visible en pantallas grandes */}
-      <div className="hidden lg:flex justify-center items-center mb-6 px-4">
-        <Image
+      <div className="hidden lg:flex justify-start items-center mb-6">
+        <img
           src="/img/citrica-logo.png"
           alt="Citrica Logo"
-          width={150}
-          height={50}
-          className="object-contain"
+          className="m-4 h-16 w-auto"
         />
       </div>
       {items.map((item) => (

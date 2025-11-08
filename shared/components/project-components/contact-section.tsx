@@ -141,7 +141,7 @@ export const ContactSectionLanding = ({
             </div>
           </Col>
 
-          <Col cols={{ lg: 5, md: 3, sm: 4 }}>
+          <Col cols={{ lg: 5, md: 3, sm: 4 }} className='mt-8 md:mt-0 lg:mt-0'>
             <div className="bg-color-ct-white rounded-2xl shadow-xl border-3 border-[757575] p-4">
               <form
                 onSubmit={handleSubmit}
@@ -232,16 +232,16 @@ export const ContactSectionLanding = ({
                 {/* Paso 1: Nombre y Email */}
                 {currentStep === 3 && status === 'idle' && (
                   <AnimatedContent key="step3" direction="horizontal" distance={50}>
-              <h3 className='mb-[10px]'>
-                <Text
-                  variant="subtitle"
-                  weight="bold"
-                  textColor="color-primary"
-                >
-                  Tus datos
-                </Text>
-              </h3>
-                    <div className="flex flex-col gap-4 w-full">
+                    <h3 className='mb-[10px]'>
+                      <Text
+                        variant="subtitle"
+                        weight="bold"
+                        textColor="color-primary"
+                      >
+                        Tus datos
+                      </Text>
+                    </h3>
+                    <div className="flex flex-col gap-4 w-full mb-8">
                       <Input
                         name="name"
                         label="Nombre"
@@ -269,176 +269,175 @@ export const ContactSectionLanding = ({
                         onChange={handleChange}
                         required
                       />
-                      <div className="flex flex-col gap-4 w-full">
-                        <Textarea
-                          name="message"
-                          label="Mensaje"
-                          placeholder="Cuéntanos sobre tu negocio y qué solución digital necesitas"
-                          variant="bordered"
-                          color="primary"
-                          radius="sm"
-                          fullWidth
-                          value={formData.message}
-                          onChange={handleChange}
-                        />
 
-                        <div className="flex gap-4 w-full max-w-[380px] mx-auto">
-                          <Button
-                            type="button"
-                            label="Anterior"
-                            variant="secondary"
-                            fullWidth
-                            onClick={prevStep}
-                          />
-                          <Button
-                            type="submit"
-                            label={isLoading ? "Enviando..." : "Agendar cita"}
-                            variant="primary"
-                            fullWidth
-                            disabled={isLoading || !formData.message}
-                          />
-                        </div>
-                      </div>
+                      <Textarea
+                        name="message"
+                        label="Mensaje"
+                        placeholder="Cuéntanos sobre tu negocio y qué solución digital necesitas"
+                        variant="bordered"
+                        color="primary"
+                        radius="sm"
+                        fullWidth
+                        value={formData.message}
+                        onChange={handleChange}
+                        className='!p-0'
+                      />
+                    </div>
+                    <div className="flex gap-4 w-full max-w-[380px] mx-auto">
+                      <Button
+                        type="button"
+                        label="Anterior"
+                        variant="secondary"
+                        fullWidth
+                        onClick={prevStep}
+                      />
+                      <Button
+                        type="submit"
+                        label={isLoading ? "Enviando..." : "Agendar cita"}
+                        variant="primary"
+                        fullWidth
+                        disabled={isLoading || !formData.message}
+                      />
                     </div>
                   </AnimatedContent>
                 )}
 
-                {/* Paso 2: Seleccionar Fecha */}
-                {currentStep === 1 && status === 'idle' && (
-                  <AnimatedContent key="step1" direction="horizontal" distance={50}>
-                    <div className="flex flex-col items-center gap-4 w-full">
-                      <Text
-                        variant="subtitle"
-                        weight="bold"
-                        textColor="color-primary"
-                      >
-                        Selecciona una fecha
-                      </Text>
+              {/* Paso 2: Seleccionar Fecha */}
+              {currentStep === 1 && status === 'idle' && (
+                <AnimatedContent key="step1" direction="horizontal" distance={50}>
+                  <div className="flex flex-col items-center gap-4 w-full">
+                    <Text
+                      variant="subtitle"
+                      weight="bold"
+                      textColor="color-primary"
+                    >
+                      Selecciona una fecha
+                    </Text>
 
-                      <div className="flex justify-center w-full">
-                        <CalendarComponent
-                          value={formData.date}
-                          onChange={handleDateChange}
-                          variant="primary"
-                          isDateFullyBooked={isDateFullyBookedSync}
-                          serverToday={serverToday}
-                        />
-                      </div>
-
-                      <div className="flex gap-4 w-full max-w-[380px] mx-auto">
-                        <Button
-                          type="button"
-                          label="Siguiente"
-                          variant="primary"
-                          fullWidth
-                          onClick={nextStep}
-                          disabled={!formData.date}
-                        />
-                      </div>
+                    <div className="flex justify-center w-full">
+                      <CalendarComponent
+                        value={formData.date}
+                        onChange={handleDateChange}
+                        variant="primary"
+                        isDateFullyBooked={isDateFullyBookedSync}
+                        serverToday={serverToday}
+                      />
                     </div>
-                  </AnimatedContent>
-                )}
 
-                {/* Paso 3: Seleccionar Horario */}
-                {currentStep === 2 && status === 'idle' && (
-                  <AnimatedContent key="step2" direction="horizontal" distance={50}>
-                    <div className="flex flex-col items-center gap-4 w-full">
-                      <Text
-                        variant="subtitle"
-                        weight="bold"
-                        textColor="color-primary"
-                      >
-                        Seleccionar Horario
-                      </Text>
+                    <div className="flex gap-4 w-full max-w-[380px] mx-auto">
+                      <Button
+                        type="button"
+                        label="Siguiente"
+                        variant="primary"
+                        fullWidth
+                        onClick={nextStep}
+                        disabled={!formData.date}
+                      />
+                    </div>
+                  </div>
+                </AnimatedContent>
+              )}
 
-                      {studioConfig.allow_multiple_time_slots && (
-                        <div className="text-center">
-                          <Text variant="body" textColor="color-on-surface-var" className="text-sm">
-                            Puedes seleccionar múltiples horarios
-                          </Text>
-                        </div>
-                      )}
+              {/* Paso 3: Seleccionar Horario */}
+              {currentStep === 2 && status === 'idle' && (
+                <AnimatedContent key="step2" direction="horizontal" distance={50}>
+                  <div className="flex flex-col items-center gap-4 w-full">
+                    <Text
+                      variant="subtitle"
+                      weight="bold"
+                      textColor="color-primary"
+                    >
+                      Seleccionar Horario
+                    </Text>
 
-                      {timeSlots.length === 0 ? (
-                        <div className="text-center py-8">
-                          <Text variant="body" textColor="color-on-surface-var">
-                            No hay horarios disponibles para esta fecha
-                          </Text>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-2 gap-3 w-full max-h-96 overflow-y-auto">
-                          {timeSlots.map((slot) => {
-                            const isOccupied = occupiedSlots.includes(slot)
-                            const isSelected = studioConfig.allow_multiple_time_slots
-                              ? selectedTimeSlots.includes(slot)
-                              : formData.timeSlot === slot
+                    {studioConfig.allow_multiple_time_slots && (
+                      <div className="text-center">
+                        <Text variant="body" textColor="color-on-surface-var" className="text-sm">
+                          Puedes seleccionar múltiples horarios
+                        </Text>
+                      </div>
+                    )}
 
-                            return (
-                              <button
-                                key={slot}
-                                type="button"
-                                onClick={() => !isOccupied && handleTimeSlotChange(slot)}
-                                disabled={isOccupied}
-                                className={`
+                    {timeSlots.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Text variant="body" textColor="color-on-surface-var">
+                          No hay horarios disponibles para esta fecha
+                        </Text>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-3 w-full max-h-96 overflow-y-auto">
+                        {timeSlots.map((slot) => {
+                          const isOccupied = occupiedSlots.includes(slot)
+                          const isSelected = studioConfig.allow_multiple_time_slots
+                            ? selectedTimeSlots.includes(slot)
+                            : formData.timeSlot === slot
+
+                          return (
+                            <button
+                              key={slot}
+                              type="button"
+                              onClick={() => !isOccupied && handleTimeSlotChange(slot)}
+                              disabled={isOccupied}
+                              className={`
                                   px-4 py-3 rounded-lg border-2 transition-all duration-200
                                   ${isOccupied
-                                    ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                                    : isSelected
-                                      ? 'border-color-ct-primary bg-color-ct-primary text-white'
-                                      : 'border-color-ct-outline bg-white text-color-ct-on-surface hover:border-color-ct-tertiary hover:bg-color-ct-tertiary hover:bg-opacity-10'
-                                  }
+                                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                                  : isSelected
+                                    ? 'border-color-ct-primary bg-color-ct-primary text-white'
+                                    : 'border-color-ct-outline bg-white text-color-ct-on-surface hover:border-color-ct-tertiary hover:bg-color-ct-tertiary hover:bg-opacity-10'
+                                }
                                 `}
+                            >
+                              <Text
+                                variant="label"
+                                textColor={
+                                  isOccupied
+                                    ? 'color-on-surface-var'
+                                    : isSelected
+                                      ? 'color-white'
+                                      : 'color-on-surface'
+                                }
                               >
-                                <Text
-                                  variant="body"
-                                  textColor={
-                                    isOccupied
-                                      ? 'color-on-surface-var'
-                                      : isSelected
-                                        ? 'color-white'
-                                        : 'color-on-surface'
-                                  }
-                                >
-                                  {slot}
-                                  {isOccupied && ' (Ocupado)'}
-                                </Text>
-                              </button>
-                            )
-                          })}
-                        </div>
-                      )}
-
-                      <div className="flex gap-4 w-full max-w-[380px] mx-auto">
-                        <Button
-                          type="button"
-                          label="Anterior"
-                          variant="secondary"
-                          fullWidth
-                          onClick={prevStep}
-                        />
-                        <Button
-                          type="button"
-                          label="Siguiente"
-                          variant="primary"
-                          fullWidth
-                          onClick={nextStep}
-                          disabled={
-                            studioConfig.allow_multiple_time_slots
-                              ? selectedTimeSlots.length === 0
-                              : !formData.timeSlot
-                          }
-                        />
+                                {slot}
+                                {isOccupied && ' (Ocupado)'}
+                              </Text>
+                            </button>
+                          )
+                        })}
                       </div>
-                    </div>
-                  </AnimatedContent>
-                )}
+                    )}
 
-                {/* Paso 4: Teléfono y Mensaje */}
-              </form>
-            </div>
-          </Col>
-        </Container>
-      </section>
+                    <div className="flex gap-4 w-full max-w-[380px] mx-auto">
+                      <Button
+                        type="button"
+                        label="Anterior"
+                        variant="secondary"
+                        fullWidth
+                        onClick={prevStep}
+                      />
+                      <Button
+                        type="button"
+                        label="Siguiente"
+                        variant="primary"
+                        fullWidth
+                        onClick={nextStep}
+                        disabled={
+                          studioConfig.allow_multiple_time_slots
+                            ? selectedTimeSlots.length === 0
+                            : !formData.timeSlot
+                        }
+                      />
+                    </div>
+                  </div>
+                </AnimatedContent>
+              )}
+
+              {/* Paso 4: Teléfono y Mensaje */}
+            </form>
+          </div>
+        </Col>
+      </Container>
+    </section >
     </>
   );
 };
