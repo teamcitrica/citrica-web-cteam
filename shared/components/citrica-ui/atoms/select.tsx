@@ -1,8 +1,9 @@
-'use client';
-import React from 'react';
-import { Select as HeroSelect, SelectItem } from '@heroui/select';
-import clsx from 'clsx';
-import Icon, { IconName } from './icon';
+"use client";
+import React from "react";
+import { Select as HeroSelect, SelectItem } from "@heroui/select";
+import clsx from "clsx";
+
+import Icon, { IconName } from "./icon";
 
 interface SelectOption {
   value: string;
@@ -19,10 +20,22 @@ interface SelectProps {
   selectedKeys?: string[];
   onSelectionChange?: (keys: any) => void;
   name?: string;
-  variant?: 'primary' | 'secondary' | 'flat' | 'bordered' | 'faded' | 'underlined';
-  color?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
-  radius?: 'none' | 'sm' | 'md' | 'lg' | 'full';
+  variant?:
+    | "primary"
+    | "secondary"
+    | "flat"
+    | "bordered"
+    | "faded"
+    | "underlined";
+  color?:
+    | "default"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "danger";
+  size?: "sm" | "md" | "lg";
+  radius?: "none" | "sm" | "md" | "lg" | "full";
   required?: boolean;
   disabled?: boolean;
   isInvalid?: boolean;
@@ -55,10 +68,10 @@ const Select = ({
   selectedKeys,
   onSelectionChange,
   name,
-  variant = 'primary',
-  color = 'default',
-  size = 'md',
-  radius = 'md',
+  variant = "primary",
+  color = "default",
+  size = "md",
+  radius = "md",
   required = false,
   disabled = false,
   isInvalid = false,
@@ -77,12 +90,16 @@ const Select = ({
 }: SelectProps) => {
   // Create icon content if icons are provided
   const startIconContent = startIcon ? (
-    <Icon name={startIcon} size={iconSize} color={iconColor} />
-  ) : startContent;
+    <Icon color={iconColor} name={startIcon} size={iconSize} />
+  ) : (
+    startContent
+  );
 
   const endIconContent = endIcon ? (
-    <Icon name={endIcon} size={iconSize} color={iconColor} />
-  ) : endContent;
+    <Icon color={iconColor} name={endIcon} size={iconSize} />
+  ) : (
+    endContent
+  );
 
   const getSelectClassByVariant = (variant: string) => {
     switch (variant) {
@@ -99,43 +116,44 @@ const Select = ({
     }
   };
 
-  const shouldUseCustomVariant = variant === 'primary' || variant === 'secondary';
-  const heroVariant = shouldUseCustomVariant ? 'bordered' : variant;
+  const shouldUseCustomVariant =
+    variant === "primary" || variant === "secondary";
+  const heroVariant = shouldUseCustomVariant ? "bordered" : variant;
 
   return (
     <HeroSelect
-      label={label}
-      placeholder={placeholder}
-      selectedKeys={selectedKeys}
-      defaultSelectedKeys={defaultSelectedKeys}
-      onSelectionChange={onSelectionChange}
-      name={name}
-      variant={heroVariant}
-      color={color}
-      size={size}
-      isRequired={required}
-      isDisabled={disabled}
-      isInvalid={isInvalid}
-      errorMessage={errorMessage}
-      description={description}
       className={clsx(
         "select-citrica-ui",
         getSelectClassByVariant(variant),
-        className
+        className,
       )}
       classNames={classNames}
-      startContent={startIconContent}
+      color={color}
+      defaultSelectedKeys={defaultSelectedKeys}
+      description={description}
       endContent={endIconContent}
+      errorMessage={errorMessage}
       fullWidth={fullWidth}
+      isDisabled={disabled}
+      isInvalid={isInvalid}
+      isRequired={required}
+      label={label}
+      name={name}
+      placeholder={placeholder}
+      selectedKeys={selectedKeys}
+      size={size}
+      startContent={startIconContent}
+      variant={heroVariant}
+      onSelectionChange={onSelectionChange}
     >
       {options.map((option) => (
         <SelectItem
           key={option.value}
-          textValue={option.label}
+          className="select-item-citrica-ui"
           description={option.description}
-          startContent={option.startContent}
           endContent={option.endContent}
-          className='select-item-citrica-ui'
+          startContent={option.startContent}
+          textValue={option.label}
         >
           {option.label}
         </SelectItem>
