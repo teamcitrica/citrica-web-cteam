@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form"
 import { Divider, Link } from "@heroui/react"
 import Button from '@/shared/components/citrica-ui/molecules/button'
 import { Icon, Text } from '@/shared/components/citrica-ui'
+import { Container } from '@/styles/07-objects/objects'
 
 type FormValues = {
   password: string;
@@ -68,43 +69,39 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="w-[968px] flex justify-center">
+    <Container className="w-[968px] flex justify-center !flex-nowrap">
       <div className='container-inputs'>
         <img className='w-[80px] pb-3 items-center' src="/img/citrica-logo.png" alt="Logo" />
-        <h2 className='text-center'>
+        <h2 className='text-center mb-4'>
           <Text textColor="white" variant="body">
             BIENVENIDO
           </Text>
         </h2>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className='flex flex-col gap-0'>
-            <Input
-              type="email"
-              placeholder="Email"
-              {...register("email")}
-              disabled={isLoading}
-              required
-            />
-
-            <Input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              {...register("password")}
-              disabled={isLoading}
-              required
-              endContent={
-                <Icon name="Eye" 
-                  className="text-[#66666666] cursor-pointer w-5 h-5"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                />
-              }
-            />
-          </div>
-
+        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center'>
+          <Input
+            type="email"
+            placeholder="Correo electónico"
+            {...register("email")}
+            disabled={isLoading}
+            required
+          />
+          <Input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            {...register("password")}
+            disabled={isLoading}
+            required
+            endContent={
+              <Icon name="Eye"
+                className="text-[#66666666] cursor-pointer w-5 h-5"
+                onClick={() => setShowPassword((prev) => !prev)}
+              />
+            }
+          />
           <Button
             type="submit"
             variant="primary"
-            label={isLoading ? 'Accediendo...' : 'Acceder'}
+            label={isLoading ? 'Accediendo...' : 'Iniciar Sesión'}
             disabled={isLoading}
             isLoading={isLoading}
             fullWidth={true}
@@ -121,10 +118,8 @@ const LoginPage = () => {
           </Link>
         </div>
       </div>
-      <div
-        className='bg-login not-sm'
-      ></div>
-    </div>
+      <div className='bg-login not-sm'></div>
+    </Container>
   )
 }
 
