@@ -28,6 +28,21 @@ export const siteConfig = {
 			href: "/admin/users",
 		},
 		{
+			title: "Crear rol",
+			icon: "ShieldCheck",
+			href: "/admin/crear-rol",
+			subItems: [
+				{
+					title: "Gestionar roles",
+					href: "/admin/crear-rol",
+				},
+				{
+					title: "Adjuntar credenciales",
+					href: "/admin/adjuntar-credenciales",
+				},
+			],
+		},
+		{
 			title: "Reservas",
 			icon: "ClipboardCheck",
 			href: "/admin/reservas",

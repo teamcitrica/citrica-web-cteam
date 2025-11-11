@@ -7,6 +7,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Tipo para los filtros recibidos desde el frontend
+interface Filter {
+  column: string;
+  operator: string;
+  value: string;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -63,6 +70,19 @@ serve(async (req) => {
       });
     }
 
+    // Leer los filtros del body (si es POST)
+    let filters: Filter[] = [];
+    let orderBy = { column: "id", direction: "asc" };
+
+    if (req.method === 'POST') {
+      const body = await req.json();
+      filters = body.filters || [];
+      orderBy = body.orderBy || orderBy;
+    }
+
+    console.log("Filtros recibidos:", JSON.stringify(filters));
+    console.log("Orden recibido:", JSON.stringify(orderBy));
+
     // Cliente Supabase Tambo (la base de datos externa)
     const TAMBO_URL = Deno.env.get("TAMBO_SUPABASE_URL");
     const TAMBO_SERVICE_KEY = Deno.env.get("TAMBO_SUPABASE_SERVICE_ROLE_KEY");
@@ -81,19 +101,64 @@ serve(async (req) => {
       }
     });
 
-    // Consulta a la tabla `sorteos_tambo` con bypass de RLS
-    // Primero obtenemos el count total
-    const { count, error: countError } = await supabaseTambo
-      .from("sorteos_tambo")
-      .select("*", { count: 'exact', head: true });
+    // Construir la consulta con filtros
+    let query = supabaseTambo.from("sorteos_tambo").select("*");
 
-    if (countError) throw countError;
+    // Aplicar cada filtro
+    filters.forEach((filter) => {
+      const { column, operator, value } = filter;
 
-    console.log(`Total de registros en sorteos_tambo: ${count}`);
+      // Ignorar filtros sin valor (excepto is_null e is_not_null)
+      if (!value && operator !== "is_null" && operator !== "is_not_null") {
+        return;
+      }
 
-    // Traer TODOS los datos usando paginación interna
+      switch (operator) {
+        case "eq":
+          query = query.eq(column, value);
+          break;
+        case "neq":
+          query = query.neq(column, value);
+          break;
+        case "gt":
+          query = query.gt(column, parseFloat(value));
+          break;
+        case "gte":
+          query = query.gte(column, parseFloat(value));
+          break;
+        case "lt":
+          query = query.lt(column, parseFloat(value));
+          break;
+        case "lte":
+          query = query.lte(column, parseFloat(value));
+          break;
+        case "contains":
+          query = query.ilike(column, `%${value}%`);
+          break;
+        case "not_contains":
+          query = query.not(column, 'ilike', `%${value}%`);
+          break;
+        case "starts_with":
+          query = query.ilike(column, `${value}%`);
+          break;
+        case "ends_with":
+          query = query.ilike(column, `%${value}`);
+          break;
+        case "is_null":
+          query = query.is(column, null);
+          break;
+        case "is_not_null":
+          query = query.not(column, 'is', null);
+          break;
+      }
+    });
+
+    // Aplicar ordenamiento
+    query = query.order(orderBy.column, { ascending: orderBy.direction === "asc" });
+
+    // Traer TODOS los datos con paginación interna
     const allData: any[] = [];
-    const pageSize = 1000; // Supabase limit per request
+    const pageSize = 1000;
     let page = 0;
     let hasMore = true;
 
@@ -101,10 +166,7 @@ serve(async (req) => {
       const start = page * pageSize;
       const end = start + pageSize - 1;
 
-      const { data: pageData, error: pageError } = await supabaseTambo
-        .from("sorteos_tambo")
-        .select("*")
-        .range(start, end);
+      const { data: pageData, error: pageError } = await query.range(start, end);
 
       if (pageError) throw pageError;
 
@@ -113,7 +175,6 @@ serve(async (req) => {
         console.log(`Página ${page + 1}: obtenidos ${pageData.length} registros (total acumulado: ${allData.length})`);
         page++;
 
-        // Si obtuvimos menos que el pageSize, ya no hay más datos
         if (pageData.length < pageSize) {
           hasMore = false;
         }
@@ -121,7 +182,7 @@ serve(async (req) => {
         hasMore = false;
       }
 
-      // Seguridad: evitar loops infinitos (10000 páginas = 10 millones de registros)
+      // Seguridad: evitar loops infinitos
       if (page > 10000) {
         console.error("Demasiadas páginas, deteniendo...");
         break;
@@ -129,9 +190,8 @@ serve(async (req) => {
     }
 
     console.log(`Total final de registros obtenidos: ${allData.length}`);
-    const data = allData;
 
-    return new Response(JSON.stringify({ data }), {
+    return new Response(JSON.stringify({ data: allData }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });

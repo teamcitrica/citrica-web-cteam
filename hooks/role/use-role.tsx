@@ -1,5 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
+import { addToast } from "@heroui/toast";
 
 import { useSupabase } from "@/shared/context/supabase-context";
 
@@ -40,9 +41,169 @@ export const useUserRole = () => {
     }
   }, [supabase]);
 
+  const createRole = useCallback(async (roleData: {
+    name: string;
+    description: string;
+  }) => {
+    try {
+      setIsLoading(true);
+
+      // Paso 1: Insertar en la tabla roles y obtener el role_id generado
+      const { data: roleInserted, error: roleError } = await supabase
+        .from("roles")
+        .insert([{
+          name: roleData.name,
+          description: roleData.description,
+        }])
+        .select();
+
+      if (roleError) {
+        console.error("Error al crear rol:", roleError);
+        addToast({
+          title: "Error",
+          description: "No se pudo crear el rol",
+          color: "danger",
+        });
+        return { success: false, error: roleError };
+      }
+
+      const newRoleId = roleInserted[0].id;
+      console.log("✅ Rol creado con ID:", newRoleId);
+
+      addToast({
+        title: "Éxito",
+        description: "Rol creado correctamente",
+        color: "success",
+      });
+
+      // Actualizar la lista de roles
+      await fetchRoles();
+
+      return { success: true, data: roleInserted };
+    } catch (err) {
+      console.error("Error en createRole:", err);
+      addToast({
+        title: "Error",
+        description: "Ocurrió un error al crear el rol",
+        color: "danger",
+      });
+      return { success: false, error: err };
+    } finally {
+      setIsLoading(false);
+    }
+  }, [supabase, fetchRoles]);
+
+  const updateRole = useCallback(async (roleId: number, roleData: {
+    name: string;
+    description: string;
+  }) => {
+    try {
+      setIsLoading(true);
+
+      const { data, error } = await supabase
+        .from("roles")
+        .update(roleData)
+        .eq("id", roleId)
+        .select();
+
+      if (error) {
+        console.error("Error al actualizar rol:", error);
+        addToast({
+          title: "Error",
+          description: "No se pudo actualizar el rol",
+          color: "danger",
+        });
+        return { success: false, error };
+      }
+
+      addToast({
+        title: "Éxito",
+        description: "Rol actualizado correctamente",
+        color: "success",
+      });
+
+      // Actualizar la lista de roles
+      await fetchRoles();
+
+      return { success: true, data };
+    } catch (err) {
+      console.error("Error en updateRole:", err);
+      addToast({
+        title: "Error",
+        description: "Ocurrió un error al actualizar el rol",
+        color: "danger",
+      });
+      return { success: false, error: err };
+    } finally {
+      setIsLoading(false);
+    }
+  }, [supabase, fetchRoles]);
+
+  const deleteRole = useCallback(async (roleId: number) => {
+    try {
+      setIsLoading(true);
+
+      // Primero eliminar las credenciales asociadas al rol
+      const { error: credentialsError } = await supabase
+        .from("credentials")
+        .delete()
+        .eq("role_id", roleId);
+
+      if (credentialsError) {
+        console.error("Error al eliminar credenciales del rol:", credentialsError);
+        addToast({
+          title: "Error",
+          description: "No se pudieron eliminar las credenciales asociadas",
+          color: "danger",
+        });
+        return { success: false, error: credentialsError };
+      }
+
+      // Luego eliminar el rol
+      const { error } = await supabase
+        .from("roles")
+        .delete()
+        .eq("id", roleId);
+
+      if (error) {
+        console.error("Error al eliminar rol:", error);
+        addToast({
+          title: "Error",
+          description: "No se pudo eliminar el rol",
+          color: "danger",
+        });
+        return { success: false, error };
+      }
+
+      addToast({
+        title: "Éxito",
+        description: "Rol y credenciales eliminados correctamente",
+        color: "success",
+      });
+
+      // Actualizar la lista de roles
+      await fetchRoles();
+
+      return { success: true };
+    } catch (err) {
+      console.error("Error en deleteRole:", err);
+      addToast({
+        title: "Error",
+        description: "Ocurrió un error al eliminar el rol",
+        color: "danger",
+      });
+      return { success: false, error: err };
+    } finally {
+      setIsLoading(false);
+    }
+  }, [supabase, fetchRoles]);
+
   return {
     roles,
     isLoading,
     fetchRoles,
+    createRole,
+    updateRole,
+    deleteRole,
   };
 };

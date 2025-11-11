@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import {
   Table,
   TableHeader,
@@ -7,7 +7,6 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Spinner,
   Pagination,
   Input,
   Select,
@@ -17,6 +16,7 @@ import Icon from "@/shared/components/citrica-ui/atoms/icon";
 import Text from "@/shared/components/citrica-ui/atoms/text";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { UserAuth } from "@/shared/context/auth-context";
+import * as XLSX from "xlsx";
 
 interface Sorteo {
   id: number;
@@ -68,14 +68,47 @@ const columns = [
 
 const ITEMS_PER_PAGE = 15;
 
+// Definición de operadores con símbolos
+const ALL_OPERATORS = [
+  { key: "eq", label: "=", numeric: true, text: true },
+  { key: "neq", label: "≠", numeric: true, text: true },
+  { key: "gt", label: ">", numeric: true, text: false },
+  { key: "gte", label: "≥", numeric: true, text: false },
+  { key: "lt", label: "<", numeric: true, text: false },
+  { key: "lte", label: "≤", numeric: true, text: false },
+  { key: "contains", label: "Contiene", numeric: false, text: true },
+  { key: "not_contains", label: "No contiene", numeric: false, text: true },
+  { key: "starts_with", label: "Empieza con", numeric: false, text: true },
+  { key: "ends_with", label: "Termina con", numeric: false, text: true },
+  { key: "is_null", label: "Es nulo", numeric: true, text: true },
+  { key: "is_not_null", label: "No es nulo", numeric: true, text: true },
+];
+
+// Columnas numéricas que permiten operadores de comparación
+const NUMERIC_COLUMNS = ["id", "pack_option"];
+
+// Función para obtener operadores disponibles según el tipo de columna
+const getOperatorsForColumn = (columnName: string) => {
+  const isNumeric = NUMERIC_COLUMNS.includes(columnName);
+
+  if (isNumeric) {
+    // Para columnas numéricas, mostrar todos los operadores numéricos
+    return ALL_OPERATORS.filter((op) => op.numeric);
+  } else {
+    // Para columnas de texto (como campaign), solo operadores de texto
+    return ALL_OPERATORS.filter((op) => op.text);
+  }
+};
+
 export default function TamboPage() {
   const { userSession } = UserAuth();
   const [sorteos, setSorteos] = useState<Sorteo[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [forbidden, setForbidden] = useState(false);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [hasSearched, setHasSearched] = useState(false);
 
   // Sistema de filtros dinámicos estilo Supabase
   type Filter = {
@@ -93,127 +126,77 @@ export default function TamboPage() {
   };
 
   const [sortDescriptor, setSortDescriptor] = useState<LocalSortDescriptor>({
-    column: "created_at",
-    direction: "descending",
+    column: "id",
+    direction: "ascending",
   });
 
-  useEffect(() => {
-    const fetchSorteos = async () => {
-      try {
-        // 1️⃣ Verificar que haya sesión activa
-        if (!userSession) {
-          setError("Debes iniciar sesión para ver esta información");
-          setLoading(false);
-          return;
-        }
+  // Función para traer datos del servidor con filtros
+  const fetchSorteos = async (applyFilters = false) => {
+    try {
+      setLoading(true);
+      setError(null);
+      setHasSearched(true);
 
-        // 2️⃣ Hacer la petición a la Edge Function
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-tambo-data`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${userSession.access_token}`,
-            },
-          }
-        );
-
-        if (res.status === 403) {
-          setForbidden(true);
-          setLoading(false);
-          return;
-        }
-
-        const json = await res.json();
-
-        if (!res.ok) throw new Error(json.error || "Error al obtener datos");
-
-        console.log("Respuesta de la API:", json);
-        console.log("Datos de sorteos:", json.data);
-
-        setSorteos(json.data || []);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
+      // 1️⃣ Verificar que haya sesión activa
+      if (!userSession) {
+        setError("Debes iniciar sesión para ver esta información");
         setLoading(false);
+        return;
       }
-    };
 
-    fetchSorteos();
-  }, [userSession]);
+      // 2️⃣ Preparar los filtros para enviar al servidor (solo si applyFilters es true)
+      const filtersToSend = applyFilters ? filters.filter(f => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null") : [];
 
-  // Función para aplicar un filtro individual
-  const applyFilter = (sorteo: Sorteo, filter: Filter): boolean => {
-    const columnValue = sorteo[filter.column as keyof Sorteo];
-    const filterValue = filter.value;
+      // 3️⃣ Preparar el orden
+      const orderBy = {
+        column: sortDescriptor.column,
+        direction: sortDescriptor.direction === "ascending" ? "asc" : "desc"
+      };
 
-    // Si no hay valor en el filtro, no filtrar
-    if (!filterValue || filterValue.trim() === "") return true;
+      // 4️⃣ Hacer la petición a la Edge Function (siempre POST con filtros)
+      const method = "POST";
+      const body = JSON.stringify({ filters: filtersToSend, orderBy });
 
-    switch (filter.operator) {
-      case "eq": // Igual
-        if (typeof columnValue === "number") {
-          return columnValue === parseFloat(filterValue);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-tambo-data`,
+        {
+          method,
+          headers: {
+            Authorization: `Bearer ${userSession.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body,
         }
-        return String(columnValue || "").toLowerCase() === filterValue.toLowerCase();
+      );
 
-      case "neq": // No igual
-        if (typeof columnValue === "number") {
-          return columnValue !== parseFloat(filterValue);
-        }
-        return String(columnValue || "").toLowerCase() !== filterValue.toLowerCase();
+      if (res.status === 403) {
+        setForbidden(true);
+        setLoading(false);
+        return;
+      }
 
-      case "gt": // Mayor que
-        if (typeof columnValue === "number") {
-          return columnValue > parseFloat(filterValue);
-        }
-        return false;
+      const json = await res.json();
 
-      case "gte": // Mayor o igual que
-        if (typeof columnValue === "number") {
-          return columnValue >= parseFloat(filterValue);
-        }
-        return false;
+      if (!res.ok) throw new Error(json.error || "Error al obtener datos");
 
-      case "lt": // Menor que
-        if (typeof columnValue === "number") {
-          return columnValue < parseFloat(filterValue);
-        }
-        return false;
+      console.log("Respuesta de la API:", json);
+      console.log("Datos de sorteos:", json.data);
 
-      case "lte": // Menor o igual que
-        if (typeof columnValue === "number") {
-          return columnValue <= parseFloat(filterValue);
-        }
-        return false;
-
-      case "contains": // Contiene (like)
-        return String(columnValue || "").toLowerCase().includes(filterValue.toLowerCase());
-
-      case "not_contains": // No contiene
-        return !String(columnValue || "").toLowerCase().includes(filterValue.toLowerCase());
-
-      case "starts_with": // Empieza con
-        return String(columnValue || "").toLowerCase().startsWith(filterValue.toLowerCase());
-
-      case "ends_with": // Termina con
-        return String(columnValue || "").toLowerCase().endsWith(filterValue.toLowerCase());
-
-      case "is_null": // Es nulo
-        return columnValue === null || columnValue === undefined || columnValue === "";
-
-      case "is_not_null": // No es nulo
-        return columnValue !== null && columnValue !== undefined && columnValue !== "";
-
-      default:
-        return true;
+      setSorteos(json.data || []);
+      setPage(1); // Resetear a la primera página
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Filtrado local solo para búsqueda general (searchTerm)
+  // Los filtros dinámicos ahora se aplican en el servidor
   const filteredSorteos = useMemo(() => {
     let filtered = sorteos;
 
-    // Filtro por búsqueda general en el input
+    // Filtro por búsqueda general en el input (búsqueda rápida local)
     if (searchTerm.trim()) {
       filtered = filtered.filter((sorteo) => {
         const firstName = sorteo.first_name || "";
@@ -237,13 +220,8 @@ export default function TamboPage() {
       });
     }
 
-    // Aplicar todos los filtros dinámicos (AND)
-    filters.forEach((filter) => {
-      filtered = filtered.filter((sorteo) => applyFilter(sorteo, filter));
-    });
-
     return filtered;
-  }, [sorteos, searchTerm, filters]);
+  }, [sorteos, searchTerm]);
 
   // Ordenar sorteos
   const sortedItems = useMemo(() => {
@@ -334,6 +312,13 @@ export default function TamboPage() {
     setSearchTerm("");
     setFilters([]);
     setPage(1);
+    setSorteos([]);
+    setHasSearched(false);
+  };
+
+  // Función para aplicar filtros (consulta al servidor)
+  const applyFiltersToServer = () => {
+    fetchSorteos(true);
   };
 
   const formatDate = (dateString: string | null) => {
@@ -348,6 +333,43 @@ export default function TamboPage() {
     } catch {
       return "Fecha inválida";
     }
+  };
+
+  // Función para exportar a Excel
+  const exportToExcel = () => {
+    // Preparar los datos para el Excel
+    const dataToExport = sortedItems.map((sorteo) => ({
+      ID: sorteo.id,
+      "FECHA CREACIÓN": formatDate(sorteo.created_at),
+      NOMBRE: sorteo.first_name || "-",
+      APELLIDO: sorteo.last_name || "-",
+      EMAIL: sorteo.email || "-",
+      TELÉFONO: sorteo.phone || "-",
+      "TIPO DOC": sorteo.doc_type || "-",
+      "NRO DOC": sorteo.doc_number || "-",
+      CUMPLEAÑOS: sorteo.bday || "-",
+      DIRECCIÓN: sorteo.address || "-",
+      PACK: sorteo.pack_option ?? "-",
+      "TRANSFER DIAGEO": sorteo.transfer_diageo === true ? "Sí" : sorteo.transfer_diageo === false ? "No" : "-",
+      CAMPAÑA: sorteo.campaign || "-",
+      "TIPO INV": sorteo.inv_type || "-",
+      "SERIE INV": sorteo.inv_serie || "-",
+      "NRO INV": sorteo.inv_number || "-",
+      "CÓDIGO INV": sorteo.inv_code || "-",
+      TÉRMINOS: sorteo.terms_accept || "-",
+      ADS: sorteo.ads_accept || "-",
+      ENCUESTA: sorteo.survey_accept || "-",
+      PUBLICIDAD: sorteo.publicity_accept || "-",
+    }));
+
+    // Crear un libro de trabajo
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Registros Tambo");
+
+    // Generar el archivo y descargarlo
+    const fileName = `registros_tambo_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
   };
 
   const renderCell = useCallback((sorteo: Sorteo, columnKey: React.Key) => {
@@ -426,20 +448,12 @@ export default function TamboPage() {
     }
   }, []);
 
-  if (loading) {
-    return (
-      <div className="w-full h-40 flex justify-center items-center">
-        <Spinner color="secondary" size="md" />
-      </div>
-    );
+  if (forbidden) {
+    return <p className="text-yellow-600 text-center mt-10">No tienes permiso para ver esta información.</p>;
   }
 
   if (error) {
     return <p className="text-red-500 text-center mt-10">{error}</p>;
-  }
-
-  if (forbidden) {
-    return <p className="text-yellow-600 text-center mt-10">No tienes permiso para ver esta información.</p>;
   }
 
   return (
@@ -447,24 +461,6 @@ export default function TamboPage() {
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="flex flex-col gap-4">
           <div className="container-blue-principal">
-            {/* Búsqueda general */}
-            <div className="flex items-center gap-4 mb-4">
-              <Input
-                className="text-[#3E688E] flex-1"
-                classNames={{
-                  inputWrapper:
-                    "!bg-[#F4F4F5] !text-[#3E688E] !placeholder-[#719BC1] input-ui-pro",
-                  mainWrapper: "",
-                }}
-                placeholder="Buscar por nombre, email, teléfono o documento"
-                startContent={
-                  <Icon className="mr-2" color="#719BC1" name="Search" />
-                }
-                value={searchTerm}
-                variant="faded"
-                onChange={handleSearchChange}
-              />
-            </div>
 
             {/* Botones de filtros */}
             <div className="flex items-center gap-3 mb-4">
@@ -475,12 +471,31 @@ export default function TamboPage() {
                 <span>+</span>
                 <span>Agregar Filtro</span>
               </button>
-              {(filters.length > 0 || searchTerm) && (
+              {filters.length > 0 && (
+                <button
+                  onClick={applyFiltersToServer}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors whitespace-nowrap flex items-center gap-2"
+                  disabled={loading}
+                >
+                  <span>🔍</span>
+                  <span>{loading ? "Aplicando..." : "Aplicar Filtros"}</span>
+                </button>
+              )}
+              {(filters.length > 0 || searchTerm || hasSearched) && (
                 <button
                   onClick={clearAllFilters}
                   className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors whitespace-nowrap"
                 >
                   Limpiar todo
+                </button>
+              )}
+              {sortedItems.length > 0 && (
+                <button
+                  onClick={exportToExcel}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap flex items-center gap-2"
+                >
+                  <span>📥</span>
+                  <span>Exportar a Excel</span>
                 </button>
               )}
             </div>
@@ -505,7 +520,7 @@ export default function TamboPage() {
                       }}
                     >
                       {columns.map((col) => (
-                        <SelectItem key={col.uid} value={col.uid}>
+                        <SelectItem key={col.uid}>
                           {col.name}
                         </SelectItem>
                       ))}
@@ -525,42 +540,11 @@ export default function TamboPage() {
                         updateFilter(filter.id, "operator", value);
                       }}
                     >
-                      <SelectItem key="eq" value="eq">
-                        Igual a
-                      </SelectItem>
-                      <SelectItem key="neq" value="neq">
-                        No igual a
-                      </SelectItem>
-                      <SelectItem key="gt" value="gt">
-                        Mayor que
-                      </SelectItem>
-                      <SelectItem key="gte" value="gte">
-                        Mayor o igual
-                      </SelectItem>
-                      <SelectItem key="lt" value="lt">
-                        Menor que
-                      </SelectItem>
-                      <SelectItem key="lte" value="lte">
-                        Menor o igual
-                      </SelectItem>
-                      <SelectItem key="contains" value="contains">
-                        Contiene
-                      </SelectItem>
-                      <SelectItem key="not_contains" value="not_contains">
-                        No contiene
-                      </SelectItem>
-                      <SelectItem key="starts_with" value="starts_with">
-                        Empieza con
-                      </SelectItem>
-                      <SelectItem key="ends_with" value="ends_with">
-                        Termina con
-                      </SelectItem>
-                      <SelectItem key="is_null" value="is_null">
-                        Es nulo
-                      </SelectItem>
-                      <SelectItem key="is_not_null" value="is_not_null">
-                        No es nulo
-                      </SelectItem>
+                      {getOperatorsForColumn(filter.column).map((op) => (
+                        <SelectItem key={op.key}>
+                          {op.label}
+                        </SelectItem>
+                      ))}
                     </Select>
 
                     {/* Input de valor (solo si no es is_null o is_not_null) */}
@@ -592,14 +576,50 @@ export default function TamboPage() {
               </div>
             )}
 
-            <div className="mt-4">
-              <Text color="white" variant="body">
-                Total de registros: {sortedItems.length}
-              </Text>
-            </div>
+            {hasSearched && (
+              <div className="mt-4">
+                <Text color="white" variant="body">
+                  Total de registros: {sortedItems.length}
+                </Text>
+              </div>
+            )}
+
+            {!hasSearched && !loading && (
+              <div className="mt-4 p-8 bg-gradient-to-br from-[#3E688E] via-[#5080a8] to-[#719BC1] rounded-xl shadow-2xl text-center">
+                <div className="text-6xl mb-4 animate-bounce">🔍</div>
+                <h3 className="text-3xl font-bold text-white mb-4 drop-shadow-lg">
+                  ¡Comienza tu búsqueda!
+                </h3>
+                <p className="text-white/90 text-lg mb-5 font-medium">
+                  Para visualizar los registros de Tambo:
+                </p>
+                <div className="bg-[#ff5b00] rounded-lg p-5 inline-block shadow-xl transform hover:scale-105 transition-transform">
+                  <p className="text-white font-bold text-lg leading-relaxed">
+                    1️⃣ Haz clic en <span className="bg-white/20 px-2 py-1 rounded">+ Agregar Filtro</span><br/>
+                    2️⃣ Selecciona tus criterios de búsqueda<br/>
+                    3️⃣ Presiona el botón <span className="bg-white/20 px-2 py-1 rounded">🔍 Aplicar Filtros</span>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {loading && (
+              <div className="mt-4 p-8 bg-gradient-to-br from-[#3E688E] via-[#5080a8] to-[#719BC1] rounded-xl shadow-2xl text-center">
+                <div className="text-6xl mb-4 animate-pulse">⏳</div>
+                <h3 className="text-3xl font-bold text-white mb-4 drop-shadow-lg">
+                  Buscando registros...
+                </h3>
+                <div className="bg-[#ff5b00]/90 rounded-lg p-4 inline-block shadow-lg">
+                  <p className="text-white font-semibold text-lg">
+                    Por favor espera mientras procesamos tu consulta
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
-          <Table
+          {hasSearched && !loading && (
+            <Table
             aria-label="Tabla de Registros de Tambo"
             selectionMode="none"
             sortDescriptor={sortDescriptor}
@@ -636,9 +656,10 @@ export default function TamboPage() {
               )}
             </TableBody>
           </Table>
+          )}
 
           {/* Paginación */}
-          {totalPages > 0 && (
+          {hasSearched && !loading && totalPages > 0 && (
             <div className="flex justify-center mt-4">
               <Pagination
                 isCompact
