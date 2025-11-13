@@ -38,7 +38,7 @@ const LoginPage = () => {
     if (!data.email || !data.password) {
       addToast({
         title: "Error",
-        description: "Por favor completa todos los campos",
+        description: "Por favor ingresa tu correo y contraseña.",
         color: "danger",
       })
       return
@@ -51,8 +51,8 @@ const LoginPage = () => {
 
       if (respError) {
         addToast({
-          title: "Error de autenticación",
-          description: respError.message || "Credenciales incorrectas",
+          title: "Error al iniciar sesión",
+          description: respError.message || "Correo o contraseña incorrectos.",
           color: "danger",
         })
       }
@@ -60,7 +60,7 @@ const LoginPage = () => {
       console.error('Login error:', error)
       addToast({
         title: "Error",
-        description: "Ocurrió un error inesperado",
+        description: "Intenta nuevamente más tarde.",
         color: "danger",
       })
     } finally {
@@ -74,7 +74,7 @@ const LoginPage = () => {
         <img className='w-[80px] pb-3 items-center' src="/img/citrica-logo.png" alt="Logo" />
         <h2 className='text-center mb-4'>
           <Text textColor="white" variant="body">
-            BIENVENIDO
+            ¡Bienvenido!
           </Text>
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center'>
@@ -87,7 +87,7 @@ const LoginPage = () => {
           />
           <Input
             type={showPassword ? "text" : "password"}
-            placeholder="Password"
+            placeholder="Contraseña"
             {...register("password")}
             disabled={isLoading}
             required
@@ -101,7 +101,7 @@ const LoginPage = () => {
           <Button
             type="submit"
             variant="primary"
-            label={isLoading ? 'Accediendo...' : 'Iniciar Sesión'}
+            label={isLoading ? 'Accediendo...' : 'Iniciar sesión'}
             disabled={isLoading}
             isLoading={isLoading}
             fullWidth={true}
@@ -109,10 +109,10 @@ const LoginPage = () => {
           />
         </form>
 
-        <div className="w-[312px] h-[94px] mt-4 flex flex-col justify-center items-center">
+        <div className="w-[312px] mt-4 flex flex-col justify-center items-center">
           <Divider className="w-[210px] h-[1px] bg-[#E5E7EB] mt-[14px] mb-2"></Divider>
           <Link href="/forgot-password">
-            <Text variant="body" textColor='color-black'>
+            <Text variant="label" textColor='color-primary'>
               ¿Olvidaste tu contraseña?
             </Text>
           </Link>
