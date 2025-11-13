@@ -19,7 +19,7 @@ import Icon from "@ui/atoms/icon";
 import { UserAuth } from "@/shared/context/auth-context";
 import { useRoleData } from "@/hooks/role/use-role-data";
 import Text from "@/shared/components/citrica-ui/atoms/text";
-import * as XLSX from "xlsx";
+import { useExcelExport } from "@/hooks/use-excel-export";
 import { Col,Container } from "@/styles/07-objects/objects";
 
 const ITEMS_PER_PAGE = 15;
@@ -63,6 +63,7 @@ export default function RoleDataPage() {
   const { userInfo } = UserAuth();
   const roleId = Number(params.roleId);
 
+  const { exportToExcel } = useExcelExport();
   const { credentials, tableData, isLoading, error, applyFilters } = useRoleData(roleId);
 
   const [page, setPage] = useState(1);
@@ -161,50 +162,13 @@ export default function RoleDataPage() {
     setHasSearched(false);
   };
 
-  // Función para exportar a Excel
-  const exportToExcel = () => {
-    // Preparar los datos para el Excel
-    const dataToExport = filteredData.map((row) => {
-      const exportRow: any = {};
-
-      // Convertir cada columna a un formato amigable para Excel
-      Object.keys(row).forEach((key) => {
-        const value = row[key];
-
-        // Formatear fechas si es posible
-        if (key.toLowerCase().includes('date') || key.toLowerCase().includes('created_at')) {
-          try {
-            const date = new Date(value);
-            if (!isNaN(date.getTime())) {
-              exportRow[key.toUpperCase()] = date.toLocaleDateString("es-ES", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              });
-            } else {
-              exportRow[key.toUpperCase()] = value ?? "-";
-            }
-          } catch {
-            exportRow[key.toUpperCase()] = value ?? "-";
-          }
-        } else if (typeof value === 'object' && value !== null) {
-          exportRow[key.toUpperCase()] = JSON.stringify(value);
-        } else {
-          exportRow[key.toUpperCase()] = value ?? "-";
-        }
-      });
-
-      return exportRow;
+  // Función para exportar a Excel usando el hook reutilizable
+  const handleExportToExcel = () => {
+    exportToExcel({
+      data: filteredData,
+      fileName: credentials?.table_name || 'datos',
+      sheetName: credentials?.table_name || 'Datos',
     });
-
-    // Crear un libro de trabajo
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, credentials?.table_name || "Datos");
-
-    // Generar el archivo y descargarlo
-    const fileName = `${credentials?.table_name || 'datos'}_${new Date().toISOString().split('T')[0]}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
   };
 
   const renderCell = (row: any, columnKey: string) => {
@@ -308,7 +272,7 @@ export default function RoleDataPage() {
 
               {filteredData.length > 0 && (
                 <button
-                  onClick={exportToExcel}
+                  onClick={handleExportToExcel}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap flex items-center gap-2"
                 >
                   <span>📥</span>

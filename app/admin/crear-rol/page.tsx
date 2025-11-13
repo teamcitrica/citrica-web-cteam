@@ -7,17 +7,18 @@ import { useUserRole, RoleType } from "@/hooks/role/use-role";
 import CreateRoleModal from "./components/modal-create-role";
 import EditRoleModal from "./components/modal-edit-role";
 import DeleteRoleModal from "./components/modal-delete-role";
+import { Col, Container } from "@/styles/07-objects/objects";
 
 export default function CrearRolPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<RoleType | null>(null);
-  const { roles, fetchRoles, isLoading } = useUserRole();
+  const { roles, fetchRolesWithCredentials, isLoading } = useUserRole();
 
   useEffect(() => {
-    fetchRoles();
-  }, [fetchRoles]);
+    fetchRolesWithCredentials();
+  }, [fetchRolesWithCredentials]);
 
   const handleEdit = (role: RoleType) => {
     setSelectedRole(role);
@@ -30,12 +31,14 @@ export default function CrearRolPage() {
   };
 
   return (
-    <div className="p-6">
+    <Container>
+      <Col cols={{lg:12,md:6,sm:4}}>
+          <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-black">Gestión de Roles</h1>
           <p className="text-gray-600 mt-2">
-            Crea y administra los roles del sistema
+            Crea y administra los roles con credenciales asociadas
           </p>
         </div>
         <Button
@@ -50,12 +53,12 @@ export default function CrearRolPage() {
       {/* Tabla de roles existentes */}
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold text-black mb-4">
-          Roles Existentes
+          Roles con Credenciales
         </h2>
         {isLoading ? (
           <p className="text-gray-600">Cargando roles...</p>
         ) : roles.length === 0 ? (
-          <p className="text-gray-600">No hay roles creados</p>
+          <p className="text-gray-600">No hay roles con credenciales asociadas</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -135,5 +138,8 @@ export default function CrearRolPage() {
         />
       )}
     </div>
+      </Col>
+    </Container>
+
   );
 }

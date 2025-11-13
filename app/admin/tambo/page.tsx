@@ -16,7 +16,7 @@ import Icon from "@/shared/components/citrica-ui/atoms/icon";
 import Text from "@/shared/components/citrica-ui/atoms/text";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { UserAuth } from "@/shared/context/auth-context";
-import * as XLSX from "xlsx";
+import { useExcelExport } from "@/hooks/use-excel-export";
 
 interface Sorteo {
   id: number;
@@ -102,6 +102,7 @@ const getOperatorsForColumn = (columnName: string) => {
 
 export default function TamboPage() {
   const { userSession } = UserAuth();
+  const { exportToExcel } = useExcelExport();
   const [sorteos, setSorteos] = useState<Sorteo[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -335,41 +336,43 @@ export default function TamboPage() {
     }
   };
 
-  // Función para exportar a Excel
-  const exportToExcel = () => {
-    // Preparar los datos para el Excel
-    const dataToExport = sortedItems.map((sorteo) => ({
-      ID: sorteo.id,
-      "FECHA CREACIÓN": formatDate(sorteo.created_at),
-      NOMBRE: sorteo.first_name || "-",
-      APELLIDO: sorteo.last_name || "-",
-      EMAIL: sorteo.email || "-",
-      TELÉFONO: sorteo.phone || "-",
-      "TIPO DOC": sorteo.doc_type || "-",
-      "NRO DOC": sorteo.doc_number || "-",
-      CUMPLEAÑOS: sorteo.bday || "-",
-      DIRECCIÓN: sorteo.address || "-",
-      PACK: sorteo.pack_option ?? "-",
-      "TRANSFER DIAGEO": sorteo.transfer_diageo === true ? "Sí" : sorteo.transfer_diageo === false ? "No" : "-",
-      CAMPAÑA: sorteo.campaign || "-",
-      "TIPO INV": sorteo.inv_type || "-",
-      "SERIE INV": sorteo.inv_serie || "-",
-      "NRO INV": sorteo.inv_number || "-",
-      "CÓDIGO INV": sorteo.inv_code || "-",
-      TÉRMINOS: sorteo.terms_accept || "-",
-      ADS: sorteo.ads_accept || "-",
-      ENCUESTA: sorteo.survey_accept || "-",
-      PUBLICIDAD: sorteo.publicity_accept || "-",
-    }));
-
-    // Crear un libro de trabajo
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Registros Tambo");
-
-    // Generar el archivo y descargarlo
-    const fileName = `registros_tambo_${new Date().toISOString().split('T')[0]}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
+  // Función para exportar a Excel usando el hook reutilizable
+  const handleExportToExcel = () => {
+    exportToExcel({
+      data: sortedItems,
+      fileName: "registros_tambo",
+      sheetName: "Registros Tambo",
+      columnMapping: {
+        id: "ID",
+        created_at: "FECHA CREACIÓN",
+        first_name: "NOMBRE",
+        last_name: "APELLIDO",
+        email: "EMAIL",
+        phone: "TELÉFONO",
+        doc_type: "TIPO DOC",
+        doc_number: "NRO DOC",
+        bday: "CUMPLEAÑOS",
+        address: "DIRECCIÓN",
+        pack_option: "PACK",
+        transfer_diageo: "TRANSFER DIAGEO",
+        campaign: "CAMPAÑA",
+        inv_type: "TIPO INV",
+        inv_serie: "SERIE INV",
+        inv_number: "NRO INV",
+        inv_code: "CÓDIGO INV",
+        terms_accept: "TÉRMINOS",
+        ads_accept: "ADS",
+        survey_accept: "ENCUESTA",
+        publicity_accept: "PUBLICIDAD",
+      },
+      customFormatter: (key, value) => {
+        // Formatear booleano de transfer_diageo
+        if (key === "transfer_diageo") {
+          return value === true ? "Sí" : value === false ? "No" : "-";
+        }
+        return value;
+      },
+    });
   };
 
   const renderCell = useCallback((sorteo: Sorteo, columnKey: React.Key) => {
@@ -491,7 +494,7 @@ export default function TamboPage() {
               )}
               {sortedItems.length > 0 && (
                 <button
-                  onClick={exportToExcel}
+                  onClick={handleExportToExcel}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap flex items-center gap-2"
                 >
                   <span>📥</span>

@@ -41,6 +41,52 @@ export const useUserRole = () => {
     }
   }, [supabase]);
 
+  const fetchRolesWithCredentials = useCallback(async () => {
+    try {
+      setIsLoading(true);
+
+      // Primero, obtener los role_id que tienen credenciales
+      const { data: credentialsData, error: credentialsError } = await supabase
+        .from("credentials")
+        .select("role_id");
+
+      if (credentialsError) {
+        console.error("Error al obtener credenciales:", credentialsError);
+        setRoles([]);
+        return;
+      }
+
+      // Extraer los role_id únicos
+      const roleIdsWithCredentials = Array.from(
+        new Set(credentialsData?.map((cred) => cred.role_id) || [])
+      );
+
+      if (roleIdsWithCredentials.length === 0) {
+        setRoles([]);
+        return;
+      }
+
+      // Obtener los roles que tienen credenciales
+      const { data, error } = await supabase
+        .from("roles")
+        .select("*")
+        .in("id", roleIdsWithCredentials);
+
+      if (error) {
+        console.error("Error al obtener roles con credenciales:", error);
+        setRoles([]);
+        return;
+      }
+
+      setRoles(data || []);
+    } catch (err) {
+      console.error("Error en fetchRolesWithCredentials:", err);
+      setRoles([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [supabase]);
+
   const createRole = useCallback(async (roleData: {
     name: string;
     description: string;
@@ -202,6 +248,7 @@ export const useUserRole = () => {
     roles,
     isLoading,
     fetchRoles,
+    fetchRolesWithCredentials,
     createRole,
     updateRole,
     deleteRole,
