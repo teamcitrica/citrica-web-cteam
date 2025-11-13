@@ -178,4 +178,37 @@
   --color-secondary-textarea-text: #{$color-dark-secondary-textarea-text};
   --color-secondary-textarea-text-hover: #{$color-dark-secondary-textarea-text-hover};
   --color-secondary-textarea-placeholder: #{$color-dark-secondary-textarea-placeholder};
+
+  // Calendar colors
+  --color-primary-calendar-base-bg: #{$color-dark-primary-calendar-base-bg};
+  --color-primary-calendar-header-bg: #{$color-dark-primary-calendar-header-bg};
+  --color-primary-calendar-header-text: #{$color-dark-primary-calendar-header-text};
+  --color-primary-calendar-header-hover: #{$color-dark-primary-calendar-header-hover};
+  --color-primary-calendar-grid-header-bg: #{$color-dark-primary-calendar-grid-header-bg};
+  --color-primary-calendar-grid-header-text: #{$color-dark-primary-calendar-grid-header-text};
+  --color-primary-calendar-grid-body-bg: #{$color-dark-primary-calendar-grid-body-bg};
+  --color-primary-calendar-cell-hover: #{$color-dark-primary-calendar-cell-hover};
+  --color-primary-calendar-cell-button-hover: #{$color-dark-primary-calendar-cell-button-hover};
+  --color-primary-calendar-cell-selected: #{$color-dark-primary-calendar-cell-selected};
+  --color-primary-calendar-cell-selected-text: #{$color-dark-primary-calendar-cell-selected-text};
+  --color-primary-calendar-cell-selected-hover: #{$color-dark-primary-calendar-cell-selected-hover};
+  --color-primary-calendar-cell-focus: #{$color-dark-primary-calendar-cell-focus};
+  --color-primary-calendar-cell-today-bg: #{$color-dark-primary-calendar-cell-today-bg};
+  --color-primary-calendar-cell-today-text: #{$color-dark-primary-calendar-cell-today-text};
+
+  --color-secondary-calendar-base-bg: #{$color-dark-secondary-calendar-base-bg};
+  --color-secondary-calendar-header-bg: #{$color-dark-secondary-calendar-header-bg};
+  --color-secondary-calendar-header-text: #{$color-dark-secondary-calendar-header-text};
+  --color-secondary-calendar-header-hover: #{$color-dark-secondary-calendar-header-hover};
+  --color-secondary-calendar-grid-header-bg: #{$color-dark-secondary-calendar-grid-header-bg};
+  --color-secondary-calendar-grid-header-text: #{$color-dark-secondary-calendar-grid-header-text};
+  --color-secondary-calendar-grid-body-bg: #{$color-dark-secondary-calendar-grid-body-bg};
+  --color-secondary-calendar-cell-hover: #{$color-dark-secondary-calendar-cell-hover};
+  --color-secondary-calendar-cell-button-hover: #{$color-dark-secondary-calendar-cell-button-hover};
+  --color-secondary-calendar-cell-selected: #{$color-dark-secondary-calendar-cell-selected};
+  --color-secondary-calendar-cell-selected-text: #{$color-dark-secondary-calendar-cell-selected-text};
+  --color-secondary-calendar-cell-selected-hover: #{$color-dark-secondary-calendar-cell-selected-hover};
+  --color-secondary-calendar-cell-focus: #{$color-dark-secondary-calendar-cell-focus};
+  --color-secondary-calendar-cell-today-bg: #{$color-dark-secondary-calendar-cell-today-bg};
+  --color-secondary-calendar-cell-today-text: #{$color-dark-secondary-calendar-cell-today-text};
 }

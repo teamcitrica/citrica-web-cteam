@@ -350,6 +350,21 @@ export const ContactSectionLanding = ({
                       Seleccionar Horario
                     </Text>
 
+                    {formData.date && (
+                      <div className="text-center mb-2">
+                        <Text variant="body" textColor="color-on-surface" className="font-medium">
+                          Fecha seleccionada: {(() => {
+                            const months = [
+                              'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                              'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                            ];
+                            const date = formData.date;
+                            return `${date.day} de ${months[date.month - 1]} de ${date.year}`;
+                          })()}
+                        </Text>
+                      </div>
+                    )}
+
                     {studioConfig.allow_multiple_time_slots && (
                       <div className="text-center">
                         <Text variant="body" textColor="color-on-surface-var" className="text-sm">
