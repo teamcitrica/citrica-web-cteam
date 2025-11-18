@@ -1,4 +1,16 @@
 .bg-sidebar{
-  background-color:#0F172A;
-  color: var(--color-primary);
+  background-color:#ffffff;
+  color: #ffffff;
+}
+
+.container-blue-principal {
+  background-color: #ffffff;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #265197;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
