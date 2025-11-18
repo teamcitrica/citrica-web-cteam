@@ -7,23 +7,39 @@ import { Divider, Link } from "@heroui/react";
 import Button from '../molecules/button';
 import Modal from '../molecules/modal';
 import Icon from '../atoms/icon';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
 
 const ForgotPasswordPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailSentModal, setShowEmailSentModal] = useState(false);
   const [email, setEmail] = useState('');
+  const supabase = createClientComponentClient();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setIsLoading(true);
-      // Simular envío de email
-      setTimeout(() => {
-        setIsLoading(false);
-        setShowEmailSentModal(true);
-      }, 1000);
-    }
-  };
+
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (!email) return;
+
+  setIsLoading(true);
+
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: "http://localhost:3000/new-password",
+  });
+
+  setIsLoading(false);
+
+  if (error) {
+    console.error("Error al enviar correo:", error.message);
+    alert("Hubo un error: " + error.message);
+    return;
+  }
+
+  // Si no hubo error → mostrar modal
+  setShowEmailSentModal(true);
+};
 
   return (
     <Container className='w-[968px] flex justify-center items-center !flex-nowrap'>
@@ -49,7 +65,7 @@ const ForgotPasswordPage = () => {
             description='Te enviaremos un enlace para restablecerla.'
             className='mb-2'
           />
-          <Button 
+          <Button
             type="submit"
             variant='primary'
             label={isLoading ? 'Enviando...' : 'Enviar enlace'}
@@ -80,7 +96,7 @@ const ForgotPasswordPage = () => {
         <div className="flex flex-col items-center py-6 px-4">
           {/* Icono de check */}
           <div className="flex items-center justify-center mb-4">
-            <Icon name='CircleCheckBig' size={32} color="var(--color-primary)"/>
+            <Icon name='CircleCheckBig' size={32} color="var(--color-primary)" />
           </div>
           <h3 className="mb-3">
             <Text variant="title" weight="bold">
@@ -92,16 +108,16 @@ const ForgotPasswordPage = () => {
               Revisa tu bandeja y sigue el enlace para restablecer tu contraseña.
             </Text>
           </p>
-          
+
           {/* Botón Cerrar */}
-          <Button 
+          <Button
             variant="primary"
             label="Cerrar"
             fullWidth
             onClick={() => setShowEmailSentModal(false)}
             className="mb-4"
           />
-          
+
           {/* Link de login */}
           <div className="text-center">
             <Text variant="label" textColor="color-on-secondary">

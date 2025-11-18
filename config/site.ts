@@ -61,6 +61,25 @@ export const siteConfig = {
 				},
 			],
 		},
+		{
+			title: "CRM",
+			icon: "Users",
+			href: "/admin/crm",
+			subItems: [
+				{
+					title: "Empresas",
+					href: "/admin/crm/empresas",
+				},
+				{
+					title: "Proyectos",
+					href: "/admin/crm/proyectos",
+				},
+				{
+					title: "Contactos",
+					href: "/admin/crm/contactos",
+				},
+			],
+		},
 		// {
 		// 	title: "Reuniones",
 		// 	icon: "ClipboardCheck",
