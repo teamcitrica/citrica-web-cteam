@@ -17,6 +17,8 @@ import { useProjectCRUD, ProjectInput, Project } from "@/hooks/projects/use-proj
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { useContactCRUD } from "@/hooks/contacts/use-contacts";
 import { useProjectContacts } from "@/hooks/project-contacts/use-project-contacts";
+import { useUserCRUD } from "@/hooks/users/use-users";
+import { useUserProjects } from "@/hooks/user-projects/use-user-projects";
 
 interface ProjectFormModalProps {
   isOpen: boolean;
@@ -34,10 +36,13 @@ export default function ProjectFormModal({
   const { createProject, updateProject, isLoading } = useProjectCRUD();
   const { companies } = useCompanyCRUD();
   const { contacts } = useContactCRUD();
+  const { users } = useUserCRUD();
   const { getProjectContacts, syncProjectContacts } = useProjectContacts();
+  const { getProjectUsers, syncProjectUsers } = useUserProjects();
   const [availableTables, setAvailableTables] = useState<string[]>([]);
   const [isLoadingTables, setIsLoadingTables] = useState(false);
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
 
   const [formData, setFormData] = useState<ProjectInput>({
     name: project?.name || null,
@@ -66,12 +71,21 @@ export default function ProjectFormModal({
         setSelectedContactIds(contactIds);
       };
 
+      // Cargar usuarios asociados al proyecto
+      const loadProjectUsers = async () => {
+        const projectUsers = await getProjectUsers(project.id);
+        const userIds = new Set(projectUsers.map(u => u.id).filter((id): id is string => !!id));
+        setSelectedUserIds(userIds);
+      };
+
       loadProjectContacts();
+      loadProjectUsers();
     } else {
       // Limpiar selección cuando es modo crear
       setSelectedContactIds(new Set());
+      setSelectedUserIds(new Set());
     }
-  }, [project, mode, getProjectContacts]);
+  }, [project, mode, getProjectContacts, getProjectUsers]);
 
   const handleInputChange = (field: keyof ProjectInput, value: string | number) => {
     setFormData((prev) => ({
@@ -187,10 +201,16 @@ export default function ProjectFormModal({
       if (mode === "create") {
         const result = await createProject(cleanedData as ProjectInput);
         if (result) {
+          const projectId = result[0].id;
+
           // Si se creó el proyecto y hay contactos seleccionados, asociarlos
           if (selectedContactIds.size > 0) {
-            const projectId = result[0].id;
             await syncProjectContacts(projectId, Array.from(selectedContactIds));
+          }
+
+          // Si hay usuarios seleccionados, asociarlos
+          if (selectedUserIds.size > 0) {
+            await syncProjectUsers(projectId, Array.from(selectedUserIds));
           }
 
           setFormData({
@@ -203,6 +223,7 @@ export default function ProjectFormModal({
           });
           setAvailableTables([]);
           setSelectedContactIds(new Set());
+          setSelectedUserIds(new Set());
           onClose();
         }
       } else {
@@ -210,6 +231,9 @@ export default function ProjectFormModal({
 
         // Sincronizar contactos del proyecto
         await syncProjectContacts(project!.id, Array.from(selectedContactIds));
+
+        // Sincronizar usuarios del proyecto
+        await syncProjectUsers(project!.id, Array.from(selectedUserIds));
 
         onClose();
       }
@@ -283,7 +307,7 @@ export default function ProjectFormModal({
                   {contacts
                     .filter(contact => contact.company_id === formData.company_id)
                     .map((contact) => (
-                      <SelectItem key={contact.id} value={contact.id}>
+                      <SelectItem key={contact.id}>
                         {contact.name || "Sin nombre"} {contact.cargo ? `- ${contact.cargo}` : ""}
                       </SelectItem>
                     ))}
@@ -295,6 +319,33 @@ export default function ProjectFormModal({
                 )}
               </div>
             )}
+
+            <div className="col-span-2">
+              <Select
+                label="Usuarios Asignados al Proyecto"
+                placeholder="Seleccione los usuarios"
+                selectionMode="multiple"
+                selectedKeys={selectedUserIds}
+                onSelectionChange={(keys) => setSelectedUserIds(keys as Set<string>)}
+                classNames={{
+                  label: "text-gray-700",
+                  value: "text-gray-800",
+                }}
+              >
+                {users.map((user) => (
+                  <SelectItem key={user.id}>
+                    {user.first_name && user.last_name
+                      ? `${user.first_name} ${user.last_name} (${user.email})`
+                      : user.email}
+                  </SelectItem>
+                ))}
+              </Select>
+              {users.length === 0 && (
+                <p className="text-sm text-gray-500 mt-2">
+                  No hay usuarios disponibles
+                </p>
+              )}
+            </div>
 
             <div className="col-span-2">
               <Input

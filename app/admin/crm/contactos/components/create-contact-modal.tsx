@@ -35,6 +35,8 @@ export default function CreateContactModal({
     address: null,
     phone: null,
     company_id: null,
+    user_id: null,
+    has_system_access: false,
   });
 
   const handleInputChange = (field: keyof ContactInput, value: string | number) => {
@@ -65,6 +67,8 @@ export default function CreateContactModal({
           address: null,
           phone: null,
           company_id: null,
+          user_id: null,
+          has_system_access: false,
         });
         onClose();
       }
@@ -140,16 +144,6 @@ export default function CreateContactModal({
                 input: "text-gray-800",
               }}
             />
-            <Input
-              label="Tipo"
-              placeholder="Tipo de contacto"
-              value={formData.tipo || ""}
-              onChange={(e) => handleInputChange("tipo", e.target.value)}
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
-            />
             <Select
               label="Empresa"
               placeholder="Seleccione una empresa"
@@ -164,7 +158,7 @@ export default function CreateContactModal({
               }}
             >
               {companies.map((company) => (
-                <SelectItem key={String(company.id)} value={String(company.id)}>
+                <SelectItem key={String(company.id)}>
                   {company.name || `Empresa ${company.id}`}
                 </SelectItem>
               ))}

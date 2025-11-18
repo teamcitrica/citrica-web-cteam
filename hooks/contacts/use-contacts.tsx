@@ -13,6 +13,8 @@ export interface Contact {
   address: string | null;
   phone: string | null;
   name: string | null;
+  user_id: string | null;
+  has_system_access: boolean | null;
 }
 
 export type ContactInput = Omit<Contact, "id">;
@@ -186,6 +188,91 @@ export const useContactCRUD = () => {
     }
   };
 
+  // Activar acceso al sistema para un contacto
+  const activateContactAccess = async (contactId: string) => {
+    try {
+      setIsLoading(true);
+
+      const response = await fetch('/api/admin/activate-contact-access', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ contact_id: contactId }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al activar acceso');
+      }
+
+      addToast({
+        title: "Acceso activado",
+        description: `Contraseña temporal: ${result.temporary_password}`,
+        color: "success",
+      });
+
+      await fetchContacts();
+
+      return {
+        success: true,
+        temporaryPassword: result.temporary_password,
+      };
+    } catch (err: any) {
+      console.error("Error al activar acceso:", err);
+      addToast({
+        title: "Error",
+        description: err.message || "No se pudo activar el acceso",
+        color: "danger",
+      });
+      return { success: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Desactivar acceso al sistema para un contacto
+  const deactivateContactAccess = async (contactId: string) => {
+    try {
+      setIsLoading(true);
+
+      const response = await fetch('/api/admin/activate-contact-access', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ contact_id: contactId }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al desactivar acceso');
+      }
+
+      addToast({
+        title: "Acceso desactivado",
+        description: "El contacto ya no puede acceder al sistema",
+        color: "success",
+      });
+
+      await fetchContacts();
+
+      return { success: true };
+    } catch (err: any) {
+      console.error("Error al desactivar acceso:", err);
+      addToast({
+        title: "Error",
+        description: err.message || "No se pudo desactivar el acceso",
+        color: "danger",
+      });
+      return { success: false, error: err.message };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Refresh function
   const refreshContacts = useCallback(async () => {
     await fetchContacts();
@@ -204,5 +291,7 @@ export const useContactCRUD = () => {
     createContact,
     updateContact,
     deleteContact,
+    activateContactAccess,
+    deactivateContactAccess,
   };
 };

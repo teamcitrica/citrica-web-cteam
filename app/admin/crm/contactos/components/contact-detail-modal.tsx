@@ -69,12 +69,6 @@ export default function ContactDetailModal({
                   {contact.address || "-"}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Tipo</p>
-                <p className="text-base font-medium text-gray-800">
-                  {contact.tipo || "-"}
-                </p>
-              </div>
               <div className="col-span-2">
                 <p className="text-sm text-gray-500">Empresa</p>
                 <p className="text-base font-medium text-gray-800">
