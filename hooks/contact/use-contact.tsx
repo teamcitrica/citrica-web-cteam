@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSupabase } from '@/shared/context/supabase-context'
 import { useBookingsAvailability } from '@/hooks/disponibilidad/use-bookings-availability'
 import { useServerTime } from '@/hooks/use-server-time'
@@ -18,6 +18,7 @@ interface ContactFormData {
 export const useContact = () => {
   const { supabase } = useSupabase()
   const {
+    bookings,
     getOccupiedSlots,
     getAvailableSlots,
     isDateFullyBooked,
@@ -43,6 +44,61 @@ export const useContact = () => {
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([])
   const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>([]) // Para selección múltiple
   const [fullyBookedDates, setFullyBookedDates] = useState<Set<string>>(new Set()) // Cache de fechas completamente reservadas
+  const [isLoadingBookedDates, setIsLoadingBookedDates] = useState(true) // Estado de carga de fechas bloqueadas
+
+  // Precargar fechas bloqueadas/reservadas (optimizado)
+  useEffect(() => {
+    const preloadBlockedDates = async () => {
+      if (!serverToday || !bookings) return
+
+      setIsLoadingBookedDates(true)
+      const blockedDates = new Set<string>()
+
+      // Identificar fechas con bloqueos de día completo (time_slots incluye '00:00')
+      bookings.forEach(booking => {
+        if (booking.time_slots && booking.time_slots.includes('00:00')) {
+          blockedDates.add(booking.booking_date)
+        }
+      })
+
+      // Para fechas futuras en los próximos 3 meses, verificar si están completamente reservadas
+      const startDate = new Date(serverToday.year, serverToday.month - 1, serverToday.day)
+      const endDate = new Date(startDate)
+      endDate.setMonth(endDate.getMonth() + 3)
+
+      const dateChecks = []
+      const currentDate = new Date(startDate)
+
+      while (currentDate <= endDate) {
+        const year = currentDate.getFullYear()
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0')
+        const day = String(currentDate.getDate()).padStart(2, '0')
+        const dateStr = `${year}-${month}-${day}`
+
+        // Solo verificar fechas que no tienen bloqueo de día completo
+        if (!blockedDates.has(dateStr)) {
+          dateChecks.push(
+            isDateFullyBooked(dateStr).then(isBlocked => ({ dateStr, isBlocked }))
+          )
+        }
+
+        currentDate.setDate(currentDate.getDate() + 1)
+      }
+
+      // Ejecutar todas las verificaciones en paralelo
+      const results = await Promise.all(dateChecks)
+      results.forEach(({ dateStr, isBlocked }) => {
+        if (isBlocked) {
+          blockedDates.add(dateStr)
+        }
+      })
+
+      setFullyBookedDates(blockedDates)
+      setIsLoadingBookedDates(false)
+    }
+
+    preloadBlockedDates()
+  }, [serverToday, bookings, isDateFullyBooked])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
@@ -280,6 +336,7 @@ export const useContact = () => {
     studioConfig,
     // Fecha del servidor
     serverToday,
-    isLoadingServerTime
+    isLoadingServerTime,
+    isLoadingBookedDates
   }
 }
