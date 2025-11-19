@@ -37,12 +37,12 @@ const handleSubmit = async (e: React.FormEvent) => {
     return;
   }
 
-  // Guardar el email en localStorage para usarlo en la verificación del OTP
+  
   if (typeof window !== 'undefined') {
     localStorage.setItem('password_reset_email', email);
   }
 
-  // Si no hubo error → mostrar modal
+
   setShowEmailSentModal(true);
 };
 
@@ -89,7 +89,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       </div>
       <div className='bg-login not-sm'></div>
 
-      {/* Modal de Email Enviado */}
+     
       <Modal
         isOpen={showEmailSentModal}
         onClose={() => setShowEmailSentModal(false)}
@@ -99,7 +99,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         className="text-center"
       >
         <div className="flex flex-col items-center py-6 px-4">
-          {/* Icono de check */}
+      
           <div className="flex items-center justify-center mb-4">
             <Icon name='CircleCheckBig' size={32} color="var(--color-primary)" />
           </div>
@@ -114,7 +114,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             </Text>
           </p>
 
-          {/* Botón Cerrar */}
+     
           <Button
             variant="primary"
             label="Cerrar"
@@ -123,7 +123,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             className="mb-4"
           />
 
-          {/* Link de login */}
+
           <div className="text-center">
             <Text variant="label" textColor="color-on-secondary">
               ¿Ya tienes una cuenta?{' '}
