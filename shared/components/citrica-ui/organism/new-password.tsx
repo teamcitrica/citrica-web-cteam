@@ -46,7 +46,6 @@ useEffect(() => {
       });
       console.log("📍 Todos los parámetros:", allParams);
 
-      // Primero verificar si hay una sesión activa
       const { data: { session } } = await supabase.auth.getSession();
 
       if (session) {
@@ -56,8 +55,6 @@ useEffect(() => {
         return;
       }
 
-      // Si no hay sesión, intentar obtener el access_token de los query params
-      // IMPORTANTE: El template actual usa {{ .Token }} que es un OTP de 6 dígitos
       const accessToken = params.get("access_token");
       const type = params.get("type");
 
@@ -69,11 +66,11 @@ useEffect(() => {
       if (accessToken && type === "recovery") {
         console.log("✅ Token de recovery encontrado, verificando OTP...");
 
-        // Verificar si el token parece un OTP (6 dígitos)
+
         if (/^\d{6}$/.test(accessToken)) {
           console.log("Token es un OTP de 6 dígitos, usando verifyOtp");
 
-          // Obtener el email del localStorage
+
           const savedEmail = typeof window !== 'undefined'
             ? localStorage.getItem('password_reset_email')
             : null;
@@ -96,7 +93,7 @@ useEffect(() => {
             setIsValidRecovery(false);
           } else if (data.session) {
             console.log("✅ Sesión creada con OTP");
-            // Limpiar el email guardado
+
             localStorage.removeItem('password_reset_email');
             setIsValidRecovery(true);
           } else {
@@ -122,7 +119,6 @@ useEffect(() => {
         return;
       }
 
-      // Intentar con token_hash (flujo PKCE moderno)
       const tokenHash = params.get("token_hash");
       if (tokenHash && type === "recovery") {
         console.log("✅ Token hash de recovery encontrado, validando sesión...");
@@ -141,7 +137,6 @@ useEffect(() => {
         return;
       }
 
-      // Intentar con hash en la URL (flujo antiguo)
       if (typeof window !== "undefined" && window.location.hash) {
         const hash = window.location.hash;
         const paramsHash = new URLSearchParams(hash.replace("#", "?"));
@@ -167,8 +162,6 @@ useEffect(() => {
           return;
         }
       }
-
-      // No hay token válido
       console.error("❌ No se encontró token de recuperación válido");
       setIsValidRecovery(false);
       setChecked(true);
@@ -183,9 +176,6 @@ useEffect(() => {
 }, [params, supabase]);
 
 
-  /** ---------------------------------------------------------
-   *  PASO 2: Cambiar contraseña
-   * --------------------------------------------------------*/
   const onSubmit = async (data: FormValues) => {
     if (!isValidRecovery) {
       alert("Link inválido o expirado.");
@@ -213,7 +203,7 @@ useEffect(() => {
     router.push('/login');
   };
 
-  // Esperar a que se valide el token
+
   if (!checked) return null;
 
   return (
@@ -273,7 +263,6 @@ useEffect(() => {
 
       <div className="bg-login not-sm"></div>
 
-      {/* Modal éxito */}
       <Modal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
