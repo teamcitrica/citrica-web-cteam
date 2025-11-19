@@ -1,13 +1,18 @@
 import { NextResponse } from 'next/server'
 
+// Configuración de runtime para Vercel Edge
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET() {
   // Zona horaria del negocio
   const TIMEZONE = 'America/Lima'
 
   const now = new Date()
 
-  // Convertir a zona horaria de Lima
-  const limaDateString = now.toLocaleString('en-US', {
+  // Convertir a zona horaria de Lima usando Intl.DateTimeFormat (más robusto)
+  const formatter = new Intl.DateTimeFormat('en-US', {
     timeZone: TIMEZONE,
     year: 'numeric',
     month: '2-digit',
@@ -18,12 +23,17 @@ export async function GET() {
     hour12: false
   })
 
-  // Parsear la fecha en formato: MM/DD/YYYY, HH:MM:SS
-  const [datePart, timePart] = limaDateString.split(', ')
-  const [month, day, year] = datePart.split('/').map(Number)
-  const [hours, minutes, seconds] = timePart.split(':').map(Number)
+  const parts = formatter.formatToParts(now)
+  const getValue = (type: string) => parts.find(p => p.type === type)?.value || '0'
 
-  return NextResponse.json({
+  const year = parseInt(getValue('year'))
+  const month = parseInt(getValue('month'))
+  const day = parseInt(getValue('day'))
+  const hours = parseInt(getValue('hour'))
+  const minutes = parseInt(getValue('minute'))
+  const seconds = parseInt(getValue('second'))
+
+  const response = NextResponse.json({
     date: now.toISOString(),
     timestamp: now.getTime(),
     timezone: TIMEZONE,
@@ -36,4 +46,11 @@ export async function GET() {
     // Formato de hora para comparación fácil (HH:MM)
     currentTime: `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
   })
+
+  // Headers para prevenir cacheo en producción
+  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0')
+  response.headers.set('Pragma', 'no-cache')
+  response.headers.set('Expires', '0')
+
+  return response
 }
