@@ -24,23 +24,168 @@ const NewPasswordPage = () => {
 
   const [isValidRecovery, setIsValidRecovery] = useState(false);
   const [checked, setChecked] = useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // Verificar si el link es válido y viene con token de recuperación
-  useEffect(() => {
-    const token = params.get("access_token");
-    const type = params.get("type");
+  /** ---------------------------------------------------------
+   *  PASO 1: Validar token de recuperación
+   * --------------------------------------------------------*/
+useEffect(() => {
+  const init = async () => {
+    try {
+      // LOG: Mostrar TODA la URL y parámetros
+      console.log("📍 URL completa:", window.location.href);
+      console.log("📍 Search params:", window.location.search);
+      console.log("📍 Hash:", window.location.hash);
 
-    if (token && type === "recovery") {
-      setIsValidRecovery(true);
+      // Obtener TODOS los parámetros
+      const allParams: Record<string, string> = {};
+      params.forEach((value, key) => {
+        allParams[key] = value;
+      });
+      console.log("📍 Todos los parámetros:", allParams);
+
+      // Primero verificar si hay una sesión activa
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session) {
+        console.log("✅ Sesión activa encontrada");
+        setIsValidRecovery(true);
+        setChecked(true);
+        return;
+      }
+
+      // Si no hay sesión, intentar obtener el access_token de los query params
+      // IMPORTANTE: El template actual usa {{ .Token }} que es un OTP de 6 dígitos
+      const accessToken = params.get("access_token");
+      const type = params.get("type");
+
+      console.log("🔍 Parámetros específicos:", {
+        accessToken: accessToken ? `presente (${accessToken})` : "ausente",
+        type
+      });
+
+      if (accessToken && type === "recovery") {
+        console.log("✅ Token de recovery encontrado, verificando OTP...");
+
+        // Verificar si el token parece un OTP (6 dígitos)
+        if (/^\d{6}$/.test(accessToken)) {
+          console.log("Token es un OTP de 6 dígitos, usando verifyOtp");
+
+          // Obtener el email del localStorage
+          const savedEmail = typeof window !== 'undefined'
+            ? localStorage.getItem('password_reset_email')
+            : null;
+
+          if (!savedEmail) {
+            console.error("❌ No se encontró el email guardado");
+            setIsValidRecovery(false);
+            setChecked(true);
+            return;
+          }
+
+          const { data, error } = await supabase.auth.verifyOtp({
+            email: savedEmail,
+            token: accessToken,
+            type: 'recovery',
+          });
+
+          if (error) {
+            console.error("❌ Error verifyOtp:", error);
+            setIsValidRecovery(false);
+          } else if (data.session) {
+            console.log("✅ Sesión creada con OTP");
+            // Limpiar el email guardado
+            localStorage.removeItem('password_reset_email');
+            setIsValidRecovery(true);
+          } else {
+            console.error("❌ No se pudo crear sesión con OTP");
+            setIsValidRecovery(false);
+          }
+        } else {
+          console.log("Token parece ser JWT, intentando setSession");
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: accessToken,
+          });
+
+          if (error) {
+            console.error("❌ Error setSession:", error);
+            setIsValidRecovery(false);
+          } else {
+            console.log("✅ Sesión creada con JWT");
+            setIsValidRecovery(true);
+          }
+        }
+        setChecked(true);
+        return;
+      }
+
+      // Intentar con token_hash (flujo PKCE moderno)
+      const tokenHash = params.get("token_hash");
+      if (tokenHash && type === "recovery") {
+        console.log("✅ Token hash de recovery encontrado, validando sesión...");
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const { data: { session: newSession } } = await supabase.auth.getSession();
+
+        if (newSession) {
+          console.log("✅ Sesión creada exitosamente");
+          setIsValidRecovery(true);
+        } else {
+          console.error("❌ No se pudo crear sesión con token_hash");
+          setIsValidRecovery(false);
+        }
+        setChecked(true);
+        return;
+      }
+
+      // Intentar con hash en la URL (flujo antiguo)
+      if (typeof window !== "undefined" && window.location.hash) {
+        const hash = window.location.hash;
+        const paramsHash = new URLSearchParams(hash.replace("#", "?"));
+        const hashAccessToken = paramsHash.get("access_token");
+        const hashType = paramsHash.get("type");
+
+        console.log("🔍 Hash params:", { accessToken: hashAccessToken ? "presente" : "ausente", type: hashType });
+
+        if (hashAccessToken && hashType === "recovery") {
+          const { error } = await supabase.auth.setSession({
+            access_token: hashAccessToken,
+            refresh_token: hashAccessToken,
+          });
+
+          if (error) {
+            console.error("❌ Error setSession:", error);
+            setIsValidRecovery(false);
+          } else {
+            console.log("✅ Sesión creada desde hash");
+            setIsValidRecovery(true);
+          }
+          setChecked(true);
+          return;
+        }
+      }
+
+      // No hay token válido
+      console.error("❌ No se encontró token de recuperación válido");
+      setIsValidRecovery(false);
+      setChecked(true);
+    } catch (error) {
+      console.error("❌ Error en init:", error);
+      setIsValidRecovery(false);
+      setChecked(true);
     }
+  };
 
-    setChecked(true);
-  }, [params]);
+  init();
+}, [params, supabase]);
 
+
+  /** ---------------------------------------------------------
+   *  PASO 2: Cambiar contraseña
+   * --------------------------------------------------------*/
   const onSubmit = async (data: FormValues) => {
     if (!isValidRecovery) {
       alert("Link inválido o expirado.");
@@ -68,7 +213,7 @@ const NewPasswordPage = () => {
     router.push('/login');
   };
 
-  // Si todavía no verificamos el token → no renderizamos nada
+  // Esperar a que se valide el token
   if (!checked) return null;
 
   return (
@@ -97,7 +242,8 @@ const NewPasswordPage = () => {
               disabled={isLoading}
               required
               endContent={
-                <Icon name="Eye"
+                <Icon
+                  name="Eye"
                   size={12}
                   className="text-[#66666666] cursor-pointer"
                   onClick={() => setShowPassword(prev => !prev)}
@@ -116,7 +262,7 @@ const NewPasswordPage = () => {
         )}
 
         <div className="w-[312px] mt-4 flex flex-col justify-center items-center">
-          <Divider className="w-[210px] h-[1px] bg-[#E5E7EB] mt-[14px] mb-2"></Divider>
+          <Divider className="w-[210px] h-[1px] bg-[#E5E7EB] mt-[14px] mb-2" />
           <Link href="/login">
             <Text variant="body" textColor='color-primary'>
               Volver al inicio de sesión
@@ -127,6 +273,7 @@ const NewPasswordPage = () => {
 
       <div className="bg-login not-sm"></div>
 
+      {/* Modal éxito */}
       <Modal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}

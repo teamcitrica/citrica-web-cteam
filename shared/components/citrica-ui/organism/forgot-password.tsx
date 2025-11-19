@@ -26,7 +26,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   setIsLoading(true);
 
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: "http://localhost:3000/new-password",
+    redirectTo: `${window.location.origin}/new-password`,
   });
 
   setIsLoading(false);
@@ -35,6 +35,11 @@ const handleSubmit = async (e: React.FormEvent) => {
     console.error("Error al enviar correo:", error.message);
     alert("Hubo un error: " + error.message);
     return;
+  }
+
+  // Guardar el email en localStorage para usarlo en la verificación del OTP
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('password_reset_email', email);
   }
 
   // Si no hubo error → mostrar modal
