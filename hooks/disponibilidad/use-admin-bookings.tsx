@@ -175,7 +175,25 @@ export const useAdminBookings = () => {
       timeSlots?: TimeSlot[]
     ) => {
       try {
-        // Primero intentar actualizar
+        // ACTUALIZACIÓN OPTIMISTA: Actualizar el estado local primero
+        setWeeklyAvailability(prevAvailability => {
+          const dayIndex = prevAvailability.findIndex(day => day.day_of_week === dayOfWeek)
+
+          if (dayIndex !== -1) {
+            // Actualizar día existente
+            const newAvailability = [...prevAvailability]
+            newAvailability[dayIndex] = {
+              ...newAvailability[dayIndex],
+              is_active: isActive,
+              ...(timeSlots && { time_slots: timeSlots })
+            }
+            return newAvailability
+          }
+
+          return prevAvailability
+        })
+
+        // Luego actualizar en la base de datos
         const updateData: any = { is_active: isActive }
         if (timeSlots) {
           updateData.time_slots = timeSlots
@@ -189,6 +207,8 @@ export const useAdminBookings = () => {
 
         if (fetchError && fetchError.code !== 'PGRST116') {
           console.error('Error fetching day availability:', fetchError)
+          // Revertir cambio optimista en caso de error
+          await getWeeklyAvailability()
           return { success: false, error: fetchError }
         }
 
@@ -201,6 +221,8 @@ export const useAdminBookings = () => {
 
           if (error) {
             console.error('Error updating day availability:', error)
+            // Revertir cambio optimista en caso de error
+            await getWeeklyAvailability()
             return { success: false, error }
           }
         } else {
@@ -215,14 +237,19 @@ export const useAdminBookings = () => {
 
           if (error) {
             console.error('Error inserting day availability:', error)
+            // Revertir cambio optimista en caso de error
+            await getWeeklyAvailability()
             return { success: false, error }
           }
         }
 
-        await getWeeklyAvailability()
+        // NO llamar a getWeeklyAvailability() si todo salió bien
+        // El estado ya está actualizado optimísticamente
         return { success: true }
       } catch (error) {
         console.error('Error in updateDayAvailability:', error)
+        // Revertir cambio optimista en caso de error
+        await getWeeklyAvailability()
         return { success: false, error }
       }
     },
@@ -233,6 +260,26 @@ export const useAdminBookings = () => {
   const toggleTimeSlot = useCallback(
     async (dayOfWeek: number, timeSlot: string, isActive: boolean) => {
       try {
+        // ACTUALIZACIÓN OPTIMISTA: Actualizar el estado local primero
+        setWeeklyAvailability(prevAvailability => {
+          const dayIndex = prevAvailability.findIndex(day => day.day_of_week === dayOfWeek)
+
+          if (dayIndex !== -1) {
+            const newAvailability = [...prevAvailability]
+            const updatedSlots = newAvailability[dayIndex].time_slots.map(slot =>
+              slot.slot === timeSlot ? { ...slot, active: isActive } : slot
+            )
+            newAvailability[dayIndex] = {
+              ...newAvailability[dayIndex],
+              time_slots: updatedSlots
+            }
+            return newAvailability
+          }
+
+          return prevAvailability
+        })
+
+        // Luego actualizar en la base de datos
         const { data: dayConfig, error: fetchError } = await supabase
           .from('studio_availability')
           .select('*')
@@ -241,6 +288,8 @@ export const useAdminBookings = () => {
 
         if (fetchError) {
           console.error('Error fetching day config:', fetchError)
+          // Revertir cambio optimista en caso de error
+          await getWeeklyAvailability()
           return { success: false, error: fetchError }
         }
 
@@ -255,13 +304,18 @@ export const useAdminBookings = () => {
 
         if (error) {
           console.error('Error toggling time slot:', error)
+          // Revertir cambio optimista en caso de error
+          await getWeeklyAvailability()
           return { success: false, error }
         }
 
-        await getWeeklyAvailability()
+        // NO llamar a getWeeklyAvailability() si todo salió bien
+        // El estado ya está actualizado optimísticamente
         return { success: true }
       } catch (error) {
         console.error('Error in toggleTimeSlot:', error)
+        // Revertir cambio optimista en caso de error
+        await getWeeklyAvailability()
         return { success: false, error }
       }
     },
