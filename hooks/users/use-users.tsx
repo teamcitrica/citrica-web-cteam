@@ -15,7 +15,7 @@ export const useUserCRUD = () => {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("users")
-        .select("*,role:roles(name)");
+        .select("*,role:roles(name),company:company(id,name)");
 
       if (error) {
         console.error("Error al obtener usuarios:", error);
@@ -90,6 +90,7 @@ export const useUserCRUD = () => {
           first_name: newUser.first_name,
           last_name: newUser.last_name,
           role_id: newUser.role_id,
+          company_id: newUser.company_id,
         },
       ]);
 
@@ -230,6 +231,7 @@ export const useUserCRUD = () => {
           first_name: user_data.first_name,
           last_name: user_data.last_name,
           role_id: Number(role_id),
+          company_id: user_data.company_id ? Number(user_data.company_id) : null,
         }),
       });
 
@@ -278,6 +280,7 @@ export const useUserCRUD = () => {
           first_name: user_data.first_name,
           last_name: user_data.last_name,
           email: user_data.email,
+          company_id: user_data.company_id,
         });
       }
 

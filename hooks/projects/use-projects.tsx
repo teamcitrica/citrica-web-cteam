@@ -8,10 +8,10 @@ export interface Project {
   id: string;
   name: string | null;
   company_id: number | null;
-  supabase_url: string | null;
-  supabase_anon_key: string | null;
   status: string | null;
-  tabla: string | null;
+  nombre_responsable: string | null;
+  email_responsable: string | null;
+  phone_responsable: string | null;
 }
 
 export type ProjectInput = Omit<Project, "id">;

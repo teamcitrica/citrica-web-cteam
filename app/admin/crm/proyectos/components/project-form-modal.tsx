@@ -39,18 +39,16 @@ export default function ProjectFormModal({
   const { users } = useUserCRUD();
   const { getProjectContacts, syncProjectContacts } = useProjectContacts();
   const { getProjectUsers, syncProjectUsers } = useUserProjects();
-  const [availableTables, setAvailableTables] = useState<string[]>([]);
-  const [isLoadingTables, setIsLoadingTables] = useState(false);
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
 
   const [formData, setFormData] = useState<ProjectInput>({
     name: project?.name || null,
     company_id: project?.company_id || null,
-    supabase_url: project?.supabase_url || null,
-    supabase_anon_key: project?.supabase_anon_key || null,
     status: project?.status || null,
-    tabla: project?.tabla || null,
+    nombre_responsable: project?.nombre_responsable || null,
+    email_responsable: project?.email_responsable || null,
+    phone_responsable: project?.phone_responsable || null,
   });
 
   useEffect(() => {
@@ -58,10 +56,10 @@ export default function ProjectFormModal({
       setFormData({
         name: project.name,
         company_id: project.company_id,
-        supabase_url: project.supabase_url,
-        supabase_anon_key: project.supabase_anon_key,
         status: project.status,
-        tabla: project.tabla,
+        nombre_responsable: project.nombre_responsable,
+        email_responsable: project.email_responsable,
+        phone_responsable: project.phone_responsable,
       });
 
       // Cargar contactos asociados al proyecto
@@ -92,81 +90,6 @@ export default function ProjectFormModal({
       ...prev,
       [field]: value || null,
     }));
-  };
-
-  const handleConsultTables = async () => {
-    if (!formData.supabase_url || !formData.supabase_anon_key) {
-      addToast({
-        title: "Error",
-        description: "Debe ingresar la URL y Anon Key de Supabase",
-        color: "danger",
-      });
-      return;
-    }
-
-    try {
-      setIsLoadingTables(true);
-
-      // Usar el endpoint REST de Supabase para obtener el schema
-      const restUrl = `${formData.supabase_url}/rest/v1/`;
-
-      const response = await fetch(restUrl, {
-        method: 'GET',
-        headers: {
-          'apikey': formData.supabase_anon_key,
-          'Authorization': `Bearer ${formData.supabase_anon_key}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      // El response contiene un objeto con las definiciones de las tablas
-      // Extraemos los nombres de las tablas del objeto 'definitions' o 'paths'
-      let tables: string[] = [];
-
-      if (data.definitions) {
-        tables = Object.keys(data.definitions).filter(key => !key.startsWith('_'));
-      } else if (data.paths) {
-        // Extraer nombres de tablas de los paths
-        const pathKeys = Object.keys(data.paths);
-        const tableSet = new Set<string>();
-        pathKeys.forEach(path => {
-          const match = path.match(/^\/([^\/]+)/);
-          if (match && match[1] !== 'rpc') {
-            tableSet.add(match[1]);
-          }
-        });
-        tables = Array.from(tableSet);
-      }
-
-      if (tables.length === 0) {
-        addToast({
-          title: "Advertencia",
-          description: "No se encontraron tablas o no hay acceso a ellas",
-          color: "warning",
-        });
-      } else {
-        setAvailableTables(tables);
-        addToast({
-          title: "Éxito",
-          description: `Se encontraron ${tables.length} tablas`,
-          color: "success",
-        });
-      }
-    } catch (err) {
-      console.error("Error al consultar tablas:", err);
-      addToast({
-        title: "Error",
-        description: "Error al conectar con Supabase. Verifique las credenciales.",
-        color: "danger",
-      });
-    } finally {
-      setIsLoadingTables(false);
-    }
   };
 
   const handleSubmit = async () => {
@@ -216,12 +139,11 @@ export default function ProjectFormModal({
           setFormData({
             name: null,
             company_id: null,
-            supabase_url: null,
-            supabase_anon_key: null,
             status: null,
-            tabla: null,
+            nombre_responsable: null,
+            email_responsable: null,
+            phone_responsable: null,
           });
-          setAvailableTables([]);
           setSelectedContactIds(new Set());
           setSelectedUserIds(new Set());
           onClose();
@@ -347,76 +269,39 @@ export default function ProjectFormModal({
               )}
             </div>
 
-            <div className="col-span-2">
-              <Input
-                label="Supabase URL"
-                placeholder="https://..."
-                value={formData.supabase_url || ""}
-                onChange={(e) => handleInputChange("supabase_url", e.target.value)}
-                classNames={{
-                  label: "text-gray-700",
-                  input: "text-gray-800",
-                }}
-              />
-            </div>
+            <Input
+              label="Nombre del Responsable"
+              placeholder="Ingrese el nombre del responsable"
+              value={formData.nombre_responsable || ""}
+              onChange={(e) => handleInputChange("nombre_responsable", e.target.value)}
+              classNames={{
+                label: "text-gray-700",
+                input: "text-gray-800",
+              }}
+            />
 
-            <div className="col-span-2">
-              <Input
-                label="Supabase Anon Key"
-                placeholder="Ingrese la anon key"
-                value={formData.supabase_anon_key || ""}
-                onChange={(e) => handleInputChange("supabase_anon_key", e.target.value)}
-                classNames={{
-                  label: "text-gray-700",
-                  input: "text-gray-800",
-                }}
-              />
-            </div>
+            <Input
+              label="Email del Responsable"
+              placeholder="email@ejemplo.com"
+              type="email"
+              value={formData.email_responsable || ""}
+              onChange={(e) => handleInputChange("email_responsable", e.target.value)}
+              classNames={{
+                label: "text-gray-700",
+                input: "text-gray-800",
+              }}
+            />
 
-            <div className="col-span-2">
-              <Button
-                color="primary"
-                variant="flat"
-                onPress={handleConsultTables}
-                isLoading={isLoadingTables}
-                isDisabled={!formData.supabase_url || !formData.supabase_anon_key}
-                className="w-full"
-              >
-                Consultar Tablas
-              </Button>
-            </div>
-
-            {availableTables.length > 0 && (
-              <Select
-                label="Tabla"
-                placeholder="Seleccione una tabla"
-                selectedKeys={formData.tabla ? [formData.tabla] : []}
-                onChange={(e) => handleInputChange("tabla", e.target.value)}
-                classNames={{
-                  label: "text-gray-700",
-                  value: "text-gray-800",
-                }}
-              >
-                {availableTables.map((table) => (
-                  <SelectItem key={table}>
-                    {table}
-                  </SelectItem>
-                ))}
-              </Select>
-            )}
-
-            {availableTables.length === 0 && formData.tabla && (
-              <Input
-                label="Tabla"
-                placeholder="Nombre de la tabla"
-                value={formData.tabla || ""}
-                onChange={(e) => handleInputChange("tabla", e.target.value)}
-                classNames={{
-                  label: "text-gray-700",
-                  input: "text-gray-800",
-                }}
-              />
-            )}
+            <Input
+              label="Teléfono del Responsable"
+              placeholder="Ingrese el teléfono"
+              value={formData.phone_responsable || ""}
+              onChange={(e) => handleInputChange("phone_responsable", e.target.value)}
+              classNames={{
+                label: "text-gray-700",
+                input: "text-gray-800",
+              }}
+            />
 
             <Select
               label="Estado"
