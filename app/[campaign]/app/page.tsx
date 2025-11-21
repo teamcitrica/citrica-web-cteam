@@ -1,6 +1,6 @@
 "use client"
-import { redirect, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState, use } from 'react';
 
 interface RedirectConfig {
   [key: string]: string;
@@ -61,11 +61,13 @@ function TrackAndRedirect({ campaign }: { campaign: string }) {
 export default function CampaignRedirectPage({
   params
 }: {
-  params: { campaign: string }
+  params: Promise<{ campaign: string }>
 }) {
+  const { campaign } = use(params);
+
   return (
     <Suspense fallback={<div>Cargando...</div>}>
-      <TrackAndRedirect campaign={params.campaign} />
+      <TrackAndRedirect campaign={campaign} />
     </Suspense>
   );
 }
