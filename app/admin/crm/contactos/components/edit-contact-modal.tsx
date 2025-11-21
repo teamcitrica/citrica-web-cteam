@@ -42,6 +42,8 @@ export default function EditContactModal({
     company_id: contact.company_id,
     user_id: contact.user_id,
     has_system_access: contact.has_system_access,
+    type_id: contact.type_id,
+    active_users: contact.active_users,
   });
 
   useEffect(() => {
@@ -55,6 +57,8 @@ export default function EditContactModal({
       company_id: contact.company_id,
       user_id: contact.user_id,
       has_system_access: contact.has_system_access,
+      type_id: contact.type_id,
+      active_users: contact.active_users,
     });
   }, [contact]);
 
