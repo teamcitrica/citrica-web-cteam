@@ -37,6 +37,8 @@ export default function CreateContactModal({
     company_id: null,
     user_id: null,
     has_system_access: false,
+    type_id: null,
+    active_users: null,
   });
 
   const handleInputChange = (field: keyof ContactInput, value: string | number) => {
@@ -69,6 +71,8 @@ export default function CreateContactModal({
           company_id: null,
           user_id: null,
           has_system_access: false,
+          type_id: null,
+          active_users: null,
         });
         onClose();
       }
