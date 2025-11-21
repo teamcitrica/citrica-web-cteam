@@ -1,58 +1,15 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import CreateCompanyModal from "./components/create-company-modal";
 import CompanyDetailModal from "./components/company-detail-modal";
 import EditCompanyModal from "./components/edit-company-modal";
 import DeleteCompanyModal from "./components/delete-company-modal";
+import { getCompanyColumns, getCompanyExportColumns } from "./columns/company-columns";
 
 import { useCompanyCRUD, Company } from "@/hooks/companies/use-companies";
-import { DataTable, Column } from "@/shared/components/citrica-ui/organism/data-table";
+import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Col, Container } from "@/styles/07-objects/objects";
-import Icon from "@ui/atoms/icon";
-
-const columns: Column<Company>[] = [
-  {
-    name: "NOMBRE",
-    uid: "name",
-    sortable: true,
-    render: (company) => (
-      <div className="text-black font-medium">{company.name || "-"}</div>
-    ),
-  },
-  {
-    name: "RUC",
-    uid: "ruc",
-    sortable: true,
-    render: (company) => (
-      <div className="text-black">{company.ruc || "-"}</div>
-    ),
-  },
-  {
-    name: "CONTACTO",
-    uid: "contact_name",
-    sortable: true,
-    render: (company) => (
-      <div className="text-black">{company.contact_name || "-"}</div>
-    ),
-  },
-  {
-    name: "EMAIL",
-    uid: "contact_email",
-    sortable: false,
-    render: (company) => (
-      <div className="text-black">{company.contact_email || "-"}</div>
-    ),
-  },
-  {
-    name: "TELÉFONO",
-    uid: "contact_phone",
-    sortable: false,
-    render: (company) => (
-      <div className="text-black">{company.contact_phone || "-"}</div>
-    ),
-  },
-];
 
 export default function EmpresasPage() {
   const { companies, isLoading, refreshCompanies, deleteCompany } = useCompanyCRUD();
@@ -85,6 +42,18 @@ export default function EmpresasPage() {
     setIsDeleteModalOpen(true);
   }, []);
 
+  const columns = useMemo(
+    () =>
+      getCompanyColumns({
+        onView: handleViewCompany,
+        onEdit: handleEditCompany,
+        onDelete: handleDeleteCompany,
+      }),
+    [handleViewCompany, handleEditCompany, handleDeleteCompany]
+  );
+
+  const exportColumns = useMemo(() => getCompanyExportColumns(), []);
+
   const handleConfirmDelete = useCallback(async () => {
     if (!companyToDelete) return;
 
@@ -102,46 +71,19 @@ export default function EmpresasPage() {
     setCompanyToDelete(null);
   }, []);
 
-  const renderActions = useCallback(
-    (company: Company) => (
-      <div className="flex items-end justify-center w-full gap-2">
-        <button
-          className="text-blue-500 hover:text-blue-700"
-          onClick={() => handleViewCompany(company)}
-        >
-          <Icon className="w-5 h-5" name="Eye" />
-        </button>
-        <button
-          className="text-green-500 hover:text-green-700"
-          onClick={() => handleEditCompany(company)}
-        >
-          <Icon className="w-5 h-5" name="SquarePen" />
-        </button>
-        <button
-          className="text-red-500 hover:text-red-700"
-          onClick={() => handleDeleteCompany(company)}
-        >
-          <Icon className="w-5 h-5" name="Trash2" />
-        </button>
-      </div>
-    ),
-    [handleViewCompany, handleEditCompany, handleDeleteCompany]
-  );
-
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="p-4">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">
-            Gestión de Empresas
+          <h1 className="text-2xl font-bold text-[#265197] mb-6">
+            <span className="text-[#678CC5]">CRM</span> {'>'} Gestión de Empresas
           </h1>
 
           <DataTable<Company>
             data={companies}
             columns={columns}
             isLoading={isLoading}
-            searchPlaceholder="Buscar por nombre..."
-            searchKey="name"
+            searchFields={[]}
             onAdd={handleOpenCreateModal}
             addButtonText="Agregar Empresa"
             emptyContent="No se encontraron empresas"
@@ -149,7 +91,15 @@ export default function EmpresasPage() {
             headerTextColor="#ffffff"
             paginationColor="#42668A"
             getRowKey={(company) => company.id}
-            renderActions={renderActions}
+            enableExport={true}
+            exportColumns={exportColumns}
+            exportTitle="Gestión de Empresas"
+            tableName="empresas"
+            showRowsPerPageSelector={true}
+            showCompanyFilter={true}
+            companies={companies}
+            companyFilterField="id"
+            companyFilterPlaceholder="Filtrar por empresa"
           />
 
           <CreateCompanyModal
