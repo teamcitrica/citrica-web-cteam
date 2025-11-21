@@ -49,6 +49,9 @@ export default function ProjectFormModal({
     nombre_responsable: project?.nombre_responsable || null,
     email_responsable: project?.email_responsable || null,
     phone_responsable: project?.phone_responsable || null,
+    tabla: project?.tabla || null,
+    supabase_url: project?.supabase_url || null,
+    supabase_anon_key: project?.supabase_anon_key || null,
   });
 
   useEffect(() => {
@@ -60,6 +63,9 @@ export default function ProjectFormModal({
         nombre_responsable: project.nombre_responsable,
         email_responsable: project.email_responsable,
         phone_responsable: project.phone_responsable,
+        tabla: project.tabla,
+        supabase_url: project.supabase_url,
+        supabase_anon_key: project.supabase_anon_key,
       });
 
       // Cargar contactos asociados al proyecto
@@ -143,6 +149,9 @@ export default function ProjectFormModal({
             nombre_responsable: null,
             email_responsable: null,
             phone_responsable: null,
+            tabla: null,
+            supabase_url: null,
+            supabase_anon_key: null,
           });
           setSelectedContactIds(new Set());
           setSelectedUserIds(new Set());
