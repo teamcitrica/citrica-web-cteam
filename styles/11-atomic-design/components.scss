@@ -6,11 +6,11 @@
 .container-blue-principal {
   background-color: #ffffff;
   padding: 16px;
-  border-radius: 8px;
-  border: 1px solid #265197;
+  border-radius: 20px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
+  box-shadow: 0px 1px 3px 1px #00000026;
+  box-shadow: 0px 1px 2px 0px #0000004D;
+  flex-direction: column;
+ 
 }

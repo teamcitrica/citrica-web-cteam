@@ -15,9 +15,16 @@ export interface Contact {
   name: string | null;
   user_id: string | null;
   has_system_access: boolean | null;
+  type_id: number | null;
+  active_users: boolean | null;
+  types_contact?: {
+    id: number;
+    name: string;
+    description: string | null;
+  };
 }
 
-export type ContactInput = Omit<Contact, "id">;
+export type ContactInput = Omit<Contact, "id" | "types_contact">;
 
 export const useContactCRUD = () => {
   const { supabase } = useSupabase();
@@ -30,7 +37,14 @@ export const useContactCRUD = () => {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("contact_clients")
-        .select("*")
+        .select(`
+          *,
+          types_contact (
+            id,
+            name,
+            description
+          )
+        `)
         .order("name", { ascending: true });
 
       if (error) {
@@ -56,7 +70,14 @@ export const useContactCRUD = () => {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("contact_clients")
-        .select("*")
+        .select(`
+          *,
+          types_contact (
+            id,
+            name,
+            description
+          )
+        `)
         .eq("id", id)
         .single();
 

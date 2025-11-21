@@ -8,6 +8,8 @@ export type UserType = {
   email: string;
   role?: { name: string };
   role_id: number;
+  company?: { id: number; name: string };
+  company_id?: number;
   updated_at?: string;
   created_at?: string;
   user_metadata?: any;
