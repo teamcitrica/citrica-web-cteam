@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   Table,
   TableHeader,
@@ -10,25 +10,34 @@ import {
   Spinner,
   Pagination,
   Input,
+  Select,
+  SelectItem,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@heroui/react";
 import { Button } from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import Text from "@/shared/components/citrica-ui/atoms/text";
+import ExportModal from "./export-modal";
+import { useTableFeatures, ExportColumn } from "@/shared/hooks/useTableFeatures";
+import "./data-table.css";
 
-export interface Column<T> {
+export interface Column<T extends Record<string, any>> {
   name: string;
   uid: string;
   sortable?: boolean;
   render?: (item: T) => React.ReactNode;
 }
 
-export interface DataTableProps<T> {
+export interface DataTableProps<T extends Record<string, any>> {
   data: T[];
   columns: Column<T>[];
   isLoading?: boolean;
   itemsPerPage?: number;
   searchPlaceholder?: string;
-  searchKey?: keyof T;
+  searchFields?: (keyof T)[];
   onAdd?: () => void;
   addButtonText?: string;
   emptyContent?: string;
@@ -37,15 +46,25 @@ export interface DataTableProps<T> {
   paginationColor?: string;
   getRowKey: (item: T) => string | number;
   renderActions?: (item: T) => React.ReactNode;
+  enableExport?: boolean;
+  exportColumns?: ExportColumn[];
+  exportTitle?: string;
+  tableName?: string;
+  showRowsPerPageSelector?: boolean;
+  // Filtro de empresa
+  showCompanyFilter?: boolean;
+  companies?: Array<{ id: number; name: string | null }>;
+  companyFilterField?: keyof T;
+  companyFilterPlaceholder?: string;
 }
 
-export function DataTable<T>({
+export function DataTable<T extends Record<string, any>>({
   data,
   columns,
   isLoading = false,
   itemsPerPage = 15,
   searchPlaceholder = "Buscar...",
-  searchKey,
+  searchFields = [],
   onAdd,
   addButtonText = "Agregar",
   emptyContent = "No se encontraron registros",
@@ -54,18 +73,23 @@ export function DataTable<T>({
   paginationColor = "#42668A",
   getRowKey,
   renderActions,
+  enableExport = false,
+  exportColumns = [],
+  exportTitle = "Tabla de datos",
+  tableName = "tabla",
+  showRowsPerPageSelector = false,
+  showCompanyFilter = false,
+  companies = [],
+  companyFilterField,
+  companyFilterPlaceholder = "Filtrar por empresa...",
 }: DataTableProps<T>) {
-  const [page, setPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  type LocalSortDescriptor = {
-    column: string;
-    direction: "ascending" | "descending";
-  };
-
-  const [sortDescriptor, setSortDescriptor] = useState<LocalSortDescriptor>({
-    column: columns[0]?.uid || "",
-    direction: "ascending",
+  const tableFeatures = useTableFeatures({
+    data,
+    initialRowsPerPage: itemsPerPage,
+    searchFields,
+    defaultSortColumn: columns[0]?.uid as keyof T,
+    defaultSortDirection: "ascending",
+    companyFilterField,
   });
 
   // Agregar columna de acciones si hay renderActions
@@ -75,52 +99,6 @@ export function DataTable<T>({
     }
     return columns;
   }, [columns, renderActions]);
-
-  // Filtrar datos
-  const filteredData = useMemo(() => {
-    if (!searchTerm.trim() || !searchKey) {
-      return data;
-    }
-
-    return data.filter((item) => {
-      const value = item[searchKey];
-      if (typeof value === "string") {
-        return value.toLowerCase().includes(searchTerm.toLowerCase());
-      }
-      return false;
-    });
-  }, [data, searchTerm, searchKey]);
-
-  // Ordenar datos
-  const sortedItems = useMemo(() => {
-    return [...filteredData].sort((a, b) => {
-      const first = a[sortDescriptor.column as keyof T];
-      const second = b[sortDescriptor.column as keyof T];
-
-      let cmp = 0;
-      if (typeof first === "string" && typeof second === "string") {
-        cmp = first.toLowerCase() < second.toLowerCase() ? -1 : first.toLowerCase() > second.toLowerCase() ? 1 : 0;
-      } else if (typeof first === "number" && typeof second === "number") {
-        cmp = first < second ? -1 : first > second ? 1 : 0;
-      }
-
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
-    });
-  }, [filteredData, sortDescriptor]);
-
-  // Calcular páginas
-  const totalPages = Math.ceil(sortedItems.length / itemsPerPage);
-
-  // Obtener items para la página actual
-  const paginatedItems = useMemo(() => {
-    const startIndex = (page - 1) * itemsPerPage;
-    return sortedItems.slice(startIndex, startIndex + itemsPerPage);
-  }, [sortedItems, page, itemsPerPage]);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setPage(1);
-  };
 
   const renderCell = useCallback(
     (item: T, columnKey: React.Key) => {
@@ -151,52 +129,159 @@ export function DataTable<T>({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="container-blue-principal">
-        <div className="flex items-center gap-6">
-          {searchKey && (
-            <Input
-              className="text-[#3E688E] min-w-[268px]"
-              classNames={{
-                inputWrapper:
-                  "!bg-[#F4F4F5] !text-[#3E688E] !placeholder-[#719BC1] input-ui-pro input-ui-pro",
-                mainWrapper: "",
-              }}
-              placeholder={searchPlaceholder}
-              startContent={
-                <Icon className="mr-2" color="#719BC1" name="Search" />
-              }
-              value={searchTerm}
-              variant="faded"
-              onChange={handleSearchChange}
-            />
-          )}
+    <div className="container-blue-principal">
+      {/* Barra de búsqueda y acciones */}
+     
+        <div className="flex items-center justify-between w-full pb-6 pt-3">
+          <div className="flex items-center gap-4 ">
+            {/* Filtro de empresa */}
+            {showCompanyFilter && companies.length > 0 && (
+              <Select
+                // label={companyFilterPlaceholder}
+                className="min-w-[264px]"
+                classNames={{
+                  trigger: "!text-[#3E688E] rounded-[24px] border-[#D4DEED] data-[focus=true]:border-[#D4DEED] data-[open=true]:border-[#D4DEED] focus:border-[#D4DEED] hover:border-[#B8D4E5]",
+                  popoverContent: "bg-white",
+                }}
+                placeholder="Seleccione una empresa"
+                selectedKeys={tableFeatures.companyFilter ? [tableFeatures.companyFilter] : ["all"]}
+                onSelectionChange={tableFeatures.onCompanyFilterChange}
+                variant="bordered"
+              >
+                {[
+                  <SelectItem
+                    key="all"
+                    classNames={{
+                      base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
+                      wrapper: "!border-none",
+                    }}
+                    style={{
+                      border: 'none',
+                      borderColor: 'transparent',
+                      borderWidth: '0',
+                    } as React.CSSProperties}
+                  >
+                    Todas las empresas
+                  </SelectItem>,
+                  ...companies.map((company) => (
+                    <SelectItem
+                      key={String(company.id)}
+                      classNames={{
+                        base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
+                        wrapper: "!border-none",
+                      }}
+                      style={{
+                        border: 'none',
+                        borderColor: 'transparent',
+                        borderWidth: '0',
+                      } as React.CSSProperties}
+                    >
+                      {company.name || "Sin nombre"}
+                    </SelectItem>
+                  )),
+                ]}
+              </Select>
+            )}
+
+            {searchFields.length > 0 && (
+              <div className="search-input-wrapper">
+                <Input
+                  className="text-[#3E688E] min-w-[264px]"
+                  classNames={{
+                    inputWrapper:
+                      "!text-[#3E688E] rounded-[24px] !border-[#D4DEED] data-[focus=true]:!border-[#D4DEED] data-[hover=true]:!border-[#B8D4E5] focus-within:!border-[#D4DEED]",
+                    mainWrapper: "",
+                  }}
+                  placeholder={searchPlaceholder}
+                  endContent={<Icon className="ml-2" color="#719BC1" name="Search" />}
+                  value={tableFeatures.filterValue}
+                  variant="bordered"
+                  onChange={(e) => tableFeatures.onSearchChange(e.target.value)}
+                />
+              </div>
+            )}
+
+            {/* {showRowsPerPageSelector && (
+              <Select
+                label="Filas por página"
+                className="min-w-[150px]"
+                selectedKeys={[String(tableFeatures.rowsPerPage)]}
+                onChange={tableFeatures.onRowsPerPageChange}
+              >
+                <SelectItem key="10">10</SelectItem>
+                <SelectItem key="15">15</SelectItem>
+                <SelectItem key="20">20</SelectItem>
+                <SelectItem key="50">50</SelectItem>
+              </Select>
+            )} */}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {enableExport && (
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button
+                    className="bg-transparent border-2 border-[#D4DEED] text-gray-700 py-4"
+                    startContent={<Icon className="w-4 h-4" name="Download" />}
+                    size="sm"
+                  >
+                    Exportar
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="Opciones de exportación"
+                  onAction={(key) =>
+                    tableFeatures.handleOpenExportModal(key as string, tableName)
+                  }
+                >
+                  <DropdownItem
+                    key="excel"
+                    startContent={<Icon className="w-4 h-4" name="FileSpreadsheet" />}
+                  >
+                    Excel (.xlsx)
+                  </DropdownItem>
+                  <DropdownItem
+                    key="csv"
+                    startContent={<Icon className="w-4 h-4" name="FileText" />}
+                  >
+                    CSV (.csv)
+                  </DropdownItem>
+                  <DropdownItem
+                    key="pdf"
+                    startContent={<Icon className="w-4 h-4" name="FileDown" />}
+                  >
+                    PDF (.pdf)
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            )}
+
+            {onAdd && (
+              <Button
+                style={{ backgroundColor: headerColor }}
+                className="text-white py-[6px] px-[6px] rounded-lg border-2 border-white"
+                startContent={<Icon className="w-4 h-4" name="Plus" />}
+                onClick={onAdd}
+              >
+                <Text color="white" variant="label">
+                  {addButtonText}
+                </Text>
+              </Button>
+            )}
+          </div>
         </div>
+     
 
-        {onAdd && (
-          <Button
-            className={`bg-[${headerColor}] mt-[10px] text-white py-[6px] px-[6px] rounded-lg border-2 border-white`}
-            startContent={<Icon className="w-4 h-4" name="Plus" />}
-            onClick={onAdd}
-          >
-            <Text color="white" variant="label">
-              {addButtonText}
-            </Text>
-          </Button>
-        )}
-      </div>
-
+      {/* Tabla */}
       <Table
+        isStriped
+        removeWrapper
         aria-label="Tabla de datos"
         selectionMode="none"
-        sortDescriptor={sortDescriptor}
-        onSortChange={(descriptor) =>
-          setSortDescriptor(descriptor as LocalSortDescriptor)
-        }
+        sortDescriptor={tableFeatures.sortDescriptor}
+        onSortChange={tableFeatures.setSortDescriptor}
         classNames={{
-          wrapper: "bg-transparent",
-          th: `bg-[${headerColor}] text-[${headerTextColor}] font-semibold text-center`,
-          td: "text-gray-700 text-center",
+          tr: "data-[odd=true]:bg-[#EEF1F7]",
         }}
       >
         <TableHeader columns={tableColumns}>
@@ -205,36 +290,56 @@ export function DataTable<T>({
               key={column.uid}
               align="center"
               allowsSorting={column.sortable}
+              style={{
+                backgroundColor: headerColor,
+                color: headerTextColor,
+              }}
             >
               {column.name}
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={emptyContent} items={paginatedItems}>
+        <TableBody emptyContent={emptyContent} items={tableFeatures.paginatedItems}>
           {(item) => (
             <TableRow key={getRowKey(item)} className="items-center">
-              {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
-              )}
+              {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
             </TableRow>
           )}
         </TableBody>
       </Table>
 
-      {totalPages > 1 && (
+      {/* Paginación */}
+      {tableFeatures.pages > 1 && (
         <div className="flex justify-center mt-4">
           <Pagination
             isCompact
             showControls
             showShadow
             classNames={{
-              cursor: `!bg-[${paginationColor}] text-white`,
+              cursor: "text-white",
             }}
-            page={page}
-            total={totalPages}
-            onChange={setPage}
+            style={{
+              "--pagination-active-bg": paginationColor,
+            } as React.CSSProperties}
+            page={tableFeatures.page}
+            total={tableFeatures.pages}
+            onChange={tableFeatures.setPage}
           />
         </div>
+      )}
+
+      {/* Modal de exportación */}
+      {enableExport && (
+        <ExportModal
+          isOpen={tableFeatures.isExportModalOpen}
+          onClose={() => tableFeatures.setIsExportModalOpen(false)}
+          exportFormat={tableFeatures.exportFormat}
+          fileName={tableFeatures.fileName}
+          onFileNameChange={tableFeatures.setFileName}
+          onConfirm={() =>
+            tableFeatures.handleConfirmExport(exportColumns, exportTitle)
+          }
+        />
       )}
     </div>
   );

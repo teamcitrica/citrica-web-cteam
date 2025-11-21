@@ -21,7 +21,7 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
         onPress={onToggle}
       >
         <span className="flex items-center gap-2">
-          <Icon name={item.icon as IconName} size={20} />
+          <Icon name={item.icon as IconName} size={20} color="#265197" />
           <Text variant="label" color="#8099B2">{item.title}</Text>
         </span>
         <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
@@ -93,7 +93,7 @@ export function Sidebar({ items }: SidebarProps) {
                 }
               }}
             >
-              <Icon name={item.icon as IconName} size={20} />
+              <Icon name={item.icon as IconName} size={20} color="#265197" />
               <Text variant="label" color={item.href === pathname ? "#000" : "#8099B2"}>{item.title}</Text>
             </Button>
           )}

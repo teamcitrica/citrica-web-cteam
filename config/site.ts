@@ -1,6 +1,10 @@
 export type SiteConfig = typeof siteConfig;
-import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck } from "lucide-react"
+import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck, Calendar, UserStar } from "lucide-react"
 
+const ROL_ADMIN = 1;
+const ROL_USER = 2;
+const ROL_MODERADOR = 3;
+const ROL_CLIENTE = 12;
 const SUBITEM_SEARCH_PARAM = "page";
 
 export const siteConfig = {
@@ -23,99 +27,93 @@ export const siteConfig = {
 	subItemSearchParam: SUBITEM_SEARCH_PARAM, // FOR SUBSECTIONS IN SIDEBAR
 	sidebarItems: [
 		{
-			title: "Usuarios de Sistema",
-			icon: "Settings",
+			title: "USUARIOS DE SISTEMA",
+			icon: "Users",
 			href: "/admin/users",
-		},
-		{
-			title: "Crear rol",
-			icon: "ShieldCheck",
-			href: "/admin/crear-rol",
+			allowedRoles: [ROL_ADMIN],
 			subItems: [
 				{
-					title: "Gestionar roles",
-					href: "/admin/crear-rol",
+					title: "Usuarios",
+					href: "/admin/users/usuarios",
+				},
+
+			],
+		},
+		{
+			title: "AGENDA",
+			icon: "Calendar",
+			href: "/admin/agenda",
+			allowedRoles: [ROL_ADMIN],
+			subItems: [
+				{
+					title: "Reservas",
+					href: "/admin/agenda/reservas",
 				},
 				{
-					title: "Adjuntar credenciales",
-					href: "/admin/adjuntar-credenciales",
+					title: "Disponibilidad",
+					href: "/admin/agenda/disponibilidad",
+				},
+				{
+					title: "Configuración",
+					href: "/admin/agenda/configuracion",
 				},
 			],
 		},
 		{
-			title: "Reservas",
+			title: "CMS",
 			icon: "ClipboardCheck",
-			href: "/admin/reservas",
+			href: "/admin/CMS",
+			allowedRoles: [ROL_ADMIN],
 			subItems: [
 				{
-					title: "Ver reservas",
-					href: "/admin/reservas",
+					title: "Proyectos",
+					href: "/admin/CMS/proyectos",
 				},
 				{
-					title: "Calendario",
-					href: "/admin/reservas/calendario",
+					title: "Solution card",
+					href: "/admin/CMS/solution_card",
 				},
 				{
-					title: "Gestión de disponibilidad",
-					href: "/admin/reservas/disponibilidad",
+					title: "Configuración",
+					href: "/admin/CMS/configuracion",
 				},
 			],
 		},
 		{
 			title: "CRM",
-			icon: "Users",
+			icon: "UserStar",
 			href: "/admin/crm",
+			allowedRoles: [ROL_ADMIN],
 			subItems: [
+				{
+					title: "Contactos",
+					href: "/admin/crm/contactos",
+				},
 				{
 					title: "Empresas",
 					href: "/admin/crm/empresas",
+				},
+				{
+					title: "Reuniones",
+					href: "/admin/crm/reuniones",
 				},
 				{
 					title: "Proyectos",
 					href: "/admin/crm/proyectos",
 				},
 				{
-					title: "Contactos",
-					href: "/admin/crm/contactos",
+					title: "Configuración",
+					href: "/admin/crm/configuracion",
 				},
 			],
 		},
-		// {
-		// 	title: "Reuniones",
-		// 	icon: "ClipboardCheck",
-		// 	href: "/panel/tareas",
-		// },
-		// {
-		// 	title: "CMS",
-		// 	icon: "Settings",
-		// 	href: "/panel/config-app", // ONLY TO DETERMINE ACTIVE, IS NOT LINKING
-		// 	subItems: [
-		// 		{
-		// 			title: "Proyectos",
-		// 			href: "/panel/config-app?" + SUBITEM_SEARCH_PARAM + "=basic",
-		// 		},
 
-		// 	],
-		// },
-		// {
-		// 	title: "CMR	",
-		// 	icon: "Users",
-		// 	href: "/",
-		// },
-	],
-	// Sidebar items para rol 4 (solo CMS)
-	sidebarItemsRole4: [
-		{
-			title: "CMS",
-			icon: "Settings",
-			href: "/admin/tambo",
-		},
 	],
 	links: {
 		github: "https://github.com/nextui-org/nextui",
 		twitter: "https://twitter.com/getnextui",
 		docs: "https://nextui.org",
 		discord: "https://discord.gg/9b6yyZKmH4",
-    sponsor: "https://patreon.com/jrgarciadev"
+		sponsor: "https://patreon.com/jrgarciadev"
 	},
 };

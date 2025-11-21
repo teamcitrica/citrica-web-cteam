@@ -1,0 +1,41 @@
+/* Eliminar borde verde del Select en hover */
+[data-slot="list-item"][data-hover="true"],
+[data-slot="list-item"][data-focus="true"],
+[data-slot="list-item"]:hover,
+[data-slot="list-item"]:focus {
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+}
+
+[data-slot="list-item"][data-hover="true"]::before,
+[data-slot="list-item"][data-hover="true"]::after,
+[data-slot="list-item"][data-focus="true"]::before,
+[data-slot="list-item"][data-focus="true"]::after {
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+}
+
+/* Alternativa: si es específicamente un li */
+li[data-hover="true"],
+li[data-focus="true"] {
+  border: none !important;
+  border-width: 0 !important;
+  border-color: transparent !important;
+  outline: none !important;
+}
+
+/* Controlar borde del Input de búsqueda */
+.search-input-wrapper [data-slot="input-wrapper"],
+.search-input-wrapper [data-slot="input-wrapper"][data-focus="true"],
+.search-input-wrapper [data-slot="input-wrapper"]:focus-within {
+  border-color: #D4DEED !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.search-input-wrapper [data-slot="input-wrapper"]:hover {
+  border-color: #B8D4E5 !important;
+}
