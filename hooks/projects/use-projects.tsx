@@ -12,6 +12,9 @@ export interface Project {
   nombre_responsable: string | null;
   email_responsable: string | null;
   phone_responsable: string | null;
+  tabla: string | null;
+  supabase_url: string | null;
+  supabase_anon_key: string | null;
 }
 
 export type ProjectInput = Omit<Project, "id">;
