@@ -35,6 +35,8 @@
 		"framer-motion": "11.13.1",
 		"gsap": "3.13.0",
 		"intl-messageformat": "^10.5.0",
+		"jspdf": "^3.0.4",
+		"jspdf-autotable": "^5.0.2",
 		"lucide-react": "^0.554.0",
 		"motion": "^12.23.12",
 		"next": "15.0.4",
