@@ -1,16 +1,16 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import CreateContactModal from "./components/create-contact-modal";
 import ContactDetailModal from "./components/contact-detail-modal";
 import EditContactModal from "./components/edit-contact-modal";
 import DeleteContactModal from "./components/delete-contact-modal";
+import { getContactColumns, getContactExportColumns } from "./columns/contact-columns";
 
 import { useContactCRUD, Contact } from "@/hooks/contacts/use-contacts";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
-import { DataTable, Column } from "@/shared/components/citrica-ui/organism/data-table";
+import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Col, Container } from "@/styles/07-objects/objects";
-import Icon from "@ui/atoms/icon";
 
 export default function ContactosPage() {
   const { contacts, isLoading, refreshContacts, deleteContact } = useContactCRUD();
@@ -22,66 +22,14 @@ export default function ContactosPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
 
-  const getCompanyName = (companyId: number | null) => {
-    if (!companyId) return "-";
-    const company = companies.find(c => c.id === companyId);
-    return company?.name || "-";
-  };
-
-  const columns: Column<Contact>[] = [
-    {
-      name: "NOMBRE Y CARGO",
-      uid: "name",
-      sortable: true,
-      render: (contact) => (
-        <div className="flex flex-col gap-1">
-          <div className="text-black font-medium">{contact.name || "-"}</div>
-          <div className="text-gray-500 text-sm">{contact.cargo || "-"}</div>
-        </div>
-      ),
+  const getCompanyName = useCallback(
+    (companyId: number | null) => {
+      if (!companyId) return "-";
+      const company = companies.find((c) => c.id === companyId);
+      return company?.name || "-";
     },
-    {
-      name: "EMPRESA Y DIRECCIÓN",
-      uid: "company",
-      sortable: false,
-      render: (contact) => (
-        <div className="flex flex-col gap-1">
-          <div className="text-black font-medium">{getCompanyName(contact.company_id)}</div>
-          <div className="text-gray-500 text-sm">{contact.address || "-"}</div>
-        </div>
-      ),
-    },
-    {
-      name: "CONTACTO",
-      uid: "contact_info",
-      sortable: false,
-      render: (contact) => (
-        <div className="flex flex-col gap-2">
-          {contact.phone && (
-            <a
-              href={`https://wa.me/${contact.phone.replace(/\D/g, '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-green-600 hover:text-green-700"
-            >
-              <Icon className="w-4 h-4" name="Phone" />
-              <span className="text-sm">{contact.phone}</span>
-            </a>
-          )}
-          {contact.email && (
-            <a
-              href={`mailto:${contact.email}`}
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
-            >
-              <Icon className="w-4 h-4" name="Mail" />
-              <span className="text-sm">{contact.email}</span>
-            </a>
-          )}
-          {!contact.phone && !contact.email && <span className="text-gray-400">-</span>}
-        </div>
-      ),
-    },
-  ];
+    [companies]
+  );
 
   const handleOpenCreateModal = () => setIsCreateModalOpen(true);
 
@@ -105,6 +53,22 @@ export default function ContactosPage() {
     setIsDeleteModalOpen(true);
   }, []);
 
+  const columns = useMemo(
+    () =>
+      getContactColumns({
+        getCompanyName,
+        onView: handleViewContact,
+        onEdit: handleEditContact,
+        onDelete: handleDeleteContact,
+      }),
+    [getCompanyName, handleViewContact, handleEditContact, handleDeleteContact]
+  );
+
+  const exportColumns = useMemo(
+    () => getContactExportColumns({ getCompanyName }),
+    [getCompanyName]
+  );
+
   const handleConfirmDelete = useCallback(async () => {
     if (!contactToDelete) return;
 
@@ -122,46 +86,20 @@ export default function ContactosPage() {
     setContactToDelete(null);
   }, []);
 
-  const renderActions = useCallback(
-    (contact: Contact) => (
-      <div className="flex items-end justify-center w-full gap-2">
-        <button
-          className="text-blue-500 hover:text-blue-700"
-          onClick={() => handleViewContact(contact)}
-        >
-          <Icon className="w-5 h-5" name="Eye" />
-        </button>
-        <button
-          className="text-green-500 hover:text-green-700"
-          onClick={() => handleEditContact(contact)}
-        >
-          <Icon className="w-5 h-5" name="SquarePen" />
-        </button>
-        <button
-          className="text-red-500 hover:text-red-700"
-          onClick={() => handleDeleteContact(contact)}
-        >
-          <Icon className="w-5 h-5" name="Trash2" />
-        </button>
-      </div>
-    ),
-    [handleViewContact, handleEditContact, handleDeleteContact]
-  );
-
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="p-4">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">
-            Gestión de Contactos
+          <h1 className="text-2xl font-bold text-[#265197] mb-6">
+            <span className="text-[#678CC5]">CRM</span> {'>'} Gestión de Contactos
           </h1>
 
           <DataTable<Contact>
             data={contacts}
             columns={columns}
             isLoading={isLoading}
-            searchPlaceholder="Buscar por nombre..."
-            searchKey="name"
+            searchPlaceholder="Buscar contactos..."
+            searchFields={["name", "email", "phone", "cargo", "address"]}
             onAdd={handleOpenCreateModal}
             addButtonText="Agregar Contacto"
             emptyContent="No se encontraron contactos"
@@ -169,7 +107,15 @@ export default function ContactosPage() {
             headerTextColor="#ffffff"
             paginationColor="#42668A"
             getRowKey={(contact) => contact.id}
-            renderActions={renderActions}
+            enableExport={true}
+            exportColumns={exportColumns}
+            exportTitle="Gestión de Contactos"
+            tableName="contactos"
+            showRowsPerPageSelector={true}
+            showCompanyFilter={true}
+            companies={companies}
+            companyFilterField="company_id"
+            companyFilterPlaceholder="Filtrar por empresa"
           />
 
           <CreateContactModal

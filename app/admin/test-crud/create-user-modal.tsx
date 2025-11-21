@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { useUserRole } from "@/hooks/role/use-role";
 import { useUserCRUD } from "@/hooks/users/use-users";
+import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { Input } from "@/shared/components/citrica-ui";
 
 type CreateUserModalProps = {
@@ -17,6 +18,7 @@ const CreateUserModal = ({
 }: CreateUserModalProps) => {
   const { createUserByRole, isLoading } = useUserCRUD();
   const { roles, fetchRoles } = useUserRole();
+  const { companies, fetchCompanies } = useCompanyCRUD();
 
   const [formData, setFormData] = useState({
     first_name: "",
@@ -24,10 +26,12 @@ const CreateUserModal = ({
     email: "",
     password: "contraseña",
     role_id: "",
+    company_id: "",
   });
 
   useEffect(() => {
     fetchRoles();
+    fetchCompanies();
   }, []);
 
   const handleChange = (
@@ -59,6 +63,7 @@ const CreateUserModal = ({
       last_name: formData.last_name,
       email: formData.email,
       password: formData.password,
+      company_id: formData.company_id ? Number(formData.company_id) : undefined,
     };
 
     try {
@@ -71,6 +76,7 @@ const CreateUserModal = ({
         email: "",
         password: "contraseña",
         role_id: "",
+        company_id: "",
       });
       // Cerrar el modal tras crear el usuario (esto ejecutará el refresh en el componente padre)
       onClose();
@@ -141,6 +147,23 @@ const CreateUserModal = ({
               </option>
             ))}
           </select>
+
+          {/* Select de empresas - Solo se muestra si el rol NO es superuser (id = 1) */}
+          {formData.role_id && Number(formData.role_id) !== 1 && (
+            <select
+              className="border rounded-md p-2 text-black"
+              name="company_id"
+              value={formData.company_id}
+              onChange={handleChange}
+            >
+              <option value="">Selecciona una empresa</option>
+              {companies.map((company) => (
+                <option key={company.id} value={company.id}>
+                  {company.name || "Sin nombre"}
+                </option>
+              ))}
+            </select>
+          )}
 
           <button
             className="mt-4 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700"

@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, role_id, first_name, last_name } = await request.json();
+    const { email, password, role_id, first_name, last_name, company_id } = await request.json();
 
     // Validar datos requeridos
     if (!email || !password || !role_id) {
@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
         role_id,
         first_name,
         last_name,
+        company_id,
       },
     });
 
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
         first_name,
         last_name,
         role_id,
+        company_id,
       });
 
     if (userError) {
@@ -91,6 +93,7 @@ export async function POST(request: NextRequest) {
         id: authData.user.id,
         email: authData.user.email,
         role_id,
+        company_id,
       },
     });
   } catch (error: any) {
