@@ -22,24 +22,29 @@ function TrackAndRedirect({ campaign }: { campaign: string }) {
       setIsTracking(true);
 
       const utm_source = searchParams.get('utm_source') || 'direct';
+      const redirectUrl = REDIRECT_URLS[campaign] || '/';
 
-      try {
-        // Hacer el insert en la tabla qr_visits
-        await fetch('/api/track-qr-visit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: campaign,
-            utm_source,
-          }),
-        });
-      } catch (error) {
-        console.error('Error tracking visit:', error);
-      } finally {
-        // Redirigir al usuario independientemente del resultado
-        const redirectUrl = REDIRECT_URLS[campaign] || '/';
-        window.location.href = redirectUrl;
+      // Usar sendBeacon para garantizar que el request se envíe
+      const data = JSON.stringify({ name: campaign, utm_source });
+      const blob = new Blob([data], { type: 'application/json' });
+      const sent = navigator.sendBeacon('/api/track-qr-visit', blob);
+
+      if (!sent) {
+        // Fallback a fetch si sendBeacon falla
+        try {
+          await fetch('/api/track-qr-visit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: data,
+            keepalive: true, // Importante: mantiene el request activo durante navegación
+          });
+        } catch (error) {
+          console.error('Error tracking:', error);
+        }
       }
+
+      // Redirigir inmediatamente
+      window.location.href = redirectUrl;
     };
 
     trackVisit();
@@ -47,14 +52,9 @@ function TrackAndRedirect({ campaign }: { campaign: string }) {
 
   return (
     <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
       height: '100vh',
-      fontFamily: 'system-ui, -apple-system, sans-serif'
-    }}>
-      <p>Redirigiendo...</p>
-    </div>
+      backgroundColor: '#000'
+    }} />
   );
 }
 
@@ -66,7 +66,7 @@ export default function CampaignRedirectPage({
   const { campaign } = use(params);
 
   return (
-    <Suspense fallback={<div>Cargando...</div>}>
+    <Suspense fallback={<div style={{ height: '100vh', backgroundColor: '#000' }} />}>
       <TrackAndRedirect campaign={campaign} />
     </Suspense>
   );
