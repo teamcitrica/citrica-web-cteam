@@ -16,7 +16,7 @@ import { addToast } from "@heroui/toast";
 import { useProjectCRUD, ProjectInput, Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { useContactCRUD } from "@/hooks/contacts/use-contacts";
-import { useProjectContacts } from "@/hooks/project-contacts/use-project-contacts";
+import { useProyectAccces } from "@/hooks/proyect_accces/use-proyect-accces";
 import { useUserCRUD } from "@/hooks/users/use-users";
 import { useUserProjects } from "@/hooks/user-projects/use-user-projects";
 
@@ -37,7 +37,7 @@ export default function ProjectFormModal({
   const { companies } = useCompanyCRUD();
   const { contacts } = useContactCRUD();
   const { users } = useUserCRUD();
-  const { getProjectContacts, syncProjectContacts } = useProjectContacts();
+  const { getProjectContacts, syncProjectContacts } = useProyectAccces();
   const { getProjectUsers, syncProjectUsers } = useUserProjects();
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());

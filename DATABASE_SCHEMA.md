@@ -201,36 +201,36 @@ CREATE TABLE credentials (
 
 ## 🔗 Tablas de Relación (Junction Tables)
 
-### 7. **project_contacts** (Relación Proyectos-Contactos)
-Tabla intermedia many-to-many entre proyectos y contactos.
+### 7. **proyect_accces** (Relación Proyectos-Usuarios)
+Tabla intermedia many-to-many entre proyectos y usuarios.
 
 ```sql
-CREATE TABLE project_contacts (
+CREATE TABLE proyect_accces (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
-  contact_id UUID REFERENCES contact_clients(id) ON DELETE CASCADE,
-  assigned_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(project_id, contact_id)
+  users_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(project_id, users_id)
 );
 ```
 
-**Propósito:** Permite asignar múltiples contactos a un proyecto.
+**Propósito:** Permite asignar múltiples usuarios a un proyecto (control de acceso).
 
-**Ejemplo:** El proyecto "Desarrollo Web XYZ" tiene 3 contactos: Juan (CEO), María (CTO), Pedro (PM).
+**Ejemplo:** El proyecto "Desarrollo Web XYZ" tiene acceso para 3 usuarios: Juan (CEO), María (CTO), Pedro (PM).
 
 **RLS:** ⚠️ NECESITA ser activado con políticas
 
 **Políticas sugeridas:**
 ```sql
 -- Permitir lectura a usuarios autenticados
-CREATE POLICY "Allow read project_contacts"
-ON project_contacts FOR SELECT
+CREATE POLICY "Allow read proyect_accces"
+ON proyect_accces FOR SELECT
 TO authenticated
 USING (true);
 
 -- Permitir INSERT/UPDATE/DELETE a admins (role_id <= 2)
-CREATE POLICY "Allow admin manage project_contacts"
-ON project_contacts FOR ALL
+CREATE POLICY "Allow admin manage proyect_accces"
+ON proyect_accces FOR ALL
 TO authenticated
 USING (
   EXISTS (
@@ -316,17 +316,17 @@ Se crea un proyecto para la empresa:
 - **Tabla:** Inserta registro en `projects` con `company_id = Tech Solutions`
 
 En el mismo modal se puede:
-- **Seleccionar contactos** de la empresa para el proyecto
-  - **Tabla:** Inserta registros en `project_contacts` (muchos a muchos)
-- **Asignar usuarios** del equipo al proyecto
+- **Asignar usuarios** de la empresa para el proyecto (control de acceso)
+  - **Tabla:** Inserta registros en `proyect_accces` (muchos a muchos)
+- **Asignar usuarios del equipo** al proyecto
   - **Tabla:** Inserta registros en `user_projects` (muchos a muchos)
 
 #### 4️⃣ **Edición de Proyecto**
 Al editar un proyecto existente:
-- **Acción:** Modificar datos del proyecto y reasignar contactos/usuarios
+- **Acción:** Modificar datos del proyecto y reasignar usuarios con acceso
 - **Proceso:**
-  1. Se cargan los contactos actuales desde `project_contacts`
-  2. Se cargan los usuarios actuales desde `user_projects`
+  1. Se cargan los usuarios con acceso actuales desde `proyect_accces`
+  2. Se cargan los usuarios del equipo actuales desde `user_projects`
   3. Al guardar, se sincronizan las relaciones:
      - Se eliminan todas las relaciones antiguas
      - Se insertan las nuevas relaciones seleccionadas
@@ -336,7 +336,7 @@ Al editar un proyecto existente:
 ```
 EMPRESA (company)
    ├─── PROYECTOS (projects)
-   │       ├─── CONTACTOS asignados (project_contacts) ◄─── CONTACTOS (contact_clients)
+   │       ├─── USUARIOS con acceso (proyect_accces) ◄─── USUARIOS (users)
    │       └─── USUARIOS asignados (user_projects) ◄─── USUARIOS (users)
    │
    └─── CONTACTOS (contact_clients)
@@ -378,14 +378,14 @@ Estas tablas YA tienen RLS y políticas activas:
 ### Tablas que NECESITAN RLS ⚠️
 
 Estas tablas de relación DEBEN tener RLS activado:
-- ⚠️ `project_contacts`
+- ⚠️ `proyect_accces`
 - ⚠️ `user_projects`
 
 ### Activar RLS en Tablas de Relación
 
 ```sql
--- Activar RLS en project_contacts
-ALTER TABLE project_contacts ENABLE ROW LEVEL SECURITY;
+-- Activar RLS en proyect_accces
+ALTER TABLE proyect_accces ENABLE ROW LEVEL SECURITY;
 
 -- Activar RLS en user_projects
 ALTER TABLE user_projects ENABLE ROW LEVEL SECURITY;
@@ -393,17 +393,17 @@ ALTER TABLE user_projects ENABLE ROW LEVEL SECURITY;
 
 ### Políticas Recomendadas
 
-#### Para `project_contacts`:
+#### Para `proyect_accces`:
 ```sql
 -- Lectura para todos los autenticados
-CREATE POLICY "Allow authenticated read project_contacts"
-ON project_contacts FOR SELECT
+CREATE POLICY "Allow authenticated read proyect_accces"
+ON proyect_accces FOR SELECT
 TO authenticated
 USING (true);
 
 -- Escritura solo para admins (role_id <= 2)
-CREATE POLICY "Allow admin write project_contacts"
-ON project_contacts FOR ALL
+CREATE POLICY "Allow admin write proyect_accces"
+ON proyect_accces FOR ALL
 TO authenticated
 USING (
   EXISTS (

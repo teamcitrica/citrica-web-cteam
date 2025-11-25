@@ -22,7 +22,7 @@ export interface ProjectContactWithDetails extends ProjectContact {
   };
 }
 
-export const useProjectContacts = () => {
+export const useProyectAccces = () => {
   const { supabase } = useSupabase();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,7 +32,7 @@ export const useProjectContacts = () => {
       try {
         setIsLoading(true);
         const { data, error } = await supabase
-          .from("project_contacts")
+          .from("proyect_accces")
           .select(`
             users_id,
             users (
@@ -76,7 +76,7 @@ export const useProjectContacts = () => {
       setIsLoading(true);
 
       const { error } = await supabase
-        .from("project_contacts")
+        .from("proyect_accces")
         .insert([{ project_id: projectId, users_id: userId }]);
 
       if (error) {
@@ -123,7 +123,7 @@ export const useProjectContacts = () => {
       setIsLoading(true);
 
       const { error } = await supabase
-        .from("project_contacts")
+        .from("proyect_accces")
         .delete()
         .eq("project_id", projectId)
         .eq("users_id", userId);
@@ -167,7 +167,7 @@ export const useProjectContacts = () => {
       }));
 
       const { error } = await supabase
-        .from("project_contacts")
+        .from("proyect_accces")
         .insert(insertData);
 
       if (error) {
@@ -205,7 +205,7 @@ export const useProjectContacts = () => {
 
       // Primero eliminamos todas las relaciones existentes
       const { error: deleteError } = await supabase
-        .from("project_contacts")
+        .from("proyect_accces")
         .delete()
         .eq("project_id", projectId);
 
@@ -231,7 +231,7 @@ export const useProjectContacts = () => {
       }));
 
       const { error: insertError } = await supabase
-        .from("project_contacts")
+        .from("proyect_accces")
         .insert(insertData);
 
       if (insertError) {
