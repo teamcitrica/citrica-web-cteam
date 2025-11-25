@@ -10,7 +10,10 @@ import {
   Input,
   Select,
   SelectItem,
+  Chip,
+  Divider,
 } from "@heroui/react";
+import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 import { addToast } from "@heroui/toast";
 
 import { useProjectCRUD, ProjectInput, Project } from "@/hooks/projects/use-projects";
@@ -40,7 +43,8 @@ export default function ProjectFormModal({
   const { getProjectContacts, syncProjectContacts } = useProjectContacts();
   const { getProjectUsers, syncProjectUsers } = useUserProjects();
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
-  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [searchValue, setSearchValue] = useState('');
 
   const [formData, setFormData] = useState<ProjectInput>({
     name: project?.name || null,
@@ -70,16 +74,34 @@ export default function ProjectFormModal({
 
       // Cargar contactos asociados al proyecto
       const loadProjectContacts = async () => {
-        const projectContacts = await getProjectContacts(project.id);
-        const contactIds = new Set(projectContacts.map(c => c.id));
-        setSelectedContactIds(contactIds);
+        try {
+          const projectContacts = await getProjectContacts(project.id);
+          if (projectContacts && projectContacts.length > 0) {
+            const contactIds = new Set(projectContacts.map(c => c.id));
+            setSelectedContactIds(contactIds);
+          } else {
+            setSelectedContactIds(new Set());
+          }
+        } catch (error) {
+          console.log("No hay contactos asociados al proyecto");
+          setSelectedContactIds(new Set());
+        }
       };
 
       // Cargar usuarios asociados al proyecto
       const loadProjectUsers = async () => {
-        const projectUsers = await getProjectUsers(project.id);
-        const userIds = new Set(projectUsers.map(u => u.id).filter((id): id is string => !!id));
-        setSelectedUserIds(userIds);
+        try {
+          const projectUsers = await getProjectUsers(project.id);
+          if (projectUsers && projectUsers.length > 0) {
+            const userIds = projectUsers.map(u => u.id).filter((id): id is string => !!id);
+            setSelectedUserIds(userIds);
+          } else {
+            setSelectedUserIds([]);
+          }
+        } catch (error) {
+          console.log("No hay usuarios asociados al proyecto");
+          setSelectedUserIds([]);
+        }
       };
 
       loadProjectContacts();
@@ -87,7 +109,7 @@ export default function ProjectFormModal({
     } else {
       // Limpiar selección cuando es modo crear
       setSelectedContactIds(new Set());
-      setSelectedUserIds(new Set());
+      setSelectedUserIds([]);
     }
   }, [project, mode, getProjectContacts, getProjectUsers]);
 
@@ -98,20 +120,47 @@ export default function ProjectFormModal({
     }));
   };
 
+  // Obtener usuarios clientes ordenados alfabéticamente
+  const clientUsers = users
+    .filter(user => user.role_id === 12)
+    .sort((a, b) => {
+      const nameA = a.first_name || '';
+      const nameB = b.first_name || '';
+      return nameA.localeCompare(nameB);
+    });
+
+  // Obtener usuarios seleccionados
+  const selectedUsers = clientUsers.filter(u => selectedUserIds.includes(u.id));
+
+  // Agregar usuario a la selección
+  const handleAddUser = (key: React.Key | null) => {
+    const userId = key?.toString() || null;
+    if (!userId) return;
+
+    // No agregar si ya está seleccionado
+    if (selectedUserIds.includes(userId)) {
+      addToast({
+        title: "Usuario ya seleccionado",
+        description: "Este usuario ya está asignado al proyecto",
+        color: "warning",
+      });
+      return;
+    }
+
+    setSelectedUserIds(prev => [...prev, userId]);
+    setSearchValue(''); // Limpiar búsqueda
+  };
+
+  // Remover usuario de la selección
+  const handleRemoveUser = (userId: string) => {
+    setSelectedUserIds(prev => prev.filter(id => id !== userId));
+  };
+
   const handleSubmit = async () => {
     if (!formData.name) {
       addToast({
         title: "Error",
         description: "El nombre del proyecto es requerido",
-        color: "danger",
-      });
-      return;
-    }
-
-    if (!formData.company_id) {
-      addToast({
-        title: "Error",
-        description: "Debe seleccionar una empresa",
         color: "danger",
       });
       return;
@@ -138,8 +187,8 @@ export default function ProjectFormModal({
           }
 
           // Si hay usuarios seleccionados, asociarlos
-          if (selectedUserIds.size > 0) {
-            await syncProjectUsers(projectId, Array.from(selectedUserIds));
+          if (selectedUserIds.length > 0) {
+            await syncProjectUsers(projectId, selectedUserIds);
           }
 
           setFormData({
@@ -154,7 +203,8 @@ export default function ProjectFormModal({
             supabase_anon_key: null,
           });
           setSelectedContactIds(new Set());
-          setSelectedUserIds(new Set());
+          setSelectedUserIds([]);
+          setSearchValue('');
           onClose();
         }
       } else {
@@ -164,7 +214,7 @@ export default function ProjectFormModal({
         await syncProjectContacts(project!.id, Array.from(selectedContactIds));
 
         // Sincronizar usuarios del proyecto
-        await syncProjectUsers(project!.id, Array.from(selectedUserIds));
+        await syncProjectUsers(project!.id, selectedUserIds);
 
         onClose();
       }
@@ -201,15 +251,12 @@ export default function ProjectFormModal({
             />
 
             <Select
-              label="Empresa"
+              label="Empresa (Opcional)"
               placeholder="Seleccione una empresa"
               selectedKeys={formData.company_id ? [formData.company_id.toString()] : []}
               onChange={(e) => {
                 handleInputChange("company_id", parseInt(e.target.value));
-                // Limpiar contactos seleccionados cuando cambia la empresa
-                setSelectedContactIds(new Set());
               }}
-              isRequired
               classNames={{
                 label: "text-gray-700",
                 value: "text-gray-800",
@@ -222,60 +269,64 @@ export default function ProjectFormModal({
               ))}
             </Select>
 
-            {formData.company_id && (
-              <div className="col-span-2">
-                <Select
-                  label="Contactos del Proyecto"
-                  placeholder="Seleccione los contactos"
-                  selectionMode="multiple"
-                  selectedKeys={selectedContactIds}
-                  onSelectionChange={(keys) => setSelectedContactIds(keys as Set<string>)}
-                  classNames={{
-                    label: "text-gray-700",
-                    value: "text-gray-800",
-                  }}
-                >
-                  {contacts
-                    .filter(contact => contact.company_id === formData.company_id)
-                    .map((contact) => (
-                      <SelectItem key={contact.id}>
-                        {contact.name || "Sin nombre"} {contact.cargo ? `- ${contact.cargo}` : ""}
-                      </SelectItem>
-                    ))}
-                </Select>
-                {contacts.filter(contact => contact.company_id === formData.company_id).length === 0 && (
-                  <p className="text-sm text-gray-500 mt-2">
-                    No hay contactos disponibles para esta empresa
-                  </p>
-                )}
-              </div>
-            )}
-
             <div className="col-span-2">
-              <Select
-                label="Usuarios Asignados al Proyecto"
-                placeholder="Seleccione los usuarios"
-                selectionMode="multiple"
-                selectedKeys={selectedUserIds}
-                onSelectionChange={(keys) => setSelectedUserIds(keys as Set<string>)}
+              <Autocomplete
+                aria-label='Seleccione usuarios clientes'
+                label="Usuarios Asignados al Proyecto (Clientes)"
+                listboxProps={{
+                  emptyContent: "No hay coincidencias",
+                }}
+                inputValue={searchValue}
+                onInputChange={setSearchValue}
+                placeholder="Buscar y seleccionar usuarios clientes"
+                onSelectionChange={handleAddUser}
+                allowsCustomValue={false}
+                menuTrigger="input"
                 classNames={{
-                  label: "text-gray-700",
-                  value: "text-gray-800",
+                  base: "w-full",
                 }}
               >
-                {users.map((user) => (
-                  <SelectItem key={user.id}>
-                    {user.first_name && user.last_name
-                      ? `${user.first_name} ${user.last_name} (${user.email})`
-                      : user.email}
-                  </SelectItem>
-                ))}
-              </Select>
-              {users.length === 0 && (
+                {clientUsers
+                  .filter(user => !selectedUserIds.includes(user.id))
+                  .map((user) => (
+                    <AutocompleteItem key={user.id}>
+                      {user.first_name && user.last_name
+                        ? `${user.first_name} ${user.last_name}`
+                        : user.email}
+                    </AutocompleteItem>
+                  ))}
+              </Autocomplete>
+
+              {/* Chips de usuarios seleccionados */}
+              {selectedUsers.length > 0 && (
+                <div className="mt-4">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Seleccionados ({selectedUsers.length}):
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedUsers.map((user) => (
+                      <Chip
+                        key={user.id}
+                        onClose={() => handleRemoveUser(user.id)}
+                        variant="flat"
+                        color="primary"
+                      >
+                        {user.first_name && user.last_name
+                          ? `${user.first_name} ${user.last_name}`
+                          : user.email}
+                      </Chip>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {clientUsers.length === 0 && (
                 <p className="text-sm text-gray-500 mt-2">
-                  No hay usuarios disponibles
+                  No hay usuarios clientes disponibles
                 </p>
               )}
+
+              <Divider className="my-4" />
             </div>
 
             <Input

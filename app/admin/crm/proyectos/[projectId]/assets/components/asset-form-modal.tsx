@@ -11,6 +11,8 @@ import {
   Textarea,
   Select,
   SelectItem,
+  Checkbox,
+  CheckboxGroup,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 
@@ -45,6 +47,9 @@ export default function AssetFormModal({
   const [assetsOptionsText, setAssetsOptionsText] = useState<string>("");
   const [tables, setTables] = useState<string[]>([]);
   const [isLoadingTables, setIsLoadingTables] = useState(false);
+  const [tableColumns, setTableColumns] = useState<string[]>([]);
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+  const [isLoadingColumns, setIsLoadingColumns] = useState(false);
 
   const handleInputChange = (field: keyof AssetInput, value: string | number | Record<string, any> | null) => {
     setFormData((prev) => ({
@@ -69,6 +74,72 @@ export default function AssetFormModal({
       // Si no es JSON válido, no actualizar formData todavía
     }
   };
+
+  // Función para obtener columnas de una tabla específica
+  const fetchTableColumns = useCallback(async (tableName: string) => {
+    if (!formData.supabase_url || !formData.supabase_anon_key || !tableName) {
+      return;
+    }
+
+    try {
+      setIsLoadingColumns(true);
+      setTableColumns([]);
+      setSelectedColumns([]);
+
+      const cleanUrl = formData.supabase_url.replace(/\/$/, "");
+
+      // Obtener el schema OpenAPI para ver las propiedades de la tabla
+      const response = await fetch(`${cleanUrl}/rest/v1/`, {
+        method: "GET",
+        headers: {
+          apikey: formData.supabase_anon_key,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Buscar las columnas de la tabla en definitions
+      const tableDefinition = data.definitions?.[tableName];
+
+      if (tableDefinition && tableDefinition.properties) {
+        const columns = Object.keys(tableDefinition.properties);
+        setTableColumns(columns);
+
+        // Pre-seleccionar id y created_at si existen
+        const defaultColumns: string[] = [];
+        if (columns.includes('id')) defaultColumns.push('id');
+        if (columns.includes('created_at')) defaultColumns.push('created_at');
+
+        setSelectedColumns(defaultColumns);
+
+        addToast({
+          title: "Columnas cargadas",
+          description: `Se encontraron ${columns.length} columnas en la tabla ${tableName}`,
+          color: "success",
+        });
+      } else {
+        addToast({
+          title: "Sin columnas",
+          description: "No se pudo obtener el schema de la tabla",
+          color: "warning",
+        });
+      }
+    } catch (err: any) {
+      console.error("Error al obtener columnas:", err);
+      addToast({
+        title: "Error",
+        description: "No se pudieron obtener las columnas de la tabla",
+        color: "danger",
+      });
+    } finally {
+      setIsLoadingColumns(false);
+    }
+  }, [formData.supabase_url, formData.supabase_anon_key]);
 
   const handleConsultTables = useCallback(async (url?: string, key?: string) => {
     const supabaseUrl = url || formData.supabase_url;
@@ -320,18 +391,70 @@ export default function AssetFormModal({
                   label="Tabla"
                   placeholder="Selecciona una tabla"
                   selectedKeys={formData.tabla ? [formData.tabla] : []}
-                  onChange={(e) => handleInputChange("tabla", e.target.value)}
+                  onChange={(e) => {
+                    const tableName = e.target.value;
+                    handleInputChange("tabla", tableName);
+                    if (tableName) {
+                      fetchTableColumns(tableName);
+                    }
+                  }}
                   classNames={{
                     label: "text-gray-700",
                     value: "text-gray-800",
                   }}
                 >
                   {tables.map((table) => (
-                    <SelectItem key={table} value={table}>
+                    <SelectItem key={table}>
                       {table}
                     </SelectItem>
                   ))}
                 </Select>
+              </div>
+            )}
+
+            {/* Mostrar columnas cuando se haya seleccionado una tabla */}
+            {tableColumns.length > 0 && (
+              <div className="col-span-2">
+                <div className="border rounded-lg p-4 bg-gray-50">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                    Selecciona las columnas visibles para el usuario
+                  </h4>
+                  <p className="text-xs text-gray-500 mb-3">
+                    Las columnas 'id' y 'created_at' están seleccionadas por defecto
+                  </p>
+
+                  {isLoadingColumns ? (
+                    <p className="text-sm text-gray-500">Cargando columnas...</p>
+                  ) : (
+                    <CheckboxGroup
+                      value={selectedColumns}
+                      onValueChange={(values) => {
+                        setSelectedColumns(values);
+                        // Actualizar assets_options automáticamente
+                        const options = { columns: values };
+                        handleInputChange("assets_options", options);
+                        setAssetsOptionsText(JSON.stringify(options, null, 2));
+                      }}
+                      classNames={{
+                        base: "w-full",
+                      }}
+                    >
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {tableColumns.map((column) => (
+                          <Checkbox
+                            key={column}
+                            value={column}
+                            classNames={{
+                              label: "text-sm text-gray-700",
+                            }}
+                          >
+                            {column}
+                          </Checkbox>
+                        ))}
+                      </div>
+                    </CheckboxGroup>
+                  )}
+                </div>
               </div>
             )}
 
