@@ -114,7 +114,16 @@ export const getUserColumns = ({
     uid: "actions",
     sortable: false,
     render: (user) => (
-      <div className="relative flex justify-center items-center">
+      <div className="relative flex justify-center items-center gap-2">
+        <Button
+          isIconOnly
+          size="sm"
+          variant="light"
+          onPress={() => onView(user)}
+          className="text-blue-500 hover:bg-blue-100"
+        >
+          <Icon className="w-5 h-5" name="Eye" />
+        </Button>
         <Dropdown>
           <DropdownTrigger>
             <Button isIconOnly size="sm" variant="light">
@@ -128,9 +137,6 @@ export const getUserColumns = ({
             aria-label="Acciones del usuario"
             onAction={(key) => {
               switch (key) {
-                case "view":
-                  onView(user);
-                  break;
                 case "edit":
                   onEdit(user);
                   break;
@@ -140,14 +146,6 @@ export const getUserColumns = ({
               }
             }}
           >
-            <DropdownItem
-              key="view"
-              startContent={
-                <Icon className="w-4 h-4 text-blue-500" name="Eye" />
-              }
-            >
-              Ver
-            </DropdownItem>
             <DropdownItem
               key="edit"
               startContent={

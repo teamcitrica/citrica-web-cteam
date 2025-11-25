@@ -131,7 +131,16 @@ export const getCompanyColumns = ({
     uid: "actions",
     sortable: false,
     render: (company) => (
-      <div className="relative flex justify-center items-center">
+      <div className="relative flex justify-center items-center gap-2">
+        <Button
+          isIconOnly
+          size="sm"
+          variant="light"
+          onPress={() => onView(company)}
+          className="text-blue-500 hover:bg-blue-100"
+        >
+          <Icon className="w-5 h-5" name="Eye" />
+        </Button>
         <Dropdown>
           <DropdownTrigger>
             <Button isIconOnly size="sm" variant="light">
@@ -145,9 +154,6 @@ export const getCompanyColumns = ({
             aria-label="Acciones de la empresa"
             onAction={(key) => {
               switch (key) {
-                case "view":
-                  onView(company);
-                  break;
                 case "edit":
                   onEdit(company);
                   break;
@@ -157,14 +163,6 @@ export const getCompanyColumns = ({
               }
             }}
           >
-            <DropdownItem
-              key="view"
-              startContent={
-                <Icon className="w-4 h-4 text-blue-500" name="Eye" />
-              }
-            >
-              Ver
-            </DropdownItem>
             <DropdownItem
               key="edit"
               startContent={

@@ -50,6 +50,18 @@ export default function ProjectDetailModal({
               <p className="text-sm font-semibold text-gray-600">Tabla</p>
               <p className="text-gray-800">{project.tabla || "-"}</p>
             </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-600">Nombre del Responsable</p>
+              <p className="text-gray-800">{project.nombre_responsable || "-"}</p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-600">Email del Responsable</p>
+              <p className="text-gray-800">{project.email_responsable || "-"}</p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-600">Teléfono del Responsable</p>
+              <p className="text-gray-800">{project.phone_responsable || "-"}</p>
+            </div>
             <div className="col-span-2">
               <p className="text-sm font-semibold text-gray-600">Supabase URL</p>
               <p className="text-gray-800 break-all">{project.supabase_url || "-"}</p>
