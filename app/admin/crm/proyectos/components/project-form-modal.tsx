@@ -130,7 +130,7 @@ export default function ProjectFormModal({
     });
 
   // Obtener usuarios seleccionados
-  const selectedUsers = clientUsers.filter(u => selectedUserIds.includes(u.id));
+  const selectedUsers = clientUsers.filter(u => u.id && selectedUserIds.includes(u.id));
 
   // Agregar usuario a la selección
   const handleAddUser = (key: React.Key | null) => {
@@ -287,7 +287,7 @@ export default function ProjectFormModal({
                 }}
               >
                 {clientUsers
-                  .filter(user => !selectedUserIds.includes(user.id))
+                  .filter(user => user.id && !selectedUserIds.includes(user.id))
                   .map((user) => (
                     <AutocompleteItem key={user.id}>
                       {user.first_name && user.last_name
@@ -307,7 +307,7 @@ export default function ProjectFormModal({
                     {selectedUsers.map((user) => (
                       <Chip
                         key={user.id}
-                        onClose={() => handleRemoveUser(user.id)}
+                        onClose={() => handleRemoveUser(user.id!)}
                         variant="flat"
                         color="primary"
                       >
