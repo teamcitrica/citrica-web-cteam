@@ -34,9 +34,9 @@ export default function ProjectDetailModal({
         </ModalHeader>
         <ModalBody>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm font-semibold text-gray-600">Nombre</p>
-              <p className="text-gray-800">{project.name || "-"}</p>
+            <div className="col-span-2">
+              <p className="text-sm font-semibold text-gray-600">Nombre del Proyecto</p>
+              <p className="text-gray-800 text-lg">{project.name || "-"}</p>
             </div>
             <div>
               <p className="text-sm font-semibold text-gray-600">Empresa</p>
@@ -46,19 +46,22 @@ export default function ProjectDetailModal({
               <p className="text-sm font-semibold text-gray-600">Estado</p>
               <p className="text-gray-800 capitalize">{project.status || "-"}</p>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-600">Tabla</p>
-              <p className="text-gray-800">{project.tabla || "-"}</p>
-            </div>
-            <div className="col-span-2">
-              <p className="text-sm font-semibold text-gray-600">Supabase URL</p>
-              <p className="text-gray-800 break-all">{project.supabase_url || "-"}</p>
-            </div>
-            <div className="col-span-2">
-              <p className="text-sm font-semibold text-gray-600">Supabase Anon Key</p>
-              <p className="text-gray-800 break-all font-mono text-xs">
-                {project.supabase_anon_key || "-"}
-              </p>
+            <div className="col-span-2 border-t pt-4 mt-2">
+              <p className="text-sm font-semibold text-gray-600 mb-3">Información del Responsable</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs font-semibold text-gray-500">Nombre</p>
+                  <p className="text-gray-800">{project.nombre_responsable || "-"}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-500">Email</p>
+                  <p className="text-gray-800">{project.email_responsable || "-"}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-500">Teléfono</p>
+                  <p className="text-gray-800">{project.phone_responsable || "-"}</p>
+                </div>
+              </div>
             </div>
           </div>
         </ModalBody>

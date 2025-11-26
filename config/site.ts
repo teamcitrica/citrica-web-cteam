@@ -107,6 +107,13 @@ export const siteConfig = {
 				},
 			],
 		},
+		{
+			title: "MIS DATOS",
+			icon: "ClipboardCheck",
+			href: "/admin/client/mis-datos",
+			allowedRoles: [ROL_CLIENTE],
+			subItems: [],
+		},
 
 	],
 	links: {

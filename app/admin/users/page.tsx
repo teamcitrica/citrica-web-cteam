@@ -1,7 +1,5 @@
-import CardUsersSuperWithModal from "./card-users-super-with-modal";
+import { redirect } from "next/navigation";
 
-const UsersPage = () => {
-  return <CardUsersSuperWithModal />;
-};
-
-export default UsersPage;
+export default function UsersPage() {
+  redirect("/admin/users/usuarios");
+}
