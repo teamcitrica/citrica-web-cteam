@@ -47,7 +47,10 @@ export const useProjectContacts = () => {
           .eq("project_id", projectId);
 
         if (error) {
-          console.error("Error al obtener usuarios del proyecto:", error);
+          // Solo log si es un error real, no si simplemente no hay datos
+          if (error.code !== 'PGRST116') {
+            console.log("Información: No hay contactos para este proyecto o error menor:", error.message);
+          }
           return [];
         }
 
@@ -57,8 +60,8 @@ export const useProjectContacts = () => {
           .filter(Boolean);
 
         return users;
-      } catch (err) {
-        console.error("Error en getProjectContacts:", err);
+      } catch (err: any) {
+        console.log("No se pudieron cargar contactos del proyecto:", err?.message || "");
         return [];
       } finally {
         setIsLoading(false);

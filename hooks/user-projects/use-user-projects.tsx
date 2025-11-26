@@ -5,14 +5,14 @@ import { addToast } from "@heroui/toast";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { UserType } from "@/shared/types/types";
 
-export interface UserProject {
+export interface ProjectAccess {
   id: string;
-  user_id: string;
+  users_id: string;
   project_id: string;
-  assigned_at: string;
+  created_at: string;
 }
 
-export interface UserProjectWithDetails extends UserProject {
+export interface ProjectAccessWithDetails extends ProjectAccess {
   users: UserType;
 }
 
@@ -26,9 +26,9 @@ export const useUserProjects = () => {
       try {
         setIsLoading(true);
         const { data, error } = await supabase
-          .from("user_projects")
+          .from("proyect_acces")
           .select(`
-            user_id,
+            users_id,
             users (
               id,
               email,
@@ -41,7 +41,10 @@ export const useUserProjects = () => {
           .eq("project_id", projectId);
 
         if (error) {
-          console.error("Error al obtener usuarios del proyecto:", error);
+          // Solo log si es un error real, no si simplemente no hay datos
+          if (error.code !== 'PGRST116') {
+            console.log("Información: No hay usuarios para este proyecto o error menor:", error.message);
+          }
           return [];
         }
 
@@ -51,8 +54,8 @@ export const useUserProjects = () => {
           .filter(Boolean);
 
         return users as UserType[];
-      } catch (err) {
-        console.error("Error en getProjectUsers:", err);
+      } catch (err: any) {
+        console.log("No se pudieron cargar usuarios del proyecto:", err?.message || "");
         return [];
       } finally {
         setIsLoading(false);
@@ -67,9 +70,9 @@ export const useUserProjects = () => {
       try {
         setIsLoading(true);
         const { data, error } = await supabase
-          .from("user_projects")
+          .from("proyect_acces")
           .select("project_id")
-          .eq("user_id", userId);
+          .eq("users_id", userId);
 
         if (error) {
           console.error("Error al obtener proyectos del usuario:", error);
@@ -96,8 +99,8 @@ export const useUserProjects = () => {
       setIsLoading(true);
 
       const { error } = await supabase
-        .from("user_projects")
-        .insert([{ project_id: projectId, user_id: userId }]);
+        .from("proyect_acces")
+        .insert([{ project_id: projectId, users_id: userId }]);
 
       if (error) {
         // Verificar si es un error de duplicado
@@ -143,10 +146,10 @@ export const useUserProjects = () => {
       setIsLoading(true);
 
       const { error } = await supabase
-        .from("user_projects")
+        .from("proyect_acces")
         .delete()
         .eq("project_id", projectId)
-        .eq("user_id", userId);
+        .eq("users_id", userId);
 
       if (error) {
         console.error("Error al remover usuario del proyecto:", error);
@@ -183,11 +186,11 @@ export const useUserProjects = () => {
 
       const insertData = userIds.map((userId) => ({
         project_id: projectId,
-        user_id: userId,
+        users_id: userId,
       }));
 
       const { error } = await supabase
-        .from("user_projects")
+        .from("proyect_acces")
         .insert(insertData);
 
       if (error) {
@@ -225,7 +228,7 @@ export const useUserProjects = () => {
 
       // Primero eliminamos todas las asignaciones existentes
       const { error: deleteError } = await supabase
-        .from("user_projects")
+        .from("proyect_acces")
         .delete()
         .eq("project_id", projectId);
 
@@ -247,11 +250,11 @@ export const useUserProjects = () => {
       // Agregamos los nuevos usuarios
       const insertData = userIds.map((userId) => ({
         project_id: projectId,
-        user_id: userId,
+        users_id: userId,
       }));
 
       const { error: insertError } = await supabase
-        .from("user_projects")
+        .from("proyect_acces")
         .insert(insertData);
 
       if (insertError) {

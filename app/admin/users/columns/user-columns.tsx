@@ -10,15 +10,15 @@ import {
 import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { ExportColumn } from "@/shared/hooks/useTableFeatures";
-import { Company } from "@/hooks/companies/use-companies";
+import { UserType } from "@/shared/types/types";
 
-type CompanyColumnsConfig = {
-  onView: (company: Company) => void;
-  onEdit: (company: Company) => void;
-  onDelete: (company: Company) => void;
+type UserColumnsConfig = {
+  onView: (user: UserType) => void;
+  onEdit: (user: UserType) => void;
+  onDelete: (user: UserType) => void;
 };
 
-type CompanyExportConfig = Record<string, never>;
+type UserExportConfig = Record<string, never>;
 
 // Función para generar un color único basado en el nombre
 const getAvatarColor = (name: string): string => {
@@ -53,74 +53,57 @@ const getInitials = (name: string): string => {
   return name.substring(0, 2).toUpperCase();
 };
 
-export const getCompanyColumns = ({
+export const getUserColumns = ({
   onView,
   onEdit,
   onDelete,
-}: CompanyColumnsConfig): Column<Company>[] => [
+}: UserColumnsConfig): Column<UserType>[] => [
   {
-    name: "EMPRESA",
-    uid: "name",
+    name: "NOMBRE",
+    uid: "nombre",
     sortable: true,
-    render: (company) => (
-      <div className="flex items-center gap-3">
-        <Avatar
-          classNames={{
-            base: `bg-gradient-to-br ${getAvatarColor(company.name || "Company")}`,
-            icon: "text-white",
-          }}
-          name={getInitials(company.name || "?")}
-          size="sm"
-        />
-        <div className="text-[#16305A] font-medium">{company.name || "-"}</div>
-      </div>
-    ),
-  },
-  {
-    name: "UBICACIÓN Y SECTOR",
-    uid: "location",
-    sortable: false,
-    render: (company) => {
-      const location = [company.departament, company.country]
-        .filter(Boolean)
-        .join(", ") || "-";
+    render: (user) => {
+      const userName = user.full_name || user.name || `${user.first_name || ""} ${user.last_name || ""}`.trim();
       return (
-        <div className="flex flex-col gap-1 items-start">
-          <div className="text-[#16305A] font-medium">{location}</div>
-          <div className="text-[#678CC5] text-sm truncate max-w-[200px]">
-            {company.description || "-"}
-          </div>
+        <div className="flex items-center gap-3">
+          <Avatar
+            classNames={{
+              base: `bg-gradient-to-br ${getAvatarColor(userName || "User")}`,
+              icon: "text-white",
+            }}
+            name={getInitials(userName || "?")}
+            size="sm"
+          />
+          <div className="text-black font-medium">{userName || "-"}</div>
         </div>
       );
     },
   },
   {
-    name: "TELÉFONO Y MAIL",
-    uid: "contact_info",
+    name: "ROL",
+    uid: "rol",
+    sortable: true,
+    render: (user) => (
+      <div className="text-black font-medium capitalize">
+        {user.role?.name || "-"}
+      </div>
+    ),
+  },
+  {
+    name: "CORREO",
+    uid: "email",
     sortable: false,
-    render: (company) => (
-      <div className="flex flex-col gap-2">
-        {company.contact_phone && (
+    render: (user) => (
+      <div className="flex items-center gap-2">
+        {user.email ? (
           <a
-            href={`https://wa.me/${company.contact_phone.replace(/\D/g, "")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-[#16305A] hover:text-green-700"
-          >
-            <Icon className="w-4 h-4" name="Phone" />
-            <span className="text-sm">{company.contact_phone}</span>
-          </a>
-        )}
-        {company.contact_email && (
-          <a
-            href={`mailto:${company.contact_email}`}
-            className="flex items-center gap-2 text-[#678CC5] hover:text-blue-700"
+            href={`mailto:${user.email}`}
+            className="flex items-center gap-2 text-black hover:text-[#ff5b00]"
           >
             <Icon className="w-4 h-4" name="Mail" />
-            <span className="text-sm">{company.contact_email}</span>
+            <span className="text-sm">{user.email}</span>
           </a>
-        )}
-        {!company.contact_phone && !company.contact_email && (
+        ) : (
           <span className="text-gray-400">-</span>
         )}
       </div>
@@ -130,13 +113,13 @@ export const getCompanyColumns = ({
     name: "ACCIONES",
     uid: "actions",
     sortable: false,
-    render: (company) => (
+    render: (user) => (
       <div className="relative flex justify-center items-center gap-2">
         <Button
           isIconOnly
           size="sm"
           variant="light"
-          onPress={() => onView(company)}
+          onPress={() => onView(user)}
           className="text-blue-500 hover:bg-blue-100"
         >
           <Icon className="w-5 h-5" name="Eye" />
@@ -151,14 +134,14 @@ export const getCompanyColumns = ({
             </Button>
           </DropdownTrigger>
           <DropdownMenu
-            aria-label="Acciones de la empresa"
+            aria-label="Acciones del usuario"
             onAction={(key) => {
               switch (key) {
                 case "edit":
-                  onEdit(company);
+                  onEdit(user);
                   break;
                 case "delete":
-                  onDelete(company);
+                  onDelete(user);
                   break;
               }
             }}
@@ -186,32 +169,20 @@ export const getCompanyColumns = ({
   },
 ];
 
-export const getCompanyExportColumns = (
+export const getUserExportColumns = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _config?: CompanyExportConfig
+  _config?: UserExportConfig
 ): ExportColumn[] => [
   {
-    header: "EMPRESA",
-    key: "name",
+    header: "NOMBRE",
+    key: "full_name",
   },
   {
-    header: "DEPARTAMENTO",
-    key: "departament",
-  },
-  {
-    header: "PAÍS",
-    key: "country",
-  },
-  {
-    header: "SECTOR/DESCRIPCIÓN",
-    key: "description",
-  },
-  {
-    header: "TELÉFONO",
-    key: "contact_phone",
+    header: "ROL",
+    key: "role.name",
   },
   {
     header: "EMAIL",
-    key: "contact_email",
+    key: "email",
   },
 ];
