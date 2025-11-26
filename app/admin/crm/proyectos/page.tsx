@@ -30,8 +30,6 @@ export default function ProyectosPage() {
   // Cargar conteos de assets y accesos
   useEffect(() => {
     const loadCounts = async () => {
-      if (projects.length === 0) return;
-
       // Obtener conteo de assets por proyecto
       const { data: assetsData } = await supabase
         .from("assets")
@@ -64,7 +62,7 @@ export default function ProyectosPage() {
     };
 
     loadCounts();
-  }, [projects, supabase]);
+  }, [supabase]);
 
   const getCompanyName = useCallback((companyId: number | null) => {
     if (!companyId) return "-";
