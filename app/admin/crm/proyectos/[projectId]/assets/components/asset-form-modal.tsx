@@ -8,11 +8,11 @@ import {
   ModalFooter,
   Button,
   Input,
-  Textarea,
   Select,
   SelectItem,
   Checkbox,
   CheckboxGroup,
+  Chip,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 
@@ -44,7 +44,6 @@ export default function AssetFormModal({
     project_id: projectId,
   });
 
-  const [assetsOptionsText, setAssetsOptionsText] = useState<string>("");
   const [tables, setTables] = useState<string[]>([]);
   const [isLoadingTables, setIsLoadingTables] = useState(false);
   const [tableColumns, setTableColumns] = useState<string[]>([]);
@@ -58,22 +57,6 @@ export default function AssetFormModal({
     }));
   };
 
-  const handleAssetsOptionsChange = (text: string) => {
-    setAssetsOptionsText(text);
-
-    // Intentar parsear el JSON
-    if (text.trim() === "") {
-      handleInputChange("assets_options", null);
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(text);
-      handleInputChange("assets_options", parsed);
-    } catch (e) {
-      // Si no es JSON válido, no actualizar formData todavía
-    }
-  };
 
   // Función para obtener columnas de una tabla específica
   const fetchTableColumns = useCallback(async (tableName: string) => {
@@ -244,13 +227,9 @@ export default function AssetFormModal({
         project_id: asset.project_id,
       });
 
-      // Convertir assets_options a texto JSON formateado
-      if (asset.assets_options) {
-        try {
-          setAssetsOptionsText(JSON.stringify(asset.assets_options, null, 2));
-        } catch (e) {
-          setAssetsOptionsText("");
-        }
+      // Si tiene columnas en assets_options, cargarlas
+      if (asset.assets_options?.columns && Array.isArray(asset.assets_options.columns)) {
+        setSelectedColumns(asset.assets_options.columns);
       }
 
       // Si tiene URL y key, cargar las tablas automáticamente
@@ -270,20 +249,7 @@ export default function AssetFormModal({
       return;
     }
 
-    // Validar JSON de assets_options si hay texto
-    if (assetsOptionsText.trim() !== "") {
-      try {
-        const parsed = JSON.parse(assetsOptionsText);
-        formData.assets_options = parsed;
-      } catch (e) {
-        addToast({
-          title: "Error",
-          description: "El formato de Assets Options debe ser un JSON válido",
-          color: "danger",
-        });
-        return;
-      }
-    }
+    // Las opciones ya están en formData.assets_options gracias a los checkboxes
 
     try {
       // Limpiar campos vacíos antes de enviar
@@ -309,7 +275,7 @@ export default function AssetFormModal({
             assets_options: null,
             project_id: projectId,
           });
-          setAssetsOptionsText("");
+          setSelectedColumns([]);
           onClose();
         }
       } else {
@@ -400,12 +366,21 @@ export default function AssetFormModal({
                   }}
                   classNames={{
                     label: "text-gray-700",
-                    value: "text-gray-800",
+                    value: "text-gray-800 truncate",
                   }}
                 >
                   {tables.map((table) => (
-                    <SelectItem key={table}>
-                      {table}
+                    <SelectItem
+                      key={table}
+                      classNames={{
+                        base: "max-w-full",
+                        title: "truncate",
+                      }}
+                      title={table}
+                    >
+                      <span className="truncate block" title={table}>
+                        {table}
+                      </span>
                     </SelectItem>
                   ))}
                 </Select>
@@ -416,62 +391,91 @@ export default function AssetFormModal({
             {tableColumns.length > 0 && (
               <div className="col-span-2">
                 <div className="border rounded-lg p-4 bg-gray-50">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3">
-                    Selecciona las columnas visibles para el usuario
-                  </h4>
-                  <p className="text-xs text-gray-500 mb-3">
-                    Las columnas 'id' y 'created_at' están seleccionadas por defecto
-                  </p>
+                  <div className="flex justify-between items-center mb-3">
+                    <h4 className="text-sm font-semibold text-gray-700">
+                      Selecciona las columnas visibles para el usuario
+                    </h4>
+                    <Button
+                      size="sm"
+                      color="primary"
+                      variant="flat"
+                      onPress={() => {
+                        const allSelected = selectedColumns.length === tableColumns.length;
+                        const newSelection = allSelected ? [] : tableColumns;
+                        setSelectedColumns(newSelection);
+                        const options = { columns: newSelection };
+                        handleInputChange("assets_options", options);
+                      }}
+                    >
+                      {selectedColumns.length === tableColumns.length ? "Deseleccionar todos" : "Seleccionar todos"}
+                    </Button>
+                  </div>
 
                   {isLoadingColumns ? (
                     <p className="text-sm text-gray-500">Cargando columnas...</p>
                   ) : (
-                    <CheckboxGroup
-                      value={selectedColumns}
-                      onValueChange={(values) => {
-                        setSelectedColumns(values);
-                        // Actualizar assets_options automáticamente
-                        const options = { columns: values };
-                        handleInputChange("assets_options", options);
-                        setAssetsOptionsText(JSON.stringify(options, null, 2));
-                      }}
-                      classNames={{
-                        base: "w-full",
-                      }}
-                    >
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        {tableColumns.map((column) => (
-                          <Checkbox
-                            key={column}
-                            value={column}
-                            classNames={{
-                              label: "text-sm text-gray-700",
-                            }}
-                          >
-                            {column}
-                          </Checkbox>
-                        ))}
-                      </div>
-                    </CheckboxGroup>
+                    <>
+                      <CheckboxGroup
+                        value={selectedColumns}
+                        onValueChange={(values) => {
+                          setSelectedColumns(values);
+                          // Actualizar assets_options automáticamente
+                          const options = { columns: values };
+                          handleInputChange("assets_options", options);
+                        }}
+                        classNames={{
+                          base: "w-full",
+                        }}
+                      >
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
+                          {tableColumns.map((column) => (
+                            <Checkbox
+                              key={column}
+                              value={column}
+                              classNames={{
+                                label: "text-sm text-gray-700 truncate",
+                              }}
+                            >
+                              <span className="truncate max-w-[150px] block" title={column}>
+                                {column}
+                              </span>
+                            </Checkbox>
+                          ))}
+                        </div>
+                      </CheckboxGroup>
+
+                      {/* Chips de columnas seleccionadas */}
+                      {selectedColumns.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                          <p className="text-xs text-gray-600 mb-2 font-medium">
+                            Columnas seleccionadas ({selectedColumns.length}):
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedColumns.map((column) => (
+                              <Chip
+                                key={column}
+                                onClose={() => {
+                                  const newSelection = selectedColumns.filter(c => c !== column);
+                                  setSelectedColumns(newSelection);
+                                  const options = { columns: newSelection };
+                                  handleInputChange("assets_options", options);
+                                }}
+                                variant="flat"
+                                color="primary"
+                                size="sm"
+                              >
+                                {column}
+                              </Chip>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
             )}
 
-            <div className="col-span-2">
-              <Textarea
-                label="Assets Options (JSON)"
-                placeholder='{"filtro1": "valor1", "filtro2": "valor2"}'
-                description="Filtros que se usarán para mostrar la tabla. Debe ser un JSON válido."
-                value={assetsOptionsText}
-                onChange={(e) => handleAssetsOptionsChange(e.target.value)}
-                minRows={5}
-                classNames={{
-                  label: "text-gray-700",
-                  input: "text-gray-800 font-mono text-sm",
-                }}
-              />
-            </div>
           </div>
         </ModalBody>
         <ModalFooter>
