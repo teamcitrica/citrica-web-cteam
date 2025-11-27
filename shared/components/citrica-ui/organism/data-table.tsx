@@ -7,17 +7,15 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Spinner,
+  Skeleton,
   Pagination,
-  Input,
-  Select,
   SelectItem,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
 } from "@heroui/react";
-import { Button } from "@heroui/react";
+import { ButtonCitricaAdmin, SelectCitricaAdmin, InputCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import Icon from "@ui/atoms/icon";
 import Text from "@/shared/components/citrica-ui/atoms/text";
 import ExportModal from "./export-modal";
@@ -120,33 +118,19 @@ export function DataTable<T extends Record<string, any>>({
     [columns, renderActions]
   );
 
-  if (isLoading) {
-    return (
-      <div className="w-full h-40 flex justify-center items-center">
-        <Spinner color="primary" size="md" />
-      </div>
-    );
-  }
-
   return (
     <div className="container-blue-principal">
       {/* Barra de búsqueda y acciones */}
-     
+
         <div className="flex items-center justify-between w-full pb-6 pt-3">
           <div className="flex items-center gap-4 ">
             {/* Filtro de empresa */}
             {showCompanyFilter && companies.length > 0 && (
-              <Select
-                // label={companyFilterPlaceholder}
-                className="min-w-[264px]"
-                classNames={{
-                  trigger: "!text-[#3E688E] rounded-[24px] border-[#D4DEED] data-[focus=true]:border-[#D4DEED] data-[open=true]:border-[#D4DEED] focus:border-[#D4DEED] hover:border-[#B8D4E5]",
-                  popoverContent: "bg-white",
-                }}
-                placeholder="Seleccione una empresa"
-                selectedKeys={tableFeatures.companyFilter ? [tableFeatures.companyFilter] : ["all"]}
+              <SelectCitricaAdmin
+                // label="Empresa"
+                placeholder="Filtrar por empresa"
+                selectedKeys={tableFeatures.companyFilter && tableFeatures.companyFilter !== "" ? [tableFeatures.companyFilter] : ["all"]}
                 onSelectionChange={tableFeatures.onCompanyFilterChange}
-                variant="bordered"
               >
                 {[
                   <SelectItem
@@ -180,22 +164,15 @@ export function DataTable<T extends Record<string, any>>({
                     </SelectItem>
                   )),
                 ]}
-              </Select>
+              </SelectCitricaAdmin>
             )}
 
             {searchFields.length > 0 && (
               <div className="search-input-wrapper">
-                <Input
-                  className="text-[#3E688E] min-w-[264px]"
-                  classNames={{
-                    inputWrapper:
-                      "!text-[#3E688E] rounded-[24px] !border-[#D4DEED] data-[focus=true]:!border-[#D4DEED] data-[hover=true]:!border-[#B8D4E5] focus-within:!border-[#D4DEED]",
-                    mainWrapper: "",
-                  }}
+                <InputCitricaAdmin
                   placeholder={searchPlaceholder}
                   endContent={<Icon className="ml-2" color="#719BC1" name="Search" />}
                   value={tableFeatures.filterValue}
-                  variant="bordered"
                   onChange={(e) => tableFeatures.onSearchChange(e.target.value)}
                 />
               </div>
@@ -220,13 +197,13 @@ export function DataTable<T extends Record<string, any>>({
             {enableExport && (
               <Dropdown>
                 <DropdownTrigger>
-                  <Button
-                    className="bg-transparent border-2 border-[#D4DEED] text-gray-700 py-4"
+                  <ButtonCitricaAdmin
+                    variant="export"
                     startContent={<Icon className="w-4 h-4" name="Download" />}
                     size="sm"
                   >
                     Exportar
-                  </Button>
+                  </ButtonCitricaAdmin>
                 </DropdownTrigger>
                 <DropdownMenu
                   aria-label="Opciones de exportación"
@@ -257,16 +234,16 @@ export function DataTable<T extends Record<string, any>>({
             )}
 
             {onAdd && (
-              <Button
+              <ButtonCitricaAdmin
+                variant="primary"
                 style={{ backgroundColor: headerColor }}
-                className="text-white py-[6px] px-[6px] rounded-lg border-2 border-white"
                 startContent={<Icon className="w-4 h-4" name="Plus" />}
                 onClick={onAdd}
               >
                 <Text color="white" variant="label">
                   {addButtonText}
                 </Text>
-              </Button>
+              </ButtonCitricaAdmin>
             )}
           </div>
         </div>
@@ -299,11 +276,27 @@ export function DataTable<T extends Record<string, any>>({
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={emptyContent} items={tableFeatures.paginatedItems}>
-          {(item) => (
-            <TableRow key={getRowKey(item)} className="items-center">
-              {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-            </TableRow>
+        <TableBody
+          emptyContent={emptyContent}
+          items={tableFeatures.paginatedItems}
+        >
+          {isLoading ? (
+            // Skeleton rows durante la carga
+            Array.from({ length: Math.min(itemsPerPage, 10) }).map((_, index) => (
+              <TableRow key={`skeleton-${index}`}>
+                {tableColumns.map((col) => (
+                  <TableCell key={col.uid}>
+                    <Skeleton className="h-6 w-full rounded-lg" />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            (item: any) => (
+              <TableRow key={getRowKey(item)} className="items-center">
+                {(columnKey: React.Key) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+              </TableRow>
+            )
           )}
         </TableBody>
       </Table>

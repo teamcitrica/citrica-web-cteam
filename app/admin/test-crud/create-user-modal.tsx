@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/react";
+import { addToast } from "@heroui/toast";
 
 import { useUserRole } from "@/hooks/role/use-role";
 import { useUserCRUD } from "@/hooks/users/use-users";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
-import { Input } from "@/shared/components/citrica-ui";
+import { InputCitricaAdmin, SelectCitricaAdmin, ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
+import { SelectItem } from "@heroui/react";
+import Text from "@/shared/components/citrica-ui/atoms/text";
 
 type CreateUserModalProps = {
   isOpen: boolean;
@@ -34,15 +38,10 @@ const CreateUserModal = ({
     fetchCompanies();
   }, []);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value, type } = e.target as HTMLInputElement;
-    const checked = (e.target as HTMLInputElement).checked;
-
+  const handleChange = (name: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
   };
 
@@ -53,8 +52,11 @@ const CreateUserModal = ({
       !formData.email ||
       !formData.role_id
     ) {
-      alert("Todos los campos son obligatorios");
-
+      addToast({
+        title: "Campos requeridos",
+        description: "Por favor complete todos los campos obligatorios",
+        color: "warning",
+      });
       return;
     }
 
@@ -69,7 +71,12 @@ const CreateUserModal = ({
     try {
       await createUserByRole(newUser, formData.role_id);
 
-      alert("Usuario agregado correctamente");
+      addToast({
+        title: "Usuario creado",
+        description: "El usuario ha sido creado correctamente",
+        color: "success",
+      });
+
       setFormData({
         first_name: "",
         last_name: "",
@@ -78,102 +85,152 @@ const CreateUserModal = ({
         role_id: "",
         company_id: "",
       });
-      // Cerrar el modal tras crear el usuario (esto ejecutará el refresh en el componente padre)
       onClose();
     } catch (error: any) {
       console.error("Error al crear el usuario:", error);
 
-      // Verificar si el error es de email duplicado
       const errorMessage = error?.message || String(error);
 
       if (errorMessage.includes("already") ||
           errorMessage.includes("duplicate") ||
           errorMessage.includes("already been registered")) {
-        alert("El email ya está registrado. Por favor, intente con otro email.");
+        addToast({
+          title: "Error",
+          description: "El email ya está registrado. Por favor, intente con otro email.",
+          color: "danger",
+        });
       } else {
-        alert(`Ocurrió un error al crear el usuario: ${errorMessage}`);
+        addToast({
+          title: "Error",
+          description: `Ocurrió un error al crear el usuario: ${errorMessage}`,
+          color: "danger",
+        });
       }
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-md p-6 w-full max-w-md relative">
-        {/* Botón de cerrar */}
-        <button className="absolute top-2 right-2 text-black" onClick={onClose}>
-          X
-        </button>
-        <div className="flex flex-col gap-4">
-          <Input
-            name="first_name"
-            placeholder="Primer nombre"
-            type="text"
-            value={formData.first_name}
-            onChange={handleChange}
-          />
-          <Input
-            name="last_name"
-            placeholder="Apellido"
-            type="text"
-            value={formData.last_name}
-            onChange={handleChange}
-          />
-          <Input
-            name="email"
-            placeholder="Email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-          />
-          <Input
-            name="password"
-            placeholder="Contraseña"
-            type="text"
-            value={formData.password}
-            onChange={handleChange}
-          />
-          <select
-            className="border rounded-md p-2 text-black"
-            name="role_id"
-            value={formData.role_id}
-            onChange={handleChange}
-          >
-            <option value="">Selecciona un rol</option>
-            {roles.map((role) => (
-              <option key={role.id} value={role.id}>
-                {role.name}
-              </option>
-            ))}
-          </select>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="lg"
+      placement="center"
+      backdrop="opaque"
+      scrollBehavior="inside"
+    >
+      <ModalContent>
+        <ModalHeader className="flex flex-col gap-1">
+          <Text variant="headline" color="#265197">Crear Usuario</Text>
+        </ModalHeader>
 
-          {/* Select de empresas - Solo se muestra si el rol NO es superuser (id = 1) */}
-          {formData.role_id && Number(formData.role_id) !== 1 && (
-            <select
-              className="border rounded-md p-2 text-black"
-              name="company_id"
-              value={formData.company_id}
-              onChange={handleChange}
+        <ModalBody>
+          <div className="flex flex-col gap-4">
+            <InputCitricaAdmin
+              label="Nombre"
+              placeholder="Ingrese el nombre"
+              value={formData.first_name}
+              onChange={(e) => handleChange("first_name", e.target.value)}
+            />
+
+            <InputCitricaAdmin
+              label="Apellido"
+              placeholder="Ingrese el apellido"
+              value={formData.last_name}
+              onChange={(e) => handleChange("last_name", e.target.value)}
+            />
+
+            <InputCitricaAdmin
+              label="Email"
+              type="email"
+              placeholder="Ingrese el email"
+              value={formData.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+            />
+
+            <InputCitricaAdmin
+              label="Contraseña"
+              type="password"
+              placeholder="Ingrese la contraseña"
+              value={formData.password}
+              onChange={(e) => handleChange("password", e.target.value)}
+            />
+
+            <SelectCitricaAdmin
+              label="Rol"
+              placeholder="Seleccione un rol"
+              selectedKeys={formData.role_id ? [formData.role_id] : []}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                handleChange("role_id", selected);
+              }}
             >
-              <option value="">Selecciona una empresa</option>
-              {companies.map((company) => (
-                <option key={company.id} value={company.id}>
-                  {company.name || "Sin nombre"}
-                </option>
+              {roles.map((role) => (
+                <SelectItem
+                  key={String(role.id)}
+                  classNames={{
+                    base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
+                    wrapper: "!border-none",
+                  }}
+                  style={{
+                    border: 'none',
+                    borderColor: 'transparent',
+                    borderWidth: '0',
+                  } as React.CSSProperties}
+                >
+                  {role.name}
+                </SelectItem>
               ))}
-            </select>
-          )}
+            </SelectCitricaAdmin>
 
-          <button
-            className="mt-4 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700"
+            {formData.role_id && Number(formData.role_id) !== 1 && (
+              <SelectCitricaAdmin
+                label="Empresa"
+                placeholder="Seleccione una empresa"
+                selectedKeys={formData.company_id ? [formData.company_id] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string;
+                  handleChange("company_id", selected);
+                }}
+              >
+                {companies.map((company) => (
+                  <SelectItem
+                    key={String(company.id)}
+                    classNames={{
+                      base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
+                      wrapper: "!border-none",
+                    }}
+                    style={{
+                      border: 'none',
+                      borderColor: 'transparent',
+                      borderWidth: '0',
+                    } as React.CSSProperties}
+                  >
+                    {company.name || "Sin nombre"}
+                  </SelectItem>
+                ))}
+              </SelectCitricaAdmin>
+            )}
+          </div>
+        </ModalBody>
+
+        <ModalFooter>
+          <ButtonCitricaAdmin
+            variant="secondary"
+            onClick={onClose}
+          >
+            Cancelar
+          </ButtonCitricaAdmin>
+          <ButtonCitricaAdmin
+            variant="primary"
+            style={{ backgroundColor: "#42668A" }}
             onClick={handleSubmit}
+            isLoading={isLoading}
           >
             Guardar Usuario
-          </button>
-        </div>
-      </div>
-    </div>
+          </ButtonCitricaAdmin>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 };
 
