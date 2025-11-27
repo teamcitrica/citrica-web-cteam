@@ -59,8 +59,8 @@ export const getUserColumns = ({
   onDelete,
 }: UserColumnsConfig): Column<UserType>[] => [
   {
-    name: "NOMBRE",
-    uid: "nombre",
+    name: "USUARIO",
+    uid: "usuario",
     sortable: true,
     render: (user) => {
       const userName = user.full_name || user.name || `${user.first_name || ""} ${user.last_name || ""}`.trim();
@@ -80,32 +80,33 @@ export const getUserColumns = ({
     },
   },
   {
-    name: "ROL",
-    uid: "rol",
+    name: "EMPRESA",
+    uid: "empresa",
     sortable: true,
     render: (user) => (
-      <div className="text-black font-medium capitalize">
-        {user.role?.name || "-"}
+      <div className="flex flex-col gap-1 text-left">
+        <div className="text-black font-medium">
+          {user.company?.name || "-"}
+        </div>
+        <div className="flex items-center gap-1 text-gray-500 text-xs">
+          <Icon className="w-3 h-3" name="Mail" />
+          <span>{user.email || "-"}</span>
+        </div>
       </div>
     ),
   },
   {
-    name: "CORREO",
-    uid: "email",
-    sortable: false,
+    name: "ROL Y ACCESO",
+    uid: "rol_acceso",
+    sortable: true,
     render: (user) => (
-      <div className="flex items-center gap-2">
-        {user.email ? (
-          <a
-            href={`mailto:${user.email}`}
-            className="flex items-center gap-2 text-black hover:text-[#ff5b00]"
-          >
-            <Icon className="w-4 h-4" name="Mail" />
-            <span className="text-sm">{user.email}</span>
-          </a>
-        ) : (
-          <span className="text-gray-400">-</span>
-        )}
+      <div className="flex flex-col gap-1 text-left">
+        <div className="text-black font-medium capitalize">
+          {user.role?.name || "-"}
+        </div>
+        <div className="text-gray-500 text-xs">
+          Accesos: {user.user_metadata?.project_access_count || 0}
+        </div>
       </div>
     ),
   },

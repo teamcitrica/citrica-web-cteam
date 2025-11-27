@@ -67,10 +67,11 @@ export function useTableFeatures<T extends Record<string, any>>({
     }
 
     // Filtro por empresa
-    if (hasCompanyFilter && companyFilterField) {
+    if (hasCompanyFilter && companyFilterField && companyFilter !== "all") {
       filtered = filtered.filter((item) => {
         const companyId = item[companyFilterField];
-        return String(companyId) === companyFilter;
+        // Comparar como string o número
+        return String(companyId) === String(companyFilter) || Number(companyId) === Number(companyFilter);
       });
     }
 

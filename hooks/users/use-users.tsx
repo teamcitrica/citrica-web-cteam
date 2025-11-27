@@ -15,14 +15,43 @@ export const useUserCRUD = () => {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("users")
-        .select("*,role:roles(name),company:company(id,name)");
+         .select(`
+        *,
+        company:company_id (
+          id,
+          name
+        ),
+        role:role_id (
+          id,
+          name
+        )
+      `);
 
       if (error) {
         console.error("Error al obtener usuarios:", error);
 
         return;
       }
-      setUsers(data);
+
+      // Obtener el conteo de accesos a proyectos para cada usuario
+      const usersWithAccessCount = await Promise.all(
+        (data || []).map(async (user) => {
+          const { count } = await supabase
+            .from("proyect_acces")
+            .select("*", { count: "exact", head: true })
+            .eq("users_id", user.id);
+
+          return {
+            ...user,
+            user_metadata: {
+              ...user.user_metadata,
+              project_access_count: count || 0,
+            },
+          };
+        })
+      );
+
+      setUsers(usersWithAccessCount);
     } catch (err) {
       console.error("Error en fetchUsers:", err);
     } finally {
