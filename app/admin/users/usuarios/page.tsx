@@ -8,6 +8,7 @@ import ModalDeleteUser from "../components/modal-delete-user";
 import { getUserColumns, getUserExportColumns } from "../columns/user-columns";
 
 import { useUserCRUD } from "@/hooks/users/use-users";
+import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { UserType } from "@/shared/types/types";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Col, Container } from "@/styles/07-objects/objects";
@@ -15,6 +16,7 @@ import { addToast } from "@heroui/toast";
 
 export default function UsersPage() {
   const { users, isLoading, refreshUsers, deleteUser } = useUserCRUD();
+  const { companies } = useCompanyCRUD();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -31,7 +33,6 @@ export default function UsersPage() {
 
   const handleCloseCreateModal = () => {
     setIsCreateModalOpen(false);
-    refreshUsers();
   };
 
   const handleViewUser = useCallback((user: UserType) => {
@@ -106,7 +107,8 @@ export default function UsersPage() {
             data={filteredUsers}
             columns={columns}
             isLoading={isLoading}
-            searchFields={[]}
+            searchFields={["full_name", "name", "first_name", "last_name", "email"]}
+            searchPlaceholder="Buscar por nombre o email..."
             onAdd={handleOpenCreateModal}
             addButtonText="Crear Usuario"
             emptyContent="No se encontraron usuarios"
@@ -119,6 +121,10 @@ export default function UsersPage() {
             exportTitle="Gestión de Usuarios"
             tableName="usuarios"
             showRowsPerPageSelector={true}
+            showCompanyFilter={true}
+            companies={companies}
+            companyFilterField="company_id"
+            companyFilterPlaceholder="Filtrar por empresa..."
           />
 
           <CreateUserModal

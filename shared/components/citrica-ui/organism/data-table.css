@@ -39,3 +39,14 @@ li[data-focus="true"] {
 .search-input-wrapper [data-slot="input-wrapper"]:hover {
   border-color: #B8D4E5 !important;
 }
+
+/* Estilos de paginación - Asegurar color azul */
+.container-blue-principal [data-slot="item"][data-active="true"] {
+  background-color: #42668A !important;
+  color: white !important;
+}
+
+.container-blue-principal [data-slot="cursor"] {
+  background-color: #42668A !important;
+  color: white !important;
+}
