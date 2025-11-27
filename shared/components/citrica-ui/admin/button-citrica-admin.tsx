@@ -2,7 +2,7 @@
 import React from "react";
 import { Button as HeroUIButton, ButtonProps as HeroUIButtonProps } from "@heroui/react";
 
-export interface ButtonCitricaAdminProps extends Omit<HeroUIButtonProps, 'className'> {
+export interface ButtonCitricaAdminProps extends Omit<HeroUIButtonProps, 'className' | 'variant'> {
   variant?: "primary" | "secondary" | "export";
   children?: React.ReactNode;
 }

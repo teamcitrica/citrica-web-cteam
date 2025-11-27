@@ -1,9 +1,10 @@
 "use client";
 import React from "react";
 import { Select as HeroUISelect, SelectProps as HeroUISelectProps } from "@heroui/react";
+import type { CollectionChildren } from "@react-types/shared";
 
-export interface SelectCitricaAdminProps extends Omit<HeroUISelectProps, 'classNames' | 'variant'> {
-  children?: React.ReactNode;
+export interface SelectCitricaAdminProps extends Omit<HeroUISelectProps, 'classNames' | 'variant' | 'children'> {
+  children: CollectionChildren<object>;
 }
 
 /**
