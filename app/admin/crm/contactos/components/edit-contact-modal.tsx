@@ -35,7 +35,6 @@ export default function EditContactModal({
   const [formData, setFormData] = useState<ContactInput>({
     name: contact.name,
     cargo: contact.cargo,
-    tipo: contact.tipo,
     email: contact.email,
     address: contact.address,
     phone: contact.phone,
@@ -43,14 +42,12 @@ export default function EditContactModal({
     user_id: contact.user_id,
     has_system_access: contact.has_system_access,
     type_id: contact.type_id,
-    active_users: contact.active_users,
   });
 
   useEffect(() => {
     setFormData({
       name: contact.name,
       cargo: contact.cargo,
-      tipo: contact.tipo,
       email: contact.email,
       address: contact.address,
       phone: contact.phone,
@@ -58,7 +55,6 @@ export default function EditContactModal({
       user_id: contact.user_id,
       has_system_access: contact.has_system_access,
       type_id: contact.type_id,
-      active_users: contact.active_users,
     });
   }, [contact]);
 
@@ -195,7 +191,10 @@ export default function EditContactModal({
               selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0];
-                handleInputChange("company_id", selected ? Number(selected) : "");
+                setFormData((prev) => ({
+                  ...prev,
+                  company_id: selected ? Number(selected) : null,
+                }));
               }}
               classNames={{
                 label: "text-gray-700",
