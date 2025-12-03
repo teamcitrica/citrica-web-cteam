@@ -30,7 +30,6 @@ export default function CreateContactModal({
   const [formData, setFormData] = useState<ContactInput>({
     name: null,
     cargo: null,
-    tipo: null,
     email: null,
     address: null,
     phone: null,
@@ -38,7 +37,6 @@ export default function CreateContactModal({
     user_id: null,
     has_system_access: false,
     type_id: null,
-    active_users: null,
   });
 
   const handleInputChange = (field: keyof ContactInput, value: string | number) => {
@@ -64,7 +62,6 @@ export default function CreateContactModal({
         setFormData({
           name: null,
           cargo: null,
-          tipo: null,
           email: null,
           address: null,
           phone: null,
@@ -72,7 +69,6 @@ export default function CreateContactModal({
           user_id: null,
           has_system_access: false,
           type_id: null,
-          active_users: null,
         });
         onClose();
       }
@@ -154,7 +150,10 @@ export default function CreateContactModal({
               selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0];
-                handleInputChange("company_id", selected ? Number(selected) : "");
+                setFormData((prev) => ({
+                  ...prev,
+                  company_id: selected ? Number(selected) : null,
+                }));
               }}
               classNames={{
                 label: "text-gray-700",
