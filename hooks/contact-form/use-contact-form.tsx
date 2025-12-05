@@ -263,6 +263,32 @@ export const useContact = () => {
         slotsToSend = convertUserFormatToSlots(formData.timeSlot)
       }
 
+      // Primero crear el contacto en la tabla contact (para leads del formulario)
+      // Preparar el time_slot para guardar
+      const timeSlotToSave = studioConfig.allow_multiple_time_slots && selectedTimeSlots.length > 0
+        ? selectedTimeSlots.join(', ')
+        : formData.timeSlot
+
+      const { error: contactError } = await supabase
+        .from('contact')
+        .insert([
+          {
+            name: formData.name,
+            email: formData.email,
+            message: formData.message,
+            time_slot: timeSlotToSave,
+            date: dateStr,
+            status: 'pendiente',
+            type_id: 2 // type_id 2 = lead
+          }
+        ])
+
+      // Si hay error de email duplicado u otro, continuar con la reserva de todas formas
+      if (contactError) {
+        console.log('Error al crear contacto (puede que ya exista):', contactError)
+      }
+
+      // Luego crear la reserva en bookings
       const { error } = await supabase
         .from('bookings')
         .insert([
