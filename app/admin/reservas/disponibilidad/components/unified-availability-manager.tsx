@@ -10,6 +10,7 @@ import { useAdminBookings } from "@/hooks/disponibilidad/use-admin-bookings";
 import { useStudioConfig } from "@/hooks/disponibilidad/use-studio-config";
 import { useAvailability } from "@/app/contexts/AvailabilityContext";
 import { useSupabase } from '@/shared/context/supabase-context';
+import { useServerTime } from '@/hooks/use-server-time';
 import { Col, Container } from "@/styles/07-objects/objects";
 
 const UnifiedAvailabilityManager = () => {
@@ -24,8 +25,9 @@ const UnifiedAvailabilityManager = () => {
   const { clearCache } = useAvailability();
   const { supabase } = useSupabase();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { serverToday } = useServerTime();
 
-  const [selectedDate, setSelectedDate] = useState<any>(today(getLocalTimeZone()));
+  const [selectedDate, setSelectedDate] = useState<any>(serverToday || today(getLocalTimeZone()));
   const [isLoading, setIsLoading] = useState(false);
   const [blockedSlots, setBlockedSlots] = useState<string[]>([]);
   const [reservedSlots, setReservedSlots] = useState<string[]>([]);
@@ -725,7 +727,7 @@ const UnifiedAvailabilityManager = () => {
                     setSelectedDate(date);
                   }
                 }}
-                minValue={today(getLocalTimeZone())}
+                minValue={serverToday || today(getLocalTimeZone())}
                 classNames={{
                   base: "max-w-none",
                   content: "w-full"

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSupabase } from '@/shared/context/supabase-context'
+import { useServerTime } from '@/hooks/use-server-time'
 
 interface Booking {
   id: string
@@ -23,6 +24,7 @@ interface StudioConfig {
 
 export const useBookingsAvailability = () => {
   const { supabase } = useSupabase()
+  const { serverToday, serverHours, serverMinutes } = useServerTime()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [studioConfig, setStudioConfig] = useState<StudioConfig>({
@@ -264,8 +266,47 @@ export const useBookingsAvailability = () => {
     const baseSlots = await getBaseAvailableSlots(date)
     const occupiedSlots = getOccupiedSlots(date)
 
-    return baseSlots.filter(slot => !occupiedSlots.includes(slot))
-  }, [getBaseAvailableSlots, getOccupiedSlots])
+    let availableSlots = baseSlots.filter(slot => !occupiedSlots.includes(slot))
+
+    // Filtrar horarios pasados si la fecha seleccionada es HOY
+    if (serverToday && serverHours !== null && serverMinutes !== null) {
+      // Parsear la fecha para compararla con serverToday
+      const [year, month, day] = date.split('-').map(Number)
+
+      // Comparar si la fecha seleccionada es hoy
+      const isToday = year === serverToday.year &&
+                     month === serverToday.month &&
+                     day === serverToday.day
+
+      if (isToday) {
+        // Filtrar horarios que ya pasaron
+        availableSlots = availableSlots.filter(slot => {
+          // Extraer la hora de inicio del slot (formato: "10:00 AM - 11:00 AM")
+          const match = slot.match(/(\d+):(\d+)\s+(AM|PM)/)
+          if (!match) return true
+
+          const hours = parseInt(match[1])
+          const minutes = parseInt(match[2])
+          const period = match[3]
+
+          // Convertir a formato 24 horas
+          let hour24 = hours
+          if (period === 'PM' && hours !== 12) {
+            hour24 = hours + 12
+          } else if (period === 'AM' && hours === 12) {
+            hour24 = 0
+          }
+
+          // Comparar con la hora actual del servidor
+          if (hour24 > serverHours) return true
+          if (hour24 === serverHours && minutes > serverMinutes) return true
+          return false
+        })
+      }
+    }
+
+    return availableSlots
+  }, [getBaseAvailableSlots, getOccupiedSlots, serverToday, serverHours, serverMinutes])
 
   // Cargar configuración y reservas al montar
   useEffect(() => {
@@ -282,6 +323,9 @@ export const useBookingsAvailability = () => {
     getAvailableSlots,
     isDateFullyBooked,
     loadStudioConfig,
-    convertUserFormatToSlots
+    convertUserFormatToSlots,
+    serverToday,
+    serverHours,
+    serverMinutes
   }
 }
