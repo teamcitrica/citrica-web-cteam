@@ -10,10 +10,11 @@ import {
   Input,
   Select,
   SelectItem,
+  Switch,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 
-import { useContactCRUD, ContactInput } from "@/hooks/contacts/use-contacts";
+import { useContactCRUD, ContactInput } from "@/hooks/contacts-clients/use-contacts-clients";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 
 interface CreateContactModalProps {
@@ -153,6 +154,7 @@ export default function CreateContactModal({
                 setFormData((prev) => ({
                   ...prev,
                   company_id: selected ? Number(selected) : null,
+                  has_system_access: selected && Number(selected) === 1 ? false : prev.has_system_access,
                 }));
               }}
               classNames={{
@@ -167,6 +169,20 @@ export default function CreateContactModal({
               ))}
             </Select>
           </div>
+
+          {formData.company_id && formData.company_id !== 1 && (
+            <div className="mt-4">
+              <Switch
+                isSelected={formData.has_system_access || false}
+                onValueChange={(value) => handleInputChange("has_system_access", value as any)}
+                classNames={{
+                  label: "text-gray-700",
+                }}
+              >
+                Dar acceso al sistema
+              </Switch>
+            </div>
+          )}
         </ModalBody>
         <ModalFooter>
           <Button color="danger" variant="light" onPress={onClose}>

@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
         first_name,
         last_name,
         role_id,
-        company_Id: company_id,  // Usar company_Id (con mayúscula) que es el nombre real de la columna
+        company_id: company_id,
       });
 
     if (userError) {
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         id: authData.user.id,
         email: authData.user.email,
         role_id,
-        company_Id: company_id,
+        company_id: company_id,
       },
     });
   } catch (error: any) {

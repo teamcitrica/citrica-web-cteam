@@ -8,7 +8,7 @@ import {
   Button,
 } from "@heroui/react";
 
-import { Contact } from "@/hooks/contacts/use-contacts";
+import { Contact } from "@/hooks/contacts-clients/use-contacts-clients";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 
 interface ContactDetailModalProps {
