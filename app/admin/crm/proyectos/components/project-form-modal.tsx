@@ -18,7 +18,7 @@ import { addToast } from "@heroui/toast";
 
 import { useProjectCRUD, ProjectInput, Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
-import { useContactCRUD } from "@/hooks/contacts/use-contacts";
+import { useContactCRUD } from "@/hooks/contacts-clients/use-contacts-clients";
 import { useProjectContacts } from "@/hooks/project-contacts/use-project-contacts";
 import { useUserCRUD } from "@/hooks/users/use-users";
 import { useUserProjects } from "@/hooks/user-projects/use-user-projects";

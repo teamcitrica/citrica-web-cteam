@@ -210,21 +210,42 @@ export const useContactCRUD = () => {
   };
 
   // Activar acceso al sistema para un contacto
-  const activateContactAccess = async (contactId: string) => {
+  const activateContactAccess = async (contactId: string, userData?: {
+    first_name?: string;
+    last_name?: string;
+    full_name?: string;
+    role_id?: number;
+    avatar_url?: string;
+  }) => {
     try {
       setIsLoading(true);
+
+      console.log('📤 Enviando solicitud para activar acceso:', {
+        contact_id: contactId,
+        user_data: userData,
+      });
 
       const response = await fetch('/api/admin/activate-contact-access', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ contact_id: contactId }),
+        body: JSON.stringify({
+          contact_id: contactId,
+          user_data: userData,
+        }),
       });
 
       const result = await response.json();
 
+      console.log('📥 Respuesta del servidor:', {
+        status: response.status,
+        ok: response.ok,
+        result,
+      });
+
       if (!response.ok) {
+        console.error('❌ Error en la respuesta:', result);
         throw new Error(result.error || 'Error al activar acceso');
       }
 
@@ -232,6 +253,7 @@ export const useContactCRUD = () => {
         title: "Acceso activado",
         description: `Contraseña temporal: ${result.temporary_password}`,
         color: "success",
+        timeout: 10000, // 10 segundos para que tengan tiempo de copiar la contraseña
       });
 
       await fetchContacts();
@@ -241,11 +263,15 @@ export const useContactCRUD = () => {
         temporaryPassword: result.temporary_password,
       };
     } catch (err: any) {
-      console.error("Error al activar acceso:", err);
+      console.error("❌ Error completo al activar acceso:", err);
+      console.error("❌ Error message:", err.message);
+      console.error("❌ Error stack:", err.stack);
+
       addToast({
-        title: "Error",
+        title: "Error al activar acceso",
         description: err.message || "No se pudo activar el acceso",
         color: "danger",
+        timeout: 8000,
       });
       return { success: false, error: err.message };
     } finally {
@@ -301,7 +327,7 @@ export const useContactCRUD = () => {
 
   useEffect(() => {
     fetchContacts();
-  }, []);
+  }, [fetchContacts]);
 
   return {
     contacts,

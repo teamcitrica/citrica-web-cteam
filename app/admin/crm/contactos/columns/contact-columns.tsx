@@ -10,7 +10,7 @@ import {
 import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { ExportColumn } from "@/shared/hooks/useTableFeatures";
-import { Contact } from "@/hooks/contacts/use-contacts";
+import { Contact } from "@/hooks/contacts-clients/use-contacts-clients";
 
 type ContactColumnsConfig = {
   getCompanyName: (companyId: number | null) => string;
