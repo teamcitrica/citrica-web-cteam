@@ -9,10 +9,9 @@ type ButtonProps = {
   onClick?: () => void;
   label?: string;
   children?: React.ReactNode;
-  // variant?: "solid" | "bordered" | "light" | "flat" | "faded" | "shadow" | "ghost";
   variant?: "primary" | "secondary" | "flat" | "success" | "warning" | "danger";
+  colorVariant?: "primary" | "secondary" | "tertiary" | "quaternary" | "quinary" | "clean";
   textVariant?: "label" | "body" | "title" | "display" | "headline" | "subtitle";
-  // color?: "primary" | "secondary" | "default" | "success" | "warning" | "danger";
   size?: "sm" | "md" | "lg";
   // radius?: "none" | "sm" | "md" | "lg" | "full";
   className?: string;
@@ -24,9 +23,6 @@ type ButtonProps = {
   fullWidth?: boolean;
   disableAnimation?: boolean;
 };
-
-
-
 
 const getTextColorByVariant = (variant: string) => {
   switch (variant) {
@@ -66,12 +62,36 @@ const getBtnClassByVariant = (variant: string) => {
   }
 }
 
+const getBtnColorClassByVariant = (btnColorVariant: string) => {
+  switch (btnColorVariant) {
+    case "primary":
+      return "btn-color-primary";
+    case "secondary":
+      return "btn-color-secondary";
+    case "tertiary":
+    case "success":
+      return "btn-color-tertiary";
+    case "quaternary":
+    case "warning":
+      return "btn-color-quaternary";
+    case "quinary":
+    case "danger":
+      return "btn-color-danger";
+    case "clean":
+    case "flat":
+      return "btn-color-clean";
+    default:
+      return "btn-color-primary";
+  }
+}
+
 const Button = ({ 
   onClick, 
   label,
   children,
   textVariant = "label", // Set default text variant
-  variant = "primary", 
+  variant = "primary",
+  colorVariant,
   size = "md",
   className = "",
   type = "button",
@@ -82,6 +102,7 @@ const Button = ({
   fullWidth = false,
   disableAnimation = false
 }: ButtonProps) => {
+  const btnColorVariant = colorVariant || variant;
   const content = children || (label && (
     <Text 
       variant={textVariant} 
@@ -97,7 +118,8 @@ const Button = ({
       onPress={onClick} 
       className={clsx(
         "btn-citrica-ui",
-        getBtnClassByVariant(variant), 
+        getBtnClassByVariant(variant),
+        getBtnColorClassByVariant(btnColorVariant),
         className
       )}
       // variant={variant}
