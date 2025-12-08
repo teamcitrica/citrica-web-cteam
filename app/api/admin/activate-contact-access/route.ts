@@ -17,7 +17,9 @@ export async function POST(request: NextRequest) {
     const {
       contact_id,
       generate_password = true,
-      user_data
+      user_data,
+      password, // Contraseña proporcionada desde el formulario
+      email_access, // Email de acceso proporcionado desde el formulario
     } = await request.json();
 
     // Validar datos requeridos
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
     // 1. Obtener datos del contacto
     console.log('🔍 Buscando contacto con ID:', contact_id);
     const { data: contact, error: contactError } = await supabaseAdmin
-      .from('contact_clients')
+      .from('contact')
       .select('*')
       .eq('id', contact_id)
       .single();
@@ -88,13 +90,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Verificar si el email ya existe en auth.users
-    console.log('🔍 Verificando si el email ya existe:', contact.email);
+    // 4. Determinar el email a usar (email_access si está disponible, sino el email normal)
+    const emailToUse = email_access || contact.email;
+
+    if (!emailToUse) {
+      return NextResponse.json(
+        { error: 'Se requiere un email para crear el usuario' },
+        { status: 400 }
+      );
+    }
+
+    // 5. Verificar si el email ya existe en auth.users
+    console.log('🔍 Verificando si el email ya existe:', emailToUse);
     const { data: existingAuthUsers } = await supabaseAdmin.auth.admin.listUsers();
-    const emailExists = existingAuthUsers?.users?.some(u => u.email === contact.email);
+    const emailExists = existingAuthUsers?.users?.some(u => u.email === emailToUse);
 
     if (emailExists) {
-      console.error('❌ Email ya existe en auth.users:', contact.email);
+      console.error('❌ Email ya existe en auth.users:', emailToUse);
       return NextResponse.json(
         { error: 'Ya existe un usuario con este email en el sistema' },
         { status: 400 }
@@ -102,26 +114,26 @@ export async function POST(request: NextRequest) {
     }
     console.log('✅ Email no existe, se puede crear el usuario');
 
-    // 5. Generar contraseña temporal
-    const temporaryPassword = generate_password ? generateTemporaryPassword() : undefined;
+    // 6. Usar la contraseña proporcionada o generar una temporal
+    const temporaryPassword = password || (generate_password ? generateTemporaryPassword() : undefined);
 
     if (!temporaryPassword) {
       return NextResponse.json(
-        { error: 'No se pudo generar la contraseña temporal' },
-        { status: 500 }
+        { error: 'Se requiere una contraseña' },
+        { status: 400 }
       );
     }
 
-    // 6. Preparar datos del usuario
+    // 7. Preparar datos del usuario
     // Usar datos proporcionados por el usuario o parsear del nombre del contacto
     const firstName = user_data?.first_name || contact.name?.split(' ')[0] || 'Cliente';
     const lastName = user_data?.last_name || contact.name?.split(' ').slice(1).join(' ') || '';
     const fullName = user_data?.full_name || contact.name || 'Cliente';
-    const roleId = user_data?.role_id || 12;
+    const roleId = user_data?.role_id || 12; // 12 = cliente
     const avatarUrl = user_data?.avatar_url || null;
 
     console.log('📝 Datos del usuario a crear:', {
-      email: contact.email,
+      email: emailToUse,
       firstName,
       lastName,
       fullName,
@@ -130,12 +142,12 @@ export async function POST(request: NextRequest) {
       companyId: contact.company_id,
     });
 
-    console.log('🔐 Contraseña temporal generada (longitud):', temporaryPassword?.length);
+    console.log('🔐 Contraseña proporcionada/generada (longitud):', temporaryPassword?.length);
 
-    // 7. Crear usuario en auth.users
+    // 8. Crear usuario en auth.users
     console.log('⏳ Intentando crear usuario en auth.users...');
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email: contact.email,
+      email: emailToUse,
       password: temporaryPassword,
       email_confirm: true, // Auto-confirmar email
       user_metadata: {
@@ -175,13 +187,13 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Usuario creado en auth.users:', authData.user.id);
 
-    // 8. Crear registro en public.users
+    // 9. Crear registro en public.users
     // NOTA: full_name es una columna generada, no la incluimos en el insert
     const { error: userError } = await supabaseAdmin
       .from('users')
       .insert({
         id: authData.user.id,
-        email: contact.email,
+        email: emailToUse,
         first_name: firstName,
         last_name: lastName,
         role_id: roleId,
@@ -203,13 +215,16 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Usuario creado en public.users');
 
-    // 9. Actualizar contact_clients con user_id, has_system_access y active_users
+    // 10. Actualizar contact con user_id, has_system_access, active_users, email_access, code y last_name
     const { error: updateError } = await supabaseAdmin
-      .from('contact_clients')
+      .from('contact')
       .update({
         user_id: authData.user.id,
         has_system_access: true,
         active_users: true,
+        email_access: emailToUse,
+        code: temporaryPassword,
+        last_name: lastName,
       })
       .eq('id', contact_id);
 
@@ -278,7 +293,7 @@ export async function DELETE(request: NextRequest) {
 
     // Obtener el contacto con su user_id
     const { data: contact, error: contactError } = await supabaseAdmin
-      .from('contact_clients')
+      .from('contact')
       .select('user_id')
       .eq('id', contact_id)
       .single();
@@ -310,9 +325,9 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Actualizar contact_clients
+    // Actualizar contact
     const { error: updateError } = await supabaseAdmin
-      .from('contact_clients')
+      .from('contact')
       .update({
         user_id: null,
         has_system_access: false,

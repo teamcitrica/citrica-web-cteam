@@ -14,9 +14,36 @@ import {
   Divider,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
+import { Icon } from "@/shared/components/citrica-ui";
 
-import { useContactCRUD, Contact, ContactInput } from "@/hooks/contacts-clients/use-contacts-clients";
+import { useContactCRUD, Contact, ContactInput } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
+
+// Función para generar contraseña segura aleatoria
+const generateSecurePassword = (): string => {
+  const length = 12;
+  const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const numbers = '0123456789';
+  const symbols = '!@#$%&*';
+  const allChars = lowercase + uppercase + numbers + symbols;
+
+  let password = '';
+
+  // Asegurar al menos un carácter de cada tipo
+  password += lowercase[Math.floor(Math.random() * lowercase.length)];
+  password += uppercase[Math.floor(Math.random() * uppercase.length)];
+  password += numbers[Math.floor(Math.random() * numbers.length)];
+  password += symbols[Math.floor(Math.random() * symbols.length)];
+
+  // Rellenar el resto
+  for (let i = password.length; i < length; i++) {
+    password += allChars[Math.floor(Math.random() * allChars.length)];
+  }
+
+  // Mezclar la contraseña
+  return password.split('').sort(() => Math.random() - 0.5).join('');
+};
 
 interface EditContactModalProps {
   isOpen: boolean;
@@ -29,7 +56,7 @@ export default function EditContactModal({
   contact,
   onClose,
 }: EditContactModalProps) {
-  const { updateContact, isLoading, activateContactAccess, deactivateContactAccess } = useContactCRUD();
+  const { updateContact, isLoading, deactivateContactAccess, refreshContacts } = useContactCRUD();
   const { companies } = useCompanyCRUD();
   const [isTogglingAccess, setIsTogglingAccess] = useState(false);
   const [showUserFields, setShowUserFields] = useState(false);
@@ -43,12 +70,18 @@ export default function EditContactModal({
     user_id: contact.user_id,
     has_system_access: contact.has_system_access,
     type_id: contact.type_id,
+    code: contact.code,
+    email_access: contact.email_access,
+    last_name: contact.last_name,
   });
   const [userFormData, setUserFormData] = useState({
     first_name: '',
     last_name: '',
+    email_access: '',
+    password: '',
     avatar_url: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     setFormData({
@@ -61,6 +94,9 @@ export default function EditContactModal({
       user_id: contact.user_id,
       has_system_access: contact.has_system_access,
       type_id: contact.type_id,
+      code: contact.code,
+      email_access: contact.email_access,
+      last_name: contact.last_name,
     });
   }, [contact]);
 
@@ -96,6 +132,8 @@ export default function EditContactModal({
       setUserFormData({
         first_name: nameParts[0] || '',
         last_name: nameParts.slice(1).join(' ') || '',
+        email_access: formData.email || '',
+        password: '',
         avatar_url: '',
       });
 
@@ -117,6 +155,13 @@ export default function EditContactModal({
       if (result.success) {
         setFormData((prev) => ({ ...prev, has_system_access: false, user_id: null }));
         setShowUserFields(false);
+        setUserFormData({
+          first_name: '',
+          last_name: '',
+          email_access: '',
+          password: '',
+          avatar_url: '',
+        });
       }
     } catch (error) {
       console.error("Error al desactivar acceso:", error);
@@ -136,36 +181,103 @@ export default function EditContactModal({
       return;
     }
 
+    if (!userFormData.email_access) {
+      addToast({
+        title: "Error",
+        description: "El email de acceso es requerido",
+        color: "danger",
+      });
+      return;
+    }
+
+    if (!userFormData.password) {
+      addToast({
+        title: "Error",
+        description: "La contraseña es requerida",
+        color: "danger",
+      });
+      return;
+    }
+
     setIsTogglingAccess(true);
 
     try {
-      // Primero actualizar los datos del contacto
-      const { user_id, has_system_access, ...updateData } = formData;
-      await updateContact(contact.id, updateData);
-
-      // Luego activar acceso con los datos del usuario
-      const result = await activateContactAccess(contact.id, {
-        first_name: userFormData.first_name,
-        last_name: userFormData.last_name,
-        full_name: `${userFormData.first_name} ${userFormData.last_name}`.trim(),
-        role_id: 12,
-        avatar_url: userFormData.avatar_url || undefined,
+      // Llamar al endpoint para activar acceso (esto hace todo el proceso en el backend)
+      const response = await fetch('/api/admin/activate-contact-access', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contact_id: contact.id,
+          password: userFormData.password,
+          email_access: userFormData.email_access,
+          user_data: {
+            first_name: userFormData.first_name,
+            last_name: userFormData.last_name,
+            full_name: `${userFormData.first_name} ${userFormData.last_name}`.trim(),
+            role_id: 12, // Cliente
+            avatar_url: userFormData.avatar_url || undefined,
+          },
+        }),
       });
 
-      if (result.success) {
-        setFormData((prev) => ({ ...prev, has_system_access: true }));
-        setShowUserFields(false);
-        setUserFormData({
-          first_name: '',
-          last_name: '',
-          avatar_url: '',
-        });
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error('❌ Error en la respuesta:', result);
+        throw new Error(result.error || 'Error al activar acceso');
       }
-    } catch (error) {
+
+      // Éxito - mostrar mensaje con la contraseña
+      addToast({
+        title: "Acceso activado",
+        description: `Usuario creado correctamente. La contraseña es: ${userFormData.password}`,
+        color: "success",
+        timeout: 15000, // 15 segundos para copiar la contraseña
+      });
+
+      // Actualizar el estado local
+      setFormData((prev) => ({
+        ...prev,
+        has_system_access: true,
+        code: userFormData.password,
+        email_access: userFormData.email_access,
+        last_name: userFormData.last_name,
+      }));
+
+      setShowUserFields(false);
+      setUserFormData({
+        first_name: '',
+        last_name: '',
+        email_access: '',
+        password: '',
+        avatar_url: '',
+      });
+
+      // Refrescar la lista de contactos
+      await refreshContacts();
+    } catch (error: any) {
       console.error("Error al activar acceso:", error);
+      addToast({
+        title: "Error al activar acceso",
+        description: error.message || "No se pudo activar el acceso",
+        color: "danger",
+        timeout: 8000,
+      });
     } finally {
       setIsTogglingAccess(false);
     }
+  };
+
+  const handleGeneratePassword = () => {
+    const newPassword = generateSecurePassword();
+    setUserFormData((prev) => ({ ...prev, password: newPassword }));
+    addToast({
+      title: "Contraseña generada",
+      description: "Se ha generado una contraseña segura",
+      color: "success",
+    });
   };
 
   const handleSubmit = async () => {
@@ -202,94 +314,97 @@ export default function EditContactModal({
           </h3>
         </ModalHeader>
         <ModalBody>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Nombre del Contacto"
-              placeholder="Ingrese el nombre completo"
-              value={formData.name || ""}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              isRequired
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
-            />
-            <Input
-              label="Cargo"
-              placeholder="Cargo o posición"
-              value={formData.cargo || ""}
-              onChange={(e) => handleInputChange("cargo", e.target.value)}
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
-            />
-            <Input
-              label="Email"
-              placeholder="correo@ejemplo.com"
-              type="email"
-              value={formData.email || ""}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
-            />
-            <Input
-              label="Teléfono"
-              placeholder="Número de teléfono"
-              value={formData.phone || ""}
-              onChange={(e) => handleInputChange("phone", e.target.value)}
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
-            />
-            <Input
-              label="Dirección"
-              placeholder="Dirección completa"
-              value={formData.address || ""}
-              onChange={(e) => handleInputChange("address", e.target.value)}
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
-            />
-            <Select
-              label="Empresa"
-              placeholder="Seleccione una empresa"
-              selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
-              onSelectionChange={(keys) => {
-                const selected = Array.from(keys)[0];
-                const newCompanyId = selected ? Number(selected) : null;
+          {/* Campos normales del contacto - Ocultos cuando showUserFields está activo */}
+          {!showUserFields && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Nombre del Contacto"
+                placeholder="Ingrese el nombre completo"
+                value={formData.name || ""}
+                onChange={(e) => handleInputChange("name", e.target.value)}
+                isRequired
+                classNames={{
+                  label: "text-gray-700",
+                  input: "text-gray-800",
+                }}
+              />
+              <Input
+                label="Cargo"
+                placeholder="Cargo o posición"
+                value={formData.cargo || ""}
+                onChange={(e) => handleInputChange("cargo", e.target.value)}
+                classNames={{
+                  label: "text-gray-700",
+                  input: "text-gray-800",
+                }}
+              />
+              <Input
+                label="Email"
+                placeholder="correo@ejemplo.com"
+                type="email"
+                value={formData.email || ""}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                classNames={{
+                  label: "text-gray-700",
+                  input: "text-gray-800",
+                }}
+              />
+              <Input
+                label="Teléfono"
+                placeholder="Número de teléfono"
+                value={formData.phone || ""}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                classNames={{
+                  label: "text-gray-700",
+                  input: "text-gray-800",
+                }}
+              />
+              <Input
+                label="Dirección"
+                placeholder="Dirección completa"
+                value={formData.address || ""}
+                onChange={(e) => handleInputChange("address", e.target.value)}
+                classNames={{
+                  label: "text-gray-700",
+                  input: "text-gray-800",
+                }}
+              />
+              <Select
+                label="Empresa"
+                placeholder="Seleccione una empresa"
+                selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0];
+                  const newCompanyId = selected ? Number(selected) : null;
 
-                // Si cambia a Citrica (id = 1) y tiene acceso, advertir al usuario
-                if (newCompanyId === 1 && formData.has_system_access) {
-                  addToast({
-                    title: "Advertencia",
-                    description: "Los contactos de Citrica no pueden tener acceso al sistema. Desactiva el acceso primero.",
-                    color: "warning",
-                  });
-                  return;
-                }
+                  // Si cambia a Citrica (id = 1) y tiene acceso, advertir al usuario
+                  if (newCompanyId === 1 && formData.has_system_access) {
+                    addToast({
+                      title: "Advertencia",
+                      description: "Los contactos de Citrica no pueden tener acceso al sistema. Desactiva el acceso primero.",
+                      color: "warning",
+                    });
+                    return;
+                  }
 
-                setFormData((prev) => ({
-                  ...prev,
-                  company_id: newCompanyId,
-                }));
-              }}
-              classNames={{
-                label: "text-gray-700",
-                value: "text-gray-800",
-              }}
-            >
-              {companies.map((company) => (
-                <SelectItem key={String(company.id)}>
-                  {company.name || `Empresa ${company.id}`}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
+                  setFormData((prev) => ({
+                    ...prev,
+                    company_id: newCompanyId,
+                  }));
+                }}
+                classNames={{
+                  label: "text-gray-700",
+                  value: "text-gray-800",
+                }}
+              >
+                {companies.map((company) => (
+                  <SelectItem key={String(company.id)}>
+                    {company.name || `Empresa ${company.id}`}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+          )}
 
           {formData.company_id && formData.company_id !== 1 && (
             <>
@@ -331,26 +446,6 @@ export default function EditContactModal({
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Input
-                        label="Email"
-                        value={formData.email || ""}
-                        isReadOnly
-                        classNames={{
-                          label: "text-gray-700",
-                          input: "text-gray-800 bg-gray-100",
-                        }}
-                        description="Email del contacto (no editable)"
-                      />
-                      <Input
-                        label="Empresa"
-                        value={companies.find((c) => c.id === formData.company_id)?.name || "Sin empresa"}
-                        isReadOnly
-                        classNames={{
-                          label: "text-gray-700",
-                          input: "text-gray-800 bg-gray-100",
-                        }}
-                        description="Empresa del contacto (no editable)"
-                      />
-                      <Input
                         label="Nombre *"
                         placeholder="Nombre del usuario"
                         value={userFormData.first_name}
@@ -373,46 +468,53 @@ export default function EditContactModal({
                         }}
                       />
                       <Input
-                        label="Avatar URL (opcional)"
-                        placeholder="https://ejemplo.com/avatar.jpg"
-                        value={userFormData.avatar_url}
-                        onChange={(e) => setUserFormData((prev) => ({ ...prev, avatar_url: e.target.value }))}
+                        label="Email de acceso *"
+                        placeholder="correo@ejemplo.com"
+                        type="email"
+                        value={userFormData.email_access}
+                        onChange={(e) => setUserFormData((prev) => ({ ...prev, email_access: e.target.value }))}
+                        isRequired
                         classNames={{
                           label: "text-gray-700",
                           input: "text-gray-800",
                         }}
+                        description="Email que usará para iniciar sesión"
                       />
+                      <div className="flex gap-2 items-end">
+                        <Input
+                          label="Contraseña *"
+                          placeholder="Ingrese o genere una contraseña"
+                          type={showPassword ? "text" : "password"}
+                          value={userFormData.password}
+                          onChange={(e) => setUserFormData((prev) => ({ ...prev, password: e.target.value }))}
+                          isRequired
+                          classNames={{
+                            label: "text-gray-700",
+                            input: "text-gray-800",
+                          }}
+                          endContent={
+                            <Icon
+                              name="Eye"
+                              className="text-gray-500 cursor-pointer w-5 h-5"
+                              onClick={() => setShowPassword((prev) => !prev)}
+                            />
+                          }
+                          className="flex-1"
+                        />
+                        <Button
+                          size="md"
+                          className="bg-[#42668A] text-white"
+                          onPress={handleGeneratePassword}
+                        >
+                          Generar
+                        </Button>
+                      </div>
                     </div>
                     <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-xs text-blue-800">
                         <strong>Nota:</strong> El nombre completo se generará automáticamente como "{userFormData.first_name} {userFormData.last_name}".
-                        Se creará una contraseña temporal que se mostrará al finalizar.
+                        La contraseña se guardará de forma segura y el usuario podrá cambiarla después de iniciar sesión.
                       </p>
-                    </div>
-                    <div className="flex justify-end gap-2 mt-4">
-                      <Button
-                        color="danger"
-                        variant="light"
-                        size="sm"
-                        onPress={() => {
-                          setShowUserFields(false);
-                          setUserFormData({
-                            first_name: '',
-                            last_name: '',
-                            avatar_url: '',
-                          });
-                        }}
-                      >
-                        Cancelar
-                      </Button>
-                      <Button
-                        className="bg-[#42668A] text-white"
-                        size="sm"
-                        onPress={handleActivateAccess}
-                        isLoading={isTogglingAccess}
-                      >
-                        Crear Usuario
-                      </Button>
                     </div>
                   </div>
                 )}
@@ -421,16 +523,52 @@ export default function EditContactModal({
           )}
         </ModalBody>
         <ModalFooter>
-          <Button color="danger" variant="light" onPress={onClose}>
-            Cancelar
-          </Button>
-          <Button
-            className="bg-[#42668A] text-white"
-            onPress={handleSubmit}
-            isLoading={isLoading}
-          >
-            Actualizar Contacto
-          </Button>
+          {showUserFields ? (
+            <>
+              <Button
+                color="danger"
+                variant="light"
+                onPress={() => {
+                  setShowUserFields(false);
+                  setUserFormData({
+                    first_name: '',
+                    last_name: '',
+                    email_access: '',
+                    password: '',
+                    avatar_url: '',
+                  });
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                className="bg-[#42668A] text-white"
+                onPress={handleActivateAccess}
+                isLoading={isTogglingAccess}
+                isDisabled={
+                  !userFormData.first_name ||
+                  !userFormData.last_name ||
+                  !userFormData.email_access ||
+                  !userFormData.password
+                }
+              >
+                Crear Acceso
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button color="danger" variant="light" onPress={onClose}>
+                Cancelar
+              </Button>
+              <Button
+                className="bg-[#42668A] text-white"
+                onPress={handleSubmit}
+                isLoading={isLoading}
+              >
+                Actualizar Contacto
+              </Button>
+            </>
+          )}
         </ModalFooter>
       </ModalContent>
     </Modal>

@@ -10,7 +10,7 @@ import {
 import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { ExportColumn } from "@/shared/hooks/useTableFeatures";
-import { Contact } from "@/hooks/contacts-clients/use-contacts-clients";
+import { Contact } from "@/hooks/contact/use-contact";
 
 type ContactColumnsConfig = {
   getCompanyName: (companyId: number | null) => string;
@@ -79,7 +79,17 @@ export const getContactColumns = ({
           size="sm"
         />
         <div className="flex flex-col items-start gap-1">
-          <div className="text-[#16305A] font-medium">{contact.name || "-"}</div>
+          <div className="flex items-center gap-2">
+            <span className="text-[#16305A] font-medium">{contact.name || "-"}</span>
+            {contact.user_id && (
+              <div className="flex items-center" title="Usuario del sistema">
+                <Icon
+                  className="w-4 h-4 text-green-600"
+                  name="ShieldCheck"
+                />
+              </div>
+            )}
+          </div>
           <div className="text-[#678CC5] text-sm">{contact.cargo || "-"}</div>
         </div>
       </div>

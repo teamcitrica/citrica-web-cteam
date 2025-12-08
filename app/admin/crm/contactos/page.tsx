@@ -7,7 +7,7 @@ import EditContactModal from "./components/edit-contact-modal";
 import DeleteContactModal from "./components/delete-contact-modal";
 import { getContactColumns, getContactExportColumns } from "./columns/contact-columns";
 
-import { useContactCRUD, Contact } from "@/hooks/contacts-clients/use-contacts-clients";
+import { useContactCRUD, Contact } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Col, Container } from "@/styles/07-objects/objects";

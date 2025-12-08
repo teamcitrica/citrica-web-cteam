@@ -14,7 +14,7 @@ import {
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 
-import { useContactCRUD, ContactInput } from "@/hooks/contacts-clients/use-contacts-clients";
+import { useContactCRUD, ContactInput } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 
 interface CreateContactModalProps {
