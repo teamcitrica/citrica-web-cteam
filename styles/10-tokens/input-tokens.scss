@@ -1,19 +1,19 @@
 
 $input-citrica-ui: (
   sm: (
-    padding: 10px 20px,
+    padding: 10px 0px,
   ),
   md: (
-    padding: 10px 20px,
+    padding: 10px 0px,
   ),
   lg: (
-    padding: 0 0,
+    padding: 10px 0px,
   )
 );
 
 .input-citrica-ui{
-  min-width: 140px;
-  max-width: 380px;
+  // min-width: 140px;
+  // max-width: 380px;
   @include a-set($input-citrica-ui);
   
   [data-slot="input-wrapper"] {

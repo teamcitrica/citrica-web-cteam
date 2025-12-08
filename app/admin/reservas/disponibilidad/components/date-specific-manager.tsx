@@ -8,6 +8,7 @@ import { today, getLocalTimeZone } from "@internationalized/date";
 
 import { useAdminBookings } from "@/hooks/disponibilidad/use-admin-bookings";
 import { useSupabase } from '@/shared/context/supabase-context';
+import { useServerTime } from '@/hooks/use-server-time';
 
 const DateSpecificManager = () => {
   const {
@@ -19,6 +20,7 @@ const DateSpecificManager = () => {
   } = useAdminBookings();
 
   const { supabase } = useSupabase();
+  const { serverToday } = useServerTime();
 
   const [selectedDate, setSelectedDate] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -366,7 +368,7 @@ const DateSpecificManager = () => {
                 handleDateSelect(date);
               }
             }}
-            minValue={today(getLocalTimeZone())}
+            minValue={serverToday || today(getLocalTimeZone())}
             classNames={{
               base: "max-w-none",
               content: "w-full"

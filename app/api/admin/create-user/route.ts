@@ -1,68 +1,106 @@
-import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
-
-// Función para obtener el cliente de Supabase Admin (lazy initialization)
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    throw new Error('Missing Supabase environment variables');
-  }
-
-  return createClient(supabaseUrl, supabaseKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
-}
+import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabaseAdmin = getSupabaseAdmin();
-    const { email, password, first_name, last_name, role_id } = await request.json();
+    const { email, password, role_id, first_name, last_name, company_id } = await request.json();
 
-    console.log('📥 Recibiendo solicitud para crear usuario:', { email, first_name, last_name, role_id });
-
-    // Validar datos
-    if (!email || !password || !first_name || !last_name || !role_id) {
+    // Validar datos requeridos
+    if (!email || !password || !role_id) {
       return NextResponse.json(
-        { error: 'Todos los campos son requeridos' },
+        { error: 'Email, password y role_id son requeridos' },
         { status: 400 }
       );
     }
 
-    // Crear usuario con Admin API (NO inicia sesión en el cliente)
+    // Crear cliente Admin con service_role
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error('Variables de entorno no configuradas');
+      return NextResponse.json(
+        { error: 'Configuración del servidor incompleta' },
+        { status: 500 }
+      );
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
+
+    // Crear usuario en auth.users
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true, // Auto-confirmar email
       user_metadata: {
+        role_id,
         first_name,
         last_name,
-        role_id: Number(role_id),
-      }
+        company_id,
+      },
     });
 
     if (authError) {
-      console.error('❌ Error creando usuario en auth:', authError);
-      return NextResponse.json({ error: authError.message }, { status: 400 });
+      console.error('Error al crear usuario en auth:', authError);
+      return NextResponse.json(
+        { error: authError.message },
+        { status: 400 }
+      );
     }
 
     console.log('✅ Usuario creado en auth.users:', authData.user.id);
 
-    // Esperar un momento para que el trigger de Supabase cree el registro en public.users
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Insertar o actualizar en la tabla public.users
+    const { error: userError } = await supabaseAdmin
+      .from('users')
+      .upsert({
+        id: authData.user.id,
+        email,
+        first_name,
+        last_name,
+        role_id,
+        company_id: company_id,
+      });
+
+    if (userError) {
+      console.error('Error al crear registro en public.users:', userError);
+      console.error('Detalles del error:', {
+        message: userError.message,
+        details: userError.details,
+        hint: userError.hint,
+        code: userError.code,
+      });
+
+      // Rollback: eliminar usuario de auth
+      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+
+      return NextResponse.json(
+        { error: `Error al crear perfil de usuario: ${userError.message}` },
+        { status: 500 }
+      );
+    }
+
+    console.log('✅ Usuario creado en public.users');
 
     return NextResponse.json({
       success: true,
-      user: authData.user,
-      message: 'Usuario creado correctamente'
+      user: {
+        id: authData.user.id,
+        email: authData.user.email,
+        role_id,
+        company_id: company_id,
+      },
     });
-
   } catch (error: any) {
-    console.error('❌ Error en create-user API:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Error general en create-user:', error);
+    return NextResponse.json(
+      { error: error.message || 'Error interno del servidor' },
+      { status: 500 }
+    );
   }
 }

@@ -182,4 +182,37 @@
   --color-secondary-textarea-text: #{$color-light-secondary-textarea-text};
   --color-secondary-textarea-text-hover: #{$color-light-secondary-textarea-text-hover};
   --color-secondary-textarea-placeholder: #{$color-light-secondary-textarea-placeholder};
+
+  // Calendar colors
+  --color-primary-calendar-base-bg: #{$color-light-primary-calendar-base-bg};
+  --color-primary-calendar-header-bg: #{$color-light-primary-calendar-header-bg};
+  --color-primary-calendar-header-text: #{$color-light-primary-calendar-header-text};
+  --color-primary-calendar-header-hover: #{$color-light-primary-calendar-header-hover};
+  --color-primary-calendar-grid-header-bg: #{$color-light-primary-calendar-grid-header-bg};
+  --color-primary-calendar-grid-header-text: #{$color-light-primary-calendar-grid-header-text};
+  --color-primary-calendar-grid-body-bg: #{$color-light-primary-calendar-grid-body-bg};
+  --color-primary-calendar-cell-hover: #{$color-light-primary-calendar-cell-hover};
+  --color-primary-calendar-cell-button-hover: #{$color-light-primary-calendar-cell-button-hover};
+  --color-primary-calendar-cell-selected: #{$color-light-primary-calendar-cell-selected};
+  --color-primary-calendar-cell-selected-text: #{$color-light-primary-calendar-cell-selected-text};
+  --color-primary-calendar-cell-selected-hover: #{$color-light-primary-calendar-cell-selected-hover};
+  --color-primary-calendar-cell-focus: #{$color-light-primary-calendar-cell-focus};
+  --color-primary-calendar-cell-today-bg: #{$color-light-primary-calendar-cell-today-bg};
+  --color-primary-calendar-cell-today-text: #{$color-light-primary-calendar-cell-today-text};
+
+  --color-secondary-calendar-base-bg: #{$color-light-secondary-calendar-base-bg};
+  --color-secondary-calendar-header-bg: #{$color-light-secondary-calendar-header-bg};
+  --color-secondary-calendar-header-text: #{$color-light-secondary-calendar-header-text};
+  --color-secondary-calendar-header-hover: #{$color-light-secondary-calendar-header-hover};
+  --color-secondary-calendar-grid-header-bg: #{$color-light-secondary-calendar-grid-header-bg};
+  --color-secondary-calendar-grid-header-text: #{$color-light-secondary-calendar-grid-header-text};
+  --color-secondary-calendar-grid-body-bg: #{$color-light-secondary-calendar-grid-body-bg};
+  --color-secondary-calendar-cell-hover: #{$color-light-secondary-calendar-cell-hover};
+  --color-secondary-calendar-cell-button-hover: #{$color-light-secondary-calendar-cell-button-hover};
+  --color-secondary-calendar-cell-selected: #{$color-light-secondary-calendar-cell-selected};
+  --color-secondary-calendar-cell-selected-text: #{$color-light-secondary-calendar-cell-selected-text};
+  --color-secondary-calendar-cell-selected-hover: #{$color-light-secondary-calendar-cell-selected-hover};
+  --color-secondary-calendar-cell-focus: #{$color-light-secondary-calendar-cell-focus};
+  --color-secondary-calendar-cell-today-bg: #{$color-light-secondary-calendar-cell-today-bg};
+  --color-secondary-calendar-cell-today-text: #{$color-light-secondary-calendar-cell-today-text};
 }

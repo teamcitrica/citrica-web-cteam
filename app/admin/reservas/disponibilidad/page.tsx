@@ -39,7 +39,7 @@ const DisponibilidadAdminPage = () => {
       <Col cols={{ lg: 12, md: 6, sm: 4 }} className="space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="flex items-center gap-3">
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="flex items-center gap-3">
             <Icon name="Clock" size={24} className="text-[#ff5b00]" />
             <div>
               <p>
@@ -51,10 +51,10 @@ const DisponibilidadAdminPage = () => {
                 {getTabDescription()}
               </Text>
             </div>
-          </div>
+          </Col>
 
           {/* Navegación de pestañas */}
-          <div className="flex gap-2">
+          <Col cols={{ lg: 12, md: 6, sm: 4 }}  className="flex justify-end gap-4">
             <Button
               size="sm"
               variant={activeTab === "disponibilidad" ? "primary" : "secondary"}
@@ -71,7 +71,7 @@ const DisponibilidadAdminPage = () => {
             >
               Configuración Semanal
             </Button>
-          </div>
+          </Col>
         </div>
 
         {/* Contenido de la pestaña activa */}

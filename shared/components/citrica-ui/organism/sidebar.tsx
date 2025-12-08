@@ -1,14 +1,18 @@
 "use client"
 import React from "react"
 import { Suspense } from 'react';
-import { Button, Link } from "@heroui/react"
+import { Button } from "@heroui/react"
 import { ChevronDown, Menu } from "lucide-react"
 import type { SidebarProps, MenuItem } from "../../../types/sidebar"
 import { Icon, Text } from "@citrica-ui"
 import { IconName } from "@/shared/components/citrica-ui/atoms/icon"
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boolean; onToggle: () => void }) {
+  const router = useRouter();
+  const pathname = usePathname();
+
   return (
     <div>
       <Button
@@ -17,24 +21,26 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
         onPress={onToggle}
       >
         <span className="flex items-center gap-2">
-          <Icon name={item.icon as IconName} size={20} />
-          <Text variant="label">{item.title}</Text>
+          <Icon name={item.icon as IconName} size={20} color="#265197" />
+          <Text variant="label" color="#8099B2">{item.title}</Text>
         </span>
         <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
       </Button>
       {isOpen && item.subItems && (
         <div className="ml-6 mt-2 flex flex-col gap-2">
-          {item.subItems.map((subItem) => (
-            <Button
-              key={subItem.title}
-              as={Link}
-              href={subItem.href}
-              variant="light"
-              className={`justify-start px-4 py-2 transition-colors hover:bg-gray-100 focus:bg-gray-100`}
-            >
-            <Text variant="label">{subItem.title}</Text>
-            </Button>
-          ))}
+          {item.subItems.map((subItem) => {
+            const isActive = pathname === subItem.href;
+            return (
+              <Button
+                key={subItem.title}
+                variant="light"
+                className={`justify-start px-4 py-2 transition-colors hover:bg-gray-100 ${isActive ? "bg-gray-100" : ""}`}
+                onPress={() => router.push(subItem.href)}
+              >
+                <Text variant="label" color={isActive ? "#000" : "#8099B2"}>{subItem.title}</Text>
+              </Button>
+            );
+          })}
         </div>
       )}
     </div>
@@ -45,6 +51,13 @@ export function Sidebar({ items }: SidebarProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const [openItems, setOpenItems] = React.useState<Record<string, boolean>>({})
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Verificar si alguna subopción está activa para mantener el acordeón abierto
+  const isSubItemActive = (item: MenuItem): boolean => {
+    if (!item.subItems) return false;
+    return item.subItems.some(subItem => pathname.startsWith(subItem.href));
+  }
 
   const toggleItem = (title: string) => {
     setOpenItems((prev) => ({ ...prev, [title]: !prev[title] }))
@@ -52,25 +65,36 @@ export function Sidebar({ items }: SidebarProps) {
 
   const NavItems = () => (
     <div className="h-[100svh] w-full overflow-y-auto px-2 py-4 bg-sidebar">
+      {/* Logo - solo visible en pantallas grandes */}
+      <div className="hidden lg:flex justify-start items-center mb-6">
+        <img
+          src="/img/citrica-logo.png"
+          alt="Citrica Logo"
+          className="m-4 h-16 w-auto"
+        />
+      </div>
       {items.map((item) => (
         <div key={item.title} className="mb-2">
           {item.subItems ? (
             <Suspense fallback={<div>Cargando...</div>}>
               <AccordionItem
                 item={item}
-                isOpen={openItems[item.title] || item.href == pathname || false}
+                isOpen={openItems[item.title] !== undefined ? openItems[item.title] : isSubItemActive(item)}
                 onToggle={() => toggleItem(item.title)}
               />
             </Suspense>
           ) : (
             <Button
-              as={Link}
-              href={item.href || "#"}
               variant="light"
-              className= {`w-full justify-start gap-2 px-4 py-2 transition-colors hover:bg-gray-100 ${item.href=== pathname ? "bg-gray-100" : ""}`}
+              className= {`w-full justify-start gap-2 px-4 py-2 transition-colors hover:bg-gray-100 ${item.href === pathname ? "bg-gray-100" : ""}`}
+              onPress={() => {
+                if (item.href && item.href !== "#") {
+                  router.push(item.href);
+                }
+              }}
             >
-              <Icon name={item.icon as IconName} size={20} />
-              <Text variant="label" color="on-primary">{item.title}</Text>
+              <Icon name={item.icon as IconName} size={20} color="#265197" />
+              <Text variant="label" color={item.href === pathname ? "#000" : "#8099B2"}>{item.title}</Text>
             </Button>
           )}
         </div>

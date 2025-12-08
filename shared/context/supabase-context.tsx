@@ -21,8 +21,11 @@ export default function SupabaseProvider({
   useEffect(()=>{
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(()=>{
-      router.refresh()
+    } = supabase.auth.onAuthStateChange((event)=>{
+      // Solo refrescar en eventos críticos, no en todos los cambios
+      if (event === 'SIGNED_OUT') {
+        router.refresh()
+      }
     })
     return () => {
       subscription.unsubscribe()

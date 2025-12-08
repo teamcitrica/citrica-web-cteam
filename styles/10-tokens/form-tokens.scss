@@ -1,5 +1,5 @@
 @mixin form-tokens {
-  --form-radius-btn: 20px;  // Border radius for inputs, selects, buttons, textareas
+  --form-radius-btn:20px;  // Border radius for inputs, selects, buttons, textareas
   --form-radius-input: 10px; 
   --form-radius-select: var(--form-radius-input);
   --form-radius-textarea: var(--form-radius-input);
