@@ -107,7 +107,7 @@ export default function EditContactModal({
     }));
   };
 
-  const handleToggleAccess = (value: boolean) => {
+  const handleToggleAccess = async (value: boolean) => {
     if (value) {
       if (!formData.email) {
         addToast({
@@ -127,17 +127,22 @@ export default function EditContactModal({
         return;
       }
 
-      // Autocompletar campos del usuario con datos del contacto
-      const nameParts = formData.name?.split(' ') || [];
-      setUserFormData({
-        first_name: nameParts[0] || '',
-        last_name: nameParts.slice(1).join(' ') || '',
-        email_access: formData.email || '',
-        password: '',
-        avatar_url: '',
-      });
+      // Si ya tiene user_id, es una reactivación - llamar directamente al endpoint
+      if (formData.user_id) {
+        await handleReactivateAccess();
+      } else {
+        // Si no tiene user_id, mostrar formulario para crear nuevo usuario
+        const nameParts = formData.name?.split(' ') || [];
+        setUserFormData({
+          first_name: nameParts[0] || '',
+          last_name: nameParts.slice(1).join(' ') || '',
+          email_access: formData.email || '',
+          password: '',
+          avatar_url: '',
+        });
 
-      setShowUserFields(true);
+        setShowUserFields(true);
+      }
     } else {
       // Si ya tiene acceso, desactivarlo
       if (formData.has_system_access && formData.user_id) {
@@ -148,12 +153,64 @@ export default function EditContactModal({
     }
   };
 
+  const handleReactivateAccess = async () => {
+    setIsTogglingAccess(true);
+    try {
+      // Llamar al endpoint - detectará automáticamente que es una reactivación
+      const response = await fetch('/api/admin/activate-contact-access', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contact_id: contact.id,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al reactivar acceso');
+      }
+
+      addToast({
+        title: "Acceso reactivado",
+        description: "El usuario puede volver a acceder al sistema",
+        color: "success",
+      });
+
+      // Actualizar estado local
+      setFormData((prev) => ({
+        ...prev,
+        has_system_access: true,
+        active_users: true,
+      }));
+
+      // Refrescar la lista de contactos
+      await refreshContacts();
+    } catch (error: any) {
+      console.error("Error al reactivar acceso:", error);
+      addToast({
+        title: "Error al reactivar acceso",
+        description: error.message || "No se pudo reactivar el acceso",
+        color: "danger",
+      });
+    } finally {
+      setIsTogglingAccess(false);
+    }
+  };
+
   const handleDeactivateAccess = async () => {
     setIsTogglingAccess(true);
     try {
       const result = await deactivateContactAccess(contact.id);
       if (result.success) {
-        setFormData((prev) => ({ ...prev, has_system_access: false, user_id: null }));
+        setFormData((prev) => ({
+          ...prev,
+          has_system_access: false,
+          active_users: false,
+          // Mantener user_id, code, email_access y last_name para poder reactivar
+        }));
         setShowUserFields(false);
         setUserFormData({
           first_name: '',
@@ -234,7 +291,7 @@ export default function EditContactModal({
         title: "Acceso activado",
         description: `Usuario creado correctamente. La contraseña es: ${userFormData.password}`,
         color: "success",
-        timeout: 15000, // 15 segundos para copiar la contraseña
+        timeout: 15000,
       });
 
       // Actualizar el estado local
@@ -314,9 +371,8 @@ export default function EditContactModal({
           </h3>
         </ModalHeader>
         <ModalBody>
-          {/* Campos normales del contacto - Ocultos cuando showUserFields está activo */}
-          {!showUserFields && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 label="Nombre del Contacto"
                 placeholder="Ingrese el nombre completo"
@@ -377,7 +433,7 @@ export default function EditContactModal({
                   const selected = Array.from(keys)[0];
                   const newCompanyId = selected ? Number(selected) : null;
 
-                  // Si cambia a Citrica (id = 1) y tiene acceso, advertir al usuario
+                 
                   if (newCompanyId === 1 && formData.has_system_access) {
                     addToast({
                       title: "Advertencia",
@@ -404,7 +460,6 @@ export default function EditContactModal({
                 ))}
               </Select>
             </div>
-          )}
 
           {formData.company_id && formData.company_id !== 1 && (
             <>
@@ -415,7 +470,7 @@ export default function EditContactModal({
                 <Switch
                   isSelected={formData.has_system_access || showUserFields}
                   onValueChange={handleToggleAccess}
-                  isDisabled={isTogglingAccess || !formData.email}
+                  isDisabled={isTogglingAccess || (!formData.email && !formData.user_id)}
                   classNames={{
                     wrapper: "group-data-[selected=true]:bg-[#42668A]",
                   }}
@@ -429,7 +484,7 @@ export default function EditContactModal({
                         ? "Este contacto puede iniciar sesión y ver sus proyectos"
                         : "Activar para permitir que este contacto acceda al sistema"}
                     </span>
-                    {!formData.email && (
+                    {!formData.email && !formData.user_id && (
                       <span className="text-xs text-danger mt-1">
                         Se requiere un email para activar el acceso
                       </span>
@@ -437,7 +492,38 @@ export default function EditContactModal({
                   </div>
                 </Switch>
 
-                {showUserFields && !formData.has_system_access && (
+            
+                {formData.user_id && (
+                  <div className="mt-4 p-4 bg-blue-50 rounded-lg space-y-3">
+                    <h5 className="text-sm font-semibold text-gray-700">Información del Usuario</h5>
+                    <p className="text-xs text-gray-600">
+                      Este contacto ya tiene un usuario creado en el sistema. Los datos no se pueden modificar.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-gray-600">Email de acceso</label>
+                        <div className="px-3 py-2 bg-white rounded-lg border border-gray-200">
+                          <span className="text-sm text-gray-800">{formData.email_access || "-"}</span>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-gray-600">Contraseña</label>
+                        <div className="px-3 py-2 bg-white rounded-lg border border-gray-200">
+                          <span className="text-sm text-gray-800">{formData.code || "••••••••"}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <p className="text-xs text-yellow-800">
+                        <strong>Nota:</strong> Para desactivar el acceso, apaga el switch de "Acceso al Sistema".
+                        El usuario se mantendrá registrado y podrás reactivarlo cuando lo necesites.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+          
+                {showUserFields && !formData.has_system_access && !formData.user_id && (
                   <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-4">
                     <h5 className="text-sm font-semibold text-gray-700">Datos del Usuario</h5>
                     <p className="text-xs text-gray-600">
@@ -506,15 +592,9 @@ export default function EditContactModal({
                           className="bg-[#42668A] text-white"
                           onPress={handleGeneratePassword}
                         >
-                          Generar
+                          Generar Automaticamente
                         </Button>
                       </div>
-                    </div>
-                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                      <p className="text-xs text-blue-800">
-                        <strong>Nota:</strong> El nombre completo se generará automáticamente como "{userFormData.first_name} {userFormData.last_name}".
-                        La contraseña se guardará de forma segura y el usuario podrá cambiarla después de iniciar sesión.
-                      </p>
                     </div>
                   </div>
                 )}

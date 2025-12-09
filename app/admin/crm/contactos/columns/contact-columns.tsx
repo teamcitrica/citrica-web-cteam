@@ -81,8 +81,8 @@ export const getContactColumns = ({
         <div className="flex flex-col items-start gap-1">
           <div className="flex items-center gap-2">
             <span className="text-[#16305A] font-medium">{contact.name || "-"}</span>
-            {contact.user_id && (
-              <div className="flex items-center" title="Usuario del sistema">
+            {contact.user_id && contact.has_system_access && contact.active_users && (
+              <div className="flex items-center" title="Usuario del sistema con acceso activo">
                 <Icon
                   className="w-4 h-4 text-green-600"
                   name="ShieldCheck"
