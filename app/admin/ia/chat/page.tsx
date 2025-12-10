@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { SelectCitricaAdmin, ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import { SelectItem } from "@heroui/react";
+import Modal from "@/shared/components/citrica-ui/molecules/modal";
 import {
   Send,
   Bot,
@@ -11,6 +12,8 @@ import {
   Loader2,
   MessageSquare,
   Sparkles,
+  Trash2,
+  RefreshCw,
 } from "lucide-react";
 
 interface Message {
@@ -18,6 +21,8 @@ interface Message {
   content: string;
   role: "user" | "assistant";
   timestamp: Date;
+  isError?: boolean;
+  retryMessage?: string;
   sources?: {
     document: string;
     geminiUri?: string;
@@ -31,21 +36,25 @@ interface Message {
 }
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      content:
-        "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?",
-      role: "assistant",
-      timestamp: new Date(),
-    },
-  ]);
+  const getInitialMessage = (): Message => ({
+    id: "1",
+    content:
+      "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?",
+    role: "assistant",
+    timestamp: new Date(),
+  });
+
+  const [messages, setMessages] = useState<Message[]>([getInitialMessage()]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [selectedDatabase, setSelectedDatabase] = useState<string>("all");
   const [storages, setStorages] = useState<any[]>([]);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [responseProfile, setResponseProfile] = useState<string>("balanced");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Cargar storages al montar (sin historial inicial)
   useEffect(() => {
     fetchStorages();
   }, []);
@@ -62,6 +71,30 @@ export default function ChatPage() {
     }
   };
 
+  const fetchChatHistory = async (storageId: string) => {
+    try {
+      setIsLoadingHistory(true);
+      const response = await fetch(`/api/rag/chat/history?storageId=${storageId}`);
+      const data = await response.json();
+
+      if (data.messages && data.messages.length > 0) {
+        // Convertir timestamps de string a Date
+        const messagesWithDates = data.messages.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp),
+        }));
+        setMessages([getInitialMessage(), ...messagesWithDates]);
+      } else {
+        setMessages([getInitialMessage()]);
+      }
+    } catch (error) {
+      console.error("Error fetching chat history:", error);
+      setMessages([getInitialMessage()]);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -70,19 +103,71 @@ export default function ChatPage() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return;
+  // Cambiar historial cuando se selecciona otra base de datos
+  const handleDatabaseChange = (dbId: string) => {
+    setSelectedDatabase(dbId);
+
+    // Si es "all", no cargar historial, empezar limpio
+    if (dbId === "all") {
+      setMessages([getInitialMessage()]);
+    } else {
+      // Para bases de datos específicas, cargar su historial
+      fetchChatHistory(dbId);
+    }
+  };
+
+  // Limpiar historial del chat actual
+  const handleClearHistory = async () => {
+    try {
+      // Llamar al endpoint para eliminar conversaciones
+      const storageParam = selectedDatabase === "all" ? "all" : selectedDatabase;
+      const response = await fetch(`/api/rag/chat/history?storageId=${storageParam}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setMessages([getInitialMessage()]);
+        setIsDeleteModalOpen(false);
+      } else {
+        alert("Error al eliminar el historial");
+      }
+    } catch (error) {
+      console.error("Error clearing history:", error);
+      alert("Error al eliminar el historial");
+    }
+  };
+
+  const handleSendMessage = async (retryMessage?: string) => {
+    const messageToSend = retryMessage || inputMessage.trim();
+    if (!messageToSend || isLoading) return;
+
+    // Si es un retry, obtener el mensaje del usuario anterior
+    let userMessageContent = messageToSend;
+    if (retryMessage) {
+      // Buscar el mensaje del usuario antes del error
+      const messagesReversed = [...messages].reverse();
+      const errorIndex = messagesReversed.findIndex(m => m.isError);
+      if (errorIndex !== -1) {
+        const userMsg = messagesReversed[errorIndex + 1];
+        if (userMsg && userMsg.role === "user") {
+          userMessageContent = userMsg.content;
+        }
+      }
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: inputMessage,
+      content: userMessageContent,
       role: "user",
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, userMessage]);
-    const currentMessage = inputMessage;
-    setInputMessage("");
+    // Solo agregar el mensaje del usuario si no es un retry
+    if (!retryMessage) {
+      setMessages((prev) => [...prev, userMessage]);
+      setInputMessage("");
+    }
+
     setIsLoading(true);
 
     try {
@@ -90,8 +175,9 @@ export default function ChatPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: currentMessage,
+          message: messageToSend,
           storageId: selectedDatabase,
+          profile: responseProfile,
         }),
       });
 
@@ -111,16 +197,39 @@ export default function ChatPage() {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error("Error sending message:", error);
+
+      // Recargar historial desde la base de datos solo si NO es "all"
+      if (selectedDatabase !== "all") {
+        setTimeout(() => fetchChatHistory(selectedDatabase), 500);
+      }
+    } catch (error: any) {
+      console.error("Error sending message:", error?.message || error);
+
+      // Detectar error 503 (modelo sobrecargado)
+      const is503Error = error?.message?.includes("overloaded") ||
+                         error?.message?.includes("503");
+
+      let errorContent = "❌ Lo siento, ocurrió un error al procesar tu mensaje. Por favor intenta de nuevo.";
+
+      if (is503Error) {
+        errorContent = `⚠️ El modelo de IA está experimentando alta demanda en este momento.\n\n💡 Sugerencias:\n• Espera unos segundos e intenta de nuevo\n• El sistema reintentará automáticamente en breve\n\nPuedes hacer clic en "Reintentar" cuando estés listo.`;
+      }
+
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content:
-          "❌ Lo siento, ocurrió un error al procesar tu mensaje. Por favor intenta de nuevo.",
+        content: errorContent,
         role: "assistant",
         timestamp: new Date(),
+        isError: true,
+        retryMessage: messageToSend,
       };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages((prev) => {
+        // Si es un retry, reemplazar el último mensaje de error
+        if (retryMessage) {
+          return [...prev.slice(0, -1), errorMessage];
+        }
+        return [...prev, errorMessage];
+      });
     } finally {
       setIsLoading(false);
     }
@@ -141,30 +250,81 @@ export default function ChatPage() {
             <span className="text-[#678CC5]">IA</span> {'>'} Chat RAG
           </h1>
 
-          {/* Selector de Base de Datos */}
-          <div className="mb-4">
-            <SelectCitricaAdmin
-              label="Base de Datos"
-              value={selectedDatabase}
-              onChange={(e) => setSelectedDatabase(e.target.value)}
-            >
-              <>
-               <SelectItem key="all">
-                Todas las bases de datos
-              </SelectItem>
-              {storages.map((storage) => (
-                <SelectItem key={storage.id}>
-                  {storage.name}
-                </SelectItem>
-              ))}
-              </>
-             
-            </SelectCitricaAdmin>
+          {/* Selectores */}
+          <div className="mb-4 flex flex-col md:flex-row gap-3">
+            {/* Selector de Base de Datos */}
+            <div className="flex-1">
+              <SelectCitricaAdmin
+                label="Base de Datos"
+                value={selectedDatabase}
+                onChange={(e) => handleDatabaseChange(e.target.value)}
+                className="w-full"
+              >
+                <>
+                  <SelectItem key="all">
+                    Todas las bases de datos
+                  </SelectItem>
+                  {storages.map((storage) => (
+                    <SelectItem key={storage.id}>
+                      {storage.name}
+                    </SelectItem>
+                  ))}
+                </>
+              </SelectCitricaAdmin>
+            </div>
+
+            {/* Selector de Perfil de Respuesta */}
+            <div className="flex-1">
+              <SelectCitricaAdmin
+                label="Calidad de Respuesta"
+                selectedKeys={[responseProfile]}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string;
+                  setResponseProfile(selected);
+                }}
+                className="w-full"
+              >
+                <>
+                  <SelectItem key="concise">
+                    Concisa (~400 palabras)
+                  </SelectItem>
+                  <SelectItem key="balanced">
+                    Balanceada (~1600 palabras)
+                  </SelectItem>
+                  <SelectItem key="detailed">
+                    Detallada (~3200 palabras)
+                  </SelectItem>
+                  <SelectItem key="comprehensive">
+                    Completa (~6400 palabras)
+                  </SelectItem>
+                </>
+              </SelectCitricaAdmin>
+            </div>
+
+            {/* Botón de eliminar historial */}
+            <div className="flex items-center justify-center">
+              <ButtonCitricaAdmin
+                onClick={() => setIsDeleteModalOpen(true)}
+                variant="secondary"
+                style={{ backgroundColor: "#dc2626", color: "white", minWidth: "auto" }}
+              >
+                <Trash2 className="w-4 h-4" />
+              </ButtonCitricaAdmin>
+            </div>
           </div>
 
           {/* Área de Mensajes */}
           <div className="flex-1 overflow-y-auto bg-white border border-gray-200 rounded-lg p-4 mb-4 space-y-4">
-            {messages.map((message) => (
+            {isLoadingHistory ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <Loader2 className="w-8 h-8 text-[#265197] animate-spin mx-auto mb-2" />
+                  <p className="text-sm text-gray-500">Cargando historial...</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex gap-3 ${
@@ -185,6 +345,19 @@ export default function ChatPage() {
                   }`}
                 >
                   <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+
+                  {message.isError && message.retryMessage && (
+                    <div className="mt-3 pt-3 border-t border-gray-300">
+                      <button
+                        onClick={() => handleSendMessage(message.retryMessage)}
+                        disabled={isLoading}
+                        className="flex items-center gap-2 px-4 py-2 bg-[#265197] text-white rounded-lg hover:bg-[#1e3f73] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                      >
+                        <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                        <span>Reintentar</span>
+                      </button>
+                    </div>
+                  )}
 
                   {message.sources && message.sources.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-gray-300">
@@ -245,6 +418,8 @@ export default function ChatPage() {
             )}
 
             <div ref={messagesEndRef} />
+              </>
+            )}
           </div>
 
           {/* Input de Mensaje */}
@@ -262,7 +437,7 @@ export default function ChatPage() {
               <MessageSquare className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             </div>
             <ButtonCitricaAdmin
-              onClick={handleSendMessage}
+              onClick={() => handleSendMessage()}
               disabled={!inputMessage.trim() || isLoading}
             >
               {isLoading ? (
@@ -283,6 +458,52 @@ export default function ChatPage() {
           </div>
         </div>
       </Col>
+
+      {/* Modal Confirmar Eliminación */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Confirmar Eliminación de Historial"
+        size="sm"
+        footer={
+          <div className="flex gap-3 w-full">
+            <ButtonCitricaAdmin
+              onClick={() => setIsDeleteModalOpen(false)}
+              variant="secondary"
+            >
+              Cancelar
+            </ButtonCitricaAdmin>
+            <ButtonCitricaAdmin
+              onClick={handleClearHistory}
+              style={{ backgroundColor: "#dc2626" }}
+            >
+              Eliminar
+            </ButtonCitricaAdmin>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            ¿Estás seguro de que deseas eliminar el historial de conversaciones
+            {selectedDatabase === "all" ? (
+              <strong className="text-[#265197]"> de todas las bases de datos</strong>
+            ) : (
+              <>
+                {" "}de{" "}
+                <strong className="text-[#265197]">
+                  {storages.find(s => s.id === selectedDatabase)?.name || "esta base de datos"}
+                </strong>
+              </>
+            )}
+            ?
+          </p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+            <p className="text-sm text-red-800">
+              ⚠️ Esta acción eliminará todas las conversaciones y no se puede deshacer.
+            </p>
+          </div>
+        </div>
+      </Modal>
     </Container>
   );
 }
