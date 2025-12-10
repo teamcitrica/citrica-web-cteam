@@ -145,7 +145,16 @@ export const getContactColumns = ({
     uid: "actions",
     sortable: false,
     render: (contact) => (
-      <div className="relative flex justify-center items-center">
+      <div className="relative flex justify-center items-center gap-2">
+        <Button
+          isIconOnly
+          size="sm"
+          variant="light"
+          onPress={() => onView(contact)}
+          className="text-blue-500 hover:bg-blue-100"
+        >
+          <Icon className="w-5 h-5" name="Eye" />
+        </Button>
         <Dropdown>
           <DropdownTrigger>
             <Button isIconOnly size="sm" variant="light">
@@ -156,9 +165,6 @@ export const getContactColumns = ({
             aria-label="Acciones del contacto"
             onAction={(key) => {
               switch (key) {
-                case "view":
-                  onView(contact);
-                  break;
                 case "edit":
                   onEdit(contact);
                   break;
@@ -168,12 +174,6 @@ export const getContactColumns = ({
               }
             }}
           >
-            <DropdownItem
-              key="view"
-              startContent={<Icon className="w-4 h-4 text-blue-500" name="Eye" />}
-            >
-              Ver
-            </DropdownItem>
             <DropdownItem
               key="edit"
               startContent={<Icon className="w-4 h-4 text-green-500" name="SquarePen" />}
