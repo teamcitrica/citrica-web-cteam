@@ -60,7 +60,7 @@ export default function EditContactModal({
   const { companies } = useCompanyCRUD();
   const [isTogglingAccess, setIsTogglingAccess] = useState(false);
   const [showUserFields, setShowUserFields] = useState(false);
-  const [formData, setFormData] = useState<ContactInput>({
+  const [formData, setFormData] = useState<Partial<ContactInput>>({
     name: contact.name,
     cargo: contact.cargo,
     email: contact.email,
@@ -371,8 +371,9 @@ export default function EditContactModal({
           </h3>
         </ModalHeader>
         <ModalBody>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Campos normales del contacto - Ocultos cuando showUserFields está activo */}
+          {!showUserFields && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 label="Nombre del Contacto"
                 placeholder="Ingrese el nombre completo"
@@ -460,6 +461,7 @@ export default function EditContactModal({
                 ))}
               </Select>
             </div>
+          )}
 
           {formData.company_id && formData.company_id !== 1 && (
             <>
