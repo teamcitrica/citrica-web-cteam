@@ -60,7 +60,7 @@ export function DataTable<T extends Record<string, any>>({
   data,
   columns,
   isLoading = false,
-  itemsPerPage = 15,
+  itemsPerPage = 50,
   searchPlaceholder = "Buscar...",
   searchFields = [],
   onAdd,
