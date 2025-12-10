@@ -17,7 +17,9 @@ export async function POST(request: NextRequest) {
     const {
       contact_id,
       generate_password = true,
-      user_data
+      user_data,
+      password, // Contraseña proporcionada desde el formulario
+      email_access, // Email de acceso proporcionado desde el formulario
     } = await request.json();
 
     // Validar datos requeridos
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
     // 1. Obtener datos del contacto
     console.log('🔍 Buscando contacto con ID:', contact_id);
     const { data: contact, error: contactError } = await supabaseAdmin
-      .from('contact_clients')
+      .from('contact')
       .select('*')
       .eq('id', contact_id)
       .single();
@@ -72,12 +74,38 @@ export async function POST(request: NextRequest) {
       user_id: contact.user_id,
     });
 
-    // 2. Verificar si el contacto ya tiene acceso
+    // 2. Verificar si es una reactivación (ya tiene user_id) o creación nueva
     if (contact.user_id) {
-      return NextResponse.json(
-        { error: 'Este contacto ya tiene acceso al sistema' },
-        { status: 400 }
-      );
+      console.log('🔄 Reactivando acceso para usuario existente:', contact.user_id);
+
+      // Solo reactivar el acceso, no crear nuevo usuario
+      const { error: updateError } = await supabaseAdmin
+        .from('contact')
+        .update({
+          has_system_access: true,
+          active_users: true,
+        })
+        .eq('id', contact_id);
+
+      if (updateError) {
+        console.error('❌ Error al reactivar acceso:', updateError);
+        return NextResponse.json(
+          { error: `Error al reactivar acceso: ${updateError.message}` },
+          { status: 500 }
+        );
+      }
+
+      console.log('✅ Acceso reactivado correctamente');
+
+      return NextResponse.json({
+        success: true,
+        reactivated: true,
+        user: {
+          id: contact.user_id,
+          email: contact.email_access || contact.email,
+        },
+        message: 'Acceso reactivado correctamente',
+      });
     }
 
     // 3. Validar que el contacto tenga email
@@ -88,128 +116,85 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Verificar si el email ya existe en auth.users
-    console.log('🔍 Verificando si el email ya existe:', contact.email);
-    const { data: existingAuthUsers } = await supabaseAdmin.auth.admin.listUsers();
-    const emailExists = existingAuthUsers?.users?.some(u => u.email === contact.email);
+    // 4. Determinar el email a usar (email_access si está disponible, sino el email normal)
+    const emailToUse = email_access || contact.email;
 
-    if (emailExists) {
-      console.error('❌ Email ya existe en auth.users:', contact.email);
+    if (!emailToUse) {
       return NextResponse.json(
-        { error: 'Ya existe un usuario con este email en el sistema' },
+        { error: 'Se requiere un email para crear el usuario' },
         { status: 400 }
       );
     }
-    console.log('✅ Email no existe, se puede crear el usuario');
 
-    // 5. Generar contraseña temporal
-    const temporaryPassword = generate_password ? generateTemporaryPassword() : undefined;
+    // 5. Usar la contraseña proporcionada o generar una temporal
+    const temporaryPassword = password || (generate_password ? generateTemporaryPassword() : undefined);
 
     if (!temporaryPassword) {
       return NextResponse.json(
-        { error: 'No se pudo generar la contraseña temporal' },
-        { status: 500 }
+        { error: 'Se requiere una contraseña' },
+        { status: 400 }
       );
     }
 
     // 6. Preparar datos del usuario
-    // Usar datos proporcionados por el usuario o parsear del nombre del contacto
     const firstName = user_data?.first_name || contact.name?.split(' ')[0] || 'Cliente';
     const lastName = user_data?.last_name || contact.name?.split(' ').slice(1).join(' ') || '';
-    const fullName = user_data?.full_name || contact.name || 'Cliente';
-    const roleId = user_data?.role_id || 12;
+    const roleId = 12; // Siempre cliente
     const avatarUrl = user_data?.avatar_url || null;
 
     console.log('📝 Datos del usuario a crear:', {
-      email: contact.email,
+      email: emailToUse,
       firstName,
       lastName,
-      fullName,
       roleId,
-      avatarUrl,
       companyId: contact.company_id,
     });
 
-    console.log('🔐 Contraseña temporal generada (longitud):', temporaryPassword?.length);
+    // 7. Llamar al endpoint create-user para crear el usuario
+    console.log('⏳ Llamando a /api/admin/create-user...');
 
-    // 7. Crear usuario en auth.users
-    console.log('⏳ Intentando crear usuario en auth.users...');
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email: contact.email,
-      password: temporaryPassword,
-      email_confirm: true, // Auto-confirmar email
-      user_metadata: {
-        role_id: roleId,
-        first_name: firstName,
-        last_name: lastName,
-        company_id: contact.company_id,
-        avatar_url: avatarUrl,
-        contact_id: contact_id,
+    // Construir URL base desde el request actual
+    const baseUrl = new URL(request.url).origin;
+    const createUserUrl = `${baseUrl}/api/admin/create-user`;
+
+    const createUserResponse = await fetch(createUserUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    });
-    console.log('✅ Respuesta de createUser recibida');
-
-    if (authError) {
-      console.error('❌ Error completo al crear usuario en auth:', JSON.stringify(authError, null, 2));
-      console.error('❌ Mensaje de error:', authError.message);
-      console.error('❌ Código de error:', authError.code);
-      console.error('❌ Status de error:', authError.status);
-
-      // Dar mensaje más específico según el error
-      let errorMessage = 'Error al crear usuario';
-      if (authError.message?.includes('already registered') || authError.message?.includes('already exists')) {
-        errorMessage = 'Ya existe un usuario con este email';
-      } else if (authError.message?.includes('invalid email') || authError.message?.includes('invalid_email')) {
-        errorMessage = 'El formato del email no es válido';
-      } else if (authError.message?.includes('Database error')) {
-        errorMessage = `Error de base de datos: ${authError.message}. Verifica que el email sea válido y que no exista otro usuario con el mismo email.`;
-      } else {
-        errorMessage = authError.message || 'Error desconocido al crear usuario';
-      }
-
-      return NextResponse.json(
-        { error: errorMessage },
-        { status: 400 }
-      );
-    }
-
-    console.log('✅ Usuario creado en auth.users:', authData.user.id);
-
-    // 8. Crear registro en public.users
-    // NOTA: full_name es una columna generada, no la incluimos en el insert
-    const { error: userError } = await supabaseAdmin
-      .from('users')
-      .insert({
-        id: authData.user.id,
-        email: contact.email,
+      body: JSON.stringify({
+        email: emailToUse,
+        password: temporaryPassword,
         first_name: firstName,
         last_name: lastName,
         role_id: roleId,
         company_id: contact.company_id,
-        avatar_url: avatarUrl,
-      });
+      }),
+    });
 
-    if (userError) {
-      console.error('Error al crear registro en public.users:', userError);
+    const createUserResult = await createUserResponse.json();
 
-      // Rollback: eliminar usuario de auth
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
-
+    if (!createUserResponse.ok) {
+      console.error('❌ Error al crear usuario:', createUserResult.error);
       return NextResponse.json(
-        { error: `Error al crear perfil de usuario: ${userError.message}` },
-        { status: 500 }
+        { error: createUserResult.error || 'Error al crear usuario' },
+        { status: createUserResponse.status }
       );
     }
 
-    console.log('✅ Usuario creado en public.users');
+    const userId = createUserResult.user.id;
+    console.log('✅ Usuario creado exitosamente:', userId);
 
-    // 9. Actualizar contact_clients con user_id, has_system_access y active_users
+    // 8. Actualizar contact con user_id, has_system_access, active_users, email_access, code y last_name
     const { error: updateError } = await supabaseAdmin
-      .from('contact_clients')
+      .from('contact')
       .update({
-        user_id: authData.user.id,
+        user_id: userId,
         has_system_access: true,
         active_users: true,
+        email_access: emailToUse,
+        code: temporaryPassword,
+        last_name: lastName,
       })
       .eq('id', contact_id);
 
@@ -217,8 +202,8 @@ export async function POST(request: NextRequest) {
       console.error('Error al actualizar contacto:', updateError);
 
       // Rollback: eliminar usuario de auth y public.users
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
-      await supabaseAdmin.from('users').delete().eq('id', authData.user.id);
+      await supabaseAdmin.auth.admin.deleteUser(userId);
+      await supabaseAdmin.from('users').delete().eq('id', userId);
 
       return NextResponse.json(
         { error: `Error al vincular contacto con usuario: ${updateError.message}` },
@@ -231,8 +216,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       user: {
-        id: authData.user.id,
-        email: authData.user.email,
+        id: userId,
+        email: emailToUse,
         role_id: 12,
       },
       temporary_password: temporaryPassword,
@@ -278,7 +263,7 @@ export async function DELETE(request: NextRequest) {
 
     // Obtener el contacto con su user_id
     const { data: contact, error: contactError } = await supabaseAdmin
-      .from('contact_clients')
+      .from('contact')
       .select('user_id')
       .eq('id', contact_id)
       .single();
@@ -297,26 +282,14 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Eliminar usuario de auth.users (esto también eliminará de public.users por CASCADE)
-    const { error: deleteAuthError } = await supabaseAdmin.auth.admin.deleteUser(
-      contact.user_id
-    );
-
-    if (deleteAuthError) {
-      console.error('Error al eliminar usuario de auth:', deleteAuthError);
-      return NextResponse.json(
-        { error: `Error al desactivar acceso: ${deleteAuthError.message}` },
-        { status: 500 }
-      );
-    }
-
-    // Actualizar contact_clients
+    // Solo desactivar el acceso, NO eliminar el usuario
+    // Esto permite reactivarlo más tarde sin crear un nuevo usuario
     const { error: updateError } = await supabaseAdmin
-      .from('contact_clients')
+      .from('contact')
       .update({
-        user_id: null,
         has_system_access: false,
         active_users: false,
+        // Mantener user_id, code, email_access y last_name para poder reactivar
       })
       .eq('id', contact_id);
 

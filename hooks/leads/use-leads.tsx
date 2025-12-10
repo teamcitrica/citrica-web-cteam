@@ -270,7 +270,7 @@ export const useContact = () => {
         : formData.timeSlot
 
       const { error: contactError } = await supabase
-        .from('contact')
+        .from('leads')
         .insert([
           {
             name: formData.name,

@@ -8,7 +8,7 @@ import {
   Button,
 } from "@heroui/react";
 
-import { Contact } from "@/hooks/contacts-clients/use-contacts-clients";
+import { Contact } from "@/hooks/contact/use-contact";
 
 interface DeleteContactModalProps {
   contact: Contact;
