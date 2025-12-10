@@ -3,7 +3,7 @@
 import { Col, Container } from '@/styles/07-objects/objects'
 import React from 'react'
 import { Button, Icon, Input, Select, Text, Textarea } from '../citrica-ui'
-import { useContact } from '@/hooks/contact-form/use-contact-form'
+import { useContact } from '@/hooks/leads/use-leads'
 import AnimatedContent from './animated-content'
 import CalendarComponent from './calendar'
 import { ctaSectionVariants } from '@/shared/archivos js/cta-section-data'

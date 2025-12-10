@@ -17,6 +17,9 @@ export interface Contact {
   has_system_access: boolean | null;
   type_id: number | null;
   active_users: boolean | null;
+  code: string | null;
+  email_access: string | null;
+  last_name: string | null;
   types_contact?: {
     id: number;
     name: string;
@@ -36,7 +39,7 @@ export const useContactCRUD = () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase
-        .from("contact_clients")
+        .from("contact")
         .select(`
           *,
           types_contact (
@@ -69,7 +72,7 @@ export const useContactCRUD = () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase
-        .from("contact_clients")
+        .from("contact")
         .select(`
           *,
           types_contact (
@@ -101,7 +104,7 @@ export const useContactCRUD = () => {
       setIsLoading(true);
 
       const { data, error } = await supabase
-        .from("contact_clients")
+        .from("contact")
         .insert([newContact])
         .select();
 
@@ -137,7 +140,7 @@ export const useContactCRUD = () => {
       setIsLoading(true);
 
       const { data, error } = await supabase
-        .from("contact_clients")
+        .from("contact")
         .update(updatedFields)
         .eq("id", id)
         .select();
@@ -179,7 +182,7 @@ export const useContactCRUD = () => {
       setIsLoading(true);
 
       const { error } = await supabase
-        .from("contact_clients")
+        .from("contact")
         .delete()
         .eq("id", id);
 
