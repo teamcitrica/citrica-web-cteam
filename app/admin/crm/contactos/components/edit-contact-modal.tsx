@@ -33,7 +33,7 @@ export default function EditContactModal({
   const { companies } = useCompanyCRUD();
   const [isTogglingAccess, setIsTogglingAccess] = useState(false);
   const [showUserFields, setShowUserFields] = useState(false);
-  const [formData, setFormData] = useState<ContactInput>({
+  const [formData, setFormData] = useState<Partial<ContactInput>>({
     name: contact.name,
     cargo: contact.cargo,
     email: contact.email,

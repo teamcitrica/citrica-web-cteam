@@ -1,5 +1,5 @@
 export type SiteConfig = typeof siteConfig;
-import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck, Calendar, UserStar } from "lucide-react"
+import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck, Calendar, UserStar, Sparkles } from "lucide-react"
 
 const ROL_ADMIN = 1;
 const ROL_USER = 2;
@@ -35,6 +35,23 @@ export const siteConfig = {
 				{
 					title: "Usuarios",
 					href: "/admin/users/usuarios",
+				},
+
+			],
+		},
+		{
+			title: "IA",
+			icon: "Sparkles",
+			href: "/admin/ia",
+			allowedRoles: [ROL_ADMIN],
+			subItems: [
+				{
+					title: "Databases RAG",
+					href: "/admin/ia/databases_rag",
+				},
+				{
+					title: "Chat",
+					href: "/admin/ia/chat",
 				},
 
 			],

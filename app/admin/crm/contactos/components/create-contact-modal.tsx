@@ -28,7 +28,7 @@ export default function CreateContactModal({
 }: CreateContactModalProps) {
   const { createContact, isLoading } = useContactCRUD();
   const { companies } = useCompanyCRUD();
-  const [formData, setFormData] = useState<ContactInput>({
+  const [formData, setFormData] = useState<Partial<ContactInput>>({
     name: null,
     cargo: null,
     email: null,
@@ -58,7 +58,7 @@ export default function CreateContactModal({
     }
 
     try {
-      const result = await createContact(formData);
+      const result = await createContact(formData as ContactInput);
       if (result) {
         setFormData({
           name: null,
