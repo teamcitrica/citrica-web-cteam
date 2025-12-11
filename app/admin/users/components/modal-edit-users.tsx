@@ -15,10 +15,11 @@ import Text from "@/shared/components/citrica-ui/atoms/text";
 type EditUserModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   user: UserType;
 };
 
-const EditUserModal = ({ isOpen, onClose, user }: EditUserModalProps) => {
+const EditUserModal = ({ isOpen, onClose, onSuccess, user }: EditUserModalProps) => {
   const { updateUserByRole, isLoading } = useUserCRUD();
   const { roles, fetchRoles } = useUserRole();
   const { companies, fetchCompanies } = useCompanyCRUD();
@@ -31,20 +32,44 @@ const EditUserModal = ({ isOpen, onClose, user }: EditUserModalProps) => {
     company_id: user.company_id?.toString() || "",
   });
 
+  const [originalData, setOriginalData] = useState({
+    first_name: user.first_name || "",
+    last_name: user.last_name || "",
+    role_id: user.role_id?.toString() || "",
+    company_id: user.company_id?.toString() || "",
+  });
+
   useEffect(() => {
     fetchRoles();
     fetchCompanies();
   }, []);
 
   useEffect(() => {
-    setFormData({
+    const userData = {
       first_name: user.first_name || "",
       last_name: user.last_name || "",
       email: user.email || "",
       role_id: user.role_id?.toString() || "",
       company_id: user.company_id?.toString() || "",
+    };
+    setFormData(userData);
+    setOriginalData({
+      first_name: user.first_name || "",
+      last_name: user.last_name || "",
+      role_id: user.role_id?.toString() || "",
+      company_id: user.company_id?.toString() || "",
     });
   }, [user]);
+
+  // Verificar si hay cambios en el formulario
+  const hasChanges = () => {
+    return (
+      formData.first_name !== originalData.first_name ||
+      formData.last_name !== originalData.last_name ||
+      formData.role_id !== originalData.role_id ||
+      formData.company_id !== originalData.company_id
+    );
+  };
 
   const handleChange = (name: string, value: string) => {
     setFormData((prev) => ({
@@ -57,7 +82,6 @@ const EditUserModal = ({ isOpen, onClose, user }: EditUserModalProps) => {
     if (
       !formData.first_name ||
       !formData.last_name ||
-      !formData.email ||
       !formData.role_id
     ) {
       addToast({
@@ -71,7 +95,6 @@ const EditUserModal = ({ isOpen, onClose, user }: EditUserModalProps) => {
     const updatedUser: Partial<UserType> = {
       first_name: formData.first_name,
       last_name: formData.last_name,
-      email: formData.email,
       role_id: Number(formData.role_id),
       company_id: formData.company_id ? Number(formData.company_id) : undefined,
     };
@@ -93,6 +116,7 @@ const EditUserModal = ({ isOpen, onClose, user }: EditUserModalProps) => {
         description: "El usuario ha sido actualizado correctamente",
         color: "success",
       });
+      onSuccess?.();
       onClose();
     } catch (error) {
       console.error("Error inesperado al editar el usuario:", error);
@@ -140,6 +164,7 @@ const EditUserModal = ({ isOpen, onClose, user }: EditUserModalProps) => {
               placeholder="Ingrese el email"
               value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
+              isDisabled={true}
             />
 
             <SelectCitricaAdmin
@@ -212,6 +237,7 @@ const EditUserModal = ({ isOpen, onClose, user }: EditUserModalProps) => {
             style={{ backgroundColor: "#42668A" }}
             onClick={handleSubmit}
             isLoading={isLoading}
+            isDisabled={!hasChanges()}
           >
             Actualizar Usuario
           </ButtonCitricaAdmin>

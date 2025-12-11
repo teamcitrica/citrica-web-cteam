@@ -5,7 +5,6 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  Avatar,
   Button,
   Chip,
 } from "@heroui/react";
@@ -19,39 +18,6 @@ type ProjectColumnsConfig = {
   onNavigateToAssets?: (projectId: string) => void;
   assetCounts: Record<string, number>;
   accessCounts: Record<string, number>;
-};
-
-// Función para generar un color único basado en el nombre
-const getAvatarColor = (name: string): string => {
-  const colors = [
-    "from-[#FFB457] to-[#FF705B]", // Naranja a rojo
-    "from-[#5EA67D] to-[#3E8A5E]", // Verde claro a verde oscuro
-    "from-[#5B9FED] to-[#3B7DBD]", // Azul claro a azul oscuro
-    "from-[#A78BFA] to-[#7C5CC8]", // Púrpura claro a púrpura oscuro
-    "from-[#F472B6] to-[#DB2777]", // Rosa claro a rosa oscuro
-    "from-[#FBBF24] to-[#D97706]", // Amarillo a naranja
-    "from-[#34D399] to-[#059669]", // Verde esmeralda claro a oscuro
-    "from-[#60A5FA] to-[#2563EB]", // Azul cielo a azul
-    "from-[#C084FC] to-[#9333EA]", // Lavanda a púrpura
-    "from-[#FB923C] to-[#EA580C]", // Naranja melocotón
-  ];
-
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  const index = Math.abs(hash) % colors.length;
-  return colors[index];
-};
-
-// Función para obtener las iniciales
-const getInitials = (name: string): string => {
-  const names = name.trim().split(" ");
-  if (names.length >= 2) {
-    return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
-  }
-  return name.substring(0, 2).toUpperCase();
 };
 
 export const getProjectColumns = ({
@@ -73,22 +39,12 @@ export const getProjectColumns = ({
 
       return (
         <div
-          className="flex items-center gap-3 cursor-pointer hover:opacity-70 transition-opacity"
+          className="flex flex-col gap-1 cursor-pointer hover:opacity-70 transition-opacity"
           onClick={() => onNavigateToAssets?.(project.id)}
         >
-          <Avatar
-            classNames={{
-              base: `bg-gradient-to-br ${getAvatarColor(name)}`,
-              icon: "text-white",
-            }}
-            name={getInitials(name)}
-            size="sm"
-          />
-          <div className="flex flex-col gap-1">
-            <div className="text-[#16305A] font-medium">{name}</div>
-            <div className="text-[#678CC5] text-sm">
-              Assets: {assetCount}
-            </div>
+          <div className="text-[#16305A] font-medium">{name}</div>
+          <div className="text-[#678CC5] text-sm">
+            Assets: {assetCount}
           </div>
         </div>
       );
@@ -175,9 +131,6 @@ export const getProjectColumns = ({
           >
             <DropdownItem
               key="edit"
-              startContent={
-                <Icon className="w-4 h-4 text-green-500" name="SquarePen" />
-              }
             >
               Editar
             </DropdownItem>
@@ -185,7 +138,6 @@ export const getProjectColumns = ({
               key="delete"
               className="text-danger"
               color="danger"
-              startContent={<Icon className="w-4 h-4" name="Trash2" />}
             >
               Eliminar
             </DropdownItem>

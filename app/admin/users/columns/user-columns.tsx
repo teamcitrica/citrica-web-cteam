@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
+  Tooltip,
 } from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
@@ -16,6 +17,7 @@ type UserColumnsConfig = {
   onView: (user: UserType) => void;
   onEdit: (user: UserType) => void;
   onDelete: (user: UserType) => void;
+  contactAccessMap: Record<string, { hasSystemAccess: boolean; isActive: boolean }>;
 };
 
 type UserExportConfig = Record<string, never>;
@@ -57,6 +59,7 @@ export const getUserColumns = ({
   onView,
   onEdit,
   onDelete,
+  contactAccessMap,
 }: UserColumnsConfig): Column<UserType>[] => [
   {
     name: "USUARIO",
@@ -64,6 +67,11 @@ export const getUserColumns = ({
     sortable: true,
     render: (user) => {
       const userName = user.full_name || user.name || `${user.first_name || ""} ${user.last_name || ""}`.trim();
+      // Verificar si este usuario fue creado desde un contacto
+      const contactAccess = user.id ? contactAccessMap[user.id] : undefined;
+      const hasSystemAccess = contactAccess !== undefined;
+      const isActive = contactAccess?.isActive || false;
+
       return (
         <div className="flex items-center gap-3">
           <Avatar
@@ -74,7 +82,23 @@ export const getUserColumns = ({
             name={getInitials(userName || "?")}
             size="sm"
           />
-          <div className="text-black font-medium">{userName || "-"}</div>
+          <div className="flex items-center gap-2">
+            <span className="text-black font-medium">{userName || "-"}</span>
+            {hasSystemAccess && (
+              <Tooltip
+                content={isActive ? "Usuario del sistema con acceso activo" : "Usuario del sistema sin acceso activo"}
+                delay={200}
+                closeDelay={0}
+              >
+                <div className="flex items-center">
+                  <Icon
+                    className={`w-4 h-4 ${isActive ? "text-green-600" : "text-red-600"}`}
+                    name="ShieldCheck"
+                  />
+                </div>
+              </Tooltip>
+            )}
+          </div>
         </div>
       );
     },
@@ -149,9 +173,6 @@ export const getUserColumns = ({
           >
             <DropdownItem
               key="edit"
-              startContent={
-                <Icon className="w-4 h-4 text-green-500" name="SquarePen" />
-              }
             >
               Editar
             </DropdownItem>
@@ -159,7 +180,6 @@ export const getUserColumns = ({
               key="delete"
               className="text-danger"
               color="danger"
-              startContent={<Icon className="w-4 h-4" name="Trash2" />}
             >
               Eliminar
             </DropdownItem>

@@ -12,8 +12,6 @@ import { useSupabase } from "@/shared/context/supabase-context";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { getAssetColumns } from "./columns/asset-columns";
 import { Col, Container } from "@/styles/07-objects/objects";
-import { Button } from "@heroui/react";
-import Icon from "@ui/atoms/icon";
 
 export default function AssetsPage() {
   const params = useParams();
@@ -148,17 +146,14 @@ export default function AssetsPage() {
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="p-4">
           <div className="flex items-center gap-3 mb-6">
-            <Button
-              isIconOnly
-              variant="light"
-              onPress={handleBackToProjects}
-              className="text-[#265197]"
-            >
-              <Icon name="ChevronLeft" className="w-5 h-5" />
-            </Button>
             <h1 className="text-2xl font-bold text-[#265197]">
               <span className="text-[#678CC5]">CRM</span> {'>'}{" "}
-              <span className="text-[#678CC5]">Proyectos</span> {'>'} {projectName}
+              <span
+                className="text-[#678CC5] cursor-pointer hover:text-[#265197] transition-colors"
+                onClick={handleBackToProjects}
+              >
+                Proyectos
+              </span> {'>'} {projectName}
             </h1>
           </div>
 

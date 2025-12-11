@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
+  Tooltip,
 } from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
@@ -81,13 +82,19 @@ export const getContactColumns = ({
         <div className="flex flex-col items-start gap-1">
           <div className="flex items-center gap-2">
             <span className="text-[#16305A] font-medium">{contact.name || "-"}</span>
-            {contact.user_id && contact.has_system_access && contact.active_users && (
-              <div className="flex items-center" title="Usuario del sistema con acceso activo">
-                <Icon
-                  className="w-4 h-4 text-green-600"
-                  name="ShieldCheck"
-                />
-              </div>
+            {contact.user_id && (
+              <Tooltip
+                content={contact.has_system_access && contact.active_users ? "Usuario del sistema con acceso activo" : "Usuario del sistema sin acceso activo"}
+                delay={200}
+                closeDelay={0}
+              >
+                <div className="flex items-center">
+                  <Icon
+                    className={`w-4 h-4 ${contact.has_system_access && contact.active_users ? "text-green-600" : "text-red-600"}`}
+                    name="ShieldCheck"
+                  />
+                </div>
+              </Tooltip>
             )}
           </div>
           <div className="text-[#678CC5] text-sm">{contact.cargo || "-"}</div>
@@ -176,7 +183,6 @@ export const getContactColumns = ({
           >
             <DropdownItem
               key="edit"
-              startContent={<Icon className="w-4 h-4 text-green-500" name="SquarePen" />}
             >
               Editar
             </DropdownItem>
@@ -184,7 +190,6 @@ export const getContactColumns = ({
               key="delete"
               className="text-danger"
               color="danger"
-              startContent={<Icon className="w-4 h-4" name="Trash2" />}
             >
               Eliminar
             </DropdownItem>

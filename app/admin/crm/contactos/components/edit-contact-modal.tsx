@@ -12,6 +12,7 @@ import {
   SelectItem,
   Switch,
   Divider,
+  Tooltip,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { Icon } from "@/shared/components/citrica-ui";
@@ -49,12 +50,14 @@ interface EditContactModalProps {
   isOpen: boolean;
   contact: Contact;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 export default function EditContactModal({
   isOpen,
   contact,
   onClose,
+  onSuccess,
 }: EditContactModalProps) {
   const { updateContact, isLoading, deactivateContactAccess, refreshContacts } = useContactCRUD();
   const { companies } = useCompanyCRUD();
@@ -74,6 +77,14 @@ export default function EditContactModal({
     email_access: contact.email_access,
     last_name: contact.last_name,
   });
+  const [originalData, setOriginalData] = useState<Partial<ContactInput>>({
+    name: contact.name,
+    cargo: contact.cargo,
+    email: contact.email,
+    address: contact.address,
+    phone: contact.phone,
+    company_id: contact.company_id,
+  });
   const [userFormData, setUserFormData] = useState({
     first_name: '',
     last_name: '',
@@ -84,7 +95,7 @@ export default function EditContactModal({
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    setFormData({
+    const contactData = {
       name: contact.name,
       cargo: contact.cargo,
       email: contact.email,
@@ -97,8 +108,29 @@ export default function EditContactModal({
       code: contact.code,
       email_access: contact.email_access,
       last_name: contact.last_name,
+    };
+    setFormData(contactData);
+    setOriginalData({
+      name: contact.name,
+      cargo: contact.cargo,
+      email: contact.email,
+      address: contact.address,
+      phone: contact.phone,
+      company_id: contact.company_id,
     });
   }, [contact]);
+
+  // Verificar si hay cambios en el formulario
+  const hasChanges = () => {
+    return (
+      formData.name !== originalData.name ||
+      formData.cargo !== originalData.cargo ||
+      formData.email !== originalData.email ||
+      formData.address !== originalData.address ||
+      formData.phone !== originalData.phone ||
+      formData.company_id !== originalData.company_id
+    );
+  };
 
   const handleInputChange = (field: keyof ContactInput, value: string | number) => {
     setFormData((prev) => ({
@@ -187,7 +219,7 @@ export default function EditContactModal({
       }));
 
       // Refrescar la lista de contactos
-      await refreshContacts();
+      onSuccess?.();
     } catch (error: any) {
       console.error("Error al reactivar acceso:", error);
       addToast({
@@ -286,12 +318,12 @@ export default function EditContactModal({
         throw new Error(result.error || 'Error al activar acceso');
       }
 
-      // Éxito - mostrar mensaje con la contraseña
+      // Éxito - mostrar mensaje
       addToast({
         title: "Acceso activado",
-        description: `Usuario creado correctamente. La contraseña es: ${userFormData.password}`,
+        description: "Usuario creado correctamente",
         color: "success",
-        timeout: 15000,
+        timeout: 5000,
       });
 
       // Actualizar el estado local
@@ -312,8 +344,9 @@ export default function EditContactModal({
         avatar_url: '',
       });
 
-      // Refrescar la lista de contactos
-      await refreshContacts();
+      // Refrescar la lista de contactos y cerrar el modal
+      onSuccess?.();
+      onClose();
     } catch (error: any) {
       console.error("Error al activar acceso:", error);
       addToast({
@@ -351,6 +384,7 @@ export default function EditContactModal({
       // No incluir user_id y has_system_access en la actualización normal
       const { user_id, has_system_access, ...updateData } = formData;
       await updateContact(contact.id, updateData);
+      onSuccess?.();
       onClose();
     } catch (error) {
       console.error("Error al actualizar contacto:", error);
@@ -494,8 +528,8 @@ export default function EditContactModal({
                   </div>
                 </Switch>
 
-            
-                {formData.user_id && (
+
+                {formData.user_id && formData.has_system_access && (
                   <div className="mt-4 p-4 bg-blue-50 rounded-lg space-y-3">
                     <h5 className="text-sm font-semibold text-gray-700">Información del Usuario</h5>
                     <p className="text-xs text-gray-600">
@@ -589,13 +623,20 @@ export default function EditContactModal({
                           }
                           className="flex-1"
                         />
-                        <Button
-                          size="md"
-                          className="bg-[#42668A] text-white"
-                          onPress={handleGeneratePassword}
+                        <Tooltip
+                          content="Generar automáticamente"
+                          delay={200}
+                          closeDelay={0}
                         >
-                          Generar Automaticamente
-                        </Button>
+                          <Button
+                            isIconOnly
+                            size="md"
+                            className="bg-[#42668A] text-white"
+                            onPress={handleGeneratePassword}
+                          >
+                            <Icon name="Shuffle" className="w-5 h-5" />
+                          </Button>
+                        </Tooltip>
                       </div>
                     </div>
                   </div>
@@ -646,6 +687,7 @@ export default function EditContactModal({
                 className="bg-[#42668A] text-white"
                 onPress={handleSubmit}
                 isLoading={isLoading}
+                isDisabled={!hasChanges()}
               >
                 Actualizar Contacto
               </Button>
