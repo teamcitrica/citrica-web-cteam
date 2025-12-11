@@ -140,6 +140,8 @@ export default function ContactosPage() {
               onClose={() => {
                 setIsEditModalOpen(false);
                 setSelectedContact(null);
+              }}
+              onSuccess={() => {
                 refreshContacts();
               }}
             />

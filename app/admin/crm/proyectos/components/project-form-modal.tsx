@@ -26,6 +26,7 @@ import { useUserProjects } from "@/hooks/user-projects/use-user-projects";
 interface ProjectFormModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   mode: "create" | "edit";
   project?: Project;
 }
@@ -33,6 +34,7 @@ interface ProjectFormModalProps {
 export default function ProjectFormModal({
   isOpen,
   onClose,
+  onSuccess,
   mode,
   project,
 }: ProjectFormModalProps) {
@@ -58,9 +60,23 @@ export default function ProjectFormModal({
     supabase_anon_key: project?.supabase_anon_key || null,
   });
 
+  const [originalData, setOriginalData] = useState<ProjectInput>({
+    name: project?.name || null,
+    company_id: project?.company_id || null,
+    status: project?.status || null,
+    nombre_responsable: project?.nombre_responsable || null,
+    email_responsable: project?.email_responsable || null,
+    phone_responsable: project?.phone_responsable || null,
+    tabla: project?.tabla || null,
+    supabase_url: project?.supabase_url || null,
+    supabase_anon_key: project?.supabase_anon_key || null,
+  });
+
+  const [originalUserIds, setOriginalUserIds] = useState<string[]>([]);
+
   useEffect(() => {
     if (mode === "edit" && project) {
-      setFormData({
+      const projectData = {
         name: project.name,
         company_id: project.company_id,
         status: project.status,
@@ -70,7 +86,9 @@ export default function ProjectFormModal({
         tabla: project.tabla,
         supabase_url: project.supabase_url,
         supabase_anon_key: project.supabase_anon_key,
-      });
+      };
+      setFormData(projectData);
+      setOriginalData(projectData);
 
       // Cargar contactos asociados al proyecto
       const loadProjectContacts = async () => {
@@ -95,12 +113,15 @@ export default function ProjectFormModal({
           if (projectUsers && projectUsers.length > 0) {
             const userIds = projectUsers.map(u => u.id).filter((id): id is string => !!id);
             setSelectedUserIds(userIds);
+            setOriginalUserIds(userIds);
           } else {
             setSelectedUserIds([]);
+            setOriginalUserIds([]);
           }
         } catch (error) {
           console.log("No hay usuarios asociados al proyecto");
           setSelectedUserIds([]);
+          setOriginalUserIds([]);
         }
       };
 
@@ -120,9 +141,34 @@ export default function ProjectFormModal({
     }));
   };
 
-  // Obtener usuarios clientes ordenados alfabéticamente
+  // Verificar si hay cambios en el formulario
+  const hasChanges = () => {
+    // Comparar campos del formulario
+    const formChanged = (
+      formData.name !== originalData.name ||
+      formData.company_id !== originalData.company_id ||
+      formData.status !== originalData.status ||
+      formData.nombre_responsable !== originalData.nombre_responsable ||
+      formData.email_responsable !== originalData.email_responsable ||
+      formData.phone_responsable !== originalData.phone_responsable ||
+      formData.tabla !== originalData.tabla ||
+      formData.supabase_url !== originalData.supabase_url ||
+      formData.supabase_anon_key !== originalData.supabase_anon_key
+    );
+
+    // Comparar usuarios asignados
+    const usersChanged = (
+      selectedUserIds.length !== originalUserIds.length ||
+      !selectedUserIds.every(id => originalUserIds.includes(id))
+    );
+
+    return formChanged || usersChanged;
+  };
+
+  // Obtener usuarios ordenados alfabéticamente
+  // Solo mostrar usuarios de la empresa seleccionada en el proyecto
   const clientUsers = users
-    .filter(user => user.role_id === 12)
+    .filter(user => user.company_id === formData.company_id)
     .sort((a, b) => {
       const nameA = a.first_name || '';
       const nameB = b.first_name || '';
@@ -205,6 +251,7 @@ export default function ProjectFormModal({
           setSelectedContactIds(new Set());
           setSelectedUserIds([]);
           setSearchValue('');
+          onSuccess?.();
           onClose();
         }
       } else {
@@ -216,6 +263,7 @@ export default function ProjectFormModal({
         // Sincronizar usuarios del proyecto
         await syncProjectUsers(project!.id, selectedUserIds);
 
+        onSuccess?.();
         onClose();
       }
     } catch (error) {
@@ -271,14 +319,14 @@ export default function ProjectFormModal({
 
             <div className="col-span-2">
               <Autocomplete
-                aria-label='Seleccione usuarios clientes'
-                label="Usuarios Asignados al Proyecto (Clientes)"
+                aria-label='Seleccione usuarios'
+                label="Usuarios Asignados al Proyecto"
                 listboxProps={{
                   emptyContent: "No hay coincidencias",
                 }}
                 inputValue={searchValue}
                 onInputChange={setSearchValue}
-                placeholder="Buscar y seleccionar usuarios clientes"
+                placeholder="Buscar y seleccionar usuarios"
                 onSelectionChange={handleAddUser}
                 allowsCustomValue={false}
                 menuTrigger="input"
@@ -322,7 +370,7 @@ export default function ProjectFormModal({
 
               {clientUsers.length === 0 && (
                 <p className="text-sm text-gray-500 mt-2">
-                  No hay usuarios clientes disponibles
+                  No hay usuarios disponibles para esta empresa
                 </p>
               )}
 
@@ -387,6 +435,7 @@ export default function ProjectFormModal({
             className="bg-[#42668A] text-white"
             onPress={handleSubmit}
             isLoading={isLoading}
+            isDisabled={mode === "edit" ? !hasChanges() : false}
           >
             {mode === "create" ? "Crear Proyecto" : "Guardar Cambios"}
           </Button>

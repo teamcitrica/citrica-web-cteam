@@ -79,6 +79,9 @@ export default function ProyectosPage() {
   const handleCloseFormModal = () => {
     setIsFormModalOpen(false);
     setSelectedProject(null);
+  };
+
+  const handleFormSuccess = () => {
     refreshProjects();
   };
 
@@ -159,6 +162,7 @@ export default function ProyectosPage() {
           <ProjectFormModal
             isOpen={isFormModalOpen}
             onClose={handleCloseFormModal}
+            onSuccess={handleFormSuccess}
             mode={formMode}
             project={formMode === "edit" ? selectedProject || undefined : undefined}
           />

@@ -4,6 +4,7 @@ import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { useUserAssets } from "@/hooks/user-assets/use-user-assets";
 import { Select, SelectItem, Spinner } from "@heroui/react";
+import { Col, Container } from "@/styles/07-objects/objects";
 
 interface ExternalTableData {
   [key: string]: any;
@@ -25,7 +26,7 @@ export default function MisDatosPage() {
       }
     };
     getCurrentUser();
-  }, []);
+  }, [supabase]);
 
   // Obtener los assets del usuario
   const { assets, isLoading: isLoadingAssets } = useUserAssets(currentUser?.id);
@@ -151,7 +152,7 @@ export default function MisDatosPage() {
     };
 
     fetchExternalData();
-  }, [selectedAssetId, assets]);
+  }, [selectedAssetId, assets, supabase]);
 
   if (isLoadingAssets) {
     return (
@@ -163,75 +164,88 @@ export default function MisDatosPage() {
 
   if (assets.length === 0) {
     return (
-      <div className="p-8">
-        <h1 className="text-2xl font-bold mb-4">Mis Datos</h1>
-        <p className="text-gray-600">
-          No tienes acceso a ningún proyecto o asset en este momento.
-        </p>
-      </div>
+      <Container>
+        <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+          <div className="p-4">
+            <h1 className="text-2xl font-bold text-[#265197] mb-6">
+              Mis Datos
+            </h1>
+            <p className="text-gray-600">
+              No tienes acceso a ningún proyecto o asset en este momento.
+            </p>
+          </div>
+        </Col>
+      </Container>
     );
   }
 
   const selectedAsset = assets.find((a) => a.id === selectedAssetId);
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Mis Datos</h1>
+    <Container>
+      <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+        <div className="p-4">
+          <h1 className="text-2xl font-bold text-[#265197] mb-6">
+            Mis Datos
+          </h1>
 
-      {/* Selector de Asset si hay múltiples */}
-      {assets.length > 1 && (
-        <div className="mb-6 max-w-md">
-          <Select
-            label="Selecciona un conjunto de datos"
-            placeholder="Selecciona un asset"
-            selectedKeys={selectedAssetId ? [selectedAssetId] : []}
-            onChange={(e) => setSelectedAssetId(e.target.value)}
-            classNames={{
-              label: "text-gray-700",
-              value: "text-gray-800",
-            }}
-          >
-            {assets.map((asset) => (
-              <SelectItem key={asset.id}>
-                {asset.name || "Sin nombre"} - {asset.project_name || "Sin proyecto"}
-              </SelectItem>
-            ))}
-          </Select>
-        </div>
-      )}
+          {/* Selector de Asset si hay múltiples */}
+          {assets.length > 1 && (
+            <div className="mb-6 max-w-md">
+              <Select
+                label="Selecciona un conjunto de datos"
+                placeholder="Selecciona un asset"
+                selectedKeys={selectedAssetId ? [selectedAssetId] : []}
+                onChange={(e) => setSelectedAssetId(e.target.value)}
+                classNames={{
+                  label: "text-gray-700",
+                  value: "text-gray-800",
+                }}
+              >
+                {assets.map((asset) => (
+                  <SelectItem key={asset.id}>
+                    {asset.name || "Sin nombre"} - {asset.project_name || "Sin proyecto"}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+          )}
 
-      {/* Título del asset seleccionado */}
-      {selectedAsset && (
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold text-gray-800">
-            {selectedAsset.name || "Sin nombre"}
-          </h2>
-          <p className="text-sm text-gray-600">
-            Proyecto: {selectedAsset.project_name || "Sin proyecto"}
-          </p>
-        </div>
-      )}
+          {/* Título del asset seleccionado */}
+          {selectedAsset && (
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold text-[#265197]">
+                {selectedAsset.name || "Sin nombre"}
+              </h2>
+              <p className="text-sm text-[#678CC5]">
+                Proyecto: {selectedAsset.project_name || "Sin proyecto"}
+              </p>
+            </div>
+          )}
 
-      {/* Tabla de datos */}
-      {isLoadingData ? (
-        <div className="flex justify-center items-center py-20">
-          <Spinner size="lg" />
+          {/* Tabla de datos */}
+          {isLoadingData ? (
+            <div className="flex justify-center items-center py-20">
+              <Spinner size="lg" />
+            </div>
+          ) : selectedAssetId && tableData.length > 0 ? (
+            <DataTable
+              data={tableData}
+              columns={columns}
+              paginationColor="#42668A"
+              headerColor="#42668A"
+              headerTextColor="#ffffff"
+              searchPlaceholder="Buscar..."
+              getRowKey={(item) => item.id || JSON.stringify(item)}
+              searchFields={columns.map(col => col.uid as any)}
+            />
+          ) : selectedAssetId ? (
+            <p className="text-gray-600">No hay datos disponibles en esta tabla.</p>
+          ) : (
+            <p className="text-gray-600">Selecciona un conjunto de datos para visualizar.</p>
+          )}
         </div>
-      ) : selectedAssetId && tableData.length > 0 ? (
-        <DataTable
-          data={tableData}
-          columns={columns}
-          paginationColor="#42668A"
-          headerColor="#42668A"
-          searchPlaceholder="Buscar..."
-          getRowKey={(item) => item.id || JSON.stringify(item)}
-          searchFields={columns.map(col => col.uid as any)}
-        />
-      ) : selectedAssetId ? (
-        <p className="text-gray-600">No hay datos disponibles en esta tabla.</p>
-      ) : (
-        <p className="text-gray-600">Selecciona un conjunto de datos para visualizar.</p>
-      )}
-    </div>
+      </Col>
+    </Container>
   );
 }
