@@ -568,7 +568,7 @@ export default function EditContactModal({
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Input
-                        label="Nombre *"
+                        label="Nombre"
                         placeholder="Nombre del usuario"
                         value={userFormData.first_name}
                         onChange={(e) => setUserFormData((prev) => ({ ...prev, first_name: e.target.value }))}
@@ -579,7 +579,7 @@ export default function EditContactModal({
                         }}
                       />
                       <Input
-                        label="Apellido *"
+                        label="Apellido"
                         placeholder="Apellido del usuario"
                         value={userFormData.last_name}
                         onChange={(e) => setUserFormData((prev) => ({ ...prev, last_name: e.target.value }))}
@@ -590,7 +590,7 @@ export default function EditContactModal({
                         }}
                       />
                       <Input
-                        label="Email de acceso *"
+                        label="Email de acceso"
                         placeholder="correo@ejemplo.com"
                         type="email"
                         value={userFormData.email_access}
@@ -602,9 +602,23 @@ export default function EditContactModal({
                         }}
                         description="Email que usará para iniciar sesión"
                       />
-                      <div className="flex gap-2 items-end">
+                      <div className="relative">
+                        <Tooltip
+                          content="Generar automáticamente"
+                          delay={200}
+                          closeDelay={0}
+                        >
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            className="absolute top-[3px] left-[100px] z-10 bg-[#42668A] text-white min-w-unit-6 w-6 h-6"
+                            onPress={handleGeneratePassword}
+                          >
+                            <Icon name="Shuffle" className="w-3 h-3" />
+                          </Button>
+                        </Tooltip>
                         <Input
-                          label="Contraseña *"
+                          label="Contraseña"
                           placeholder="Ingrese o genere una contraseña"
                           type={showPassword ? "text" : "password"}
                           value={userFormData.password}
@@ -621,22 +635,7 @@ export default function EditContactModal({
                               onClick={() => setShowPassword((prev) => !prev)}
                             />
                           }
-                          className="flex-1"
                         />
-                        <Tooltip
-                          content="Generar automáticamente"
-                          delay={200}
-                          closeDelay={0}
-                        >
-                          <Button
-                            isIconOnly
-                            size="md"
-                            className="bg-[#42668A] text-white"
-                            onPress={handleGeneratePassword}
-                          >
-                            <Icon name="Shuffle" className="w-5 h-5" />
-                          </Button>
-                        </Tooltip>
                       </div>
                     </div>
                   </div>
