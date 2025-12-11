@@ -235,9 +235,14 @@ export default function AssetFormModal({
       // Si tiene URL y key, cargar las tablas automáticamente
       if (asset.supabase_url && asset.supabase_anon_key) {
         handleConsultTables(asset.supabase_url, asset.supabase_anon_key);
+
+        // Si también tiene una tabla seleccionada, cargar sus columnas
+        if (asset.tabla) {
+          fetchTableColumns(asset.tabla);
+        }
       }
     }
-  }, [asset, mode, handleConsultTables]);
+  }, [asset, mode, handleConsultTables, fetchTableColumns]);
 
   const handleSubmit = async () => {
     if (!formData.name) {
