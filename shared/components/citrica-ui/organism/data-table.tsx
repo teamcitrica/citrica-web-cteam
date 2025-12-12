@@ -119,7 +119,7 @@ export function DataTable<T extends Record<string, any>>({
   );
 
   return (
-    <div className="container-blue-principal">
+    <div className="container-blue-principal overflow-x-auto">
       {/* Barra de búsqueda y acciones */}
 
         <div className="flex items-center justify-between w-full pb-6 pt-3">
