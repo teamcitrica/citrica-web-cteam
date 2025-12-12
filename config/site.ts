@@ -129,7 +129,7 @@ export const siteConfig = {
 			icon: "ClipboardCheck",
 			href: "/admin/client/mis-datos",
 			allowedRoles: [ROL_CLIENTE],
-			subItems: [],
+			subItems: [], 
 		},
 
 	],

@@ -7,7 +7,6 @@ import type { SidebarProps, MenuItem } from "../../../types/sidebar"
 import { Icon, Text } from "@citrica-ui"
 import { IconName } from "@/shared/components/citrica-ui/atoms/icon"
 import { usePathname, useRouter } from 'next/navigation';
-import Image from 'next/image';
 
 function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boolean; onToggle: () => void }) {
   const router = useRouter();
