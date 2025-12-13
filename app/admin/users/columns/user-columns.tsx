@@ -17,7 +17,6 @@ type UserColumnsConfig = {
   onView: (user: UserType) => void;
   onEdit: (user: UserType) => void;
   onDelete: (user: UserType) => void;
-  contactAccessMap: Record<string, { hasSystemAccess: boolean; isActive: boolean }>;
 };
 
 type UserExportConfig = Record<string, never>;
@@ -59,7 +58,6 @@ export const getUserColumns = ({
   onView,
   onEdit,
   onDelete,
-  contactAccessMap,
 }: UserColumnsConfig): Column<UserType>[] => [
   {
     name: "USUARIO",
@@ -67,10 +65,7 @@ export const getUserColumns = ({
     sortable: true,
     render: (user) => {
       const userName = user.full_name || user.name || `${user.first_name || ""} ${user.last_name || ""}`.trim();
-      // Verificar si este usuario fue creado desde un contacto
-      const contactAccess = user.id ? contactAccessMap[user.id] : undefined;
-      const hasSystemAccess = contactAccess !== undefined;
-      const isActive = contactAccess?.isActive || false;
+      const isActive = user.active_users === true;
 
       return (
         <div className="flex items-center gap-3">
@@ -84,9 +79,9 @@ export const getUserColumns = ({
           />
           <div className="flex items-center gap-2">
             <span className="text-black font-medium">{userName || "-"}</span>
-            {hasSystemAccess && (
+            {user.active_users !== undefined && (
               <Tooltip
-                content={isActive ? "Usuario del sistema con acceso activo" : "Usuario del sistema sin acceso activo"}
+                content={isActive ? "Usuario con acceso activo" : "Usuario sin acceso activo"}
                 delay={200}
                 closeDelay={0}
               >
@@ -139,7 +134,10 @@ export const getUserColumns = ({
     uid: "actions",
     sortable: false,
     render: (user) => (
-      <div className="relative flex justify-center items-center gap-2">
+      <div
+        className="relative flex justify-center items-center gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
         <Button
           isIconOnly
           size="sm"

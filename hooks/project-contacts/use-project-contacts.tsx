@@ -32,7 +32,7 @@ export const useProjectContacts = () => {
       try {
         setIsLoading(true);
         const { data, error } = await supabase
-          .from("project_contacts")
+          .from("proyect_acces")
           .select(`
             users_id,
             users (
@@ -79,7 +79,7 @@ export const useProjectContacts = () => {
       setIsLoading(true);
 
       const { error } = await supabase
-        .from("project_contacts")
+        .from("proyect_acces")
         .insert([{ project_id: projectId, users_id: userId }]);
 
       if (error) {
@@ -126,7 +126,7 @@ export const useProjectContacts = () => {
       setIsLoading(true);
 
       const { error } = await supabase
-        .from("project_contacts")
+        .from("proyect_acces")
         .delete()
         .eq("project_id", projectId)
         .eq("users_id", userId);
@@ -170,7 +170,7 @@ export const useProjectContacts = () => {
       }));
 
       const { error } = await supabase
-        .from("project_contacts")
+        .from("proyect_acces")
         .insert(insertData);
 
       if (error) {
@@ -208,12 +208,22 @@ export const useProjectContacts = () => {
 
       // Primero eliminamos todas las relaciones existentes
       const { error: deleteError } = await supabase
-        .from("project_contacts")
+        .from("proyect_acces")
         .delete()
         .eq("project_id", projectId);
 
       if (deleteError) {
-        console.error("Error al eliminar usuarios previos:", deleteError);
+        console.error("Error al eliminar usuarios previos:", {
+          message: deleteError.message,
+          details: deleteError.details,
+          hint: deleteError.hint,
+          code: deleteError.code,
+        });
+        addToast({
+          title: "Error",
+          description: `No se pudieron eliminar usuarios previos: ${deleteError.message || 'Error de permisos'}`,
+          color: "danger",
+        });
         return false;
       }
 
@@ -234,7 +244,7 @@ export const useProjectContacts = () => {
       }));
 
       const { error: insertError } = await supabase
-        .from("project_contacts")
+        .from("proyect_acces")
         .insert(insertData);
 
       if (insertError) {

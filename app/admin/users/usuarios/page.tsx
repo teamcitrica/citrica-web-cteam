@@ -6,10 +6,8 @@ import UserDetailModal from "../components/modal-details-users";
 import EditUserModal from "../components/modal-edit-users";
 import ModalDeleteUser from "../components/modal-delete-user";
 import { getUserColumns, getUserExportColumns } from "../columns/user-columns";
-
 import { useUserCRUD } from "@/hooks/users/use-users";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
-import { useContactCRUD } from "@/hooks/contact/use-contact";
 import { UserType } from "@/shared/types/types";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Col, Container } from "@/styles/07-objects/objects";
@@ -18,7 +16,6 @@ import { addToast } from "@heroui/toast";
 export default function UsersPage() {
   const { users, isLoading, refreshUsers, deleteUser } = useUserCRUD();
   const { companies } = useCompanyCRUD();
-  const { contacts } = useContactCRUD();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -31,24 +28,12 @@ export default function UsersPage() {
     return users.filter((user) => user.role_id !== 5);
   }, [users]);
 
-  // Crear mapa de contactos por user_id para identificar usuarios creados desde contactos
-  const contactAccessMap = useMemo(() => {
-    const map: Record<string, { hasSystemAccess: boolean; isActive: boolean }> = {};
-    contacts.forEach((contact) => {
-      if (contact.user_id) {
-        map[contact.user_id] = {
-          hasSystemAccess: contact.has_system_access || false,
-          isActive: contact.active_users || false,
-        };
-      }
-    });
-    return map;
-  }, [contacts]);
 
   const handleOpenCreateModal = () => setIsCreateModalOpen(true);
 
   const handleCloseCreateModal = () => {
     setIsCreateModalOpen(false);
+    refreshUsers(); // Refrescar usuarios después de cerrar el modal
   };
 
   const handleViewUser = useCallback((user: UserType) => {
@@ -72,9 +57,8 @@ export default function UsersPage() {
         onView: handleViewUser,
         onEdit: handleEditUser,
         onDelete: handleDeleteUser,
-        contactAccessMap,
       }),
-    [handleViewUser, handleEditUser, handleDeleteUser, contactAccessMap]
+    [handleViewUser, handleEditUser, handleDeleteUser]
   );
 
   const exportColumns = useMemo(() => getUserExportColumns(), []);

@@ -57,7 +57,7 @@ export const useUserCRUD = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [supabase]);
+  }, []);
 
   // 🔹 Obtener usuario autenticado
   const fetchUserById = async (id: string) => {
@@ -204,32 +204,30 @@ export const useUserCRUD = () => {
     }
   };
 
-  // 🔹 Eliminar usuario (hard delete - eliminación permanente)
+  // 🔹 Eliminar usuario (hard delete - eliminación permanente de auth.users y public.users)
   const deleteUser = async (id: string) => {
     try {
       setIsLoading(true);
 
       console.log("🔴 Intentando eliminar usuario con ID:", id);
 
-      // Hard delete: eliminar el usuario permanentemente de la base de datos
-      const { error } = await supabase
-        .from("users")
-        .delete()
-        .eq("id", id);
+      // Llamar a la API Route que elimina de auth.users y public.users
+      const response = await fetch('/api/admin/delete-user', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user_id: id }),
+      });
 
-      console.log("🟡 Respuesta de Supabase DELETE - error:", error);
+      const result = await response.json();
 
-      if (error) {
-        console.error("❌ Error al eliminar usuario:", {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-        });
-        throw error;
+      if (!response.ok) {
+        console.error("❌ Error al eliminar usuario:", result.error);
+        throw new Error(result.error || 'Error al eliminar usuario');
       }
 
-      console.log("✅ Usuario eliminado correctamente");
+      console.log("✅ Usuario eliminado correctamente de auth.users y public.users");
       await fetchUsers();
 
       return { success: true };
@@ -285,7 +283,7 @@ export const useUserCRUD = () => {
     }
   };
 
-  // 🔹 Actualizar usuario por rol
+  // 🔹 Actualizar usuario por rol (usando API Route con Service Role Key)
   const updateUserByRole = async (user_id: string, user_data: Partial<UserType>, role_id: string) => {
     try {
       setIsLoading(true);
@@ -298,30 +296,45 @@ export const useUserCRUD = () => {
         throw new Error("role_id es requerido");
       }
 
-      // Actualizar en public.users
-      const publicPayload: Partial<UserType> = {
+      // Preparar datos a actualizar
+      const updatePayload: any = {
         role_id: Number(role_id),
-        updated_at: new Date().toISOString(),
       };
 
       if (user_data) {
-        Object.assign(publicPayload, {
-          first_name: user_data.first_name,
-          last_name: user_data.last_name,
-          email: user_data.email,
-          company_id: user_data.company_id,
-        });
+        if (user_data.first_name !== undefined) updatePayload.first_name = user_data.first_name;
+        if (user_data.last_name !== undefined) updatePayload.last_name = user_data.last_name;
+        if (user_data.email !== undefined) updatePayload.email = user_data.email;
+        if (user_data.company_id !== undefined) updatePayload.company_id = user_data.company_id;
+        if (user_data.active_users !== undefined) updatePayload.active_users = user_data.active_users;
       }
 
       console.log("🟢 Actualizando usuario con ID:", user_id);
-      console.log("🟢 Payload a actualizar:", publicPayload);
+      console.log("🟢 Payload a actualizar:", updatePayload);
 
-      const result = await updateUser(user_id, publicPayload);
+      // Llamar a la API Route que usa Service Role Key
+      const response = await fetch('/api/admin/update-user', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id,
+          user_data: updatePayload,
+        }),
+      });
 
-      console.log("✅ Usuario actualizado exitosamente:", result);
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error("Error al actualizar usuario:", result.error);
+        throw new Error(result.error || 'Error al actualizar usuario');
+      }
+
+      console.log("✅ Usuario actualizado exitosamente:", result.user);
       await fetchUsers();
 
-      return { data: result, error: null };
+      return { data: result.user, error: null };
     } catch (err: any) {
       console.error("Error inesperado en updateUserByRole:", err);
       throw err;

@@ -36,7 +36,6 @@ export default function CreateContactModal({
     phone: null,
     company_id: null,
     user_id: null,
-    has_system_access: false,
     type_id: null,
     code: null,
     email_access: null,
@@ -71,7 +70,6 @@ export default function CreateContactModal({
           phone: null,
           company_id: null,
           user_id: null,
-          has_system_access: false,
           type_id: null,
           code: null,
           email_access: null,
@@ -160,7 +158,6 @@ export default function CreateContactModal({
                 setFormData((prev) => ({
                   ...prev,
                   company_id: selected ? Number(selected) : null,
-                  has_system_access: selected && Number(selected) === 1 ? false : prev.has_system_access,
                 }));
               }}
               classNames={{
@@ -176,7 +173,7 @@ export default function CreateContactModal({
             </Select>
           </div>
 
-          {formData.company_id && formData.company_id !== 1 && (
+          {/* {formData.company_id && formData.company_id !== 1 && (
             <div className="mt-4">
               <Switch
                 isSelected={formData.has_system_access || false}
@@ -188,7 +185,7 @@ export default function CreateContactModal({
                 Dar acceso al sistema
               </Switch>
             </div>
-          )}
+          )} */}
         </ModalBody>
         <ModalFooter>
           <Button color="danger" variant="light" onPress={onClose}>

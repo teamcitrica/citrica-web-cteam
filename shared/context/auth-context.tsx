@@ -96,10 +96,10 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
         if (data.user && data.session) {
           console.log(data.user.id);
 
-          // Validar si el usuario es cliente y tiene acceso activo
+          // Validar si el usuario tiene acceso activo
           const { data: userData, error: userError } = await supabase
             .from('users')
-            .select('id, role_id, company_id')
+            .select('id, active_users')
             .eq('id', data.user.id)
             .single();
 
@@ -114,40 +114,24 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
             return { respData: null, respError };
           }
 
-          // Si el usuario es cliente (role_id = 12) y tiene empresa
-          if (userData && userData.role_id === 12 && userData.company_id) {
-            console.log("Validando acceso de cliente...");
+          // Validar que active_users sea true
+          if (!userData || userData.active_users !== true) {
+            console.log("Acceso denegado: usuario sin acceso activo");
 
-            // Verificar en la tabla contact si active_users es true
-            const { data: contactData, error: contactError } = await supabase
-              .from('contact')
-              .select('active_users, user_id')
-              .eq('user_id', data.user.id)
-              .single();
+            // Cerrar la sesión
+            await supabase.auth.signOut({ scope: 'local' });
 
-            if (contactError) {
-              console.error("Error al verificar acceso del contacto:", contactError);
-            }
+            // Crear error personalizado
+            respError = {
+              message: "Usuario sin acceso al sistema",
+              name: "AccessDenied",
+              status: 403,
+            } as AuthError;
 
-            // Si no existe el contacto O active_users es false, denegar acceso
-            if (!contactData || contactData.active_users === false) {
-              console.log("Acceso denegado: usuario sin acceso activo");
-
-              // Cerrar la sesión
-              await supabase.auth.signOut({ scope: 'local' });
-
-              // Crear error personalizado
-              respError = {
-                message: "Usuario sin acceso al sistema",
-                name: "AccessDenied",
-                status: 403,
-              } as AuthError;
-
-              return { respData: null, respError };
-            }
-
-            console.log("✅ Acceso de cliente validado correctamente");
+            return { respData: null, respError };
           }
+
+          console.log("✅ Acceso validado correctamente");
 
           setUserSession(data.session);
           await getUserInfo(data.user.id);
