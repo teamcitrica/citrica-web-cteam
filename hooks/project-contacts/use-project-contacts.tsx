@@ -33,7 +33,8 @@ export const useProjectContacts = () => {
         setIsLoading(true);
         const { data, error } = await supabase
           .from("proyect_acces")
-          .select(`
+          .select(
+            `
             users_id,
             users (
               id,
@@ -43,37 +44,42 @@ export const useProjectContacts = () => {
               role_id,
               company_id
             )
-          `)
+          `,
+          )
           .eq("project_id", projectId);
 
         if (error) {
           // Solo log si es un error real, no si simplemente no hay datos
-          if (error.code !== 'PGRST116') {
-            console.log("Información: No hay contactos para este proyecto o error menor:", error.message);
+          if (error.code !== "PGRST116") {
+            console.log(
+              "Información: No hay contactos para este proyecto o error menor:",
+              error.message,
+            );
           }
           return [];
         }
 
         // Extraer solo los datos de users
-        const users = data
-          .map((item: any) => item.users)
-          .filter(Boolean);
+        const users = data.map((item: any) => item.users).filter(Boolean);
 
         return users;
       } catch (err: any) {
-        console.log("No se pudieron cargar contactos del proyecto:", err?.message || "");
+        console.log(
+          "No se pudieron cargar contactos del proyecto:",
+          err?.message || "",
+        );
         return [];
       } finally {
         setIsLoading(false);
       }
     },
-    [supabase]
+    [supabase],
   );
 
   // Agregar un usuario a un proyecto
   const addContactToProject = async (
     projectId: string,
-    userId: string
+    userId: string,
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
@@ -120,7 +126,7 @@ export const useProjectContacts = () => {
   // Eliminar un usuario de un proyecto
   const removeContactFromProject = async (
     projectId: string,
-    userId: string
+    userId: string,
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
@@ -159,7 +165,7 @@ export const useProjectContacts = () => {
   // Agregar múltiples usuarios a un proyecto
   const addMultipleContactsToProject = async (
     projectId: string,
-    userIds: string[]
+    userIds: string[],
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
@@ -169,9 +175,7 @@ export const useProjectContacts = () => {
         users_id: userId,
       }));
 
-      const { error } = await supabase
-        .from("proyect_acces")
-        .insert(insertData);
+      const { error } = await supabase.from("proyect_acces").insert(insertData);
 
       if (error) {
         console.error("Error al agregar usuarios al proyecto:", error);
@@ -185,7 +189,8 @@ export const useProjectContacts = () => {
 
       addToast({
         title: "Usuarios agregados",
-        description: "Los usuarios han sido asociados al proyecto correctamente",
+        description:
+          "Los usuarios han sido asociados al proyecto correctamente",
         color: "success",
       });
 
@@ -201,7 +206,8 @@ export const useProjectContacts = () => {
   // Sincronizar usuarios de un proyecto (elimina los que no están en la lista y agrega los nuevos)
   const syncProjectContacts = async (
     projectId: string,
-    userIds: string[]
+    userIds: string[],
+    showToast: boolean = true,
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
@@ -219,21 +225,25 @@ export const useProjectContacts = () => {
           hint: deleteError.hint,
           code: deleteError.code,
         });
-        addToast({
-          title: "Error",
-          description: `No se pudieron eliminar usuarios previos: ${deleteError.message || 'Error de permisos'}`,
-          color: "danger",
-        });
+        if (showToast) {
+          addToast({
+            title: "Error",
+            description: `No se pudieron eliminar usuarios previos: ${deleteError.message || "Error de permisos"}`,
+            color: "danger",
+          });
+        }
         return false;
       }
 
       // Si no hay usuarios nuevos, terminamos aquí
       if (userIds.length === 0) {
-        addToast({
-          title: "Usuarios actualizados",
-          description: "Se han actualizado los usuarios del proyecto",
-          color: "success",
-        });
+        if (showToast) {
+          addToast({
+            title: "Usuarios actualizados",
+            description: "Se han actualizado los usuarios del proyecto",
+            color: "success",
+          });
+        }
         return true;
       }
 
@@ -249,19 +259,24 @@ export const useProjectContacts = () => {
 
       if (insertError) {
         console.error("Error al agregar nuevos usuarios:", insertError);
-        addToast({
-          title: "Error",
-          description: "No se pudieron actualizar los usuarios del proyecto",
-          color: "danger",
-        });
+        if (showToast) {
+          addToast({
+            title: "Error",
+            description: "No se pudieron actualizar los usuarios del proyecto",
+            color: "danger",
+          });
+        }
         return false;
       }
 
-      addToast({
-        title: "Usuarios actualizados",
-        description: "Los usuarios del proyecto han sido actualizados correctamente",
-        color: "success",
-      });
+      if (showToast) {
+        addToast({
+          title: "Usuarios actualizados",
+          description:
+            "Los usuarios del proyecto han sido actualizados correctamente",
+          color: "success",
+        });
+      }
 
       return true;
     } catch (err) {

@@ -14,7 +14,8 @@ import { Col, Container } from "@/styles/07-objects/objects";
 import { addToast } from "@heroui/toast";
 
 export default function UsersPage() {
-  const { users, isLoading, refreshUsers, deleteUser } = useUserCRUD();
+  const { users, isLoading, refreshUsers, deleteUser, updateUserByRole } =
+    useUserCRUD();
   const { companies } = useCompanyCRUD();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
@@ -27,7 +28,6 @@ export default function UsersPage() {
   const filteredUsers = useMemo(() => {
     return users.filter((user) => user.role_id !== 5);
   }, [users]);
-
 
   const handleOpenCreateModal = () => setIsCreateModalOpen(true);
 
@@ -51,14 +51,47 @@ export default function UsersPage() {
     setIsDeleteModalOpen(true);
   }, []);
 
+  const handleToggleAccess = useCallback(
+    async (user: UserType) => {
+      if (!user.id) return;
+
+      const newActiveStatus = !user.active_users;
+      const userName =
+        user.full_name || user.name || `${user.first_name} ${user.last_name}`;
+
+      try {
+        await updateUserByRole(
+          user.id,
+          { active_users: newActiveStatus },
+          String(user.role_id),
+        );
+
+        addToast({
+          title: newActiveStatus ? "Acceso activado" : "Acceso desactivado",
+          description: `El acceso al sistema para ${userName} ha sido ${newActiveStatus ? "activado" : "desactivado"}`,
+          color: "success",
+        });
+      } catch (error) {
+        console.error("Error al cambiar acceso:", error);
+        addToast({
+          title: "Error",
+          description: "No se pudo cambiar el acceso del usuario",
+          color: "danger",
+        });
+      }
+    },
+    [updateUserByRole],
+  );
+
   const columns = useMemo(
     () =>
       getUserColumns({
         onView: handleViewUser,
         onEdit: handleEditUser,
         onDelete: handleDeleteUser,
+        onToggleAccess: handleToggleAccess,
       }),
-    [handleViewUser, handleEditUser, handleDeleteUser]
+    [handleViewUser, handleEditUser, handleDeleteUser, handleToggleAccess],
   );
 
   const exportColumns = useMemo(() => getUserExportColumns(), []);
@@ -108,7 +141,13 @@ export default function UsersPage() {
             data={filteredUsers}
             columns={columns}
             isLoading={isLoading}
-            searchFields={["full_name", "name", "first_name", "last_name", "email"]}
+            searchFields={[
+              "full_name",
+              "name",
+              "first_name",
+              "last_name",
+              "email",
+            ]}
             searchPlaceholder="Buscar por nombre o email..."
             onAdd={handleOpenCreateModal}
             addButtonText="Crear Usuario"
