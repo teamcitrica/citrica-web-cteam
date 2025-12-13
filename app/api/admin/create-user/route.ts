@@ -65,6 +65,7 @@ export async function POST(request: NextRequest) {
         last_name,
         role_id,
         company_id: company_id,
+        active_users: true, // Usuario activo por defecto al crearlo
       });
 
     if (userError) {

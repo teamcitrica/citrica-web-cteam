@@ -123,14 +123,14 @@ export const DropCitrica: React.FC<DropCitricaProps> = ({
     <Dropdown placement={placement} isDisabled={isDisabled}>
       <DropdownTrigger>
         <div 
-          className={`flex items-center justify-between gap-2 rounded-full p-2 w-[60px] cursor-pointer ${triggerClassName}`}
+          className={`flex items-center justify-between gap-2 rounded-full p-2 cursor-pointer ${triggerClassName}`}
           style={defaultTriggerStyle}
         >
           <div className="bg-white rounded-full p-[2px]">
             <Avatar
               src={userAvatar}
               isBordered={false}
-              className={`w-[${avatarSize}px] h-[${avatarSize}px]`}
+              className=""
               name={userName}
             />
           </div>

@@ -17,7 +17,7 @@ type UserColumnsConfig = {
   onView: (user: UserType) => void;
   onEdit: (user: UserType) => void;
   onDelete: (user: UserType) => void;
-  contactAccessMap: Record<string, { hasSystemAccess: boolean; isActive: boolean }>;
+  onToggleAccess: (user: UserType) => void;
 };
 
 type UserExportConfig = Record<string, never>;
@@ -59,18 +59,18 @@ export const getUserColumns = ({
   onView,
   onEdit,
   onDelete,
-  contactAccessMap,
+  onToggleAccess,
 }: UserColumnsConfig): Column<UserType>[] => [
   {
     name: "USUARIO",
     uid: "usuario",
     sortable: true,
     render: (user) => {
-      const userName = user.full_name || user.name || `${user.first_name || ""} ${user.last_name || ""}`.trim();
-      // Verificar si este usuario fue creado desde un contacto
-      const contactAccess = user.id ? contactAccessMap[user.id] : undefined;
-      const hasSystemAccess = contactAccess !== undefined;
-      const isActive = contactAccess?.isActive || false;
+      const userName =
+        user.full_name ||
+        user.name ||
+        `${user.first_name || ""} ${user.last_name || ""}`.trim();
+      const isActive = user.active_users === true;
 
       return (
         <div className="flex items-center gap-3">
@@ -84,9 +84,13 @@ export const getUserColumns = ({
           />
           <div className="flex items-center gap-2">
             <span className="text-black font-medium">{userName || "-"}</span>
-            {hasSystemAccess && (
+            {user.active_users !== undefined && (
               <Tooltip
-                content={isActive ? "Usuario del sistema con acceso activo" : "Usuario del sistema sin acceso activo"}
+                content={
+                  isActive
+                    ? "Usuario con acceso activo"
+                    : "Usuario sin acceso activo"
+                }
                 delay={200}
                 closeDelay={0}
               >
@@ -165,22 +169,25 @@ export const getUserColumns = ({
                 case "edit":
                   onEdit(user);
                   break;
+                case "toggle-access":
+                  onToggleAccess(user);
+                  break;
                 case "delete":
                   onDelete(user);
                   break;
               }
             }}
           >
+            <DropdownItem key="edit">Editar</DropdownItem>
             <DropdownItem
-              key="edit"
+              key="toggle-access"
+              className={user.active_users ? "text-warning" : "text-success"}
             >
-              Editar
+              {user.active_users
+                ? "Quitar acceso al sistema"
+                : "Dar acceso al sistema"}
             </DropdownItem>
-            <DropdownItem
-              key="delete"
-              className="text-danger"
-              color="danger"
-            >
+            <DropdownItem key="delete" className="text-danger" color="danger">
               Eliminar
             </DropdownItem>
           </DropdownMenu>
@@ -192,7 +199,7 @@ export const getUserColumns = ({
 
 export const getUserExportColumns = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _config?: UserExportConfig
+  _config?: UserExportConfig,
 ): ExportColumn[] => [
   {
     header: "NOMBRE",
