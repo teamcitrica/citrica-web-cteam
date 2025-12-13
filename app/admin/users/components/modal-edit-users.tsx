@@ -170,7 +170,7 @@ const EditUserModal = ({ isOpen, onClose, onSuccess, user }: EditUserModalProps)
             <SelectCitricaAdmin
               label="Rol"
               placeholder="Seleccione un rol"
-              selectedKeys={formData.role_id ? [formData.role_id] : []}
+              selectedKeys={formData.role_id && roles.some(r => String(r.id) === formData.role_id) ? [formData.role_id] : []}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
                 handleChange("role_id", selected);
@@ -198,7 +198,7 @@ const EditUserModal = ({ isOpen, onClose, onSuccess, user }: EditUserModalProps)
               <SelectCitricaAdmin
                 label="Empresa"
                 placeholder="Seleccione una empresa"
-                selectedKeys={formData.company_id ? [formData.company_id] : []}
+                selectedKeys={formData.company_id && companies.some(c => String(c.id) === formData.company_id) ? [formData.company_id] : []}
                 onSelectionChange={(keys) => {
                   const selected = Array.from(keys)[0] as string;
                   handleChange("company_id", selected);
@@ -228,14 +228,14 @@ const EditUserModal = ({ isOpen, onClose, onSuccess, user }: EditUserModalProps)
         <ModalFooter>
           <ButtonCitricaAdmin
             variant="secondary"
-            onClick={onClose}
+            onPress={onClose}
           >
             Cancelar
           </ButtonCitricaAdmin>
           <ButtonCitricaAdmin
             variant="primary"
             style={{ backgroundColor: "#42668A" }}
-            onClick={handleSubmit}
+            onPress={handleSubmit}
             isLoading={isLoading}
             isDisabled={!hasChanges()}
           >

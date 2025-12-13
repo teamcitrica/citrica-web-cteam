@@ -18,6 +18,8 @@ type ContactColumnsConfig = {
   onView: (contact: Contact) => void;
   onEdit: (contact: Contact) => void;
   onDelete: (contact: Contact) => void;
+  onGrantAccess: (contact: Contact) => void;
+  onRevokeAccess: (contact: Contact) => void;
 };
 
 type ContactExportConfig = {
@@ -64,6 +66,8 @@ export const getContactColumns = ({
   onView,
   onEdit,
   onDelete,
+  onGrantAccess,
+  onRevokeAccess,
 }: ContactColumnsConfig): Column<Contact>[] => [
   {
     name: "NOMBRE Y CARGO",
@@ -84,13 +88,13 @@ export const getContactColumns = ({
             <span className="text-[#16305A] font-medium">{contact.name || "-"}</span>
             {contact.user_id && (
               <Tooltip
-                content={contact.has_system_access && contact.active_users ? "Usuario del sistema con acceso activo" : "Usuario del sistema sin acceso activo"}
+                content="Usuario del sistema"
                 delay={200}
                 closeDelay={0}
               >
                 <div className="flex items-center">
                   <Icon
-                    className={`w-4 h-4 ${contact.has_system_access && contact.active_users ? "text-green-600" : "text-red-600"}`}
+                    className="w-4 h-4 text-blue-600"
                     name="ShieldCheck"
                   />
                 </div>
@@ -152,7 +156,10 @@ export const getContactColumns = ({
     uid: "actions",
     sortable: false,
     render: (contact) => (
-      <div className="relative flex justify-center items-center gap-2">
+      <div
+        className="relative flex justify-center items-center gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
         <Button
           isIconOnly
           size="sm"
@@ -175,17 +182,36 @@ export const getContactColumns = ({
                 case "edit":
                   onEdit(contact);
                   break;
+                case "grant-access":
+                  onGrantAccess(contact);
+                  break;
+                case "revoke-access":
+                  onRevokeAccess(contact);
+                  break;
                 case "delete":
                   onDelete(contact);
                   break;
               }
             }}
           >
-            <DropdownItem
-              key="edit"
-            >
+            <DropdownItem key="edit">
               Editar
             </DropdownItem>
+            {!contact.user_id ? (
+              <DropdownItem
+                key="grant-access"
+                className="text-success"
+              >
+                Dar acceso al sistema
+              </DropdownItem>
+            ) : (
+              <DropdownItem
+                key="revoke-access"
+                className="text-warning"
+              >
+                Quitar acceso al sistema
+              </DropdownItem>
+            )}
             <DropdownItem
               key="delete"
               className="text-danger"

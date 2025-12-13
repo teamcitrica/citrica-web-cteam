@@ -8,6 +8,10 @@ export interface Project {
   id: string;
   name: string | null;
   company_id: number | null;
+  company?: {
+    id: number;
+    name: string | null;
+  };
   status: string | null;
   nombre_responsable: string | null;
   email_responsable: string | null;
@@ -15,22 +19,29 @@ export interface Project {
   tabla: string | null;
   supabase_url: string | null;
   supabase_anon_key: string | null;
+  access_count?: number;
 }
 
-export type ProjectInput = Omit<Project, "id">;
+export type ProjectInput = Omit<Project, "id" | "company">;
 
 export const useProjectCRUD = () => {
   const { supabase } = useSupabase();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Leer: Traer todos los proyectos de la tabla
+  // Leer: Traer todos los proyectos de la tabla con información de la empresa
   const fetchProjects = useCallback(async () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("projects")
-        .select("*");
+        .select(`
+          *,
+          company:company_id (
+            id,
+            name
+          )
+        `);
 
       if (error) {
         console.error("Error al obtener proyectos:", error);
@@ -41,7 +52,23 @@ export const useProjectCRUD = () => {
         });
         return;
       }
-      setProjects(data || []);
+
+      // Obtener el conteo de accesos para cada proyecto
+      const projectsWithAccessCount = await Promise.all(
+        (data || []).map(async (project) => {
+          const { count } = await supabase
+            .from("proyect_acces")
+            .select("*", { count: "exact", head: true })
+            .eq("project_id", project.id);
+
+          return {
+            ...project,
+            access_count: count || 0,
+          };
+        })
+      );
+
+      setProjects(projectsWithAccessCount);
     } catch (err) {
       console.error("Error en fetchProjects:", err);
     } finally {

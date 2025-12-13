@@ -14,9 +14,7 @@ export interface Contact {
   phone: string | null;
   name: string | null;
   user_id: string | null;
-  has_system_access: boolean | null;
   type_id: number | null;
-  active_users: boolean | null;
   code: string | null;
   email_access: string | null;
   last_name: string | null;
@@ -27,7 +25,7 @@ export interface Contact {
   };
 }
 
-export type ContactInput = Omit<Contact, "id" | "types_contact" | "active_users" | "tipo">;
+export type ContactInput = Omit<Contact, "id" | "types_contact" | "tipo">;
 
 export const useContactCRUD = () => {
   const { supabase } = useSupabase();

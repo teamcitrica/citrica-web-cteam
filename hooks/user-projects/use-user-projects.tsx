@@ -27,7 +27,8 @@ export const useUserProjects = () => {
         setIsLoading(true);
         const { data, error } = await supabase
           .from("proyect_acces")
-          .select(`
+          .select(
+            `
             users_id,
             users (
               id,
@@ -37,31 +38,36 @@ export const useUserProjects = () => {
               role_id,
               created_at
             )
-          `)
+          `,
+          )
           .eq("project_id", projectId);
 
         if (error) {
           // Solo log si es un error real, no si simplemente no hay datos
-          if (error.code !== 'PGRST116') {
-            console.log("Información: No hay usuarios para este proyecto o error menor:", error.message);
+          if (error.code !== "PGRST116") {
+            console.log(
+              "Información: No hay usuarios para este proyecto o error menor:",
+              error.message,
+            );
           }
           return [];
         }
 
         // Extraer solo los datos de users
-        const users = data
-          .map((item: any) => item.users)
-          .filter(Boolean);
+        const users = data.map((item: any) => item.users).filter(Boolean);
 
         return users as UserType[];
       } catch (err: any) {
-        console.log("No se pudieron cargar usuarios del proyecto:", err?.message || "");
+        console.log(
+          "No se pudieron cargar usuarios del proyecto:",
+          err?.message || "",
+        );
         return [];
       } finally {
         setIsLoading(false);
       }
     },
-    [supabase]
+    [supabase],
   );
 
   // Obtener todos los proyectos asignados a un usuario específico
@@ -87,13 +93,13 @@ export const useUserProjects = () => {
         setIsLoading(false);
       }
     },
-    [supabase]
+    [supabase],
   );
 
   // Asignar un usuario a un proyecto
   const assignUserToProject = async (
     projectId: string,
-    userId: string
+    userId: string,
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
@@ -140,7 +146,7 @@ export const useUserProjects = () => {
   // Remover un usuario de un proyecto
   const removeUserFromProject = async (
     projectId: string,
-    userId: string
+    userId: string,
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
@@ -179,7 +185,7 @@ export const useUserProjects = () => {
   // Asignar múltiples usuarios a un proyecto
   const assignMultipleUsersToProject = async (
     projectId: string,
-    userIds: string[]
+    userIds: string[],
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
@@ -189,9 +195,7 @@ export const useUserProjects = () => {
         users_id: userId,
       }));
 
-      const { error } = await supabase
-        .from("proyect_acces")
-        .insert(insertData);
+      const { error } = await supabase.from("proyect_acces").insert(insertData);
 
       if (error) {
         console.error("Error al asignar usuarios al proyecto:", error);
@@ -205,7 +209,8 @@ export const useUserProjects = () => {
 
       addToast({
         title: "Usuarios asignados",
-        description: "Los usuarios han sido asignados al proyecto correctamente",
+        description:
+          "Los usuarios han sido asignados al proyecto correctamente",
         color: "success",
       });
 
@@ -221,7 +226,8 @@ export const useUserProjects = () => {
   // Sincronizar usuarios de un proyecto (elimina los que no están en la lista y agrega los nuevos)
   const syncProjectUsers = async (
     projectId: string,
-    userIds: string[]
+    userIds: string[],
+    showToast: boolean = true,
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
@@ -239,11 +245,13 @@ export const useUserProjects = () => {
 
       // Si no hay usuarios nuevos, terminamos aquí
       if (userIds.length === 0) {
-        addToast({
-          title: "Usuarios actualizados",
-          description: "Se han actualizado los usuarios del proyecto",
-          color: "success",
-        });
+        if (showToast) {
+          addToast({
+            title: "Usuarios actualizados",
+            description: "Se han actualizado los usuarios del proyecto",
+            color: "success",
+          });
+        }
         return true;
       }
 
@@ -259,19 +267,24 @@ export const useUserProjects = () => {
 
       if (insertError) {
         console.error("Error al agregar nuevos usuarios:", insertError);
-        addToast({
-          title: "Error",
-          description: "No se pudieron actualizar los usuarios del proyecto",
-          color: "danger",
-        });
+        if (showToast) {
+          addToast({
+            title: "Error",
+            description: "No se pudieron actualizar los usuarios del proyecto",
+            color: "danger",
+          });
+        }
         return false;
       }
 
-      addToast({
-        title: "Usuarios actualizados",
-        description: "Los usuarios del proyecto han sido actualizados correctamente",
-        color: "success",
-      });
+      if (showToast) {
+        addToast({
+          title: "Usuarios actualizados",
+          description:
+            "Los usuarios del proyecto han sido actualizados correctamente",
+          color: "success",
+        });
+      }
 
       return true;
     } catch (err) {
