@@ -18,8 +18,7 @@ type ContactColumnsConfig = {
   onView: (contact: Contact) => void;
   onEdit: (contact: Contact) => void;
   onDelete: (contact: Contact) => void;
-  onGrantAccess: (contact: Contact) => void;
-  onRevokeAccess: (contact: Contact) => void;
+  onToggleAccess: (contact: Contact) => void;
 };
 
 type ContactExportConfig = {
@@ -66,8 +65,7 @@ export const getContactColumns = ({
   onView,
   onEdit,
   onDelete,
-  onGrantAccess,
-  onRevokeAccess,
+  onToggleAccess,
 }: ContactColumnsConfig): Column<Contact>[] => [
   {
     name: "NOMBRE Y CARGO",
@@ -86,15 +84,19 @@ export const getContactColumns = ({
         <div className="flex flex-col items-start gap-1">
           <div className="flex items-center gap-2">
             <span className="text-[#16305A] font-medium">{contact.name || "-"}</span>
-            {contact.user_id && (
+            {contact.user_id !== null && (
               <Tooltip
-                content="Usuario del sistema"
+                content={
+                  contact.active_users
+                    ? "Usuario con acceso activo"
+                    : "Usuario sin acceso activo"
+                }
                 delay={200}
                 closeDelay={0}
               >
                 <div className="flex items-center">
                   <Icon
-                    className="w-4 h-4 text-blue-600"
+                    className={`w-4 h-4 ${contact.active_users ? "text-green-600" : "text-red-600"}`}
                     name="ShieldCheck"
                   />
                 </div>
@@ -182,11 +184,8 @@ export const getContactColumns = ({
                 case "edit":
                   onEdit(contact);
                   break;
-                case "grant-access":
-                  onGrantAccess(contact);
-                  break;
-                case "revoke-access":
-                  onRevokeAccess(contact);
+                case "toggle-access":
+                  onToggleAccess(contact);
                   break;
                 case "delete":
                   onDelete(contact);
@@ -197,21 +196,14 @@ export const getContactColumns = ({
             <DropdownItem key="edit">
               Editar
             </DropdownItem>
-            {!contact.user_id ? (
-              <DropdownItem
-                key="grant-access"
-                className="text-success"
-              >
-                Dar acceso al sistema
-              </DropdownItem>
-            ) : (
-              <DropdownItem
-                key="revoke-access"
-                className="text-warning"
-              >
-                Quitar acceso al sistema
-              </DropdownItem>
-            )}
+            <DropdownItem
+              key="toggle-access"
+              className={contact.active_users ? "text-warning" : "text-success"}
+            >
+              {contact.active_users
+                ? "Quitar acceso al sistema"
+                : "Dar acceso al sistema"}
+            </DropdownItem>
             <DropdownItem
               key="delete"
               className="text-danger"

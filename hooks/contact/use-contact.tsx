@@ -18,6 +18,7 @@ export interface Contact {
   code: string | null;
   email_access: string | null;
   last_name: string | null;
+  active_users?: boolean;
   types_contact?: {
     id: number;
     name: string;
@@ -44,6 +45,9 @@ export const useContactCRUD = () => {
             id,
             name,
             description
+          ),
+          users:user_id (
+            active_users
           )
         `)
         .order("name", { ascending: true });
@@ -57,7 +61,13 @@ export const useContactCRUD = () => {
         });
         return;
       }
-      setContacts(data || []);
+      // Transformar los datos para incluir active_users del usuario relacionado
+      const transformedData = (data || []).map((contact: any) => ({
+        ...contact,
+        active_users: contact.users?.active_users,
+        users: undefined, // Remover el objeto users anidado
+      }));
+      setContacts(transformedData);
     } catch (err) {
       console.error("Error en fetchContacts:", err);
     } finally {
@@ -77,6 +87,9 @@ export const useContactCRUD = () => {
             id,
             name,
             description
+          ),
+          users:user_id (
+            active_users
           )
         `)
         .eq("id", id)
@@ -87,7 +100,12 @@ export const useContactCRUD = () => {
         return null;
       }
 
-      return data;
+      // Transformar datos para incluir active_users
+      return {
+        ...data,
+        active_users: (data as any).users?.active_users,
+        users: undefined,
+      };
     } catch (err) {
       console.error("Error en fetchContactById:", err);
       return null;
