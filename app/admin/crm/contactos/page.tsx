@@ -6,7 +6,6 @@ import ContactDetailModal from "./components/contact-detail-modal";
 import EditContactModal from "./components/edit-contact-modal";
 import DeleteContactModal from "./components/delete-contact-modal";
 import GrantAccessModal from "./components/grant-access-modal";
-import RevokeAccessModal from "./components/revoke-access-modal";
 import { getContactColumns, getContactExportColumns } from "./columns/contact-columns";
 
 import { useContactCRUD, Contact } from "@/hooks/contact/use-contact";
@@ -23,7 +22,6 @@ export default function ContactosPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isGrantAccessModalOpen, setIsGrantAccessModalOpen] = useState(false);
-  const [isRevokeAccessModalOpen, setIsRevokeAccessModalOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
 
   const getCompanyName = useCallback(
@@ -53,14 +51,9 @@ export default function ContactosPage() {
     setIsEditModalOpen(true);
   }, []);
 
-  const handleGrantAccess = useCallback((contact: Contact) => {
+  const handleToggleAccess = useCallback((contact: Contact) => {
     setSelectedContact(contact);
     setIsGrantAccessModalOpen(true);
-  }, []);
-
-  const handleRevokeAccess = useCallback((contact: Contact) => {
-    setSelectedContact(contact);
-    setIsRevokeAccessModalOpen(true);
   }, []);
 
   const handleDeleteContact = useCallback((contact: Contact) => {
@@ -75,10 +68,9 @@ export default function ContactosPage() {
         onView: handleViewContact,
         onEdit: handleEditContact,
         onDelete: handleDeleteContact,
-        onGrantAccess: handleGrantAccess,
-        onRevokeAccess: handleRevokeAccess,
+        onToggleAccess: handleToggleAccess,
       }),
-    [getCompanyName, handleViewContact, handleEditContact, handleDeleteContact, handleGrantAccess, handleRevokeAccess]
+    [getCompanyName, handleViewContact, handleEditContact, handleDeleteContact, handleToggleAccess]
   );
 
   const exportColumns = useMemo(
@@ -170,20 +162,6 @@ export default function ContactosPage() {
               contact={selectedContact}
               onClose={() => {
                 setIsGrantAccessModalOpen(false);
-                setSelectedContact(null);
-              }}
-              onSuccess={() => {
-                refreshContacts();
-              }}
-            />
-          )}
-
-          {isRevokeAccessModalOpen && selectedContact && (
-            <RevokeAccessModal
-              isOpen={isRevokeAccessModalOpen}
-              contact={selectedContact}
-              onClose={() => {
-                setIsRevokeAccessModalOpen(false);
                 setSelectedContact(null);
               }}
               onSuccess={() => {
