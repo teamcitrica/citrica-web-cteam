@@ -57,6 +57,7 @@ export default function GrantAccessModal({
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const isRevoke = contact.active_users === true;
 
   const handleGeneratePassword = () => {
     const newPassword = generateSecurePassword();
@@ -80,88 +81,115 @@ export default function GrantAccessModal({
   };
 
   const handleSubmit = async () => {
-    if (!password) {
-      addToast({
-        title: "Error",
-        description: "La contraseña es requerida",
-        color: "danger",
-      });
-      return;
-    }
-
-    if (!contact.email) {
-      addToast({
-        title: "Error",
-        description: "El contacto debe tener un email",
-        color: "danger",
-      });
-      return;
-    }
-
-    if (!contact.name) {
-      addToast({
-        title: "Error",
-        description: "El contacto debe tener un nombre",
-        color: "danger",
-      });
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      // Separar nombre y apellido
-      const nameParts = contact.name.split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
-
-      // Determinar el role_id basándose en la empresa
-      // company_id === 1 (Citrica) -> role_id = 1 (Admin/Staff)
-      // Otras empresas -> role_id = 12 (Cliente)
-      const roleId = contact.company_id === 1 ? 1 : 12;
-
-      // Llamar al endpoint para activar acceso
-      const response = await fetch('/api/admin/activate-contact-access', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contact_id: contact.id,
-          password: password,
-          email_access: contact.email,
-          user_data: {
-            first_name: firstName,
-            last_name: lastName,
-            full_name: contact.name,
-            role_id: roleId,
+      if (isRevoke) {
+        // Quitar acceso
+        const response = await fetch('/api/admin/activate-contact-access', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
           },
-        }),
-      });
+          body: JSON.stringify({ contact_id: contact.id }),
+        });
 
-      const result = await response.json();
+        const result = await response.json();
 
-      if (!response.ok) {
-        console.error('❌ Error en la respuesta:', result);
-        throw new Error(result.error || 'Error al activar acceso');
+        if (!response.ok) {
+          throw new Error(result.error || 'Error al desactivar acceso');
+        }
+
+        addToast({
+          title: "Acceso desactivado",
+          description: "El contacto ya no puede acceder al sistema",
+          color: "success",
+        });
+      } else {
+        // Dar acceso
+        if (!password) {
+          addToast({
+            title: "Error",
+            description: "La contraseña es requerida",
+            color: "danger",
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        if (!contact.email) {
+          addToast({
+            title: "Error",
+            description: "El contacto debe tener un email",
+            color: "danger",
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        if (!contact.name) {
+          addToast({
+            title: "Error",
+            description: "El contacto debe tener un nombre",
+            color: "danger",
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        // Separar nombre y apellido
+        const nameParts = contact.name.split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        // Determinar el role_id basándose en la empresa
+        // company_id === 1 (Citrica) -> role_id = 1 (Admin/Staff)
+        // Otras empresas -> role_id = 12 (Cliente)
+        const roleId = contact.company_id === 1 ? 1 : 12;
+
+        // Llamar al endpoint para activar acceso
+        const response = await fetch('/api/admin/activate-contact-access', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contact_id: contact.id,
+            password: password,
+            email_access: contact.email,
+            user_data: {
+              first_name: firstName,
+              last_name: lastName,
+              full_name: contact.name,
+              role_id: roleId,
+            },
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          console.error('❌ Error en la respuesta:', result);
+          throw new Error(result.error || 'Error al activar acceso');
+        }
+
+        // Éxito - mostrar mensaje
+        addToast({
+          title: "Acceso activado",
+          description: "Usuario creado correctamente",
+          color: "success",
+          timeout: 5000,
+        });
       }
-
-      // Éxito - mostrar mensaje
-      addToast({
-        title: "Acceso activado",
-        description: "Usuario creado correctamente",
-        color: "success",
-        timeout: 5000,
-      });
 
       // Refrescar la lista de contactos y cerrar el modal
       onSuccess?.();
       onClose();
     } catch (error: any) {
-      console.error("Error al activar acceso:", error);
+      console.error("Error:", error);
       addToast({
-        title: "Error al activar acceso",
-        description: error.message || "No se pudo activar el acceso",
+        title: isRevoke ? "Error al desactivar acceso" : "Error al activar acceso",
+        description: error.message || `No se pudo ${isRevoke ? 'desactivar' : 'activar'} el acceso`,
         color: "danger",
         timeout: 8000,
       });
@@ -186,92 +214,105 @@ export default function GrantAccessModal({
         <form autoComplete="off" onSubmit={(e) => e.preventDefault()}>
           <ModalHeader className="flex flex-col gap-1">
             <h3 className="text-lg font-semibold text-gray-800">
-              Dar Acceso al Sistema
+              {isRevoke ? "Quitar Acceso al Sistema" : "Dar Acceso al Sistema"}
             </h3>
           </ModalHeader>
           <ModalBody>
           <div className="space-y-4">
-            {contact.company_id === 1 && (
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-xs text-blue-800">
-                  <strong>Nota:</strong> Este contacto pertenece a Citrica y se creará como usuario administrador/staff (no cliente).
+            {isRevoke ? (
+              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  ¿Está seguro que desea quitar el acceso al sistema para <strong>{contact.name}</strong>?
+                </p>
+                <p className="text-xs text-yellow-700 mt-2">
+                  El usuario ya no podrá iniciar sesión en el sistema.
                 </p>
               </div>
-            )}
-
-            <div className="p-4 bg-gray-50 rounded-lg space-y-3">
-              <h5 className="text-sm font-semibold text-gray-700">Información del Contacto</h5>
-
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs font-medium text-gray-600">Nombre</label>
-                  <div className="px-3 py-2 bg-white rounded-lg border border-gray-200 mt-1">
-                    <span className="text-sm text-gray-800">{contact.name || "-"}</span>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs font-medium text-gray-600">Email</label>
-                  <div className="px-3 py-2 bg-white rounded-lg border border-gray-200 mt-1">
-                    <span className="text-sm text-gray-800">{contact.email || "-"}</span>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs font-medium text-gray-600">Contraseña *</label>
-                  <div className="flex gap-2 mt-1">
-                    <div className="flex-1">
-                      <InputCitricaAdmin
-                        name="new-password"
-                        autoComplete="new-password"
-                        placeholder="Ingrese o genere una contraseña"
-                        type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        isRequired
-                        endContent={
-                          <div className="flex items-center gap-1">
-                            <Tooltip content="Mostrar/Ocultar contraseña">
-                              <div
-                                className="cursor-pointer"
-                                onClick={() => setShowPassword((prev) => !prev)}
-                              >
-                                <Icon
-                                  name={showPassword ? "EyeOff" : "Eye"}
-                                  className="text-gray-500 w-5 h-5"
-                                />
-                              </div>
-                            </Tooltip>
-                          </div>
-                        }
-                      />
-                    </div>
-                    <Tooltip content="Generar contraseña">
-                      <Button
-                        isIconOnly
-                        className="bg-[#42668A] text-white"
-                        onPress={handleGeneratePassword}
-                      >
-                        <Icon name="Shuffle" className="w-5 h-5" />
-                      </Button>
-                    </Tooltip>
-                    <Tooltip content="Copiar al portapapeles">
-                      <Button
-                        isIconOnly
-                        className="bg-green-600 text-white"
-                        onPress={handleCopyPassword}
-                        isDisabled={!password}
-                      >
-                        <Icon name="Copy" className="w-5 h-5" />
-                      </Button>
-                    </Tooltip>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Esta contraseña será la que el usuario utilice para iniciar sesión
+            ) : (
+              contact.company_id === 1 && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-xs text-blue-800">
+                    <strong>Nota:</strong> Este contacto pertenece a Citrica y se creará como usuario administrador/staff (no cliente).
                   </p>
                 </div>
+              )
+            )}
+
+            {!isRevoke && (
+              <div className="p-4 bg-gray-50 rounded-lg space-y-3">
+                <h5 className="text-sm font-semibold text-gray-700">Información del Contacto</h5>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-xs font-medium text-gray-600">Nombre</label>
+                    <div className="px-3 py-2 bg-white rounded-lg border border-gray-200 mt-1">
+                      <span className="text-sm text-gray-800">{contact.name || "-"}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-gray-600">Email</label>
+                    <div className="px-3 py-2 bg-white rounded-lg border border-gray-200 mt-1">
+                      <span className="text-sm text-gray-800">{contact.email || "-"}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-gray-600">Contraseña *</label>
+                    <div className="flex gap-2 mt-1">
+                      <div className="flex-1">
+                        <InputCitricaAdmin
+                          name="new-password"
+                          autoComplete="new-password"
+                          placeholder="Ingrese o genere una contraseña"
+                          type={showPassword ? "text" : "password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          isRequired
+                          endContent={
+                            <div className="flex items-center gap-1">
+                              <Tooltip content="Mostrar/Ocultar contraseña">
+                                <div
+                                  className="cursor-pointer"
+                                  onClick={() => setShowPassword((prev) => !prev)}
+                                >
+                                  <Icon
+                                    name={showPassword ? "EyeOff" : "Eye"}
+                                    className="text-gray-500 w-5 h-5"
+                                  />
+                                </div>
+                              </Tooltip>
+                            </div>
+                          }
+                        />
+                      </div>
+                      <Tooltip content="Generar contraseña">
+                        <Button
+                          isIconOnly
+                          className="bg-[#42668A] text-white"
+                          onPress={handleGeneratePassword}
+                        >
+                          <Icon name="Shuffle" className="w-5 h-5" />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip content="Copiar al portapapeles">
+                        <Button
+                          isIconOnly
+                          className="bg-green-600 text-white"
+                          onPress={handleCopyPassword}
+                          isDisabled={!password}
+                        >
+                          <Icon name="Copy" className="w-5 h-5" />
+                        </Button>
+                      </Tooltip>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Esta contraseña será la que el usuario utilice para iniciar sesión
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </ModalBody>
         <ModalFooter>
@@ -279,12 +320,12 @@ export default function GrantAccessModal({
             Cancelar
           </Button>
           <Button
-            className="bg-[#42668A] text-white"
+            className={isRevoke ? "bg-warning text-white" : "bg-[#42668A] text-white"}
             onPress={handleSubmit}
             isLoading={isLoading}
-            isDisabled={!password}
+            isDisabled={!isRevoke && !password}
           >
-            Dar Acceso
+            {isRevoke ? "Quitar Acceso" : "Dar Acceso"}
           </Button>
         </ModalFooter>
         </form>
