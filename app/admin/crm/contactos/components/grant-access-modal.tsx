@@ -58,6 +58,8 @@ export default function GrantAccessModal({
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const isRevoke = contact.active_users === true;
+  const isReactivation = contact.user_id !== null && contact.active_users === false; // Ya tiene user_id pero está inactivo
+  const isFirstTime = contact.user_id === null; // No tiene user_id, es primera vez
 
   const handleGeneratePassword = () => {
     const newPassword = generateSecurePassword();
@@ -106,11 +108,13 @@ export default function GrantAccessModal({
           color: "success",
         });
       } else {
-        // Dar acceso
-        if (!password) {
+        // Dar acceso o reactivar
+
+        // Si es reactivación, no necesitamos contraseña (el API ya la maneja)
+        if (isFirstTime && !password) {
           addToast({
             title: "Error",
-            description: "La contraseña es requerida",
+            description: "La contraseña es requerida para la primera activación",
             color: "danger",
           });
           setIsLoading(false);
@@ -155,7 +159,7 @@ export default function GrantAccessModal({
           },
           body: JSON.stringify({
             contact_id: contact.id,
-            password: password,
+            password: isFirstTime ? password : undefined, // Solo enviar contraseña si es primera vez
             email_access: contact.email,
             user_data: {
               first_name: firstName,
@@ -173,10 +177,12 @@ export default function GrantAccessModal({
           throw new Error(result.error || 'Error al activar acceso');
         }
 
-        // Éxito - mostrar mensaje
+        // Éxito - mostrar mensaje apropiado
         addToast({
-          title: "Acceso activado",
-          description: "Usuario creado correctamente",
+          title: isReactivation ? "Acceso reactivado" : "Acceso activado",
+          description: isReactivation
+            ? "Usuario reactivado correctamente"
+            : "Usuario creado correctamente",
           color: "success",
           timeout: 5000,
         });
@@ -214,7 +220,11 @@ export default function GrantAccessModal({
         <form autoComplete="off" onSubmit={(e) => e.preventDefault()}>
           <ModalHeader className="flex flex-col gap-1">
             <h3 className="text-lg font-semibold text-gray-800">
-              {isRevoke ? "Quitar Acceso al Sistema" : "Dar Acceso al Sistema"}
+              {isRevoke
+                ? "Quitar Acceso al Sistema"
+                : isReactivation
+                  ? "Reactivar Acceso al Sistema"
+                  : "Dar Acceso al Sistema"}
             </h3>
           </ModalHeader>
           <ModalBody>
@@ -226,6 +236,15 @@ export default function GrantAccessModal({
                 </p>
                 <p className="text-xs text-yellow-700 mt-2">
                   El usuario ya no podrá iniciar sesión en el sistema.
+                </p>
+              </div>
+            ) : isReactivation ? (
+              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-800">
+                  ¿Está seguro que desea reactivar el acceso al sistema para <strong>{contact.name}</strong>?
+                </p>
+                <p className="text-xs text-green-700 mt-2">
+                  El usuario podrá volver a iniciar sesión con su contraseña existente.
                 </p>
               </div>
             ) : (
@@ -257,59 +276,106 @@ export default function GrantAccessModal({
                     </div>
                   </div>
 
-                  <div>
-                    <label className="text-xs font-medium text-gray-600">Contraseña *</label>
-                    <div className="flex gap-2 mt-1">
-                      <div className="flex-1">
-                        <InputCitricaAdmin
-                          name="new-password"
-                          autoComplete="new-password"
-                          placeholder="Ingrese o genere una contraseña"
-                          type={showPassword ? "text" : "password"}
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          isRequired
-                          endContent={
-                            <div className="flex items-center gap-1">
-                              <Tooltip content="Mostrar/Ocultar contraseña">
+                  {/* Mostrar contraseña solo si es primera vez o si ya existe */}
+                  {isReactivation ? (
+                    <div>
+                      <label className="text-xs font-medium text-gray-600">Contraseña Actual</label>
+                      <div className="flex gap-2 mt-1">
+                        <div className="flex-1 px-3 py-2 bg-white rounded-lg border border-gray-200 flex items-center justify-between">
+                          <span className="text-sm text-gray-800 font-mono">
+                            {showPassword ? (contact.code || "••••••••") : "••••••••"}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <Tooltip content="Mostrar/Ocultar contraseña">
+                              <div
+                                className="cursor-pointer"
+                                onClick={() => setShowPassword((prev) => !prev)}
+                              >
+                                <Icon
+                                  name={showPassword ? "EyeOff" : "Eye"}
+                                  className="text-gray-500 w-5 h-5"
+                                />
+                              </div>
+                            </Tooltip>
+                            {contact.code && (
+                              <Tooltip content="Copiar al portapapeles">
                                 <div
                                   className="cursor-pointer"
-                                  onClick={() => setShowPassword((prev) => !prev)}
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(contact.code || "");
+                                    addToast({
+                                      title: "Contraseña copiada",
+                                      description: "La contraseña ha sido copiada al portapapeles",
+                                      color: "success",
+                                    });
+                                  }}
                                 >
-                                  <Icon
-                                    name={showPassword ? "EyeOff" : "Eye"}
-                                    className="text-gray-500 w-5 h-5"
-                                  />
+                                  <Icon name="Copy" className="text-gray-500 w-5 h-5" />
                                 </div>
                               </Tooltip>
-                            </div>
-                          }
-                        />
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <Tooltip content="Generar contraseña">
-                        <Button
-                          isIconOnly
-                          className="bg-[#42668A] text-white"
-                          onPress={handleGeneratePassword}
-                        >
-                          <Icon name="Shuffle" className="w-5 h-5" />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip content="Copiar al portapapeles">
-                        <Button
-                          isIconOnly
-                          className="bg-green-600 text-white"
-                          onPress={handleCopyPassword}
-                          isDisabled={!password}
-                        >
-                          <Icon name="Copy" className="w-5 h-5" />
-                        </Button>
-                      </Tooltip>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Esta es la contraseña que el usuario utiliza para iniciar sesión
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Esta contraseña será la que el usuario utilice para iniciar sesión
-                    </p>
-                  </div>
+                  ) : (
+                    <div>
+                      <label className="text-xs font-medium text-gray-600">Contraseña *</label>
+                      <div className="flex gap-2 mt-1">
+                        <div className="flex-1">
+                          <InputCitricaAdmin
+                            name="new-password"
+                            autoComplete="new-password"
+                            placeholder="Ingrese o genere una contraseña"
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            isRequired
+                            endContent={
+                              <div className="flex items-center gap-1">
+                                <Tooltip content="Mostrar/Ocultar contraseña">
+                                  <div
+                                    className="cursor-pointer"
+                                    onClick={() => setShowPassword((prev) => !prev)}
+                                  >
+                                    <Icon
+                                      name={showPassword ? "EyeOff" : "Eye"}
+                                      className="text-gray-500 w-5 h-5"
+                                    />
+                                  </div>
+                                </Tooltip>
+                              </div>
+                            }
+                          />
+                        </div>
+                        <Tooltip content="Generar contraseña">
+                          <Button
+                            isIconOnly
+                            className="bg-[#42668A] text-white"
+                            onPress={handleGeneratePassword}
+                          >
+                            <Icon name="Shuffle" className="w-5 h-5" />
+                          </Button>
+                        </Tooltip>
+                        <Tooltip content="Copiar al portapapeles">
+                          <Button
+                            isIconOnly
+                            className="bg-green-600 text-white"
+                            onPress={handleCopyPassword}
+                            isDisabled={!password}
+                          >
+                            <Icon name="Copy" className="w-5 h-5" />
+                          </Button>
+                        </Tooltip>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Esta contraseña será la que el usuario utilice para iniciar sesión
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -320,12 +386,12 @@ export default function GrantAccessModal({
             Cancelar
           </Button>
           <Button
-            className={isRevoke ? "bg-warning text-white" : "bg-[#42668A] text-white"}
+            className={isRevoke ? "bg-warning text-white" : isReactivation ? "bg-green-600 text-white" : "bg-[#42668A] text-white"}
             onPress={handleSubmit}
             isLoading={isLoading}
-            isDisabled={!isRevoke && !password}
+            isDisabled={!isRevoke && !isReactivation && !password}
           >
-            {isRevoke ? "Quitar Acceso" : "Dar Acceso"}
+            {isRevoke ? "Quitar Acceso" : isReactivation ? "Reactivar Acceso" : "Dar Acceso"}
           </Button>
         </ModalFooter>
         </form>
