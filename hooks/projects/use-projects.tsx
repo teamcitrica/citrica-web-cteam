@@ -20,6 +20,7 @@ export interface Project {
   supabase_url: string | null;
   supabase_anon_key: string | null;
   access_count?: number;
+  asset_count?: number;
 }
 
 export type ProjectInput = Omit<Project, "id" | "company">;
@@ -53,22 +54,30 @@ export const useProjectCRUD = () => {
         return;
       }
 
-      // Obtener el conteo de accesos para cada proyecto
-      const projectsWithAccessCount = await Promise.all(
+      // Obtener conteos de accesos y assets para cada proyecto
+      const projectsWithCounts = await Promise.all(
         (data || []).map(async (project) => {
-          const { count } = await supabase
+          // Conteo de accesos
+          const { count: accessCount } = await supabase
             .from("proyect_acces")
+            .select("*", { count: "exact", head: true })
+            .eq("project_id", project.id);
+
+          // Conteo de assets
+          const { count: assetCount } = await supabase
+            .from("assets")
             .select("*", { count: "exact", head: true })
             .eq("project_id", project.id);
 
           return {
             ...project,
-            access_count: count || 0,
+            access_count: accessCount || 0,
+            asset_count: assetCount || 0,
           };
         })
       );
 
-      setProjects(projectsWithAccessCount);
+      setProjects(projectsWithCounts);
     } catch (err) {
       console.error("Error en fetchProjects:", err);
     } finally {
@@ -221,6 +230,7 @@ export const useProjectCRUD = () => {
 
   useEffect(() => {
     fetchProjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

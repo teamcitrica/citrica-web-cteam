@@ -45,7 +45,7 @@ export const siteConfig = {
 			href: "/admin/ia",
 			allowedRoles: [ROL_ADMIN],
 			subItems: [
-				{
+				{ 
 					title: "Databases RAG",
 					href: "/admin/ia/databases_rag",
 				},
@@ -63,8 +63,8 @@ export const siteConfig = {
 			allowedRoles: [ROL_ADMIN],
 			subItems: [
 				{
-					title: "Reservas",
-					href: "/admin/agenda/reservas",
+					title: "Calendario",
+					href: "/admin/agenda/calendario",
 				},
 				{
 					title: "Disponibilidad",

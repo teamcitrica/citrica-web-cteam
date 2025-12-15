@@ -1,9 +1,8 @@
 "use client";
 import { useState, useCallback, useMemo } from "react";
 
-import CreateUserModal from "../../test-crud/create-user-modal";
+import UserFormModal from "../components/modal-user-form";
 import UserDetailModal from "../components/modal-details-users";
-import EditUserModal from "../components/modal-edit-users";
 import ModalDeleteUser from "../components/modal-delete-user";
 import { getUserColumns, getUserExportColumns } from "../columns/user-columns";
 import { useUserCRUD } from "@/hooks/users/use-users";
@@ -12,15 +11,17 @@ import { UserType } from "@/shared/types/types";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { addToast } from "@heroui/toast";
+import { UserAuth } from "@/shared/context/auth-context";
 
 export default function UsersPage() {
   const { users, isLoading, refreshUsers, deleteUser, updateUserByRole } =
     useUserCRUD();
   const { companies } = useCompanyCRUD();
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const { userSession } = UserAuth();
+  const [isUserFormModalOpen, setIsUserFormModalOpen] = useState(false);
+  const [userToEdit, setUserToEdit] = useState<UserType | null>(null);
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<UserType | null>(null);
 
@@ -29,11 +30,14 @@ export default function UsersPage() {
     return users.filter((user) => user.role_id !== 5);
   }, [users]);
 
-  const handleOpenCreateModal = () => setIsCreateModalOpen(true);
+  const handleOpenCreateModal = () => {
+    setUserToEdit(null);
+    setIsUserFormModalOpen(true);
+  };
 
-  const handleCloseCreateModal = () => {
-    setIsCreateModalOpen(false);
-    refreshUsers(); // Refrescar usuarios después de cerrar el modal
+  const handleCloseUserFormModal = () => {
+    setIsUserFormModalOpen(false);
+    setUserToEdit(null);
   };
 
   const handleViewUser = useCallback((user: UserType) => {
@@ -42,14 +46,24 @@ export default function UsersPage() {
   }, []);
 
   const handleEditUser = useCallback((user: UserType) => {
-    setSelectedUser(user);
-    setIsEditModalOpen(true);
+    setUserToEdit(user);
+    setIsUserFormModalOpen(true);
   }, []);
 
   const handleDeleteUser = useCallback((user: UserType) => {
+    // Prevenir que un usuario se elimine a sí mismo
+    if (userSession?.user?.id && user.id === userSession.user.id) {
+      addToast({
+        title: "Acción no permitida",
+        description: "No puedes eliminar tu propio usuario mientras estás conectado",
+        color: "warning",
+      });
+      return;
+    }
+
     setUserToDelete(user);
     setIsDeleteModalOpen(true);
-  }, []);
+  }, [userSession]);
 
   const handleToggleAccess = useCallback(
     async (user: UserType) => {
@@ -114,13 +128,30 @@ export default function UsersPage() {
         description: `El usuario ${userName} ha sido eliminado correctamente`,
         color: "success",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error al eliminar usuario:", error);
-      addToast({
-        title: "Error",
-        description: "Hubo un error al eliminar el usuario",
-        color: "danger",
-      });
+
+      const errorMessage = error?.message || String(error);
+
+      // Cerrar el modal antes de mostrar el error
+      setIsDeleteModalOpen(false);
+      setUserToDelete(null);
+
+      // Detectar si el error es por relación con proyectos
+      if (errorMessage.includes("Database error deleting user") ||
+          errorMessage.includes("Error al eliminar autenticación")) {
+        addToast({
+          title: "No se puede eliminar el usuario",
+          description: `${userName} está asignado a uno o más proyectos. Desvincúlelo de todos los proyectos antes de eliminarlo.`,
+          color: "warning",
+        });
+      } else {
+        addToast({
+          title: "Error",
+          description: "Hubo un error al eliminar el usuario",
+          color: "danger",
+        });
+      }
     }
   }, [userToDelete, deleteUser]);
 
@@ -167,9 +198,13 @@ export default function UsersPage() {
             companyFilterPlaceholder="Filtrar por empresa..."
           />
 
-          <CreateUserModal
-            isOpen={isCreateModalOpen}
-            onClose={handleCloseCreateModal}
+          <UserFormModal
+            isOpen={isUserFormModalOpen}
+            onClose={handleCloseUserFormModal}
+            user={userToEdit}
+            onSuccess={() => {
+              refreshUsers();
+            }}
           />
 
           {isDetailModalOpen && selectedUser && (
@@ -178,20 +213,6 @@ export default function UsersPage() {
               onClose={() => {
                 setIsDetailModalOpen(false);
                 setSelectedUser(null);
-              }}
-            />
-          )}
-
-          {isEditModalOpen && selectedUser && (
-            <EditUserModal
-              isOpen={isEditModalOpen}
-              user={selectedUser}
-              onClose={() => {
-                setIsEditModalOpen(false);
-                setSelectedUser(null);
-              }}
-              onSuccess={() => {
-                refreshUsers();
               }}
             />
           )}

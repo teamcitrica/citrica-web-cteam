@@ -301,6 +301,7 @@ export function useTableFeatures<T extends Record<string, any>>({
     setSortDescriptor,
     setIsExportModalOpen,
     setFileName,
+    setExportFormat,
 
     // Handlers
     onSearchChange,
@@ -310,5 +311,6 @@ export function useTableFeatures<T extends Record<string, any>>({
     onRowsPerPageChange,
     handleOpenExportModal,
     handleConfirmExport,
+    getDefaultFileName,
   };
 }
