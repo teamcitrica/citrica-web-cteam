@@ -13,6 +13,7 @@ import {
   Checkbox,
   CheckboxGroup,
   Chip,
+  Tooltip,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 
@@ -60,16 +61,22 @@ export default function AssetFormModal({
   const [selectedFilterValue, setSelectedFilterValue] = useState<string>("");
   const [isLoadingFilterValues, setIsLoadingFilterValues] = useState(false);
 
+  // Cache de valores de columnas
+  const [columnValuesCache, setColumnValuesCache] = useState<Record<string, string[]>>({});
+
   const handleInputChange = (field: keyof AssetInput, value: string | number | Record<string, any> | null) => {
+    // Para strings vacíos, mantener el string vacío en lugar de null para permitir escritura
+    const finalValue = typeof value === "string" && value === "" ? "" : (value || null);
+
     setFormData((prev) => ({
       ...prev,
-      [field]: value || null,
+      [field]: finalValue,
     }));
   };
 
 
   // Función para obtener columnas de una tabla específica
-  const fetchTableColumns = useCallback(async (tableName: string, preservedColumns?: string[]) => {
+  const fetchTableColumns = useCallback(async (tableName: string, preservedColumns?: string[], showToast = true) => {
     if (!formData.supabase_url || !formData.supabase_anon_key || !tableName) {
       return;
     }
@@ -110,40 +117,48 @@ export default function AssetFormModal({
           setSelectedColumns(preservedColumns);
         }
 
-        addToast({
-          title: "Columnas cargadas",
-          description: `Se encontraron ${columns.length} columnas en la tabla ${tableName}`,
-          color: "success",
-        });
+        if (showToast) {
+          addToast({
+            title: "Columnas cargadas",
+            description: `Se encontraron ${columns.length} columnas en la tabla ${tableName}`,
+            color: "success",
+          });
+        }
       } else {
-        addToast({
-          title: "Sin columnas",
-          description: "No se pudo obtener el schema de la tabla",
-          color: "warning",
-        });
+        if (showToast) {
+          addToast({
+            title: "Sin columnas",
+            description: "No se pudo obtener el schema de la tabla",
+            color: "warning",
+          });
+        }
       }
     } catch (err: any) {
       console.error("Error al obtener columnas:", err);
-      addToast({
-        title: "Error",
-        description: "No se pudieron obtener las columnas de la tabla",
-        color: "danger",
-      });
+      if (showToast) {
+        addToast({
+          title: "Error",
+          description: "No se pudieron obtener las columnas de la tabla",
+          color: "danger",
+        });
+      }
     } finally {
       setIsLoadingColumns(false);
     }
   }, [formData.supabase_url, formData.supabase_anon_key]);
 
-  const handleConsultTables = useCallback(async (url?: string, key?: string) => {
+  const handleConsultTables = useCallback(async (url?: string, key?: string, showToast = true) => {
     const supabaseUrl = url || formData.supabase_url;
     const supabaseKey = key || formData.supabase_anon_key;
 
     if (!supabaseUrl || !supabaseKey) {
-      addToast({
-        title: "Campos requeridos",
-        description: "Por favor ingresa la URL y la clave anon de Supabase",
-        color: "warning",
-      });
+      if (showToast) {
+        addToast({
+          title: "Campos requeridos",
+          description: "Por favor ingresa la URL y la clave anon de Supabase",
+          color: "warning",
+        });
+      }
       return;
     }
 
@@ -199,28 +214,34 @@ export default function AssetFormModal({
       }
 
       if (tableNames.length === 0) {
-        addToast({
-          title: "Sin tablas",
-          description: "No se encontraron tablas en este Supabase.",
-          color: "warning",
-        });
+        if (showToast) {
+          addToast({
+            title: "Sin tablas",
+            description: "No se encontraron tablas en este Supabase.",
+            color: "warning",
+          });
+        }
       } else {
         setTables(tableNames);
-        addToast({
-          title: "Éxito",
-          description: `Se encontraron ${tableNames.length} tablas`,
-          color: "success",
-        });
+        if (showToast) {
+          addToast({
+            title: "Éxito",
+            description: `Se encontraron ${tableNames.length} tablas`,
+            color: "success",
+          });
+        }
       }
     } catch (err: any) {
       console.error("Error al consultar tablas:", err);
-      addToast({
-        title: "Error",
-        description:
-          err.message ||
-          "No se pudieron consultar las tablas. Verifica las credenciales.",
-        color: "danger",
-      });
+      if (showToast) {
+        addToast({
+          title: "Error",
+          description:
+            err.message ||
+            "No se pudieron consultar las tablas. Verifica las credenciales.",
+          color: "danger",
+        });
+      }
     } finally {
       setIsLoadingTables(false);
     }
@@ -241,8 +262,12 @@ export default function AssetFormModal({
     setShowColumnSelection(false);
     setShowFilterSelection(true);
 
-    // Actualizar assets_options con las columnas
-    const options = { columns: selectedColumns, filters: filters };
+    // Actualizar assets_options con las columnas y el cache de valores
+    const options = {
+      columns: selectedColumns,
+      filters: filters,
+      columnValues: columnValuesCache
+    };
     handleInputChange("assets_options", options);
 
     addToast({
@@ -253,8 +278,21 @@ export default function AssetFormModal({
   };
 
   // Función para obtener valores únicos de una columna
-  const fetchColumnValues = useCallback(async (columnName: string) => {
+  const fetchColumnValues = useCallback(async (columnName: string, showToast = true, forceRefresh = false) => {
     if (!formData.supabase_url || !formData.supabase_anon_key || !formData.tabla || !columnName) {
+      return;
+    }
+
+    // Si ya tenemos valores en cache y no es un refresh forzado, usar el cache
+    if (!forceRefresh && columnValuesCache[columnName]) {
+      setFilterColumnValues(columnValuesCache[columnName]);
+      if (showToast) {
+        addToast({
+          title: "Valores cargados desde caché",
+          description: `${columnValuesCache[columnName].length} valores únicos`,
+          color: "success",
+        });
+      }
       return;
     }
 
@@ -263,42 +301,103 @@ export default function AssetFormModal({
       setFilterColumnValues([]);
 
       const cleanUrl = formData.supabase_url.replace(/\/$/, "");
+      const uniqueValuesSet = new Set<string>();
 
-      // Hacer una consulta para obtener valores únicos de la columna
-      const response = await fetch(
-        `${cleanUrl}/rest/v1/${formData.tabla}?select=${columnName}`,
-        {
-          method: "GET",
-          headers: {
-            apikey: formData.supabase_anon_key,
-            "Content-Type": "application/json",
-          },
+      // Parámetros de paginación
+      const pageSize = 1000; // Número de registros por página
+      const maxPages = 100; // Máximo 100 páginas (100,000 registros)
+      let currentPage = 0;
+      let hasMoreData = true;
+
+      // Hacer múltiples peticiones paginadas para obtener valores únicos
+      while (hasMoreData && currentPage < maxPages) {
+        const offset = currentPage * pageSize;
+
+        const response = await fetch(
+          `${cleanUrl}/rest/v1/${formData.tabla}?select=${columnName}&limit=${pageSize}&offset=${offset}`,
+          {
+            method: "GET",
+            headers: {
+              apikey: formData.supabase_anon_key,
+              "Content-Type": "application/json",
+              "Prefer": "count=exact"
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
         }
-      );
 
-      if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
+        const data = await response.json();
+
+        // Si no hay más datos, terminar el loop
+        if (data.length === 0) {
+          hasMoreData = false;
+          break;
+        }
+
+        // Agregar valores únicos al Set
+        data.forEach((item: any) => {
+          const value = item[columnName];
+          if (value !== null && value !== undefined) {
+            uniqueValuesSet.add(String(value));
+          }
+        });
+
+        // Si recibimos menos registros que el pageSize, ya no hay más datos
+        if (data.length < pageSize) {
+          hasMoreData = false;
+        }
+
+        currentPage++;
+
+        // Actualizar la UI mientras se cargan más valores
+        if (showToast && currentPage % 10 === 0) {
+          setFilterColumnValues(Array.from(uniqueValuesSet).sort());
+        }
       }
 
-      const data = await response.json();
+      // Convertir el Set a Array, ordenar y actualizar
+      const uniqueValues = Array.from(uniqueValuesSet).sort();
+      setFilterColumnValues(uniqueValues);
 
-      // Extraer valores únicos
-      const uniqueValues = Array.from(new Set(data.map((item: any) => item[columnName]))).filter(
-        (value) => value !== null && value !== undefined
-      );
+      // Guardar en cache
+      setColumnValuesCache(prev => ({
+        ...prev,
+        [columnName]: uniqueValues
+      }));
 
-      setFilterColumnValues(uniqueValues.map(String));
+      // También actualizar assets_options inmediatamente con el nuevo cache
+      const updatedCache = { ...columnValuesCache, [columnName]: uniqueValues };
+      const options = {
+        columns: selectedColumns,
+        filters: filters,
+        columnValues: updatedCache
+      };
+      handleInputChange("assets_options", options);
+
+      if (showToast) {
+        const totalScanned = currentPage * pageSize;
+        addToast({
+          title: "Valores cargados",
+          description: `Se encontraron ${uniqueValues.length} valores únicos (escaneados ${Math.min(totalScanned, uniqueValues.length * pageSize)} registros)`,
+          color: "success",
+        });
+      }
     } catch (err: any) {
       console.error("Error al obtener valores de columna:", err);
-      addToast({
-        title: "Error",
-        description: "No se pudieron obtener los valores de la columna",
-        color: "danger",
-      });
+      if (showToast) {
+        addToast({
+          title: "Error",
+          description: "No se pudieron obtener los valores de la columna",
+          color: "danger",
+        });
+      }
     } finally {
       setIsLoadingFilterValues(false);
     }
-  }, [formData.supabase_url, formData.supabase_anon_key, formData.tabla]);
+  }, [formData.supabase_url, formData.supabase_anon_key, formData.tabla, columnValuesCache, selectedColumns, filters]);
 
   // Función para agregar filtro
   const handleAddFilter = () => {
@@ -315,8 +414,12 @@ export default function AssetFormModal({
     const updatedFilters = [...filters, newFilter];
     setFilters(updatedFilters);
 
-    // Actualizar assets_options
-    const options = { columns: selectedColumns, filters: updatedFilters };
+    // Actualizar assets_options con cache incluido
+    const options = {
+      columns: selectedColumns,
+      filters: updatedFilters,
+      columnValues: columnValuesCache
+    };
     handleInputChange("assets_options", options);
 
     // Limpiar selección
@@ -336,8 +439,12 @@ export default function AssetFormModal({
     const updatedFilters = filters.filter((_, i) => i !== index);
     setFilters(updatedFilters);
 
-    // Actualizar assets_options
-    const options = { columns: selectedColumns, filters: updatedFilters };
+    // Actualizar assets_options con cache incluido
+    const options = {
+      columns: selectedColumns,
+      filters: updatedFilters,
+      columnValues: columnValuesCache
+    };
     handleInputChange("assets_options", options);
 
     addToast({
@@ -347,6 +454,11 @@ export default function AssetFormModal({
   };
 
   useEffect(() => {
+    // Resetear todo cuando el modal se abre
+    if (!isOpen) {
+      return;
+    }
+
     if (mode === "edit" && asset) {
       setFormData({
         name: asset.name,
@@ -367,6 +479,11 @@ export default function AssetFormModal({
         ? asset.assets_options.filters
         : [];
 
+      // Extraer el cache de valores de columnas guardado
+      const savedColumnValues = asset.assets_options?.columnValues && typeof asset.assets_options.columnValues === 'object'
+        ? asset.assets_options.columnValues
+        : {};
+
       // Si tiene columnas en assets_options, cargarlas
       if (savedColumns.length > 0) {
         setSelectedColumns(savedColumns);
@@ -380,21 +497,26 @@ export default function AssetFormModal({
         setFilters(savedFilters);
       }
 
-      // Si tiene URL y key, cargar las tablas automáticamente
-      if (asset.supabase_url && asset.supabase_anon_key) {
-        handleConsultTables(asset.supabase_url, asset.supabase_anon_key);
+      // Si tiene cache de valores, cargarlo
+      if (Object.keys(savedColumnValues).length > 0) {
+        setColumnValuesCache(savedColumnValues);
+      }
 
-        // Si también tiene una tabla seleccionada, cargar sus columnas preservando las selecciones
+      // Si tiene URL y key, cargar las tablas automáticamente sin mostrar toasts
+      if (asset.supabase_url && asset.supabase_anon_key) {
+        handleConsultTables(asset.supabase_url, asset.supabase_anon_key, false);
+
+        // Si también tiene una tabla seleccionada, cargar sus columnas preservando las selecciones sin mostrar toasts
         if (asset.tabla) {
-          fetchTableColumns(asset.tabla, savedColumns);
+          fetchTableColumns(asset.tabla, savedColumns, false);
         }
       }
     } else if (mode === "create") {
       // Limpiar el formulario cuando se abre en modo "create"
       setFormData({
-        name: null,
-        supabase_url: null,
-        supabase_anon_key: null,
+        name: "",
+        supabase_url: "",
+        supabase_anon_key: "",
         tabla: null,
         assets_options: null,
         project_id: projectId,
@@ -406,8 +528,13 @@ export default function AssetFormModal({
       setShowColumnSelection(true);
       setShowFilterSelection(false);
       setFilters([]);
+      setColumnValuesCache({});
+      setFilterColumnValues([]);
+      setSelectedFilterColumn("");
+      setSelectedFilterValue("");
     }
-  }, [asset, mode, handleConsultTables, fetchTableColumns, projectId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [asset, mode, projectId, isOpen]);
 
   const handleSubmit = async () => {
     if (!formData.name) {
@@ -437,15 +564,26 @@ export default function AssetFormModal({
       if (mode === "create") {
         const result = await createAsset(cleanedData as AssetInput);
         if (result) {
+          // Limpiar completamente el formulario después de crear
           setFormData({
-            name: null,
-            supabase_url: null,
-            supabase_anon_key: null,
+            name: "",
+            supabase_url: "",
+            supabase_anon_key: "",
             tabla: null,
             assets_options: null,
             project_id: projectId,
           });
           setSelectedColumns([]);
+          setTables([]);
+          setTableColumns([]);
+          setColumnsConfirmed(false);
+          setShowColumnSelection(true);
+          setShowFilterSelection(false);
+          setFilters([]);
+          setColumnValuesCache({});
+          setFilterColumnValues([]);
+          setSelectedFilterColumn("");
+          setSelectedFilterValue("");
           onClose();
         }
       } else {
@@ -490,6 +628,7 @@ export default function AssetFormModal({
                 placeholder="https://xxx.supabase.co"
                 value={formData.supabase_url || ""}
                 onChange={(e) => handleInputChange("supabase_url", e.target.value)}
+                isDisabled={mode === "edit"}
                 classNames={{
                   label: "text-gray-700",
                   input: "text-gray-800",
@@ -503,6 +642,7 @@ export default function AssetFormModal({
                 placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                 value={formData.supabase_anon_key || ""}
                 onChange={(e) => handleInputChange("supabase_anon_key", e.target.value)}
+                isDisabled={mode === "edit"}
                 classNames={{
                   label: "text-gray-700",
                   input: "text-gray-800",
@@ -510,16 +650,18 @@ export default function AssetFormModal({
               />
             </div>
 
-            <div className="col-span-2">
-              <Button
-                className="bg-green-600 text-white w-full"
-                onPress={() => handleConsultTables()}
-                isLoading={isLoadingTables}
-                isDisabled={!formData.supabase_url || !formData.supabase_anon_key}
-              >
-                {isLoadingTables ? "Consultando..." : "Consultar Tablas"}
-              </Button>
-            </div>
+            {mode === "create" && (
+              <div className="col-span-2">
+                <Button
+                  className="bg-green-600 text-white w-full"
+                  onPress={() => handleConsultTables()}
+                  isLoading={isLoadingTables}
+                  isDisabled={!formData.supabase_url || !formData.supabase_anon_key}
+                >
+                  {isLoadingTables ? "Consultando..." : "Consultar Tablas"}
+                </Button>
+              </div>
+            )}
 
             {tables.length > 0 && (
               <div className="col-span-2">
@@ -712,31 +854,51 @@ export default function AssetFormModal({
                           }}
                         >
                           {selectedColumns.map((column) => (
-                            <SelectItem key={column} value={column}>
+                            <SelectItem key={column}>
                               {column}
                             </SelectItem>
                           ))}
                         </Select>
 
-                        {/* Select de valores */}
-                        <Select
-                          label="Valor"
-                          placeholder="Selecciona un valor"
-                          selectedKeys={selectedFilterValue ? [selectedFilterValue] : []}
-                          onChange={(e) => setSelectedFilterValue(e.target.value)}
-                          isDisabled={!selectedFilterColumn || isLoadingFilterValues}
-                          isLoading={isLoadingFilterValues}
-                          classNames={{
-                            label: "text-gray-700",
-                            value: "text-gray-800",
-                          }}
-                        >
-                          {filterColumnValues.map((value) => (
-                            <SelectItem key={value} value={value}>
-                              {value}
-                            </SelectItem>
-                          ))}
-                        </Select>
+                        {/* Select de valores con botón de refresh */}
+                        <div className="flex gap-2">
+                          <Select
+                            label="Valor"
+                            placeholder="Selecciona un valor"
+                            selectedKeys={selectedFilterValue ? [selectedFilterValue] : []}
+                            onChange={(e) => setSelectedFilterValue(e.target.value)}
+                            isDisabled={!selectedFilterColumn || isLoadingFilterValues}
+                            isLoading={isLoadingFilterValues}
+                            classNames={{
+                              label: "text-gray-700",
+                              value: "text-gray-800",
+                              base: "flex-1",
+                            }}
+                          >
+                            {filterColumnValues.map((value) => (
+                              <SelectItem key={value}>
+                                {value}
+                              </SelectItem>
+                            ))}
+                          </Select>
+
+                          {selectedFilterColumn && columnValuesCache[selectedFilterColumn] && (
+                            <div className="flex items-end">
+                              <Tooltip content="Refrescar valores desde Supabase" placement="top">
+                                <Button
+                                  size="md"
+                                  color="primary"
+                                  variant="flat"
+                                  onPress={() => fetchColumnValues(selectedFilterColumn, true, true)}
+                                  isDisabled={isLoadingFilterValues}
+                                  className="h-14"
+                                >
+                                  🔄
+                                </Button>
+                              </Tooltip>
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       {/* Botón para agregar filtro */}

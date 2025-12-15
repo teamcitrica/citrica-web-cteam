@@ -18,6 +18,9 @@ export default function AssetDataPage() {
   const [tableData, setTableData] = useState<ExternalTableData[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [columns, setColumns] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [totalRecords, setTotalRecords] = useState(0);
   const { supabase } = useSupabase();
 
   // Obtener el usuario actual
@@ -65,21 +68,43 @@ export default function AssetDataPage() {
         const columnsToSelect = selectedAsset.assets_options?.columns || ["*"];
         const selectQuery = columnsToSelect.join(",");
 
-        // Fetch de la tabla externa
+        // Construir filtros desde assets_options
+        const filters = selectedAsset.assets_options?.filters || [];
+        let filterQuery = "";
+        if (filters.length > 0) {
+          const filterParams = filters.map((filter: any) =>
+            `${filter.column}=eq.${filter.value}`
+          ).join("&");
+          filterQuery = `&${filterParams}`;
+        }
+
+        // Calcular offset para la paginación
+        const offset = (currentPage - 1) * pageSize;
+        const paginationQuery = `&limit=${pageSize}&offset=${offset}`;
+
+        // Fetch de la tabla externa con filtros y paginación
         const response = await fetch(
-          `${cleanUrl}/rest/v1/${selectedAsset.tabla}?select=${selectQuery}`,
+          `${cleanUrl}/rest/v1/${selectedAsset.tabla}?select=${selectQuery}${filterQuery}${paginationQuery}`,
           {
             method: "GET",
             headers: {
               apikey: selectedAsset.supabase_anon_key,
               Authorization: `Bearer ${selectedAsset.supabase_anon_key}`,
               "Content-Type": "application/json",
+              "Prefer": "count=exact"
             },
           }
         );
 
         if (!response.ok) {
           throw new Error(`Error HTTP: ${response.status}`);
+        }
+
+        // Obtener el total de registros del header Content-Range
+        const contentRange = response.headers.get("content-range");
+        if (contentRange) {
+          const total = parseInt(contentRange.split("/")[1], 10);
+          setTotalRecords(total);
         }
 
         const data = await response.json();
@@ -151,7 +176,7 @@ export default function AssetDataPage() {
     };
 
     fetchExternalData();
-  }, [assetId, assets, supabase]);
+  }, [assetId, assets, supabase, currentPage, pageSize]);
 
   const selectedAsset = assets.find((a) => a.id === assetId);
   const isLoading = isLoadingAssets || !currentUser || isLoadingData;
@@ -194,6 +219,15 @@ export default function AssetDataPage() {
               getRowKey={(item) => item.id || JSON.stringify(item)}
               searchFields={columns.map(col => col.uid as any)}
               emptyContent="No hay datos disponibles en esta tabla."
+              serverSidePagination={true}
+              totalRecords={totalRecords}
+              currentPage={currentPage}
+              itemsPerPage={pageSize}
+              onPageChange={(page) => setCurrentPage(page)}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setCurrentPage(1); // Resetear a la primera página cuando cambia el tamaño
+              }}
             />
           )}
         </div>

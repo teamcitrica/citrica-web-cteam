@@ -54,6 +54,12 @@ export interface DataTableProps<T extends Record<string, any>> {
   companies?: Array<{ id: number; name: string | null }>;
   companyFilterField?: keyof T;
   companyFilterPlaceholder?: string;
+  // Paginación del servidor
+  serverSidePagination?: boolean;
+  totalRecords?: number;
+  currentPage?: number;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -80,6 +86,11 @@ export function DataTable<T extends Record<string, any>>({
   companies = [],
   companyFilterField,
   companyFilterPlaceholder = "Filtrar por empresa...",
+  serverSidePagination = false,
+  totalRecords = 0,
+  currentPage = 1,
+  onPageChange,
+  onPageSizeChange,
 }: DataTableProps<T>) {
   const tableFeatures = useTableFeatures({
     data,
@@ -302,23 +313,50 @@ export function DataTable<T extends Record<string, any>>({
       </Table>
 
       {/* Paginación */}
-      {tableFeatures.pages > 1 && (
-        <div className="flex justify-center mt-4">
-          <Pagination
-            isCompact
-            showControls
-            showShadow
-            classNames={{
-              cursor: "text-white",
-            }}
-            style={{
-              "--pagination-active-bg": paginationColor,
-            } as React.CSSProperties}
-            page={tableFeatures.page}
-            total={tableFeatures.pages}
-            onChange={tableFeatures.setPage}
-          />
-        </div>
+      {serverSidePagination ? (
+        // Paginación del servidor
+        totalRecords > 0 && (
+          <div className="flex justify-center mt-4">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              classNames={{
+                cursor: "text-white",
+              }}
+              style={{
+                "--pagination-active-bg": paginationColor,
+              } as React.CSSProperties}
+              page={currentPage}
+              total={Math.ceil(totalRecords / tableFeatures.rowsPerPage)}
+              onChange={(page) => {
+                if (onPageChange) {
+                  onPageChange(page);
+                }
+              }}
+            />
+          </div>
+        )
+      ) : (
+        // Paginación del cliente
+        tableFeatures.pages > 1 && (
+          <div className="flex justify-center mt-4">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              classNames={{
+                cursor: "text-white",
+              }}
+              style={{
+                "--pagination-active-bg": paginationColor,
+              } as React.CSSProperties}
+              page={tableFeatures.page}
+              total={tableFeatures.pages}
+              onChange={tableFeatures.setPage}
+            />
+          </div>
+        )
       )}
 
       {/* Modal de exportación */}
