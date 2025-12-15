@@ -27,8 +27,10 @@ export default function ProyectosPage() {
   const [assetCounts, setAssetCounts] = useState<Record<string, number>>({});
   const [accessCounts, setAccessCounts] = useState<Record<string, number>>({});
 
-  // Cargar conteos de assets y accesos
+  // Cargar conteos de assets y accesos cuando los proyectos cambien
   useEffect(() => {
+    if (projects.length === 0) return; // No cargar si no hay proyectos
+
     const loadCounts = async () => {
       // Obtener conteo de assets por proyecto
       const { data: assetsData } = await supabase
@@ -62,10 +64,11 @@ export default function ProyectosPage() {
     };
 
     loadCounts();
-  }, [supabase]);
+  }, [supabase, projects]); // Agregar projects como dependencia
 
   const getCompanyName = useCallback((companyId: number | null) => {
     if (!companyId) return "-";
+    if (companies.length === 0) return "Cargando..."; // Empresas aún no han cargado
     const company = companies.find(c => c.id === companyId);
     return company?.name || "-";
   }, [companies]);

@@ -119,7 +119,7 @@ export function DataTable<T extends Record<string, any>>({
   );
 
   return (
-    <div className="container-blue-principal">
+    <div className="container-blue-principal overflow-x-auto">
       {/* Barra de búsqueda y acciones */}
 
         <div className="flex items-center justify-between w-full pb-6 pt-3">
@@ -127,7 +127,7 @@ export function DataTable<T extends Record<string, any>>({
             {/* Filtro de empresa */}
             {showCompanyFilter && companies.length > 0 && (
               <SelectCitricaAdmin
-                // label="Empresa"
+                aria-label="Filtrar por empresa"
                 placeholder="Filtrar por empresa"
                 selectedKeys={tableFeatures.companyFilter && tableFeatures.companyFilter !== "" ? [tableFeatures.companyFilter] : ["all"]}
                 onSelectionChange={tableFeatures.onCompanyFilterChange}
@@ -238,7 +238,7 @@ export function DataTable<T extends Record<string, any>>({
                 variant="primary"
                 style={{ backgroundColor: headerColor }}
                 startContent={<Icon className="w-4 h-4" name="Plus" />}
-                onClick={onAdd}
+                onPress={onAdd}
               >
                 <Text color="white" variant="label">
                   {addButtonText}

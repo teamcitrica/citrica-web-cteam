@@ -6,19 +6,17 @@ import UserDetailModal from "../components/modal-details-users";
 import EditUserModal from "../components/modal-edit-users";
 import ModalDeleteUser from "../components/modal-delete-user";
 import { getUserColumns, getUserExportColumns } from "../columns/user-columns";
-
 import { useUserCRUD } from "@/hooks/users/use-users";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
-import { useContactCRUD } from "@/hooks/contact/use-contact";
 import { UserType } from "@/shared/types/types";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { addToast } from "@heroui/toast";
 
 export default function UsersPage() {
-  const { users, isLoading, refreshUsers, deleteUser } = useUserCRUD();
+  const { users, isLoading, refreshUsers, deleteUser, updateUserByRole } =
+    useUserCRUD();
   const { companies } = useCompanyCRUD();
-  const { contacts } = useContactCRUD();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -31,24 +29,11 @@ export default function UsersPage() {
     return users.filter((user) => user.role_id !== 5);
   }, [users]);
 
-  // Crear mapa de contactos por user_id para identificar usuarios creados desde contactos
-  const contactAccessMap = useMemo(() => {
-    const map: Record<string, { hasSystemAccess: boolean; isActive: boolean }> = {};
-    contacts.forEach((contact) => {
-      if (contact.user_id) {
-        map[contact.user_id] = {
-          hasSystemAccess: contact.has_system_access || false,
-          isActive: contact.active_users || false,
-        };
-      }
-    });
-    return map;
-  }, [contacts]);
-
   const handleOpenCreateModal = () => setIsCreateModalOpen(true);
 
   const handleCloseCreateModal = () => {
     setIsCreateModalOpen(false);
+    refreshUsers(); // Refrescar usuarios después de cerrar el modal
   };
 
   const handleViewUser = useCallback((user: UserType) => {
@@ -66,15 +51,47 @@ export default function UsersPage() {
     setIsDeleteModalOpen(true);
   }, []);
 
+  const handleToggleAccess = useCallback(
+    async (user: UserType) => {
+      if (!user.id) return;
+
+      const newActiveStatus = !user.active_users;
+      const userName =
+        user.full_name || user.name || `${user.first_name} ${user.last_name}`;
+
+      try {
+        await updateUserByRole(
+          user.id,
+          { active_users: newActiveStatus },
+          String(user.role_id),
+        );
+
+        addToast({
+          title: newActiveStatus ? "Acceso activado" : "Acceso desactivado",
+          description: `El acceso al sistema para ${userName} ha sido ${newActiveStatus ? "activado" : "desactivado"}`,
+          color: "success",
+        });
+      } catch (error) {
+        console.error("Error al cambiar acceso:", error);
+        addToast({
+          title: "Error",
+          description: "No se pudo cambiar el acceso del usuario",
+          color: "danger",
+        });
+      }
+    },
+    [updateUserByRole],
+  );
+
   const columns = useMemo(
     () =>
       getUserColumns({
         onView: handleViewUser,
         onEdit: handleEditUser,
         onDelete: handleDeleteUser,
-        contactAccessMap,
+        onToggleAccess: handleToggleAccess,
       }),
-    [handleViewUser, handleEditUser, handleDeleteUser, contactAccessMap]
+    [handleViewUser, handleEditUser, handleDeleteUser, handleToggleAccess],
   );
 
   const exportColumns = useMemo(() => getUserExportColumns(), []);
@@ -124,7 +141,13 @@ export default function UsersPage() {
             data={filteredUsers}
             columns={columns}
             isLoading={isLoading}
-            searchFields={["full_name", "name", "first_name", "last_name", "email"]}
+            searchFields={[
+              "full_name",
+              "name",
+              "first_name",
+              "last_name",
+              "email",
+            ]}
             searchPlaceholder="Buscar por nombre o email..."
             onAdd={handleOpenCreateModal}
             addButtonText="Crear Usuario"

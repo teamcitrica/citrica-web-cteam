@@ -50,6 +50,16 @@ export default function AssetFormModal({
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
   const [isLoadingColumns, setIsLoadingColumns] = useState(false);
 
+  // Estados para acordeones y filtros
+  const [columnsConfirmed, setColumnsConfirmed] = useState(false);
+  const [showColumnSelection, setShowColumnSelection] = useState(true);
+  const [showFilterSelection, setShowFilterSelection] = useState(false);
+  const [filters, setFilters] = useState<Array<{ column: string; value: string }>>([]);
+  const [selectedFilterColumn, setSelectedFilterColumn] = useState<string>("");
+  const [filterColumnValues, setFilterColumnValues] = useState<string[]>([]);
+  const [selectedFilterValue, setSelectedFilterValue] = useState<string>("");
+  const [isLoadingFilterValues, setIsLoadingFilterValues] = useState(false);
+
   const handleInputChange = (field: keyof AssetInput, value: string | number | Record<string, any> | null) => {
     setFormData((prev) => ({
       ...prev,
@@ -59,7 +69,7 @@ export default function AssetFormModal({
 
 
   // Función para obtener columnas de una tabla específica
-  const fetchTableColumns = useCallback(async (tableName: string) => {
+  const fetchTableColumns = useCallback(async (tableName: string, preservedColumns?: string[]) => {
     if (!formData.supabase_url || !formData.supabase_anon_key || !tableName) {
       return;
     }
@@ -67,7 +77,9 @@ export default function AssetFormModal({
     try {
       setIsLoadingColumns(true);
       setTableColumns([]);
-      setSelectedColumns([]);
+      if (!preservedColumns) {
+        setSelectedColumns([]);
+      }
 
       const cleanUrl = formData.supabase_url.replace(/\/$/, "");
 
@@ -93,12 +105,10 @@ export default function AssetFormModal({
         const columns = Object.keys(tableDefinition.properties);
         setTableColumns(columns);
 
-        // Pre-seleccionar id y created_at si existen
-        const defaultColumns: string[] = [];
-        if (columns.includes('id')) defaultColumns.push('id');
-        if (columns.includes('created_at')) defaultColumns.push('created_at');
-
-        setSelectedColumns(defaultColumns);
+        // Si hay columnas preservadas (modo edit), usar esas
+        if (preservedColumns && preservedColumns.length > 0) {
+          setSelectedColumns(preservedColumns);
+        }
 
         addToast({
           title: "Columnas cargadas",
@@ -216,6 +226,126 @@ export default function AssetFormModal({
     }
   }, [formData.supabase_url, formData.supabase_anon_key]);
 
+  // Función para confirmar columnas seleccionadas
+  const handleConfirmColumns = () => {
+    if (selectedColumns.length === 0) {
+      addToast({
+        title: "Selecciona columnas",
+        description: "Debes seleccionar al menos una columna",
+        color: "warning",
+      });
+      return;
+    }
+
+    setColumnsConfirmed(true);
+    setShowColumnSelection(false);
+    setShowFilterSelection(true);
+
+    // Actualizar assets_options con las columnas
+    const options = { columns: selectedColumns, filters: filters };
+    handleInputChange("assets_options", options);
+
+    addToast({
+      title: "Columnas confirmadas",
+      description: `Se confirmaron ${selectedColumns.length} columnas`,
+      color: "success",
+    });
+  };
+
+  // Función para obtener valores únicos de una columna
+  const fetchColumnValues = useCallback(async (columnName: string) => {
+    if (!formData.supabase_url || !formData.supabase_anon_key || !formData.tabla || !columnName) {
+      return;
+    }
+
+    try {
+      setIsLoadingFilterValues(true);
+      setFilterColumnValues([]);
+
+      const cleanUrl = formData.supabase_url.replace(/\/$/, "");
+
+      // Hacer una consulta para obtener valores únicos de la columna
+      const response = await fetch(
+        `${cleanUrl}/rest/v1/${formData.tabla}?select=${columnName}`,
+        {
+          method: "GET",
+          headers: {
+            apikey: formData.supabase_anon_key,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Extraer valores únicos
+      const uniqueValues = Array.from(new Set(data.map((item: any) => item[columnName]))).filter(
+        (value) => value !== null && value !== undefined
+      );
+
+      setFilterColumnValues(uniqueValues.map(String));
+    } catch (err: any) {
+      console.error("Error al obtener valores de columna:", err);
+      addToast({
+        title: "Error",
+        description: "No se pudieron obtener los valores de la columna",
+        color: "danger",
+      });
+    } finally {
+      setIsLoadingFilterValues(false);
+    }
+  }, [formData.supabase_url, formData.supabase_anon_key, formData.tabla]);
+
+  // Función para agregar filtro
+  const handleAddFilter = () => {
+    if (!selectedFilterColumn || !selectedFilterValue) {
+      addToast({
+        title: "Campos requeridos",
+        description: "Selecciona una columna y un valor para el filtro",
+        color: "warning",
+      });
+      return;
+    }
+
+    const newFilter = { column: selectedFilterColumn, value: selectedFilterValue };
+    const updatedFilters = [...filters, newFilter];
+    setFilters(updatedFilters);
+
+    // Actualizar assets_options
+    const options = { columns: selectedColumns, filters: updatedFilters };
+    handleInputChange("assets_options", options);
+
+    // Limpiar selección
+    setSelectedFilterColumn("");
+    setSelectedFilterValue("");
+    setFilterColumnValues([]);
+
+    addToast({
+      title: "Filtro agregado",
+      description: `Filtro: ${selectedFilterColumn} = ${selectedFilterValue}`,
+      color: "success",
+    });
+  };
+
+  // Función para eliminar filtro
+  const handleRemoveFilter = (index: number) => {
+    const updatedFilters = filters.filter((_, i) => i !== index);
+    setFilters(updatedFilters);
+
+    // Actualizar assets_options
+    const options = { columns: selectedColumns, filters: updatedFilters };
+    handleInputChange("assets_options", options);
+
+    addToast({
+      title: "Filtro eliminado",
+      color: "success",
+    });
+  };
+
   useEffect(() => {
     if (mode === "edit" && asset) {
       setFormData({
@@ -227,18 +357,36 @@ export default function AssetFormModal({
         project_id: asset.project_id,
       });
 
+      // Extraer las columnas guardadas
+      const savedColumns = asset.assets_options?.columns && Array.isArray(asset.assets_options.columns)
+        ? asset.assets_options.columns
+        : [];
+
+      // Extraer los filtros guardados
+      const savedFilters = asset.assets_options?.filters && Array.isArray(asset.assets_options.filters)
+        ? asset.assets_options.filters
+        : [];
+
       // Si tiene columnas en assets_options, cargarlas
-      if (asset.assets_options?.columns && Array.isArray(asset.assets_options.columns)) {
-        setSelectedColumns(asset.assets_options.columns);
+      if (savedColumns.length > 0) {
+        setSelectedColumns(savedColumns);
+        setColumnsConfirmed(true);
+        setShowColumnSelection(false);
+        setShowFilterSelection(true);
+      }
+
+      // Si tiene filtros, cargarlos
+      if (savedFilters.length > 0) {
+        setFilters(savedFilters);
       }
 
       // Si tiene URL y key, cargar las tablas automáticamente
       if (asset.supabase_url && asset.supabase_anon_key) {
         handleConsultTables(asset.supabase_url, asset.supabase_anon_key);
 
-        // Si también tiene una tabla seleccionada, cargar sus columnas
+        // Si también tiene una tabla seleccionada, cargar sus columnas preservando las selecciones
         if (asset.tabla) {
-          fetchTableColumns(asset.tabla);
+          fetchTableColumns(asset.tabla, savedColumns);
         }
       }
     } else if (mode === "create") {
@@ -254,6 +402,10 @@ export default function AssetFormModal({
       setSelectedColumns([]);
       setTables([]);
       setTableColumns([]);
+      setColumnsConfirmed(false);
+      setShowColumnSelection(true);
+      setShowFilterSelection(false);
+      setFilters([]);
     }
   }, [asset, mode, handleConsultTables, fetchTableColumns, projectId]);
 
@@ -405,90 +557,226 @@ export default function AssetFormModal({
               </div>
             )}
 
-            {/* Mostrar columnas cuando se haya seleccionado una tabla */}
+            {/* Acordeón: Selección de columnas */}
             {tableColumns.length > 0 && (
               <div className="col-span-2">
-                <div className="border rounded-lg p-4 bg-gray-50">
-                  <div className="flex justify-between items-center mb-3">
-                    <h4 className="text-sm font-semibold text-gray-700">
-                      Selecciona las columnas visibles para el usuario
+                <div className="border rounded-lg bg-white">
+                  {/* Header del acordeón de columnas */}
+                  <button
+                    type="button"
+                    onClick={() => setShowColumnSelection(!showColumnSelection)}
+                    className="w-full flex justify-between items-center p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      {columnsConfirmed && "✓"} 1. Selecciona las columnas visibles
                     </h4>
-                    <Button
-                      size="sm"
-                      color="primary"
-                      variant="flat"
-                      onPress={() => {
-                        const allSelected = selectedColumns.length === tableColumns.length;
-                        const newSelection = allSelected ? [] : tableColumns;
-                        setSelectedColumns(newSelection);
-                        const options = { columns: newSelection };
-                        handleInputChange("assets_options", options);
-                      }}
-                    >
-                      {selectedColumns.length === tableColumns.length ? "Deseleccionar todos" : "Seleccionar todos"}
-                    </Button>
-                  </div>
+                    <span className="text-gray-500">
+                      {showColumnSelection ? "▼" : "▶"}
+                    </span>
+                  </button>
 
-                  {isLoadingColumns ? (
-                    <p className="text-sm text-gray-500">Cargando columnas...</p>
-                  ) : (
-                    <>
-                      <CheckboxGroup
-                        value={selectedColumns}
-                        onValueChange={(values) => {
-                          setSelectedColumns(values);
-                          // Actualizar assets_options automáticamente
-                          const options = { columns: values };
-                          handleInputChange("assets_options", options);
-                        }}
-                        classNames={{
-                          base: "w-full",
-                        }}
-                      >
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
-                          {tableColumns.map((column) => (
-                            <Checkbox
-                              key={column}
-                              value={column}
-                              classNames={{
-                                label: "text-sm text-gray-700 truncate",
-                              }}
-                            >
-                              <span className="truncate max-w-[150px] block" title={column}>
-                                {column}
-                              </span>
-                            </Checkbox>
+                  {/* Contenido del acordeón de columnas */}
+                  {showColumnSelection && (
+                    <div className="p-4 border-t bg-gray-50">
+                      <div className="flex justify-between items-center mb-3">
+                        <p className="text-xs text-gray-600">
+                          Selecciona las columnas que serán visibles para el usuario
+                        </p>
+                        <Button
+                          size="sm"
+                          color="primary"
+                          variant="flat"
+                          onPress={() => {
+                            const allSelected = selectedColumns.length === tableColumns.length;
+                            const newSelection = allSelected ? [] : tableColumns;
+                            setSelectedColumns(newSelection);
+                          }}
+                        >
+                          {selectedColumns.length === tableColumns.length ? "Deseleccionar todos" : "Seleccionar todos"}
+                        </Button>
+                      </div>
+
+                      {isLoadingColumns ? (
+                        <p className="text-sm text-gray-500">Cargando columnas...</p>
+                      ) : (
+                        <>
+                          <CheckboxGroup
+                            value={selectedColumns}
+                            onValueChange={(values) => {
+                              setSelectedColumns(values);
+                            }}
+                            classNames={{
+                              base: "w-full",
+                            }}
+                          >
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
+                              {tableColumns.map((column) => (
+                                <Checkbox
+                                  key={column}
+                                  value={column}
+                                  classNames={{
+                                    label: "text-sm text-gray-700 truncate",
+                                  }}
+                                >
+                                  <span className="truncate max-w-[150px] block" title={column}>
+                                    {column}
+                                  </span>
+                                </Checkbox>
+                              ))}
+                            </div>
+                          </CheckboxGroup>
+
+                          {/* Chips de columnas seleccionadas */}
+                          {selectedColumns.length > 0 && (
+                            <div className="mt-4 pt-4 border-t border-gray-200">
+                              <p className="text-xs text-gray-600 mb-2 font-medium">
+                                Columnas seleccionadas ({selectedColumns.length}):
+                              </p>
+                              <div className="flex flex-wrap gap-2 mb-4">
+                                {selectedColumns.map((column) => (
+                                  <Chip
+                                    key={column}
+                                    onClose={() => {
+                                      const newSelection = selectedColumns.filter(c => c !== column);
+                                      setSelectedColumns(newSelection);
+                                    }}
+                                    variant="flat"
+                                    color="primary"
+                                    size="sm"
+                                  >
+                                    {column}
+                                  </Chip>
+                                ))}
+                              </div>
+
+                              {/* Botón de confirmar columnas */}
+                              <Button
+                                className="bg-green-600 text-white w-full"
+                                onPress={handleConfirmColumns}
+                                isDisabled={columnsConfirmed}
+                              >
+                                {columnsConfirmed ? "Columnas Confirmadas ✓" : "Confirmar Columnas"}
+                              </Button>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Acordeón: Filtros de datos */}
+            {columnsConfirmed && (
+              <div className="col-span-2">
+                <div className="border rounded-lg bg-white">
+                  {/* Header del acordeón de filtros */}
+                  <button
+                    type="button"
+                    onClick={() => setShowFilterSelection(!showFilterSelection)}
+                    className="w-full flex justify-between items-center p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <h4 className="text-sm font-semibold text-gray-700">
+                      2. Configura filtros (opcional)
+                    </h4>
+                    <span className="text-gray-500">
+                      {showFilterSelection ? "▼" : "▶"}
+                    </span>
+                  </button>
+
+                  {/* Contenido del acordeón de filtros */}
+                  {showFilterSelection && (
+                    <div className="p-4 border-t bg-gray-50">
+                      <p className="text-xs text-gray-600 mb-4">
+                        Selecciona una columna y su valor para filtrar los datos
+                      </p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        {/* Select de columnas */}
+                        <Select
+                          label="Columna"
+                          placeholder="Selecciona una columna"
+                          selectedKeys={selectedFilterColumn ? [selectedFilterColumn] : []}
+                          onChange={(e) => {
+                            const column = e.target.value;
+                            setSelectedFilterColumn(column);
+                            setSelectedFilterValue("");
+                            if (column) {
+                              fetchColumnValues(column);
+                            }
+                          }}
+                          classNames={{
+                            label: "text-gray-700",
+                            value: "text-gray-800",
+                          }}
+                        >
+                          {selectedColumns.map((column) => (
+                            <SelectItem key={column} value={column}>
+                              {column}
+                            </SelectItem>
                           ))}
-                        </div>
-                      </CheckboxGroup>
+                        </Select>
 
-                      {/* Chips de columnas seleccionadas */}
-                      {selectedColumns.length > 0 && (
+                        {/* Select de valores */}
+                        <Select
+                          label="Valor"
+                          placeholder="Selecciona un valor"
+                          selectedKeys={selectedFilterValue ? [selectedFilterValue] : []}
+                          onChange={(e) => setSelectedFilterValue(e.target.value)}
+                          isDisabled={!selectedFilterColumn || isLoadingFilterValues}
+                          isLoading={isLoadingFilterValues}
+                          classNames={{
+                            label: "text-gray-700",
+                            value: "text-gray-800",
+                          }}
+                        >
+                          {filterColumnValues.map((value) => (
+                            <SelectItem key={value} value={value}>
+                              {value}
+                            </SelectItem>
+                          ))}
+                        </Select>
+                      </div>
+
+                      {/* Botón para agregar filtro */}
+                      <Button
+                        className="bg-blue-600 text-white w-full mb-4"
+                        onPress={handleAddFilter}
+                        isDisabled={!selectedFilterColumn || !selectedFilterValue}
+                      >
+                        Agregar Filtro
+                      </Button>
+
+                      {/* Lista de filtros agregados */}
+                      {filters.length > 0 && (
                         <div className="mt-4 pt-4 border-t border-gray-200">
                           <p className="text-xs text-gray-600 mb-2 font-medium">
-                            Columnas seleccionadas ({selectedColumns.length}):
+                            Filtros aplicados ({filters.length}):
                           </p>
-                          <div className="flex flex-wrap gap-2">
-                            {selectedColumns.map((column) => (
-                              <Chip
-                                key={column}
-                                onClose={() => {
-                                  const newSelection = selectedColumns.filter(c => c !== column);
-                                  setSelectedColumns(newSelection);
-                                  const options = { columns: newSelection };
-                                  handleInputChange("assets_options", options);
-                                }}
-                                variant="flat"
-                                color="primary"
-                                size="sm"
+                          <div className="space-y-2">
+                            {filters.map((filter, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between bg-white p-3 rounded-lg border"
                               >
-                                {column}
-                              </Chip>
+                                <span className="text-sm text-gray-700">
+                                  <strong>{filter.column}</strong> = {filter.value}
+                                </span>
+                                <Button
+                                  size="sm"
+                                  color="danger"
+                                  variant="light"
+                                  onPress={() => handleRemoveFilter(index)}
+                                >
+                                  Eliminar
+                                </Button>
+                              </div>
                             ))}
                           </div>
                         </div>
                       )}
-                    </>
+                    </div>
                   )}
                 </div>
               </div>

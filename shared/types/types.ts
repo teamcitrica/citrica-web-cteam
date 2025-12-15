@@ -10,6 +10,7 @@ export type UserType = {
   role_id: number;
   company?: { id: number; name: string };
   company_id?: number;
+  active_users?: boolean; // Estado de acceso del usuario
   updated_at?: string;
   created_at?: string;
   user_metadata?: any;

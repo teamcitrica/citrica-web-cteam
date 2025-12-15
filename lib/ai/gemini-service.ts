@@ -51,6 +51,63 @@ const COSTS = {
 };
 
 // ================================================================
+// PERFILES DE RESPUESTA - Controla calidad y cantidad
+// ================================================================
+
+export type ResponseProfile = "concise" | "balanced" | "detailed" | "comprehensive";
+
+export interface ResponseConfig {
+  temperature: number;      // 0.0 - 2.0: Creatividad (bajo = preciso, alto = creativo)
+  maxOutputTokens: number;  // Límite de tokens en la respuesta
+  topP?: number;           // 0.0 - 1.0: Diversidad del vocabulario
+  topK?: number;           // Número de tokens candidatos a considerar
+}
+
+/**
+ * Perfiles predefinidos para diferentes casos de uso
+ */
+export const RESPONSE_PROFILES: Record<ResponseProfile, ResponseConfig> = {
+  // Respuestas cortas y directas (ideal para FAQs rápidas)
+  concise: {
+    temperature: 0.3,      // Más preciso y directo
+    maxOutputTokens: 512,  // ~400 palabras
+    topP: 0.8,
+    topK: 20,
+  },
+
+  // Balance entre detalle y brevedad (uso general)
+  balanced: {
+    temperature: 0.7,      // Balance creatividad/precisión
+    maxOutputTokens: 2048, // ~1600 palabras
+    topP: 0.9,
+    topK: 40,
+  },
+
+  // Respuestas detalladas con explicaciones (análisis, tutoriales)
+  detailed: {
+    temperature: 0.8,      // Más explicativo y contextual
+    maxOutputTokens: 4096, // ~3200 palabras
+    topP: 0.95,
+    topK: 60,
+  },
+
+  // Respuestas muy completas (investigación, reportes)
+  comprehensive: {
+    temperature: 0.9,      // Máxima cobertura y creatividad
+    maxOutputTokens: 8192, // ~6400 palabras
+    topP: 1.0,
+    topK: 80,
+  },
+};
+
+/**
+ * Obtiene la configuración de un perfil específico
+ */
+export function getResponseConfig(profile: ResponseProfile = "balanced"): ResponseConfig {
+  return RESPONSE_PROFILES[profile];
+}
+
+// ================================================================
 // FUNCIONES DE UTILIDAD
 // ================================================================
 
@@ -255,6 +312,9 @@ export async function generateChatResponse(
   config: {
     temperature?: number;
     maxOutputTokens?: number;
+    topP?: number;
+    topK?: number;
+    profile?: ResponseProfile;
   } = {}
 ): Promise<ChatResult> {
   return retryWithBackoff(async () => {
@@ -263,11 +323,16 @@ export async function generateChatResponse(
         model: "gemini-2.5-flash",
       });
 
+      // Si se especifica un perfil, usar su configuración
+      const profileConfig = config.profile ? getResponseConfig(config.profile) : null;
+
       const result = await model.generateContent({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         generationConfig: {
-          temperature: config.temperature ?? 0.7,
-          maxOutputTokens: config.maxOutputTokens ?? 1024,
+          temperature: config.temperature ?? profileConfig?.temperature ?? 0.7,
+          maxOutputTokens: config.maxOutputTokens ?? profileConfig?.maxOutputTokens ?? 1024,
+          topP: config.topP ?? profileConfig?.topP,
+          topK: config.topK ?? profileConfig?.topK,
         },
       });
 
@@ -291,6 +356,80 @@ export async function generateChatResponse(
       };
     } catch (error: any) {
       console.error("❌ Error generando respuesta:", error.message);
+      throw new Error(`Error al generar respuesta: ${error.message}`);
+    }
+  });
+}
+
+/**
+ * Genera respuesta de chat usando Gemini File API directamente (RAG nativo)
+ * Los archivos deben estar previamente subidos a Gemini File API
+ */
+export async function generateChatResponseWithFiles(
+  prompt: string,
+  fileUris: string[], // URIs de archivos de Gemini (ej: "files/abc123")
+  config: {
+    temperature?: number;
+    maxOutputTokens?: number;
+    topP?: number;
+    topK?: number;
+    profile?: ResponseProfile;
+  } = {}
+): Promise<ChatResult> {
+  return retryWithBackoff(async () => {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash",
+      });
+
+      // Si se especifica un perfil, usar su configuración
+      const profileConfig = config.profile ? getResponseConfig(config.profile) : null;
+
+      // Construir el contenido con archivos y prompt
+      const parts: any[] = [];
+
+      // Agregar archivos como fileData
+      for (const uri of fileUris) {
+        parts.push({
+          fileData: {
+            fileUri: uri,
+          },
+        });
+      }
+
+      // Agregar el prompt del usuario
+      parts.push({ text: prompt });
+
+      const result = await model.generateContent({
+        contents: [{ role: "user", parts }],
+        generationConfig: {
+          temperature: config.temperature ?? profileConfig?.temperature ?? 0.7,
+          maxOutputTokens: config.maxOutputTokens ?? profileConfig?.maxOutputTokens ?? 2048,
+          topP: config.topP ?? profileConfig?.topP,
+          topK: config.topK ?? profileConfig?.topK,
+        },
+      });
+
+      const response = result.response;
+      const text = response.text();
+
+      // Calcular tokens
+      const promptTokens = Math.ceil(prompt.length / 4) + (fileUris.length * 1000); // Estimar tokens de archivos
+      const completionTokens = Math.ceil(text.length / 4);
+      const totalTokens = promptTokens + completionTokens;
+      const estimatedCost = calculateCost(promptTokens, completionTokens);
+
+      return {
+        response: text,
+        usage: {
+          promptTokens,
+          completionTokens,
+          totalTokens,
+          estimatedCost,
+        },
+      };
+    } catch (error: any) {
+      console.error("❌ Error generando respuesta con archivos:", error.message);
       throw new Error(`Error al generar respuesta: ${error.message}`);
     }
   });

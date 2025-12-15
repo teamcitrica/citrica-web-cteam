@@ -257,11 +257,11 @@ export default function ProjectFormModal({
       } else {
         await updateProject(project!.id, cleanedData);
 
-        // Sincronizar contactos del proyecto
-        await syncProjectContacts(project!.id, Array.from(selectedContactIds));
+        // Sincronizar contactos del proyecto (sin toast individual)
+        await syncProjectContacts(project!.id, Array.from(selectedContactIds), false);
 
-        // Sincronizar usuarios del proyecto
-        await syncProjectUsers(project!.id, selectedUserIds);
+        // Sincronizar usuarios del proyecto (sin toast individual)
+        await syncProjectUsers(project!.id, selectedUserIds, false);
 
         onSuccess?.();
         onClose();

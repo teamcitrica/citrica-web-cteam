@@ -18,6 +18,7 @@ type ContactColumnsConfig = {
   onView: (contact: Contact) => void;
   onEdit: (contact: Contact) => void;
   onDelete: (contact: Contact) => void;
+  onToggleAccess: (contact: Contact) => void;
 };
 
 type ContactExportConfig = {
@@ -64,6 +65,7 @@ export const getContactColumns = ({
   onView,
   onEdit,
   onDelete,
+  onToggleAccess,
 }: ContactColumnsConfig): Column<Contact>[] => [
   {
     name: "NOMBRE Y CARGO",
@@ -82,15 +84,19 @@ export const getContactColumns = ({
         <div className="flex flex-col items-start gap-1">
           <div className="flex items-center gap-2">
             <span className="text-[#16305A] font-medium">{contact.name || "-"}</span>
-            {contact.user_id && (
+            {contact.user_id !== null && (
               <Tooltip
-                content={contact.has_system_access && contact.active_users ? "Usuario del sistema con acceso activo" : "Usuario del sistema sin acceso activo"}
+                content={
+                  contact.active_users
+                    ? "Usuario con acceso activo"
+                    : "Usuario sin acceso activo"
+                }
                 delay={200}
                 closeDelay={0}
               >
                 <div className="flex items-center">
                   <Icon
-                    className={`w-4 h-4 ${contact.has_system_access && contact.active_users ? "text-green-600" : "text-red-600"}`}
+                    className={`w-4 h-4 ${contact.active_users ? "text-green-600" : "text-red-600"}`}
                     name="ShieldCheck"
                   />
                 </div>
@@ -152,7 +158,10 @@ export const getContactColumns = ({
     uid: "actions",
     sortable: false,
     render: (contact) => (
-      <div className="relative flex justify-center items-center gap-2">
+      <div
+        className="relative flex justify-center items-center gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
         <Button
           isIconOnly
           size="sm"
@@ -175,16 +184,25 @@ export const getContactColumns = ({
                 case "edit":
                   onEdit(contact);
                   break;
+                case "toggle-access":
+                  onToggleAccess(contact);
+                  break;
                 case "delete":
                   onDelete(contact);
                   break;
               }
             }}
           >
-            <DropdownItem
-              key="edit"
-            >
+            <DropdownItem key="edit">
               Editar
+            </DropdownItem>
+            <DropdownItem
+              key="toggle-access"
+              className={contact.active_users ? "text-warning" : "text-success"}
+            >
+              {contact.active_users
+                ? "Quitar acceso al sistema"
+                : "Dar acceso al sistema"}
             </DropdownItem>
             <DropdownItem
               key="delete"

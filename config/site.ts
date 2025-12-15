@@ -110,18 +110,18 @@ export const siteConfig = {
 					title: "Empresas",
 					href: "/admin/crm/empresas",
 				},
-				{
-					title: "Reuniones",
-					href: "/admin/crm/reuniones",
-				},
+				// {
+				// 	title: "Reuniones",
+				// 	href: "/admin/crm/reuniones",
+				// },
 				{
 					title: "Proyectos",
 					href: "/admin/crm/proyectos",
 				},
-				{
-					title: "Configuración",
-					href: "/admin/crm/configuracion",
-				},
+				// {
+				// 	title: "Configuración",
+				// 	href: "/admin/crm/configuracion",
+				// },
 			],
 		},
 		{
@@ -129,7 +129,7 @@ export const siteConfig = {
 			icon: "ClipboardCheck",
 			href: "/admin/client/mis-datos",
 			allowedRoles: [ROL_CLIENTE],
-			subItems: [],
+			subItems: [], 
 		},
 
 	],

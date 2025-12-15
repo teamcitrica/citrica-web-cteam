@@ -4,6 +4,7 @@ import { Col, Container } from "@/styles/07-objects/objects";
 import { InputCitricaAdmin, ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
 import { Card, CardHeader, CardBody, CardFooter, Skeleton } from "@heroui/react";
+import { addToast } from "@heroui/toast";
 import {
   Database,
   Upload,
@@ -44,7 +45,7 @@ export default function DatabasesRAGPage() {
   const [newStorageName, setNewStorageName] = useState("");
   const [newStorageDescription, setNewStorageDescription] = useState("");
   const [selectedStorage, setSelectedStorage] = useState<DocumentStorage | null>(null);
-  const [uploadingFiles, setUploadingFiles] = useState(false);
+  const [uploadingFiles, setUploadingFiles] = useState<Record<string, boolean>>({});
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [storageToDelete, setStorageToDelete] = useState<DocumentStorage | null>(null);
 
@@ -114,7 +115,7 @@ export default function DatabasesRAGPage() {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    setUploadingFiles(true);
+    setUploadingFiles(prev => ({ ...prev, [storageId]: true }));
 
     try {
       // Procesar cada archivo
@@ -138,13 +139,21 @@ export default function DatabasesRAGPage() {
         console.log("Upload result:", result);
       }
 
-      alert(`✅ ${files.length} archivo(s) procesado(s) exitosamente`);
+      addToast({
+        title: "Éxito",
+        description: `${files.length} archivo(s) procesado(s) exitosamente`,
+        color: "success",
+      });
       await fetchStorages(); // Recargar lista
     } catch (error: any) {
       console.error("Error uploading files:", error);
-      alert(`❌ Error: ${error.message || "Error al procesar archivos"}`);
+      addToast({
+        title: "Error",
+        description: error.message || "Error al procesar archivos",
+        color: "danger",
+      });
     } finally {
-      setUploadingFiles(false);
+      setUploadingFiles(prev => ({ ...prev, [storageId]: false }));
     }
   };
 
@@ -347,10 +356,10 @@ export default function DatabasesRAGPage() {
                     {/* Upload Button */}
                     <label
                       onClick={(e) => e.stopPropagation()}
-                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-[#265197] text-[#265197] rounded-lg hover:bg-blue-50 transition-colors cursor-pointer ${uploadingFiles ? "opacity-50 cursor-not-allowed" : ""
+                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-[#265197] text-[#265197] rounded-lg hover:bg-blue-50 transition-colors cursor-pointer ${uploadingFiles[storage.id] ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                     >
-                      {uploadingFiles ? (
+                      {uploadingFiles[storage.id] ? (
                         <>
                           <Loader2 className="w-5 h-5 animate-spin" />
                           <span className="text-sm font-medium">Subiendo...</span>
@@ -368,7 +377,7 @@ export default function DatabasesRAGPage() {
                         multiple
                         accept=".pdf,.txt,.doc,.docx,.md"
                         onChange={(e) => handleFileUpload(storage.id, e)}
-                        disabled={uploadingFiles}
+                        disabled={uploadingFiles[storage.id]}
                         className="hidden"
                       />
                     </label>

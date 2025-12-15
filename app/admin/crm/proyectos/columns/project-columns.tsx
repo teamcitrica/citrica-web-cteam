@@ -39,7 +39,7 @@ export const getProjectColumns = ({
 
       return (
         <div
-          className="flex flex-col gap-1 cursor-pointer hover:opacity-70 transition-opacity"
+          className="flex flex-col gap-1 cursor-pointer hover:opacity-70 transition-opacity items-start"
           onClick={() => onNavigateToAssets?.(project.id)}
         >
           <div className="text-[#16305A] font-medium">{name}</div>
@@ -55,11 +55,14 @@ export const getProjectColumns = ({
     uid: "company_id",
     sortable: true,
     render: (project) => {
-      const accessCount = accessCounts[project.id] || 0;
+      // Usar access_count del proyecto (viene del hook) o del accessCounts (por compatibilidad)
+      const accessCount = project.access_count ?? accessCounts[project.id] ?? 0;
+      // Usar la información de empresa que viene con el proyecto (JOIN) o fallback a getCompanyName
+      const companyName = project.company?.name || getCompanyName(project.company_id);
 
       return (
         <div className="flex flex-col gap-1">
-          <div className="text-[#16305A] font-medium">{getCompanyName(project.company_id)}</div>
+          <div className="text-[#16305A] font-medium">{companyName}</div>
           <div className="text-[#678CC5] text-sm">
             Accesos: {accessCount}
           </div>

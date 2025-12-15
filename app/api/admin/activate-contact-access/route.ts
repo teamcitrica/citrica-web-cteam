@@ -70,7 +70,6 @@ export async function POST(request: NextRequest) {
       name: contact.name,
       email: contact.email,
       company_id: contact.company_id,
-      has_system_access: contact.has_system_access,
       user_id: contact.user_id,
     });
 
@@ -78,19 +77,38 @@ export async function POST(request: NextRequest) {
     if (contact.user_id) {
       console.log('🔄 Reactivando acceso para usuario existente:', contact.user_id);
 
-      // Solo reactivar el acceso, no crear nuevo usuario
-      const { error: updateError } = await supabaseAdmin
-        .from('contact')
-        .update({
-          has_system_access: true,
-          active_users: true,
-        })
-        .eq('id', contact_id);
+      // Obtener datos del usuario existente
+      const { data: existingUser, error: getUserError } = await supabaseAdmin
+        .from('users')
+        .select('email, first_name, last_name, role_id, company_id')
+        .eq('id', contact.user_id)
+        .single();
 
-      if (updateError) {
-        console.error('❌ Error al reactivar acceso:', updateError);
+      if (getUserError) {
+        console.error('❌ Error al obtener datos del usuario:', getUserError);
         return NextResponse.json(
-          { error: `Error al reactivar acceso: ${updateError.message}` },
+          { error: `Error al obtener datos del usuario: ${getUserError.message}` },
+          { status: 500 }
+        );
+      }
+
+      // Reactivar usando upsert (esto funciona porque upsert tiene permisos)
+      const { error: reactivateError } = await supabaseAdmin
+        .from('users')
+        .upsert({
+          id: contact.user_id,
+          email: existingUser.email,
+          first_name: existingUser.first_name,
+          last_name: existingUser.last_name,
+          role_id: existingUser.role_id,
+          company_id: existingUser.company_id,
+          active_users: true,
+        });
+
+      if (reactivateError) {
+        console.error('❌ Error al reactivar acceso:', reactivateError);
+        return NextResponse.json(
+          { error: `Error al reactivar acceso: ${reactivateError.message}` },
           { status: 500 }
         );
       }
@@ -139,7 +157,10 @@ export async function POST(request: NextRequest) {
     // 6. Preparar datos del usuario
     const firstName = user_data?.first_name || contact.name?.split(' ')[0] || 'Cliente';
     const lastName = user_data?.last_name || contact.name?.split(' ').slice(1).join(' ') || '';
-    const roleId = 12; // Siempre cliente
+    // Determinar role_id: Si viene en user_data lo usa, sino:
+    // - company_id === 1 (Citrica) -> role_id = 1 (Admin/Staff)
+    // - Otras empresas -> role_id = 12 (Cliente)
+    const roleId = user_data?.role_id || (contact.company_id === 1 ? 1 : 12);
     const avatarUrl = user_data?.avatar_url || null;
 
     console.log('📝 Datos del usuario a crear:', {
@@ -185,40 +206,38 @@ export async function POST(request: NextRequest) {
     const userId = createUserResult.user.id;
     console.log('✅ Usuario creado exitosamente:', userId);
 
-    // 8. Actualizar contact con user_id, has_system_access, active_users, email_access, code y last_name
-    const { error: updateError } = await supabaseAdmin
+    // 8. Actualizar contact con user_id, email_access, code y last_name
+    const { error: updateContactError } = await supabaseAdmin
       .from('contact')
       .update({
         user_id: userId,
-        has_system_access: true,
-        active_users: true,
         email_access: emailToUse,
         code: temporaryPassword,
         last_name: lastName,
       })
       .eq('id', contact_id);
 
-    if (updateError) {
-      console.error('Error al actualizar contacto:', updateError);
+    if (updateContactError) {
+      console.error('Error al actualizar contacto:', updateContactError);
 
       // Rollback: eliminar usuario de auth y public.users
       await supabaseAdmin.auth.admin.deleteUser(userId);
       await supabaseAdmin.from('users').delete().eq('id', userId);
 
       return NextResponse.json(
-        { error: `Error al vincular contacto con usuario: ${updateError.message}` },
+        { error: `Error al vincular contacto con usuario: ${updateContactError.message}` },
         { status: 500 }
       );
     }
 
-    console.log('✅ Contacto actualizado con acceso al sistema');
+    console.log('✅ Contacto actualizado con acceso al sistema (active_users se estableció durante la creación del usuario)');
 
     return NextResponse.json({
       success: true,
       user: {
         id: userId,
         email: emailToUse,
-        role_id: 12,
+        role_id: roleId,
       },
       temporary_password: temporaryPassword,
       message: 'Acceso activado correctamente. Envía la contraseña temporal al contacto por un canal seguro.',
@@ -282,19 +301,40 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Solo desactivar el acceso, NO eliminar el usuario
-    // Esto permite reactivarlo más tarde sin crear un nuevo usuario
-    const { error: updateError } = await supabaseAdmin
-      .from('contact')
-      .update({
-        has_system_access: false,
-        active_users: false,
-        // Mantener user_id, code, email_access y last_name para poder reactivar
-      })
-      .eq('id', contact_id);
+    // Obtener datos del usuario existente
+    const { data: existingUser, error: getUserError } = await supabaseAdmin
+      .from('users')
+      .select('email, first_name, last_name, role_id, company_id')
+      .eq('id', contact.user_id)
+      .single();
 
-    if (updateError) {
-      console.error('Error al actualizar contacto:', updateError);
+    if (getUserError) {
+      console.error('Error al obtener datos del usuario:', getUserError);
+      return NextResponse.json(
+        { error: `Error al obtener datos del usuario: ${getUserError.message}` },
+        { status: 500 }
+      );
+    }
+
+    // Desactivar usando upsert (esto funciona porque upsert tiene permisos)
+    const { error: deactivateError } = await supabaseAdmin
+      .from('users')
+      .upsert({
+        id: contact.user_id,
+        email: existingUser.email,
+        first_name: existingUser.first_name,
+        last_name: existingUser.last_name,
+        role_id: existingUser.role_id,
+        company_id: existingUser.company_id,
+        active_users: false,
+      });
+
+    if (deactivateError) {
+      console.error('Error al desactivar usuario:', deactivateError);
+      return NextResponse.json(
+        { error: `Error al desactivar usuario: ${deactivateError.message}` },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({

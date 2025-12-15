@@ -5,6 +5,7 @@ import CreateContactModal from "./components/create-contact-modal";
 import ContactDetailModal from "./components/contact-detail-modal";
 import EditContactModal from "./components/edit-contact-modal";
 import DeleteContactModal from "./components/delete-contact-modal";
+import GrantAccessModal from "./components/grant-access-modal";
 import { getContactColumns, getContactExportColumns } from "./columns/contact-columns";
 
 import { useContactCRUD, Contact } from "@/hooks/contact/use-contact";
@@ -14,21 +15,23 @@ import { Col, Container } from "@/styles/07-objects/objects";
 
 export default function ContactosPage() {
   const { contacts, isLoading, refreshContacts, deleteContact } = useContactCRUD();
-  const { companies } = useCompanyCRUD();
+  const { companies, isLoading: isLoadingCompanies } = useCompanyCRUD();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isGrantAccessModalOpen, setIsGrantAccessModalOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
 
   const getCompanyName = useCallback(
     (companyId: number | null) => {
       if (!companyId) return "-";
+      if (isLoadingCompanies) return "Cargando...";
       const company = companies.find((c) => c.id === companyId);
       return company?.name || "-";
     },
-    [companies]
+    [companies, isLoadingCompanies]
   );
 
   const handleOpenCreateModal = () => setIsCreateModalOpen(true);
@@ -48,6 +51,11 @@ export default function ContactosPage() {
     setIsEditModalOpen(true);
   }, []);
 
+  const handleToggleAccess = useCallback((contact: Contact) => {
+    setSelectedContact(contact);
+    setIsGrantAccessModalOpen(true);
+  }, []);
+
   const handleDeleteContact = useCallback((contact: Contact) => {
     setContactToDelete(contact);
     setIsDeleteModalOpen(true);
@@ -60,8 +68,9 @@ export default function ContactosPage() {
         onView: handleViewContact,
         onEdit: handleEditContact,
         onDelete: handleDeleteContact,
+        onToggleAccess: handleToggleAccess,
       }),
-    [getCompanyName, handleViewContact, handleEditContact, handleDeleteContact]
+    [getCompanyName, handleViewContact, handleEditContact, handleDeleteContact, handleToggleAccess]
   );
 
   const exportColumns = useMemo(
@@ -139,6 +148,20 @@ export default function ContactosPage() {
               contact={selectedContact}
               onClose={() => {
                 setIsEditModalOpen(false);
+                setSelectedContact(null);
+              }}
+              onSuccess={() => {
+                refreshContacts();
+              }}
+            />
+          )}
+
+          {isGrantAccessModalOpen && selectedContact && (
+            <GrantAccessModal
+              isOpen={isGrantAccessModalOpen}
+              contact={selectedContact}
+              onClose={() => {
+                setIsGrantAccessModalOpen(false);
                 setSelectedContact(null);
               }}
               onSuccess={() => {
