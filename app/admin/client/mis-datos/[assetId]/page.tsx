@@ -207,7 +207,9 @@ export default function AssetDataPage() {
 
   // Función para obtener TODOS los datos del backend para exportar
   const fetchAllDataForExport = async () => {
-    if (!selectedAsset) return [];
+    if (!selectedAsset || !selectedAsset.supabase_url || !selectedAsset.supabase_anon_key || !selectedAsset.tabla) {
+      return [];
+    }
 
     try {
       const cleanUrl = selectedAsset.supabase_url.replace(/\/$/, "");
