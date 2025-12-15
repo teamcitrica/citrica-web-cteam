@@ -241,8 +241,21 @@ export default function AssetFormModal({
           fetchTableColumns(asset.tabla);
         }
       }
+    } else if (mode === "create") {
+      // Limpiar el formulario cuando se abre en modo "create"
+      setFormData({
+        name: null,
+        supabase_url: null,
+        supabase_anon_key: null,
+        tabla: null,
+        assets_options: null,
+        project_id: projectId,
+      });
+      setSelectedColumns([]);
+      setTables([]);
+      setTableColumns([]);
     }
-  }, [asset, mode, handleConsultTables, fetchTableColumns]);
+  }, [asset, mode, handleConsultTables, fetchTableColumns, projectId]);
 
   const handleSubmit = async () => {
     if (!formData.name) {
