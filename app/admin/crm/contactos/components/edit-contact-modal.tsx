@@ -1,17 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   Button,
   Select,
   SelectItem,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
+import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 
 import { useContactCRUD, Contact, ContactInput } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
@@ -119,79 +115,13 @@ export default function EditContactModal({
   };
 
   return (
-    <Modal
+    <DrawerCitricaAdmin
       isOpen={isOpen}
       onClose={onClose}
-      size="3xl"
-      scrollBehavior="inside"
-    >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
-          <h3 className="text-lg font-semibold text-gray-800">
-            Editar Contacto
-          </h3>
-        </ModalHeader>
-        <ModalBody>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InputCitricaAdmin
-              label="Nombre del Contacto"
-              placeholder="Ingrese el nombre completo"
-              value={formData.name || ""}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              isRequired
-            />
-            <InputCitricaAdmin
-              label="Cargo"
-              placeholder="Cargo o posición"
-              value={formData.cargo || ""}
-              onChange={(e) => handleInputChange("cargo", e.target.value)}
-            />
-            <InputCitricaAdmin
-              label="Email"
-              placeholder="correo@ejemplo.com"
-              type="email"
-              value={formData.email || ""}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-            />
-            <InputCitricaAdmin
-              label="Teléfono"
-              placeholder="Número de teléfono"
-              value={formData.phone || ""}
-              onChange={(e) => handleInputChange("phone", e.target.value)}
-            />
-            <InputCitricaAdmin
-              label="Dirección"
-              placeholder="Dirección completa"
-              value={formData.address || ""}
-              onChange={(e) => handleInputChange("address", e.target.value)}
-            />
-            <Select
-              label="Empresa"
-              placeholder="Seleccione una empresa"
-              selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
-              onSelectionChange={(keys) => {
-                const selected = Array.from(keys)[0];
-                const newCompanyId = selected ? Number(selected) : null;
-
-                setFormData((prev) => ({
-                  ...prev,
-                  company_id: newCompanyId,
-                }));
-              }}
-              classNames={{
-                label: "text-gray-700",
-                value: "text-gray-800",
-              }}
-            >
-              {companies.map((company) => (
-                <SelectItem key={String(company.id)}>
-                  {company.name || `Empresa ${company.id}`}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
-        </ModalBody>
-        <ModalFooter>
+      title="Editar Contacto"
+      size="2xl"
+      footer={
+        <>
           <Button color="danger" variant="light" onPress={onClose}>
             Cancelar
           </Button>
@@ -203,8 +133,67 @@ export default function EditContactModal({
           >
             Actualizar Contacto
           </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </>
+      }
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <InputCitricaAdmin
+          label="Nombre del Contacto"
+          placeholder="Ingrese el nombre completo"
+          value={formData.name || ""}
+          onChange={(e) => handleInputChange("name", e.target.value)}
+          isRequired
+        />
+        <InputCitricaAdmin
+          label="Cargo"
+          placeholder="Cargo o posición"
+          value={formData.cargo || ""}
+          onChange={(e) => handleInputChange("cargo", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="Email"
+          placeholder="correo@ejemplo.com"
+          type="email"
+          value={formData.email || ""}
+          onChange={(e) => handleInputChange("email", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="Teléfono"
+          placeholder="Número de teléfono"
+          value={formData.phone || ""}
+          onChange={(e) => handleInputChange("phone", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="Dirección"
+          placeholder="Dirección completa"
+          value={formData.address || ""}
+          onChange={(e) => handleInputChange("address", e.target.value)}
+        />
+        <Select
+          label="Empresa"
+          placeholder="Seleccione una empresa"
+          selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0];
+            const newCompanyId = selected ? Number(selected) : null;
+
+            setFormData((prev) => ({
+              ...prev,
+              company_id: newCompanyId,
+            }));
+          }}
+          classNames={{
+            label: "text-gray-700",
+            value: "text-gray-800",
+          }}
+        >
+          {companies.map((company) => (
+            <SelectItem key={String(company.id)}>
+              {company.name || `Empresa ${company.id}`}
+            </SelectItem>
+          ))}
+        </Select>
+      </div>
+    </DrawerCitricaAdmin>
   );
 }

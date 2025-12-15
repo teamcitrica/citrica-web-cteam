@@ -1,13 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   Button,
-  Input,
   Select,
   SelectItem,
   Chip,
@@ -15,6 +9,8 @@ import {
 } from "@heroui/react";
 import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 import { addToast } from "@heroui/toast";
+import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
+import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 
 import { useProjectCRUD, ProjectInput, Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
@@ -272,31 +268,35 @@ export default function ProjectFormModal({
   };
 
   return (
-    <Modal
+    <DrawerCitricaAdmin
       isOpen={isOpen}
       onClose={onClose}
-      size="3xl"
-      scrollBehavior="inside"
+      title={mode === "create" ? "Agregar Nuevo Proyecto" : "Editar Proyecto"}
+      size="2xl"
+      footer={
+        <>
+          <Button color="danger" variant="light" onPress={onClose}>
+            Cancelar
+          </Button>
+          <Button
+            className="bg-[#42668A] text-white"
+            onPress={handleSubmit}
+            isLoading={isLoading}
+            isDisabled={mode === "edit" ? !hasChanges() : false}
+          >
+            {mode === "create" ? "Crear Proyecto" : "Guardar Cambios"}
+          </Button>
+        </>
+      }
     >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
-          <h3 className="text-lg font-semibold text-gray-800">
-            {mode === "create" ? "Agregar Nuevo Proyecto" : "Editar Proyecto"}
-          </h3>
-        </ModalHeader>
-        <ModalBody>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Nombre del Proyecto"
-              placeholder="Ingrese el nombre"
-              value={formData.name || ""}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              isRequired
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
-            />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <InputCitricaAdmin
+          label="Nombre del Proyecto"
+          placeholder="Ingrese el nombre"
+          value={formData.name || ""}
+          onChange={(e) => handleInputChange("name", e.target.value)}
+          isRequired
+        />
 
             <Select
               label="Empresa (Opcional)"
@@ -377,38 +377,26 @@ export default function ProjectFormModal({
               <Divider className="my-4" />
             </div>
 
-            <Input
+            <InputCitricaAdmin
               label="Nombre del Responsable"
               placeholder="Ingrese el nombre del responsable"
               value={formData.nombre_responsable || ""}
               onChange={(e) => handleInputChange("nombre_responsable", e.target.value)}
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
             />
 
-            <Input
+            <InputCitricaAdmin
               label="Email del Responsable"
               placeholder="email@ejemplo.com"
               type="email"
               value={formData.email_responsable || ""}
               onChange={(e) => handleInputChange("email_responsable", e.target.value)}
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
             />
 
-            <Input
+            <InputCitricaAdmin
               label="Teléfono del Responsable"
               placeholder="Ingrese el teléfono"
               value={formData.phone_responsable || ""}
               onChange={(e) => handleInputChange("phone_responsable", e.target.value)}
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
             />
 
             <Select
@@ -426,21 +414,6 @@ export default function ProjectFormModal({
               <SelectItem key="cerrado">Cerrado</SelectItem>
             </Select>
           </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="danger" variant="light" onPress={onClose}>
-            Cancelar
-          </Button>
-          <Button
-            className="bg-[#42668A] text-white"
-            onPress={handleSubmit}
-            isLoading={isLoading}
-            isDisabled={mode === "edit" ? !hasChanges() : false}
-          >
-            {mode === "create" ? "Crear Proyecto" : "Guardar Cambios"}
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+    </DrawerCitricaAdmin>
   );
 }
