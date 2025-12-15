@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -9,7 +8,7 @@ import { useUserRole } from "@/hooks/role/use-role";
 import { useUserCRUD } from "@/hooks/users/use-users";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { UserType } from "@/shared/types/types";
-import { InputCitricaAdmin, SelectCitricaAdmin, ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
+import { InputCitricaAdmin, SelectCitricaAdmin, ButtonCitricaAdmin, DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import { SelectItem } from "@heroui/react";
 import Text from "@/shared/components/citrica-ui/atoms/text";
 
@@ -243,26 +242,35 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
   };
 
   return (
-    <Modal
+    <DrawerCitricaAdmin
       isOpen={isOpen}
       onClose={onClose}
+      title={isEditMode ? "Editar Usuario" : "Crear Usuario"}
       size="lg"
-      placement="center"
-      backdrop="opaque"
-      scrollBehavior="inside"
+      footer={
+        <>
+          <ButtonCitricaAdmin
+            variant="secondary"
+            onPress={onClose}
+          >
+            Cancelar
+          </ButtonCitricaAdmin>
+          <ButtonCitricaAdmin
+            variant="primary"
+            style={{ backgroundColor: "#42668A" }}
+            onPress={handleSubmit}
+            isLoading={isLoading}
+            isDisabled={isEditMode && !hasChanges()}
+          >
+            {isEditMode ? "Actualizar Usuario" : "Guardar Usuario"}
+          </ButtonCitricaAdmin>
+        </>
+      }
     >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
-          <Text variant="headline" color="#265197">
-            {isEditMode ? "Editar Usuario" : "Crear Usuario"}
-          </Text>
-        </ModalHeader>
-
-        <ModalBody>
-          <form autoComplete="off" onSubmit={(e) => e.preventDefault()}>
-            {/* Campos fake para engañar al autofill del navegador */}
-            <input type="text" name="fake_username" style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} tabIndex={-1} />
-            <input type="password" name="fake_password" style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} tabIndex={-1} />
+      <form autoComplete="off" onSubmit={(e) => e.preventDefault()}>
+        {/* Campos fake para engañar al autofill del navegador */}
+        <input type="text" name="fake_username" style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} tabIndex={-1} />
+        <input type="password" name="fake_password" style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} tabIndex={-1} />
 
             <div className="flex flex-col gap-4">
               <InputCitricaAdmin
@@ -387,27 +395,7 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             )}
             </div>
           </form>
-        </ModalBody>
-
-        <ModalFooter>
-          <ButtonCitricaAdmin
-            variant="secondary"
-            onPress={onClose}
-          >
-            Cancelar
-          </ButtonCitricaAdmin>
-          <ButtonCitricaAdmin
-            variant="primary"
-            style={{ backgroundColor: "#42668A" }}
-            onPress={handleSubmit}
-            isLoading={isLoading}
-            isDisabled={isEditMode && !hasChanges()}
-          >
-            {isEditMode ? "Actualizar Usuario" : "Guardar Usuario"}
-          </ButtonCitricaAdmin>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+    </DrawerCitricaAdmin>
   );
 };
 

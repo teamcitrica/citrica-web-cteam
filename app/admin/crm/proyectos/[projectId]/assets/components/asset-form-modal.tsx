@@ -1,13 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
   Button,
-  Input,
   Select,
   SelectItem,
   Checkbox,
@@ -16,6 +10,8 @@ import {
   Tooltip,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
+import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
+import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 
 import { useAssetCRUD, AssetInput, Asset } from "@/hooks/assets/use-assets";
 
@@ -596,57 +592,52 @@ export default function AssetFormModal({
   };
 
   return (
-    <Modal
+    <DrawerCitricaAdmin
       isOpen={isOpen}
       onClose={onClose}
-      size="3xl"
-      scrollBehavior="inside"
+      title={mode === "create" ? "Agregar Nuevo Asset" : "Editar Asset"}
+      size="2xl"
+      footer={
+        <>
+          <Button color="danger" variant="light" onPress={onClose}>
+            Cancelar
+          </Button>
+          <Button
+            className="bg-[#42668A] text-white"
+            onPress={handleSubmit}
+            isLoading={isLoading}
+          >
+            {mode === "create" ? "Crear Asset" : "Guardar Cambios"}
+          </Button>
+        </>
+      }
     >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
-          <h3 className="text-lg font-semibold text-gray-800">
-            {mode === "create" ? "Agregar Nuevo Asset" : "Editar Asset"}
-          </h3>
-        </ModalHeader>
-        <ModalBody>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Nombre del Asset"
-              placeholder="Ingrese el nombre"
-              value={formData.name || ""}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              isRequired
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
-            />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <InputCitricaAdmin
+          label="Nombre del Asset"
+          placeholder="Ingrese el nombre"
+          value={formData.name || ""}
+          onChange={(e) => handleInputChange("name", e.target.value)}
+          isRequired
+        />
 
             <div className="col-span-2">
-              <Input
+              <InputCitricaAdmin
                 label="Supabase URL"
                 placeholder="https://xxx.supabase.co"
                 value={formData.supabase_url || ""}
                 onChange={(e) => handleInputChange("supabase_url", e.target.value)}
                 isDisabled={mode === "edit"}
-                classNames={{
-                  label: "text-gray-700",
-                  input: "text-gray-800",
-                }}
               />
             </div>
 
             <div className="col-span-2">
-              <Input
+              <InputCitricaAdmin
                 label="Supabase Anon Key"
                 placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                 value={formData.supabase_anon_key || ""}
                 onChange={(e) => handleInputChange("supabase_anon_key", e.target.value)}
                 isDisabled={mode === "edit"}
-                classNames={{
-                  label: "text-gray-700",
-                  input: "text-gray-800",
-                }}
               />
             </div>
 
@@ -945,20 +936,6 @@ export default function AssetFormModal({
             )}
 
           </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="danger" variant="light" onPress={onClose}>
-            Cancelar
-          </Button>
-          <Button
-            className="bg-[#42668A] text-white"
-            onPress={handleSubmit}
-            isLoading={isLoading}
-          >
-            {mode === "create" ? "Crear Asset" : "Guardar Cambios"}
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+    </DrawerCitricaAdmin>
   );
 }
