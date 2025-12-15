@@ -305,15 +305,31 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
           return;
         }
 
+        // Manejar TOKEN_REFRESHED
+        if (event === 'TOKEN_REFRESHED') {
+          if (session) {
+            setUserSession(session);
+            // Reset lastUserIdFetched para permitir que getUserInfo se ejecute en el próximo refresh
+            setLastUserIdFetched(null);
+          }
+          return;
+        }
+
+        // Manejar SIGNED_OUT
+        if (event === 'SIGNED_OUT') {
+          setUserSession(null);
+          setUserInfo(null);
+          setLastUserIdFetched(null);
+          return;
+        }
+
+        // Para otros eventos
         if (session !== null) {
           setUserSession(session);
-          // Solo llamar getUserInfo en eventos como TOKEN_REFRESHED
-          if (event === 'TOKEN_REFRESHED' && !userInfo) {
-            getUserInfo(session.user.id);
-          }
         } else {
           setUserSession(null);
           setUserInfo(null);
+          setLastUserIdFetched(null);
         }
       },
     );
