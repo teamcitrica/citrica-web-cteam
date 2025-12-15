@@ -16,11 +16,7 @@ export default function SupabaseProvider({
   children: ReactNode
 }) {
   const router = useRouter()
-  const [supabase] = useState(()=> createPagesBrowserClient({
-    cookieOptions: {
-      lifetime: 60 * 60 * 24 * 7, // 7 days
-    },
-  }))
+  const [supabase] = useState(()=> createPagesBrowserClient())
 
   useEffect(()=>{
     const {
