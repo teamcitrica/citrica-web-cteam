@@ -38,7 +38,6 @@ export default function ContactosPage() {
 
   const handleCloseCreateModal = () => {
     setIsCreateModalOpen(false);
-    refreshContacts();
   };
 
   const handleViewContact = useCallback((contact: Contact) => {
@@ -130,6 +129,9 @@ export default function ContactosPage() {
           <CreateContactModal
             isOpen={isCreateModalOpen}
             onClose={handleCloseCreateModal}
+            onSuccess={() => {
+              refreshContacts();
+            }}
           />
 
           {isDetailModalOpen && selectedContact && (
