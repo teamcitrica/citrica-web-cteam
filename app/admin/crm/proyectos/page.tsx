@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 import ProjectFormModal from "./components/project-form-modal";
@@ -8,14 +8,12 @@ import DeleteProjectModal from "./components/delete-project-modal";
 
 import { useProjectCRUD, Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
-import { useSupabase } from "@/shared/context/supabase-context";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { getProjectColumns } from "./columns/project-columns";
 import { Col, Container } from "@/styles/07-objects/objects";
 
 export default function ProyectosPage() {
   const router = useRouter();
-  const { supabase } = useSupabase();
   const { projects, isLoading, refreshProjects, deleteProject } = useProjectCRUD();
   const { companies } = useCompanyCRUD();
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -24,47 +22,23 @@ export default function ProyectosPage() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
-  const [assetCounts, setAssetCounts] = useState<Record<string, number>>({});
-  const [accessCounts, setAccessCounts] = useState<Record<string, number>>({});
 
-  // Cargar conteos de assets y accesos cuando los proyectos cambien
-  useEffect(() => {
-    if (projects.length === 0) return; // No cargar si no hay proyectos
+  // Crear mapas de conteos a partir de los proyectos
+  const assetCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    projects.forEach((project) => {
+      counts[project.id] = project.asset_count || 0;
+    });
+    return counts;
+  }, [projects]);
 
-    const loadCounts = async () => {
-      // Obtener conteo de assets por proyecto
-      const { data: assetsData } = await supabase
-        .from("assets")
-        .select("project_id");
-
-      if (assetsData) {
-        const counts: Record<string, number> = {};
-        assetsData.forEach((asset) => {
-          if (asset.project_id) {
-            counts[asset.project_id] = (counts[asset.project_id] || 0) + 1;
-          }
-        });
-        setAssetCounts(counts);
-      }
-
-      // Obtener conteo de accesos por proyecto
-      const { data: accessData } = await supabase
-        .from("proyect_acces")
-        .select("project_id");
-
-      if (accessData) {
-        const counts: Record<string, number> = {};
-        accessData.forEach((access) => {
-          if (access.project_id) {
-            counts[access.project_id] = (counts[access.project_id] || 0) + 1;
-          }
-        });
-        setAccessCounts(counts);
-      }
-    };
-
-    loadCounts();
-  }, [supabase, projects]); // Agregar projects como dependencia
+  const accessCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    projects.forEach((project) => {
+      counts[project.id] = project.access_count || 0;
+    });
+    return counts;
+  }, [projects]);
 
   const getCompanyName = useCallback((companyId: number | null) => {
     if (!companyId) return "-";

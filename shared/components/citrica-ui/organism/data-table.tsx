@@ -54,6 +54,19 @@ export interface DataTableProps<T extends Record<string, any>> {
   companies?: Array<{ id: number; name: string | null }>;
   companyFilterField?: keyof T;
   companyFilterPlaceholder?: string;
+  // Paginación del servidor
+  serverSidePagination?: boolean;
+  totalRecords?: number;
+  currentPage?: number;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
+  // Custom export para paginación de backend
+  onExport?: (format: string, fileName: string) => Promise<void>;
+  // Búsqueda del servidor
+  onSearchChange?: (searchValue: string) => void;
+  searchValue?: string;
+  // Ordenamiento del servidor
+  onSortChange?: (column: string, direction: "ascending" | "descending") => void;
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -80,6 +93,15 @@ export function DataTable<T extends Record<string, any>>({
   companies = [],
   companyFilterField,
   companyFilterPlaceholder = "Filtrar por empresa...",
+  serverSidePagination = false,
+  totalRecords = 0,
+  currentPage = 1,
+  onPageChange,
+  onPageSizeChange,
+  onExport,
+  onSearchChange: onSearchChangeServer,
+  searchValue: searchValueServer,
+  onSortChange: onSortChangeServer,
 }: DataTableProps<T>) {
   const tableFeatures = useTableFeatures({
     data,
@@ -172,8 +194,14 @@ export function DataTable<T extends Record<string, any>>({
                 <InputCitricaAdmin
                   placeholder={searchPlaceholder}
                   endContent={<Icon className="ml-2" color="#719BC1" name="Search" />}
-                  value={tableFeatures.filterValue}
-                  onChange={(e) => tableFeatures.onSearchChange(e.target.value)}
+                  value={serverSidePagination && onSearchChangeServer ? (searchValueServer || "") : tableFeatures.filterValue}
+                  onChange={(e) => {
+                    if (serverSidePagination && onSearchChangeServer) {
+                      onSearchChangeServer(e.target.value);
+                    } else {
+                      tableFeatures.onSearchChange(e.target.value);
+                    }
+                  }}
                 />
               </div>
             )}
@@ -207,9 +235,17 @@ export function DataTable<T extends Record<string, any>>({
                 </DropdownTrigger>
                 <DropdownMenu
                   aria-label="Opciones de exportación"
-                  onAction={(key) =>
-                    tableFeatures.handleOpenExportModal(key as string, tableName)
-                  }
+                  onAction={(key) => {
+                    if (serverSidePagination && onExport) {
+                      // Para paginación de backend, usar onExport custom
+                      const fileName = tableFeatures.getDefaultFileName(tableName);
+                      tableFeatures.setFileName(fileName);
+                      tableFeatures.setExportFormat(key as string);
+                      tableFeatures.setIsExportModalOpen(true);
+                    } else {
+                      tableFeatures.handleOpenExportModal(key as string, tableName);
+                    }
+                  }}
                 >
                   <DropdownItem
                     key="excel"
@@ -256,7 +292,19 @@ export function DataTable<T extends Record<string, any>>({
         aria-label="Tabla de datos"
         selectionMode="none"
         sortDescriptor={tableFeatures.sortDescriptor}
-        onSortChange={tableFeatures.setSortDescriptor}
+        onSortChange={(descriptor) => {
+          if (serverSidePagination && onSortChangeServer) {
+            // Para paginación de backend, usar onSortChange custom
+            if (descriptor.column) {
+              onSortChangeServer(
+                descriptor.column as string,
+                descriptor.direction as "ascending" | "descending"
+              );
+            }
+          } else {
+            tableFeatures.setSortDescriptor(descriptor);
+          }
+        }}
         classNames={{
           tr: "data-[odd=true]:bg-[#EEF1F7]",
         }}
@@ -302,23 +350,50 @@ export function DataTable<T extends Record<string, any>>({
       </Table>
 
       {/* Paginación */}
-      {tableFeatures.pages > 1 && (
-        <div className="flex justify-center mt-4">
-          <Pagination
-            isCompact
-            showControls
-            showShadow
-            classNames={{
-              cursor: "text-white",
-            }}
-            style={{
-              "--pagination-active-bg": paginationColor,
-            } as React.CSSProperties}
-            page={tableFeatures.page}
-            total={tableFeatures.pages}
-            onChange={tableFeatures.setPage}
-          />
-        </div>
+      {serverSidePagination ? (
+        // Paginación del servidor
+        totalRecords > 0 && (
+          <div className="flex justify-center mt-4">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              classNames={{
+                cursor: "text-white",
+              }}
+              style={{
+                "--pagination-active-bg": paginationColor,
+              } as React.CSSProperties}
+              page={currentPage}
+              total={Math.ceil(totalRecords / tableFeatures.rowsPerPage)}
+              onChange={(page) => {
+                if (onPageChange) {
+                  onPageChange(page);
+                }
+              }}
+            />
+          </div>
+        )
+      ) : (
+        // Paginación del cliente
+        tableFeatures.pages > 1 && (
+          <div className="flex justify-center mt-4">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              classNames={{
+                cursor: "text-white",
+              }}
+              style={{
+                "--pagination-active-bg": paginationColor,
+              } as React.CSSProperties}
+              page={tableFeatures.page}
+              total={tableFeatures.pages}
+              onChange={tableFeatures.setPage}
+            />
+          </div>
+        )
       )}
 
       {/* Modal de exportación */}
@@ -329,9 +404,15 @@ export function DataTable<T extends Record<string, any>>({
           exportFormat={tableFeatures.exportFormat}
           fileName={tableFeatures.fileName}
           onFileNameChange={tableFeatures.setFileName}
-          onConfirm={() =>
-            tableFeatures.handleConfirmExport(exportColumns, exportTitle)
-          }
+          onConfirm={async () => {
+            if (serverSidePagination && onExport) {
+              // Para paginación de backend, usar onExport custom
+              await onExport(tableFeatures.exportFormat, tableFeatures.fileName);
+              tableFeatures.setIsExportModalOpen(false);
+            } else {
+              tableFeatures.handleConfirmExport(exportColumns, exportTitle);
+            }
+          }}
         />
       )}
     </div>
