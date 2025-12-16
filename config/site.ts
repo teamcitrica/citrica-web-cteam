@@ -1,5 +1,5 @@
 export type SiteConfig = typeof siteConfig;
-import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck, Calendar, UserStar, Sparkles } from "lucide-react"
+import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck, Calendar, UserStar, Sparkles, Folder } from "lucide-react"
 
 const ROL_ADMIN = 1;
 const ROL_USER = 2;
@@ -126,7 +126,7 @@ export const siteConfig = {
 		},
 		{
 			title: "PROYECTOS",
-			icon: "ClipboardCheck",
+			icon: "Folder",
 			href: "/admin/client/mis-datos",
 			allowedRoles: [ROL_CLIENTE],
 			subItems: [],
