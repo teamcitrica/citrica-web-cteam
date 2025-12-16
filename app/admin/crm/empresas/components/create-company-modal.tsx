@@ -1,12 +1,10 @@
 "use client";
 import { useState } from "react";
-import {
-  Button,
-  Textarea,
-} from "@heroui/react";
+import { Textarea } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
+import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
 
 import { useCompanyCRUD, CompanyInput } from "@/hooks/companies/use-companies";
 
@@ -87,20 +85,21 @@ export default function CreateCompanyModal({
       customWidth="max-w-[400px]"
       footer={
         <>
-          <Button
-            variant="bordered"
+          <ButtonCitricaAdmin
+            variant="secondary"
             onPress={onClose}
-            className="border-[#42668A] text-[#42668A] rounded-[8px] w-[162px]"
+            className="w-[162px]"
           >
             Cerrar
-          </Button>
-          <Button
-            className="bg-[#42668A] text-white w-[162px] rounded-[8px]"
+          </ButtonCitricaAdmin>
+          <ButtonCitricaAdmin
+            variant="primary"
+            className="bg-[#42668A] w-[162px]"
             onPress={handleSubmit}
             isLoading={isLoading}
           >
             Agregar
-          </Button>
+          </ButtonCitricaAdmin>
         </>
       }
     >

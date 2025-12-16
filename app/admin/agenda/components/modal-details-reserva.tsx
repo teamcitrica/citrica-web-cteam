@@ -7,8 +7,8 @@ import {
   ModalBody,
   ModalFooter,
 } from "@heroui/react";
-import { Button } from "@heroui/react";
 import Text from "@/shared/components/citrica-ui/atoms/text";
+import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
 import { Reserva, ReservaEstado } from "@/hooks/reservas/use-reservas";
 
 interface ReservaDetailModalProps {
@@ -170,12 +170,12 @@ export default function ReservaDetailModal({
           </div>
         </ModalBody>
         <ModalFooter className="border-t border-gray-200">
-          <Button
-            className="bg-[#ff5b00] text-white"
+          <ButtonCitricaAdmin
+            variant="secondary"
             onPress={onClose}
           >
             Cerrar
-          </Button>
+          </ButtonCitricaAdmin>
         </ModalFooter>
       </ModalContent>
     </Modal>
