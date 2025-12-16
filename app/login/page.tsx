@@ -22,9 +22,8 @@ const LoginPage = () => {
   }
 
   return (
-    <Container className='flex justify-center items-center h-screen'>
-      <LoginContainer
-      />
+    <Container className='flex justify-center items-center h-screen bg-[url("/img/login-bkg-img-lg.jpg")] bg-cover bg-center bg-no-repeat'>
+      <LoginContainer/>
     </Container>
   )
 }

@@ -456,15 +456,6 @@ export default function AssetFormModal({
     }
 
     if (mode === "edit" && asset) {
-      setFormData({
-        name: asset.name,
-        supabase_url: asset.supabase_url,
-        supabase_anon_key: asset.supabase_anon_key,
-        tabla: asset.tabla,
-        assets_options: asset.assets_options,
-        project_id: asset.project_id,
-      });
-
       // Extraer las columnas guardadas
       const savedColumns = asset.assets_options?.columns && Array.isArray(asset.assets_options.columns)
         ? asset.assets_options.columns
@@ -480,32 +471,60 @@ export default function AssetFormModal({
         ? asset.assets_options.columnValues
         : {};
 
-      // Si tiene columnas en assets_options, cargarlas
+      // Configurar estados primero
       if (savedColumns.length > 0) {
         setSelectedColumns(savedColumns);
         setColumnsConfirmed(true);
         setShowColumnSelection(false);
         setShowFilterSelection(true);
+      } else {
+        setSelectedColumns([]);
+        setColumnsConfirmed(false);
+        setShowColumnSelection(true);
+        setShowFilterSelection(false);
       }
 
       // Si tiene filtros, cargarlos
       if (savedFilters.length > 0) {
         setFilters(savedFilters);
+      } else {
+        setFilters([]);
       }
 
       // Si tiene cache de valores, cargarlo
       if (Object.keys(savedColumnValues).length > 0) {
         setColumnValuesCache(savedColumnValues);
+      } else {
+        setColumnValuesCache({});
       }
+
+      // Establecer formData después de configurar los estados
+      setFormData({
+        name: asset.name,
+        supabase_url: asset.supabase_url,
+        supabase_anon_key: asset.supabase_anon_key,
+        tabla: asset.tabla,
+        assets_options: asset.assets_options,
+        project_id: asset.project_id,
+      });
 
       // Si tiene URL y key, cargar las tablas automáticamente sin mostrar toasts
       if (asset.supabase_url && asset.supabase_anon_key) {
-        handleConsultTables(asset.supabase_url, asset.supabase_anon_key, false);
+        const url = asset.supabase_url;
+        const key = asset.supabase_anon_key;
+        const tabla = asset.tabla;
 
-        // Si también tiene una tabla seleccionada, cargar sus columnas preservando las selecciones sin mostrar toasts
-        if (asset.tabla) {
-          fetchTableColumns(asset.tabla, savedColumns, false);
-        }
+        // Usar setTimeout para asegurar que los estados se actualicen antes de cargar datos
+        setTimeout(() => {
+          handleConsultTables(url, key, false);
+
+          // Si también tiene una tabla seleccionada, cargar sus columnas preservando las selecciones sin mostrar toasts
+          if (tabla) {
+            setTimeout(() => {
+              fetchTableColumns(tabla, savedColumns, false);
+            }, 100);
+          }
+        }, 100);
       }
     } else if (mode === "create") {
       // Limpiar el formulario cuando se abre en modo "create"
