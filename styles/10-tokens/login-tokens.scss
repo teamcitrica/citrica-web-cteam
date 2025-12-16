@@ -23,15 +23,15 @@ $container-inputs : (
 }
 
 .bg-login {
-  background: url("https://citrica-websites.s3.us-east-1.amazonaws.com/citrica-web-cteam-landing/img-login.png");
+  background: url("/img/login-form-image-lg.jpg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
   width: 100%;
   max-width: 484px;
   height: 473px;
-  border: 1px solid #E9E8DD;
+  // border: 1px solid #E9E8DD;
   border-top-right-radius: 12px;
   border-bottom-right-radius: 12px;
-  box-shadow: 8px 8px 24px rgba(102, 102, 102, 0.3);
+  // box-shadow: 8px 8px 24px rgba(102, 102, 102, 0.3);
 }
