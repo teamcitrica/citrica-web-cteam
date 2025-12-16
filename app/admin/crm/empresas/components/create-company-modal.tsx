@@ -13,11 +13,13 @@ import { useCompanyCRUD, CompanyInput } from "@/hooks/companies/use-companies";
 interface CreateCompanyModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 export default function CreateCompanyModal({
   isOpen,
   onClose,
+  onSuccess,
 }: CreateCompanyModalProps) {
   const { createCompany, isLoading } = useCompanyCRUD();
   const [formData, setFormData] = useState<CompanyInput>({
@@ -69,6 +71,7 @@ export default function CreateCompanyModal({
           address_number: null,
           contact_position: null,
         });
+        onSuccess?.();
         onClose();
       }
     } catch (error) {
@@ -80,24 +83,28 @@ export default function CreateCompanyModal({
     <DrawerCitricaAdmin
       isOpen={isOpen}
       onClose={onClose}
-      title="Agregar Nueva Empresa"
-      size="2xl"
+      title="AGREGAR EMPRESA"
+      customWidth="max-w-[400px]"
       footer={
         <>
-          <Button color="danger" variant="light" onPress={onClose}>
-            Cancelar
+          <Button
+            variant="bordered"
+            onPress={onClose}
+            className="border-[#42668A] text-[#42668A] rounded-[8px] w-[162px]"
+          >
+            Cerrar
           </Button>
           <Button
-            className="bg-[#42668A] text-white"
+            className="bg-[#42668A] text-white w-[162px] rounded-[8px]"
             onPress={handleSubmit}
             isLoading={isLoading}
           >
-            Crear Empresa
+            Agregar
           </Button>
         </>
       }
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
         <InputCitricaAdmin
           label="Nombre de la Empresa"
           placeholder="Ingrese el nombre"
@@ -173,8 +180,9 @@ export default function CreateCompanyModal({
         value={formData.description || ""}
         onChange={(e) => handleInputChange("description", e.target.value)}
         classNames={{
-          label: "text-gray-700",
-          input: "text-gray-800",
+          label: "!text-[#265197]",
+          input: "!text-[#265197]",
+          inputWrapper: "bg-white !border-[#D4DEED]",
         }}
         className="mt-4"
       />

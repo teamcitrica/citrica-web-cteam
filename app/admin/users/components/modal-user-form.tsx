@@ -245,15 +245,16 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
     <DrawerCitricaAdmin
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditMode ? "Editar Usuario" : "Crear Usuario"}
-      size="lg"
+      title={isEditMode ? "EDITAR USUARIO" : "AGREGAR USUARIO"}
+      customWidth="max-w-[400px]"
       footer={
         <>
           <ButtonCitricaAdmin
             variant="secondary"
             onPress={onClose}
+            className="border-[#42668A] text-[#42668A] rounded-[8px] w-[162px]"
           >
-            Cancelar
+            Cerrar
           </ButtonCitricaAdmin>
           <ButtonCitricaAdmin
             variant="primary"
@@ -261,8 +262,9 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             onPress={handleSubmit}
             isLoading={isLoading}
             isDisabled={isEditMode && !hasChanges()}
+            className="bg-[#42668A] text-white w-[162px] rounded-[8px]"
           >
-            {isEditMode ? "Actualizar Usuario" : "Guardar Usuario"}
+            {isEditMode ? "Guardar" : "Agregar"}
           </ButtonCitricaAdmin>
         </>
       }
