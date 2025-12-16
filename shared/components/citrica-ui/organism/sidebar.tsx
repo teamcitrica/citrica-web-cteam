@@ -1,12 +1,14 @@
 "use client"
 import React from "react"
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Button } from "@heroui/react"
 import { ChevronDown, Menu } from "lucide-react"
 import type { SidebarProps, MenuItem } from "../../../types/sidebar"
 import { Icon, Text } from "@citrica-ui"
 import { IconName } from "@/shared/components/citrica-ui/atoms/icon"
 import { usePathname, useRouter } from 'next/navigation';
+import { UserAuth } from "@/shared/context/auth-context";
+import { useSupabase } from "@/shared/context/supabase-context";
 
 function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boolean; onToggle: () => void }) {
   const router = useRouter();
@@ -49,8 +51,50 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
 export function Sidebar({ items }: SidebarProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const [openItems, setOpenItems] = React.useState<Record<string, boolean>>({})
+  const [companyName, setCompanyName] = useState<string | null>(null)
   const pathname = usePathname();
   const router = useRouter();
+  const { userInfo } = UserAuth();
+  const { supabase } = useSupabase();
+
+  // Obtener el nombre de la empresa del usuario
+  useEffect(() => {
+    const fetchCompanyName = async () => {
+      if (!userInfo?.id) return;
+
+      try {
+        // Buscar el contacto del usuario
+        const { data: contactData, error: contactError } = await supabase
+          .from('contact')
+          .select('company_id')
+          .eq('user_id', userInfo.id)
+          .single();
+
+        if (contactError || !contactData?.company_id) {
+          console.log('No se encontró empresa para este usuario');
+          return;
+        }
+
+        // Buscar la empresa
+        const { data: companyData, error: companyError } = await supabase
+          .from('company')
+          .select('name')
+          .eq('id', contactData.company_id)
+          .single();
+
+        if (companyError) {
+          console.error('Error al obtener empresa:', companyError);
+          return;
+        }
+
+        setCompanyName(companyData?.name || null);
+      } catch (error) {
+        console.error('Error al obtener nombre de empresa:', error);
+      }
+    };
+
+    fetchCompanyName();
+  }, [userInfo, supabase]);
 
   // Verificar si alguna subopción está activa para mantener el acordeón abierto
   const isSubItemActive = (item: MenuItem): boolean => {
@@ -65,12 +109,20 @@ export function Sidebar({ items }: SidebarProps) {
   const NavItems = () => (
     <div className="h-[100svh] w-full overflow-y-auto px-2 py-4 bg-sidebar">
       {/* Logo - solo visible en pantallas grandes */}
-      <div className="hidden lg:flex justify-start items-center">
+      <div className="hidden lg:flex flex-col justify-start items-start mb-4">
         <img
           src="/img/citrica-logo.png"
           alt="Citrica Logo"
           className="m-4 h-16 w-auto"
         />
+        {/* Nombre de la empresa - solo en vista MIS DATOS */}
+        {companyName && pathname.includes('/admin/client/mis-datos') && (
+          <div className="px-4 pb-2 w-full text-start">
+            <Text variant="body" color="#16305A" className="font-semibold">
+              {companyName}
+            </Text>
+          </div>
+        )}
       </div>
       {items.map((item) => (
         <div key={item.title} className="mb-2">

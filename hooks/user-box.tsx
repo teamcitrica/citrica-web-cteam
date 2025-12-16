@@ -23,8 +23,8 @@ export const UserBox = () => {
       label: "Cerrar sesión",
       onClick: handleLogout,
       icon: "LogOut",
-      color: "danger",
-      className: "flex justify-center pl-[16px] py-[13px] text-danger"
+      color: "default",
+      className: "flex justify-center pl-[16px] py-[13px] text-[#265197] hover:bg-[#265197] hover:text-white transition-colors"
     }
   ];
 
@@ -40,7 +40,7 @@ export const UserBox = () => {
       userAvatar={undefined} // Si tienes avatar del usuario, pásalo aquí
       items={dropdownItems}
       onItemClick={handleItemClick}
-      triggerBackgroundColor="#E9E6DD"
+      triggerBackgroundColor="transparent"
       avatarSize={40}
       dropdownWidth="241px"
       dropdownHeight="96px"

@@ -122,19 +122,15 @@ export const DropCitrica: React.FC<DropCitricaProps> = ({
   return (
     <Dropdown placement={placement} isDisabled={isDisabled}>
       <DropdownTrigger>
-        <div 
-          className={`flex items-center justify-between gap-2 rounded-full cursor-pointer ${triggerClassName}`}
+        <div
+          className={`flex items-center gap-3 rounded-full cursor-pointer px-3 py-2 ${triggerClassName}`}
           style={defaultTriggerStyle}
         >
-          <div className="bg-white rounded-full p-[2px]">
-            <Avatar
-              src={userAvatar}
-              isBordered={false}
-              className=""
-              name={userName}
-            />
+          <div className="rounded-full flex items-center justify-center overflow-hidden" style={{ width: '48px', height: '48px' }}>
+            <img src="/avatar-logueo-citrica.png" alt="Avatar" width="48" height="48" />
           </div>
-          <Icon name="ChevronDown" size={16} className="text-gray-600" />
+          <span className="text-sm font-medium flex-1" style={{ color: '#16305A' }}>{userName}</span>
+          <Icon name="ChevronDown" size={16} style={{ color: '#16305A' }} />
         </div>
       </DropdownTrigger>
 
