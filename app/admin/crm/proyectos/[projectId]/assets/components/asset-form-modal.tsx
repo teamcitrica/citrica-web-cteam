@@ -56,6 +56,7 @@ export default function AssetFormModal({
   const [filterColumnValues, setFilterColumnValues] = useState<string[]>([]);
   const [selectedFilterValue, setSelectedFilterValue] = useState<string>("");
   const [isLoadingFilterValues, setIsLoadingFilterValues] = useState(false);
+  const [lastConfirmedColumns, setLastConfirmedColumns] = useState<string[]>([]);
 
   // Cache de valores de columnas
   const [columnValuesCache, setColumnValuesCache] = useState<Record<string, string[]>>({});
@@ -72,8 +73,11 @@ export default function AssetFormModal({
 
 
   // Función para obtener columnas de una tabla específica
-  const fetchTableColumns = useCallback(async (tableName: string, preservedColumns?: string[], showToast = true) => {
-    if (!formData.supabase_url || !formData.supabase_anon_key || !tableName) {
+  const fetchTableColumns = useCallback(async (tableName: string, preservedColumns?: string[], showToast = true, supabaseUrl?: string, supabaseKey?: string) => {
+    const url = supabaseUrl || formData.supabase_url;
+    const key = supabaseKey || formData.supabase_anon_key;
+
+    if (!url || !key || !tableName) {
       return;
     }
 
@@ -84,13 +88,13 @@ export default function AssetFormModal({
         setSelectedColumns([]);
       }
 
-      const cleanUrl = formData.supabase_url.replace(/\/$/, "");
+      const cleanUrl = url.replace(/\/$/, "");
 
       // Obtener el schema OpenAPI para ver las propiedades de la tabla
       const response = await fetch(`${cleanUrl}/rest/v1/`, {
         method: "GET",
         headers: {
-          apikey: formData.supabase_anon_key,
+          apikey: key,
           "Content-Type": "application/json",
         },
       });
@@ -255,8 +259,9 @@ export default function AssetFormModal({
     }
 
     setColumnsConfirmed(true);
-    setShowColumnSelection(false);
+    // No cerramos el acordeón, lo dejamos abierto
     setShowFilterSelection(true);
+    setLastConfirmedColumns([...selectedColumns]);
 
     // Actualizar assets_options con las columnas y el cache de valores
     const options = {
@@ -271,6 +276,24 @@ export default function AssetFormModal({
       description: `Se confirmaron ${selectedColumns.length} columnas`,
       color: "success",
     });
+  };
+
+  // Verificar si las columnas han cambiado desde la última confirmación
+  const columnsHaveChanged = () => {
+    // Si no hay columnas confirmadas previamente, no hay cambios
+    if (lastConfirmedColumns.length === 0 && selectedColumns.length === 0) {
+      return false;
+    }
+
+    // Si las longitudes son diferentes, hay cambios
+    if (selectedColumns.length !== lastConfirmedColumns.length) {
+      return true;
+    }
+
+    // Si las columnas son diferentes, hay cambios
+    const sortedSelected = [...selectedColumns].sort();
+    const sortedConfirmed = [...lastConfirmedColumns].sort();
+    return !sortedSelected.every((col, index) => col === sortedConfirmed[index]);
   };
 
   // Función para obtener valores únicos de una columna
@@ -474,11 +497,13 @@ export default function AssetFormModal({
       // Configurar estados primero
       if (savedColumns.length > 0) {
         setSelectedColumns(savedColumns);
+        setLastConfirmedColumns(savedColumns);
         setColumnsConfirmed(true);
-        setShowColumnSelection(false);
+        setShowColumnSelection(true); // Mantener abierto para que se vea en edición
         setShowFilterSelection(true);
       } else {
         setSelectedColumns([]);
+        setLastConfirmedColumns([]);
         setColumnsConfirmed(false);
         setShowColumnSelection(true);
         setShowFilterSelection(false);
@@ -514,17 +539,13 @@ export default function AssetFormModal({
         const key = asset.supabase_anon_key;
         const tabla = asset.tabla;
 
-        // Usar setTimeout para asegurar que los estados se actualicen antes de cargar datos
-        setTimeout(() => {
-          handleConsultTables(url, key, false);
+        // Cargar tablas inmediatamente
+        handleConsultTables(url, key, false);
 
-          // Si también tiene una tabla seleccionada, cargar sus columnas preservando las selecciones sin mostrar toasts
-          if (tabla) {
-            setTimeout(() => {
-              fetchTableColumns(tabla, savedColumns, false);
-            }, 100);
-          }
-        }, 100);
+        // Si también tiene una tabla seleccionada, cargar sus columnas preservando las selecciones sin mostrar toasts
+        if (tabla) {
+          fetchTableColumns(tabla, savedColumns, false, url, key);
+        }
       }
     } else if (mode === "create") {
       // Limpiar el formulario cuando se abre en modo "create"
@@ -537,6 +558,7 @@ export default function AssetFormModal({
         project_id: projectId,
       });
       setSelectedColumns([]);
+      setLastConfirmedColumns([]);
       setTables([]);
       setTableColumns([]);
       setColumnsConfirmed(false);
@@ -561,7 +583,12 @@ export default function AssetFormModal({
       return;
     }
 
-    // Las opciones ya están en formData.assets_options gracias a los checkboxes
+    // Actualizar assets_options con las columnas y filtros actuales antes de guardar
+    const updatedOptions = {
+      columns: selectedColumns,
+      filters: filters,
+      columnValues: columnValuesCache
+    };
 
     try {
       // Limpiar campos vacíos antes de enviar
@@ -572,6 +599,11 @@ export default function AssetFormModal({
           cleanedData[key] = value;
         }
       });
+
+      // Actualizar assets_options con los valores actuales
+      if (selectedColumns.length > 0 || filters.length > 0 || Object.keys(columnValuesCache).length > 0) {
+        cleanedData.assets_options = updatedOptions;
+      }
 
       // Asegurar que project_id siempre esté presente
       cleanedData.project_id = projectId;
@@ -589,6 +621,7 @@ export default function AssetFormModal({
             project_id: projectId,
           });
           setSelectedColumns([]);
+          setLastConfirmedColumns([]);
           setTables([]);
           setTableColumns([]);
           setColumnsConfirmed(false);
@@ -629,6 +662,7 @@ export default function AssetFormModal({
             className="bg-[#42668A] text-white w-[162px] rounded-[8px]"
             onPress={handleSubmit}
             isLoading={isLoading}
+            isDisabled={tableColumns.length > 0 && selectedColumns.length > 0 && columnsHaveChanged()}
           >
             {mode === "create" ? "Agregar" : "Guardar"}
           </Button>
@@ -712,7 +746,7 @@ export default function AssetFormModal({
             )}
 
             {/* Acordeón: Selección de columnas */}
-            {tableColumns.length > 0 && (
+            {(tableColumns.length > 0 || selectedColumns.length > 0) && (
               <div>
                 <div className="border rounded-lg bg-white">
                   {/* Header del acordeón de columnas */}
@@ -807,9 +841,9 @@ export default function AssetFormModal({
                               <Button
                                 className="bg-green-600 text-white w-full"
                                 onPress={handleConfirmColumns}
-                                isDisabled={columnsConfirmed}
+                                isDisabled={columnsConfirmed && !columnsHaveChanged()}
                               >
-                                {columnsConfirmed ? "Columnas Confirmadas ✓" : "Confirmar Columnas"}
+                                {columnsConfirmed && !columnsHaveChanged() ? "Columnas Confirmadas ✓" : "Confirmar Columnas"}
                               </Button>
                             </div>
                           )}
