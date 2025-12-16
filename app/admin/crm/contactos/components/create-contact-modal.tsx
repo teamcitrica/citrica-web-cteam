@@ -166,20 +166,6 @@ export default function CreateContactModal({
         />
 
       </div>
-
-      {/* {formData.company_id && formData.company_id !== 1 && (
-        <div className="mt-4">
-          <Switch
-            isSelected={formData.has_system_access || false}
-            onValueChange={(value) => handleInputChange("has_system_access", value as any)}
-            classNames={{
-              label: "text-gray-700",
-            }}
-          >
-            Dar acceso al sistema
-          </Switch>
-        </div>
-      )} */}
     </DrawerCitricaAdmin>
   );
 }

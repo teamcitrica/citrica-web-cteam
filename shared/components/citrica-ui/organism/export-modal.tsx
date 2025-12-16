@@ -11,6 +11,7 @@ type ExportModalProps = {
   fileName: string;
   onFileNameChange: (value: string) => void;
   onConfirm: () => void;
+  isLoading?: boolean;
 };
 
 const ExportModal: React.FC<ExportModalProps> = ({
@@ -20,6 +21,7 @@ const ExportModal: React.FC<ExportModalProps> = ({
   fileName,
   onFileNameChange,
   onConfirm,
+  isLoading = false,
 }) => {
   return (
     <Modal isOpen={isOpen} onOpenChange={onClose} size="md">
@@ -45,15 +47,16 @@ const ExportModal: React.FC<ExportModalProps> = ({
               </div>
             </ModalBody>
             <ModalFooter>
-              <Button variant="light" onPress={onCloseModal}>
+              <Button variant="light" onPress={onCloseModal} isDisabled={isLoading}>
                 Cancelar
               </Button>
               <Button
                 className="bg-[#5EA667] text-white"
                 onPress={onConfirm}
-                isDisabled={!fileName.trim()}
+                isDisabled={!fileName.trim() || isLoading}
+                isLoading={isLoading}
               >
-                Exportar
+                {isLoading ? "Exportando..." : "Exportar"}
               </Button>
             </ModalFooter>
           </>

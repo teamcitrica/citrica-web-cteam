@@ -169,30 +169,38 @@ export default function EditContactModal({
           value={formData.address || ""}
           onChange={(e) => handleInputChange("address", e.target.value)}
         />
-        <Select
-          label="Empresa"
-          placeholder="Seleccione una empresa"
-          selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
-            const newCompanyId = selected ? Number(selected) : null;
+        <div>
+          <Select
+            label="Empresa"
+            placeholder="Seleccione una empresa"
+            selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0];
+              const newCompanyId = selected ? Number(selected) : null;
 
-            setFormData((prev) => ({
-              ...prev,
-              company_id: newCompanyId,
-            }));
-          }}
-          classNames={{
-            label: "text-gray-700",
-            value: "text-gray-800",
-          }}
-        >
-          {companies.map((company) => (
-            <SelectItem key={String(company.id)}>
-              {company.name || `Empresa ${company.id}`}
-            </SelectItem>
-          ))}
-        </Select>
+              setFormData((prev) => ({
+                ...prev,
+                company_id: newCompanyId,
+              }));
+            }}
+            isDisabled={!!contact.user_id}
+            classNames={{
+              label: "text-gray-700",
+              value: "text-gray-800",
+            }}
+          >
+            {companies.map((company) => (
+              <SelectItem key={String(company.id)}>
+                {company.name || `Empresa ${company.id}`}
+              </SelectItem>
+            ))}
+          </Select>
+          {contact.user_id && (
+            <p className="text-xs text-gray-500 mt-1">
+              No se puede cambiar la empresa porque este contacto ya tiene un usuario creado. Para cambiar la empresa, edítalo desde el menú de usuarios.
+            </p>
+          )}
+        </div>
       </div>
     </DrawerCitricaAdmin>
   );
