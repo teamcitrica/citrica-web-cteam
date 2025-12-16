@@ -184,6 +184,15 @@ export default function AssetDataPage() {
                 );
               }
 
+              // Formatear URLs con truncado
+              if (col.toLowerCase().includes("url") || col.toLowerCase().includes("image")) {
+                return (
+                  <div className="text-black font-medium max-w-[200px] truncate cursor-pointer select-text" title={String(value)}>
+                    {String(value)}
+                  </div>
+                );
+              }
+
               return (
                 <div className="text-black font-medium">{String(value)}</div>
               );
