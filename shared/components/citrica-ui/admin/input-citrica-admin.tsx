@@ -28,8 +28,9 @@ export const InputCitricaAdmin: React.FC<InputCitricaAdminProps> = ({
           "!text-[#3E688E] !rounded-[12px] !border-[#D4DEED] data-[focus=true]:!border-[#D4DEED] data-[hover=true]:!border-[#B8D4E5] focus-within:!border-[#D4DEED]",
         mainWrapper: "",
         label: "!text-[#265197]",
-        input: "placeholder:text-[#A7BDE2]",
+        input: "placeholder:text-[#A7BDE2] !rounded-[12px]",
         innerWrapper: "!rounded-[12px]",
+        base: "!rounded-[12px]",
       }}
       variant="bordered"
       endContent={endContent}
