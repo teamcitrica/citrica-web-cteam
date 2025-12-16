@@ -46,7 +46,7 @@ export const useContactCRUD = () => {
             name,
             description
           ),
-          users:user_id (
+          users!user_id (
             active_users
           )
         `)
@@ -88,7 +88,7 @@ export const useContactCRUD = () => {
             name,
             description
           ),
-          users:user_id (
+          users!user_id (
             active_users
           )
         `)
