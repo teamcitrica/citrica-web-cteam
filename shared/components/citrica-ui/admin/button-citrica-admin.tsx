@@ -29,7 +29,7 @@ export const ButtonCitricaAdmin: React.FC<ButtonCitricaAdminProps> = ({
       case "primary":
         return "text-white py-[6px] px-[6px] rounded-lg border-2 border-white";
       case "secondary":
-        return "bg-transparent text-gray-700 py-4";
+        return "border-[#42668A] border-[2px] bg-transparent text-[#42668A] rounded-[8px]";
       case "export":
         return "bg-transparent border-2 border-[#D4DEED] text-gray-700 py-4";
       default:

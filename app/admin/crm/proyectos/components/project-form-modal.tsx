@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import {
-  Button,
   Select,
   SelectItem,
   Chip,
@@ -11,6 +10,7 @@ import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
+import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
 
 import { useProjectCRUD, ProjectInput, Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
@@ -275,17 +275,18 @@ export default function ProjectFormModal({
       size="2xl"
       footer={
         <>
-          <Button color="danger" variant="light" onPress={onClose}>
+          <ButtonCitricaAdmin variant="secondary" onPress={onClose}>
             Cancelar
-          </Button>
-          <Button
-            className="bg-[#42668A] text-white"
+          </ButtonCitricaAdmin>
+          <ButtonCitricaAdmin
+            variant="primary"
+            className="bg-[#42668A]"
             onPress={handleSubmit}
             isLoading={isLoading}
             isDisabled={mode === "edit" ? !hasChanges() : false}
           >
             {mode === "create" ? "Crear Proyecto" : "Guardar Cambios"}
-          </Button>
+          </ButtonCitricaAdmin>
         </>
       }
     >

@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
-import { Input } from "@heroui/input";
-import { Button } from "@heroui/button";
+import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
+import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
 
 type ExportModalProps = {
   isOpen: boolean;
@@ -24,40 +24,45 @@ const ExportModal: React.FC<ExportModalProps> = ({
   isLoading = false,
 }) => {
   return (
-    <Modal isOpen={isOpen} onOpenChange={onClose} size="md">
+    <Modal isOpen={isOpen} onOpenChange={onClose} className="w-[360px]">
       <ModalContent>
         {(onCloseModal) => (
           <>
-            <ModalHeader className="flex flex-col gap-1">
-              Exportar tabla
+            <ModalHeader className="flex flex-col gap-1 h-[64px] text-[#16305A] bg-white">
+              EXPORTAR TABLA
             </ModalHeader>
-            <ModalBody>
+            <ModalBody className="bg-[#EDF1F7] h-[156px]">
               <div className="flex flex-col gap-4">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-[#265197] font-bold">
                   Formato seleccionado:{" "}
                   <span className="font-semibold uppercase">{exportFormat}</span>
                 </p>
-                <Input
-                  label="Nombre del archivo"
-                  placeholder="Ingrese el nombre del archivo"
-                  value={fileName}
-                  onChange={(e) => onFileNameChange(e.target.value)}
-                  description="El nombre por defecto incluye la fecha actual"
-                />
+                <div>
+                  <InputCitricaAdmin
+                    label="Nombre del archivo"
+                    placeholder="Ingrese el nombre del archivo"
+                    value={fileName}
+                    onChange={(e) => onFileNameChange(e.target.value)}
+                  />
+                  <span className="text-label !text-[12px] text-[#678CC5] bg-[#EDF1F7] block mt-1">
+                    El nombre por defecto incluye la fecha actual.
+                  </span>
+                </div>
               </div>
             </ModalBody>
-            <ModalFooter>
-              <Button variant="light" onPress={onCloseModal} isDisabled={isLoading}>
+            <ModalFooter className="h-[72px] flex justify-center">
+              <ButtonCitricaAdmin variant="secondary" onPress={onCloseModal} isDisabled={isLoading}>
                 Cancelar
-              </Button>
-              <Button
-                className="bg-[#5EA667] text-white"
+              </ButtonCitricaAdmin>
+              <ButtonCitricaAdmin
+                variant="primary"
+                className="bg-[#265197]"
                 onPress={onConfirm}
                 isDisabled={!fileName.trim() || isLoading}
                 isLoading={isLoading}
               >
                 {isLoading ? "Exportando..." : "Exportar"}
-              </Button>
+              </ButtonCitricaAdmin>
             </ModalFooter>
           </>
         )}
