@@ -42,8 +42,8 @@ export default function PanelLayout({
     // Si hay assets y el usuario tiene el rol de cliente (ROL_CLIENTE = 12)
     if (assets.length > 0 && roleId === 12) {
       const itemsWithAssets = baseItems.map(item => {
-        // Si es el item "MIS DATOS", agregar los assets como subitems
-        if (item.title === "MIS DATOS") {
+        // Si es el item "PROYECTOS", agregar los assets como subitems
+        if (item.title === "PROYECTOS") {
           return {
             ...item,
             subItems: assets.map(asset => ({
