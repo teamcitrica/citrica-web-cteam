@@ -284,7 +284,6 @@ export function DataTable<T extends Record<string, any>>({
             )}
           </div>
         </div>
-      </div>
 
       {/* Contenedor de tabla con scroll horizontal */}
       <div className="overflow-x-auto">
