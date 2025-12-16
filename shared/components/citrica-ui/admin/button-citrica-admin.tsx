@@ -2,9 +2,10 @@
 import React from "react";
 import { Button as HeroUIButton, ButtonProps as HeroUIButtonProps } from "@heroui/react";
 
-export interface ButtonCitricaAdminProps extends Omit<HeroUIButtonProps, 'className' | 'variant'> {
+export interface ButtonCitricaAdminProps extends Omit<HeroUIButtonProps, 'variant'> {
   variant?: "primary" | "secondary" | "export";
   children?: React.ReactNode;
+  className?: string;
 }
 
 /**
@@ -19,6 +20,7 @@ export const ButtonCitricaAdmin: React.FC<ButtonCitricaAdminProps> = ({
   variant = "primary",
   children,
   style,
+  className = "",
   ...props
 }) => {
   const getVariantStyles = () => {
@@ -36,7 +38,7 @@ export const ButtonCitricaAdmin: React.FC<ButtonCitricaAdminProps> = ({
 
   return (
     <HeroUIButton
-      className={getVariantStyles()}
+      className={`${getVariantStyles()} ${className}`.trim()}
       style={style}
       {...props}
     >
