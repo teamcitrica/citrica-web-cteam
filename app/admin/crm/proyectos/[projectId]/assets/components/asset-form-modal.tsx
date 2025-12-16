@@ -614,24 +614,28 @@ export default function AssetFormModal({
     <DrawerCitricaAdmin
       isOpen={isOpen}
       onClose={onClose}
-      title={mode === "create" ? "Agregar Nuevo Asset" : "Editar Asset"}
-      size="2xl"
+      title={mode === "create" ? "AGREGAR ASSET" : "EDITAR ASSET"}
+      customWidth="max-w-[500px]"
       footer={
         <>
-          <Button color="danger" variant="light" onPress={onClose}>
-            Cancelar
+          <Button
+            variant="bordered"
+            onPress={onClose}
+            className="border-[#42668A] text-[#42668A] rounded-[8px] w-[162px]"
+          >
+            Cerrar
           </Button>
           <Button
-            className="bg-[#42668A] text-white"
+            className="bg-[#42668A] text-white w-[162px] rounded-[8px]"
             onPress={handleSubmit}
             isLoading={isLoading}
           >
-            {mode === "create" ? "Crear Asset" : "Guardar Cambios"}
+            {mode === "create" ? "Agregar" : "Guardar"}
           </Button>
         </>
       }
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
         <InputCitricaAdmin
           label="Nombre del Asset"
           placeholder="Ingrese el nombre"
@@ -640,28 +644,24 @@ export default function AssetFormModal({
           isRequired
         />
 
-            <div className="col-span-2">
-              <InputCitricaAdmin
-                label="Supabase URL"
-                placeholder="https://xxx.supabase.co"
-                value={formData.supabase_url || ""}
-                onChange={(e) => handleInputChange("supabase_url", e.target.value)}
-                isDisabled={mode === "edit"}
-              />
-            </div>
+            <InputCitricaAdmin
+              label="Supabase URL"
+              placeholder="https://xxx.supabase.co"
+              value={formData.supabase_url || ""}
+              onChange={(e) => handleInputChange("supabase_url", e.target.value)}
+              isDisabled={mode === "edit"}
+            />
 
-            <div className="col-span-2">
-              <InputCitricaAdmin
-                label="Supabase Anon Key"
-                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                value={formData.supabase_anon_key || ""}
-                onChange={(e) => handleInputChange("supabase_anon_key", e.target.value)}
-                isDisabled={mode === "edit"}
-              />
-            </div>
+            <InputCitricaAdmin
+              label="Supabase Anon Key"
+              placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              value={formData.supabase_anon_key || ""}
+              onChange={(e) => handleInputChange("supabase_anon_key", e.target.value)}
+              isDisabled={mode === "edit"}
+            />
 
             {mode === "create" && (
-              <div className="col-span-2">
+              <div>
                 <Button
                   className="bg-green-600 text-white w-full"
                   onPress={() => handleConsultTables()}
@@ -674,7 +674,7 @@ export default function AssetFormModal({
             )}
 
             {tables.length > 0 && (
-              <div className="col-span-2">
+              <div>
                 <Select
                   label="Tabla"
                   placeholder="Selecciona una tabla"
@@ -687,8 +687,10 @@ export default function AssetFormModal({
                     }
                   }}
                   classNames={{
-                    label: "text-gray-700",
-                    value: "text-gray-800 truncate",
+                    label: "!text-[#265197]",
+                    value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2] truncate",
+                    trigger: "bg-white !border-[#D4DEED]",
+                    selectorIcon: "text-[#678CC5]",
                   }}
                 >
                   {tables.map((table) => (
@@ -711,7 +713,7 @@ export default function AssetFormModal({
 
             {/* Acordeón: Selección de columnas */}
             {tableColumns.length > 0 && (
-              <div className="col-span-2">
+              <div>
                 <div className="border rounded-lg bg-white">
                   {/* Header del acordeón de columnas */}
                   <button
@@ -821,7 +823,7 @@ export default function AssetFormModal({
 
             {/* Acordeón: Filtros de datos */}
             {columnsConfirmed && (
-              <div className="col-span-2">
+              <div>
                 <div className="border rounded-lg bg-white">
                   {/* Header del acordeón de filtros */}
                   <button
@@ -859,8 +861,10 @@ export default function AssetFormModal({
                             }
                           }}
                           classNames={{
-                            label: "text-gray-700",
-                            value: "text-gray-800",
+                            label: "!text-[#265197]",
+                            value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
+                            trigger: "bg-white !border-[#D4DEED]",
+                            selectorIcon: "text-[#678CC5]",
                           }}
                         >
                           {selectedColumns.map((column) => (
@@ -880,8 +884,10 @@ export default function AssetFormModal({
                             isDisabled={!selectedFilterColumn || isLoadingFilterValues}
                             isLoading={isLoadingFilterValues}
                             classNames={{
-                              label: "text-gray-700",
-                              value: "text-gray-800",
+                              label: "!text-[#265197]",
+                              value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
+                              trigger: "bg-white !border-[#D4DEED]",
+                              selectorIcon: "text-[#678CC5]",
                               base: "flex-1",
                             }}
                           >

@@ -96,7 +96,7 @@ export const getContactColumns = ({
               >
                 <div className="flex items-center">
                   <Icon
-                    className={`w-4 h-4 ${contact.active_users ? "text-green-600" : "text-red-600"}`}
+                    className={`w-4 h-4 ${contact.active_users ? "text-green-600" : "text-[#b5b5b5]"}`}
                     name="ShieldCheck"
                   />
                 </div>

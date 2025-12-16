@@ -24,8 +24,12 @@ export const SelectCitricaAdmin: React.FC<SelectCitricaAdminProps> = ({
     <HeroUISelect
       className={className}
       classNames={{
-        trigger: "!text-[#3E688E] rounded-[24px] border-[#D4DEED] data-[focus=true]:border-[#D4DEED] data-[open=true]:border-[#D4DEED] focus:border-[#D4DEED] hover:border-[#B8D4E5]",
+        trigger: "bg-white !border-[#D4DEED] !rounded-[12px] data-[focus=true]:!border-[#D4DEED] data-[open=true]:!border-[#D4DEED] data-[hover=true]:!border-[#B8D4E5]",
+        label: "!text-[#265197]",
+        value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
+        selectorIcon: "text-[#678CC5]",
         popoverContent: "bg-white",
+        innerWrapper: "!rounded-[12px]",
       }}
       variant="bordered"
       {...props}

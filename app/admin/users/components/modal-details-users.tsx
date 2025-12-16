@@ -59,139 +59,65 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose }) => {
     <Modal
       isOpen={true}
       onClose={onClose}
-      size="2xl"
+      size="md"
       placement="center"
       backdrop="opaque"
       scrollBehavior="inside"
+      classNames={{
+        closeButton: "w-5 h-5 min-w-5 !text-base text-[#265197] border border-[#265197] rounded-full hover:bg-[#265197] hover:text-white transition-colors flex items-center justify-center",
+        base: "rounded-2xl",
+        body: "rounded-b-2xl",
+      }}
     >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1 border-b">
-          <Text variant="headline" color="#265197">Detalles del Usuario</Text>
+      <ModalContent className="rounded-2xl">
+        <ModalHeader className="flex flex-col gap-1">
+          <h3 className="text-lg font-semibold text-[#265197]">Detalles del Usuario</h3>
         </ModalHeader>
 
-        <ModalBody className="py-6">
-          <div className="flex flex-col gap-6">
-            {/* Información principal con avatar */}
-            <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+        <ModalBody className="bg-[#EEF1F7]">
+          <div className="flex flex-col gap-4">
+            {/* Información principal con avatar centrado */}
+            <div className="flex flex-col items-center gap-3 pb-4 border-b border-gray-300">
               <Avatar
                 classNames={{
-                  base: `bg-gradient-to-br ${getAvatarColor(userName || "User")} w-20 h-20`,
-                  icon: "text-white text-2xl",
+                  base: `bg-gradient-to-br ${getAvatarColor(userName || "User")} w-16 h-16`,
+                  icon: "text-white text-xl",
                 }}
                 name={getInitials(userName || "?")}
-                size="lg"
+                size="md"
               />
-              <div className="flex flex-col gap-2 flex-1">
-                <Text variant="headline" color="#265197">{userName || "-"}</Text>
-                <div className="flex items-center gap-2">
-                  <Icon className="w-4 h-4 text-gray-500" name="Mail" />
-                  <Text variant="body" color="#666">{user.email || "-"}</Text>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Chip
-                    size="sm"
-                    variant="flat"
-                    color="primary"
-                    classNames={{
-                      base: "bg-blue-100",
-                      content: "text-blue-700 font-medium",
-                    }}
-                  >
-                    {user.role?.name || "Sin rol"}
-                  </Chip>
-                </div>
+              <div className="flex flex-col gap-1 items-center">
+                <h3 className="text-lg font-semibold text-[#265197]">{userName || "-"}</h3>
+                <p className="text-sm text-[#265197]">{user.email || "-"}</p>
+                <Chip
+                  size="sm"
+                  variant="flat"
+                  classNames={{
+                    base: "bg-[#265197]",
+                    content: "text-white font-medium",
+                  }}
+                >
+                  {user.role?.name || "Sin rol"}
+                </Chip>
               </div>
             </div>
 
             {/* Información detallada */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Nombre */}
-              <div className="flex flex-col gap-1">
-                <Text variant="label" color="#666">Nombre</Text>
-                <Text variant="body" color="#333">{user.first_name || "-"}</Text>
-              </div>
-
-              {/* Apellido */}
-              <div className="flex flex-col gap-1">
-                <Text variant="label" color="#666">Apellido</Text>
-                <Text variant="body" color="#333">{user.last_name || "-"}</Text>
-              </div>
-
-              {/* Email */}
-              <div className="flex flex-col gap-1">
-                <Text variant="label" color="#666">Correo Electrónico</Text>
-                <Text variant="body" color="#333">{user.email || "-"}</Text>
-              </div>
-
-              {/* Rol */}
-              <div className="flex flex-col gap-1">
-                <Text variant="label" color="#666">Rol</Text>
-                <Text variant="body" color="#333">{user.role?.name || "-"}</Text>
-              </div>
-
-              {/* Empresa */}
-              <div className="flex flex-col gap-1">
-                <Text variant="label" color="#666">Empresa</Text>
-                <Text variant="body" color="#333">{user.company?.name || "-"}</Text>
-              </div>
-
-              {/* ID de Usuario */}
-              <div className="flex flex-col gap-1">
-                <Text variant="label" color="#666">ID de Usuario</Text>
-                <Text variant="body" color="#333" className="font-mono text-xs">{user.id || "-"}</Text>
-              </div>
-
-              {/* Accesos a Proyectos */}
-              <div className="flex flex-col gap-1">
-                <Text variant="label" color="#666">Accesos a Proyectos</Text>
-                <Text variant="body" color="#333">
-                  {user.user_metadata?.project_access_count || 0} proyecto(s)
-                </Text>
-              </div>
-
-              {/* ID de Rol */}
-              <div className="flex flex-col gap-1">
-                <Text variant="label" color="#666">ID de Rol</Text>
-                <Text variant="body" color="#333">{user.role_id || "-"}</Text>
-              </div>
-
-              {/* ID de Empresa */}
-              {user.company_id && (
-                <div className="flex flex-col gap-1">
-                  <Text variant="label" color="#666">ID de Empresa</Text>
-                  <Text variant="body" color="#333">{user.company_id}</Text>
-                </div>
-              )}
-
-              {/* Fecha de creación */}
-              <div className="flex flex-col gap-1">
-                <Text variant="label" color="#666">Fecha de Creación</Text>
-                <div className="flex items-center gap-2">
-                  <Icon className="w-4 h-4 text-gray-500" name="Calendar" />
-                  <Text variant="body" color="#333">{createdDate}</Text>
-                </div>
-              </div>
-
-              {/* Última actualización */}
-              <div className="flex flex-col gap-1">
-                <Text variant="label" color="#666">Última Actualización</Text>
-                <div className="flex items-center gap-2">
-                  <Icon className="w-4 h-4 text-gray-500" name="Calendar" />
-                  <Text variant="body" color="#333">{updatedDate}</Text>
-                </div>
-              </div>
+            <h3>
+              <Text variant="subtitle" color="#265197" weight="bold">Datos del usuario</Text>
+            </h3>x  
+            <div className="flex flex-col gap-1 mb-[24px]">
+              <p className="text-sm text-[#265197]">Nombre: {user.first_name || "-"}</p>
+              <p className="text-sm text-[#265197]">Apellido: {user.last_name || "-"}</p>
+              <p className="text-sm text-[#265197]">Email: {user.email || "-"}</p>
+              <p className="text-sm text-[#265197]">Rol: {user.role?.name || "-"}</p>
+              <p className="text-sm text-[#265197]">Empresa: {user.company?.name || "-"}</p>
+              <p className="text-sm text-[#265197]">Accesos a Proyectos: {user.user_metadata?.project_access_count || 0} proyecto(s)</p>
+              <p className="text-sm text-[#265197]">Fecha de Creación: {createdDate}</p>
+              <p className="text-sm text-[#265197]">Última Actualización: {updatedDate}</p>
             </div>
           </div>
         </ModalBody>
-
-        <ModalFooter className="border-t">
-          <ButtonCitricaAdmin
-            variant="primary"
-            onClick={onClose}
-          >
-            Cerrar
-          </ButtonCitricaAdmin>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );

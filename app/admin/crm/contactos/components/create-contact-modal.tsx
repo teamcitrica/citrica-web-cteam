@@ -85,24 +85,53 @@ export default function CreateContactModal({
     <DrawerCitricaAdmin
       isOpen={isOpen}
       onClose={onClose}
-      title="Agregar Nuevo Contacto"
-      size="2xl"
+      title="AGREGAR CONTACTO"
+      customWidth="max-w-[400px]"
       footer={
         <>
-          <Button color="danger" variant="light" onPress={onClose}>
-            Cancelar
+          <Button
+            variant="bordered"
+            onPress={onClose}
+            className="border-[#42668A] text-[#42668A] rounded-[8px] w-[162px]"
+          >
+           Cerrar
           </Button>
           <Button
-            className="bg-[#42668A] text-white"
+            className="bg-[#42668A] text-white w-[162px] rounded-[8px]"
             onPress={handleSubmit}
             isLoading={isLoading}
           >
-            Crear Contacto
+            Agregar
           </Button>
         </>
       }
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-4 ">
+        <Select
+          label="Empresa"
+          placeholder="Seleccione una empresa"
+          selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0];
+            setFormData((prev) => ({
+              ...prev,
+              company_id: selected ? Number(selected) : null,
+            }));
+          }}
+          classNames={{
+            label: "!text-[#265197]",
+            value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
+            trigger: "bg-white !border-[#D4DEED]",
+            selectorIcon: "text-[#678CC5]",
+          }}
+        >
+          {companies.map((company) => (
+            <SelectItem key={String(company.id)} className="text-[#265197]">
+              {company.name || `Empresa ${company.id}`}
+            </SelectItem>
+          ))}
+        </Select>
+
         <InputCitricaAdmin
           label="Nombre del Contacto"
           placeholder="Ingrese el nombre completo"
@@ -135,28 +164,7 @@ export default function CreateContactModal({
           value={formData.address || ""}
           onChange={(e) => handleInputChange("address", e.target.value)}
         />
-        <Select
-          label="Empresa"
-          placeholder="Seleccione una empresa"
-          selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
-            setFormData((prev) => ({
-              ...prev,
-              company_id: selected ? Number(selected) : null,
-            }));
-          }}
-          classNames={{
-            label: "text-gray-700",
-            value: "text-gray-800",
-          }}
-        >
-          {companies.map((company) => (
-            <SelectItem key={String(company.id)}>
-              {company.name || `Empresa ${company.id}`}
-            </SelectItem>
-          ))}
-        </Select>
+
       </div>
 
       {/* {formData.company_id && formData.company_id !== 1 && (

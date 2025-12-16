@@ -24,6 +24,9 @@ export default function EmpresasPage() {
 
   const handleCloseCreateModal = () => {
     setIsCreateModalOpen(false);
+  };
+
+  const handleCreateSuccess = () => {
     refreshCompanies();
   };
 
@@ -105,6 +108,7 @@ export default function EmpresasPage() {
           <CreateCompanyModal
             isOpen={isCreateModalOpen}
             onClose={handleCloseCreateModal}
+            onSuccess={handleCreateSuccess}
           />
 
           {isDetailModalOpen && selectedCompany && (
@@ -114,6 +118,7 @@ export default function EmpresasPage() {
                 setIsDetailModalOpen(false);
                 setSelectedCompany(null);
               }}
+              width="360px"
             />
           )}
 
@@ -124,8 +129,8 @@ export default function EmpresasPage() {
               onClose={() => {
                 setIsEditModalOpen(false);
                 setSelectedCompany(null);
-                refreshCompanies();
               }}
+              onSuccess={handleCreateSuccess}
             />
           )}
 
