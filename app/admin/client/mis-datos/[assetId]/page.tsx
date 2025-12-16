@@ -422,23 +422,11 @@ export default function AssetDataPage() {
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="p-4">
-          <h1 className="text-2xl font-bold text-[#265197] mb-6">
-            Mis Datos
-          </h1>
-
-          {/* Título del asset seleccionado */}
+          {/* Breadcrumb similar a contactos */}
           {selectedAsset && (
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-[#265197]">
-                {selectedAsset.name || "Sin nombre"}
-              </h2>
-              <p className="text-sm text-[#678CC5]">
-                Proyecto: {selectedAsset.project_name || "Sin proyecto"}
-              </p>
-              <p className="text-sm font-medium text-[#265197] mt-2">
-                Total de registros: {totalRecords}
-              </p>
-            </div>
+            <h1 className="text-2xl font-bold text-[#265197] mb-6">
+              <span className="text-[#678CC5]">Proyectos</span> {'>'} {selectedAsset.name || "Sin nombre"}
+            </h1>
           )}
 
           {/* Mostrar mensaje de error si no existe el asset */}
@@ -456,7 +444,6 @@ export default function AssetDataPage() {
                 </div>
               )}
 
-              {/* Tabla de datos */}
               <DataTable
                 data={tableData}
                 columns={columns.length > 0 ? columns : [{ name: "CARGANDO", uid: "loading", sortable: false }]}
