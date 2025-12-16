@@ -7,6 +7,7 @@ import {
   ModalBody,
   ModalFooter,
   Divider,
+  Skeleton,
 } from "@heroui/react";
 
 import { Project } from "@/hooks/projects/use-projects";
@@ -33,16 +34,27 @@ export default function ProjectDetailModal({
   const { companies } = useCompanyCRUD();
   const { getProjectUsers } = useUserProjects();
   const [projectUsers, setProjectUsers] = useState<UserType[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+  const [isLoadingCompany, setIsLoadingCompany] = useState(true);
 
-  const companyName = companies.find(c => c.id === project.company_id)?.name || "Sin empresa";
+  const companyName = companies.find(c => c.id === project.company_id)?.name;
 
   useEffect(() => {
     const fetchUsers = async () => {
+      setIsLoadingUsers(true);
       const users = await getProjectUsers(project.id);
       setProjectUsers(users);
+      setIsLoadingUsers(false);
     };
     fetchUsers();
   }, [project.id, getProjectUsers]);
+
+  useEffect(() => {
+    // Esperar a que companies esté cargado
+    if (companies.length > 0 || project.company_id === null) {
+      setIsLoadingCompany(false);
+    }
+  }, [companies, project.company_id]);
 
   return (
     <Modal className="w-[360px]" isOpen={true} onClose={onClose} scrollBehavior="inside">
@@ -56,14 +68,24 @@ export default function ProjectDetailModal({
           <div className="flex flex-col">
             <p className="text-sm font-semibold text-[#265197] pb-2">Nombre: {toCamelCase(project.name) || "-"}</p>
             <div className="flex flex-col gap-1">
-              <p className="text-sm text-[#265197]">Empresa: {toCamelCase(companyName)}</p>
+              {isLoadingCompany ? (
+                <Skeleton className="h-5 w-48 rounded-lg" />
+              ) : (
+                <p className="text-sm text-[#265197]">Empresa: {companyName ? toCamelCase(companyName) : "Sin empresa"}</p>
+              )}
               <p className="text-sm  text-[#265197]">Estado: {toCamelCase(project.status) || "-"}</p>
               <p className="text-sm text-[#265197]">Assets: {project.asset_count ?? 0}</p>
             </div>
             <Divider className="my-4" />
             <p className="text-sm font-semibold text-[#265197] pb-2">{project.access_count ?? 0} {(project.access_count ?? 0) === 1 ? "Usuario invitado" : "Usuarios invitados"}</p>
             <div className="flex flex-col gap-1">
-              {projectUsers.length > 0 ? (
+              {isLoadingUsers ? (
+                <>
+                  <Skeleton className="h-4 w-40 rounded-lg mb-1" />
+                  <Skeleton className="h-4 w-36 rounded-lg mb-1" />
+                  <Skeleton className="h-4 w-44 rounded-lg" />
+                </>
+              ) : projectUsers.length > 0 ? (
                 projectUsers.map((user) => (
                   <p key={user.id} className="text-sm text-[#265197]">
                     {toCamelCase(user.first_name)} {toCamelCase(user.last_name)}

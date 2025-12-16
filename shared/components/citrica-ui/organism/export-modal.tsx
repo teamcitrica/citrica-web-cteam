@@ -51,11 +51,11 @@ const ExportModal: React.FC<ExportModalProps> = ({
               </div>
             </ModalBody>
             <ModalFooter className="h-[72px] flex justify-center">
-              <ButtonCitricaAdmin variant="secondary" onPress={onCloseModal} isDisabled={isLoading}>
+              <ButtonCitricaAdmin variant="modalv2" onPress={onCloseModal} isDisabled={isLoading}>
                 Cancelar
               </ButtonCitricaAdmin>
               <ButtonCitricaAdmin
-                variant="primary"
+                variant="modal"
                 className="bg-[#265197]"
                 onPress={onConfirm}
                 isDisabled={!fileName.trim() || isLoading}

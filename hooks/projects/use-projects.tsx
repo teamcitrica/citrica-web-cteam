@@ -50,7 +50,7 @@ export const useProjectCRUD = () => {
             id,
             name
           ),
-          created_by_user:created_by (
+          created_by_user:users!created_by (
             id,
             first_name,
             last_name,
