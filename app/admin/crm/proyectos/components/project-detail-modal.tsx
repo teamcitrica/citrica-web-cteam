@@ -1,74 +1,118 @@
 "use client";
+import { useEffect, useState } from "react";
 import {
   Modal,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Button,
+  Divider,
+  Skeleton,
 } from "@heroui/react";
 
 import { Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
+import { useUserProjects } from "@/hooks/user-projects/use-user-projects";
+import { UserType } from "@/shared/types/types";
+import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 
 interface ProjectDetailModalProps {
   project: Project;
   onClose: () => void;
 }
 
+// Función para convertir texto a Camel Case (primera letra mayúscula, resto minúscula)
+const toCamelCase = (text: string | undefined | null): string => {
+  if (!text) return "";
+  return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+};
+
 export default function ProjectDetailModal({
   project,
   onClose,
 }: ProjectDetailModalProps) {
   const { companies } = useCompanyCRUD();
+  const { getProjectUsers } = useUserProjects();
+  const [projectUsers, setProjectUsers] = useState<UserType[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+  const [isLoadingCompany, setIsLoadingCompany] = useState(true);
 
-  const companyName = companies.find(c => c.id === project.company_id)?.name || "Sin empresa";
+  const companyName = companies.find(c => c.id === project.company_id)?.name;
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setIsLoadingUsers(true);
+      const users = await getProjectUsers(project.id);
+      setProjectUsers(users);
+      setIsLoadingUsers(false);
+    };
+    fetchUsers();
+  }, [project.id, getProjectUsers]);
+
+  useEffect(() => {
+    // Esperar a que companies esté cargado
+    if (companies.length > 0 || project.company_id === null) {
+      setIsLoadingCompany(false);
+    }
+  }, [companies, project.company_id]);
 
   return (
-    <Modal isOpen={true} onClose={onClose} size="2xl" scrollBehavior="inside">
+    <Modal className="w-[360px]" isOpen={true} onClose={onClose} scrollBehavior="inside">
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
-          <h3 className="text-lg font-semibold text-gray-800">
-            Detalles del Proyecto
+        <ModalHeader className="flex flex-col gap-1 h-[64px]">
+          <h3 className="text-lg font-semibold text-[#16305A]">
+            DETALLES DEL PROYECTO
           </h3>
         </ModalHeader>
-        <ModalBody>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <p className="text-sm font-semibold text-gray-600">Nombre del Proyecto</p>
-              <p className="text-gray-800 text-lg">{project.name || "-"}</p>
+        <ModalBody className=" bg-[#EDF1F7]">
+          <div className="flex flex-col">
+            <p className="text-sm font-semibold text-[#265197] pb-2">Nombre: {toCamelCase(project.name) || "-"}</p>
+            <div className="flex flex-col gap-1">
+              {isLoadingCompany ? (
+                <Skeleton className="h-5 w-48 rounded-lg" />
+              ) : (
+                <p className="text-sm text-[#265197]">Empresa: {companyName ? toCamelCase(companyName) : "Sin empresa"}</p>
+              )}
+              <p className="text-sm  text-[#265197]">Estado: {toCamelCase(project.status) || "-"}</p>
+              <p className="text-sm text-[#265197]">Assets: {project.asset_count ?? 0}</p>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-600">Empresa</p>
-              <p className="text-gray-800">{companyName}</p>
+            <Divider className="my-4" />
+            <p className="text-sm font-semibold text-[#265197] pb-2">{project.access_count ?? 0} {(project.access_count ?? 0) === 1 ? "Usuario invitado" : "Usuarios invitados"}</p>
+            <div className="flex flex-col gap-1">
+              {isLoadingUsers ? (
+                <>
+                  <Skeleton className="h-4 w-40 rounded-lg mb-1" />
+                  <Skeleton className="h-4 w-36 rounded-lg mb-1" />
+                  <Skeleton className="h-4 w-44 rounded-lg" />
+                </>
+              ) : projectUsers.length > 0 ? (
+                projectUsers.map((user) => (
+                  <p key={user.id} className="text-sm text-[#265197]">
+                    {toCamelCase(user.first_name)} {toCamelCase(user.last_name)}
+                  </p>
+                ))
+              ) : (
+                <p className="text-sm text-[#265197]">No hay usuarios asignados</p>
+              )}
             </div>
-            <div>
-              <p className="text-sm font-semibold text-gray-600">Estado</p>
-              <p className="text-gray-800 capitalize">{project.status || "-"}</p>
+
+            <Divider className="my-4" />
+            <div className="flex items-center gap-2 text-sm text-[#678CC5]">
+              <span>
+                Creado el: {project.created_at ? new Date(project.created_at).toLocaleDateString('es-ES') : '-'}
+              </span>
+              <Divider orientation="vertical" className="h-4" />
+              <span>
+                Por: {project.created_by_user ? `${toCamelCase(project.created_by_user.first_name)} ${toCamelCase(project.created_by_user.last_name)}` : '-'}
+              </span>
             </div>
-            <div className="col-span-2 border-t pt-4 mt-2">
-              <p className="text-sm font-semibold text-gray-600 mb-3">Información del Responsable</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs font-semibold text-gray-500">Nombre</p>
-                  <p className="text-gray-800">{project.nombre_responsable || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-500">Email</p>
-                  <p className="text-gray-800">{project.email_responsable || "-"}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-500">Teléfono</p>
-                  <p className="text-gray-800">{project.phone_responsable || "-"}</p>
-                </div>
-              </div>
-            </div>
+
           </div>
         </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onPress={onClose}>
+        <ModalFooter className="h-[72px]">
+          <ButtonCitricaAdmin variant="modal" onPress={onClose}>
             Cerrar
-          </Button>
+          </ButtonCitricaAdmin>
         </ModalFooter>
       </ModalContent>
     </Modal>
