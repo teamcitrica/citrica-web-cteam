@@ -1,13 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import {
-  Button,
   Select,
   SelectItem,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
+import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
 
 import { useContactCRUD, Contact, ContactInput } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
@@ -122,17 +122,18 @@ export default function EditContactModal({
       size="2xl"
       footer={
         <>
-          <Button color="danger" variant="light" onPress={onClose}>
+          <ButtonCitricaAdmin variant="secondary" onPress={onClose}>
             Cancelar
-          </Button>
-          <Button
-            className="bg-[#42668A] text-white"
+          </ButtonCitricaAdmin>
+          <ButtonCitricaAdmin
+            variant="primary"
+            className="bg-[#42668A]"
             onPress={handleSubmit}
             isLoading={isLoading}
             isDisabled={!hasChanges()}
           >
             Actualizar Contacto
-          </Button>
+          </ButtonCitricaAdmin>
         </>
       }
     >

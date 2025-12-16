@@ -1,11 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-import {
-  Button,
-  Textarea,
-} from "@heroui/react";
+import { Textarea } from "@heroui/react";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
+import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
 
 import { Company, CompanyInput, useCompanyCRUD } from "@/hooks/companies/use-companies";
 
@@ -80,16 +78,17 @@ export default function EditCompanyModal({
       size="2xl"
       footer={
         <>
-          <Button color="danger" variant="light" onPress={onClose}>
+          <ButtonCitricaAdmin variant="secondary" onPress={onClose}>
             Cancelar
-          </Button>
-          <Button
-            className="bg-[#42668A] text-white"
+          </ButtonCitricaAdmin>
+          <ButtonCitricaAdmin
+            variant="primary"
+            className="bg-[#42668A]"
             onPress={handleSubmit}
             isLoading={isLoading}
           >
             Guardar Cambios
-          </Button>
+          </ButtonCitricaAdmin>
         </>
       }
     >
