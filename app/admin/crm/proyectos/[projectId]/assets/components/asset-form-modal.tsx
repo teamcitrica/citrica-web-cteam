@@ -7,6 +7,7 @@ import {
   CheckboxGroup,
   Chip,
   Tooltip,
+  Button,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
