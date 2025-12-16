@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Input from '@ui/atoms/input'
+
 import { addToast } from "@heroui/toast"
 import { UserAuth } from '@/shared/context/auth-context'
 import { useForm } from "react-hook-form"
@@ -9,6 +9,7 @@ import { Divider, Link } from "@heroui/react"
 import Button from '@/shared/components/citrica-ui/molecules/button'
 import { Icon, Text } from '@/shared/components/citrica-ui'
 import { Container } from '@/styles/07-objects/objects'
+import { InputCitricaAdmin } from '../admin'
 
 type FormValues = {
   password: string;
@@ -72,25 +73,38 @@ const LoginPage = () => {
     <Container className="w-[968px] flex justify-center !flex-nowrap">
       <div className='container-inputs'>
         <img className='w-[80px] pb-3 items-center' src="/img/citrica-logo.png" alt="Logo" />
-        <h2 className='text-center mb-4'>
-          <Text textColor="white" variant="body">
+        <h2 className='text-center mb-1'>
+          <Text color="#FF5B00" variant="headline">
             ¡Bienvenido!
           </Text>
         </h2>
-        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center'>
-          <Input
+        <span>
+           <Text variant="body">
+            Ingresa tu correo electrónico y tu clave
+          </Text>
+        </span>
+        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center gap-5 mt-7'>
+          <InputCitricaAdmin
+            label="email"
             type="email"
             placeholder="Correo electónico"
             {...register("email")}
             disabled={isLoading}
             required
+            classNames={{
+              label: "!text-[#FF5B00]"
+            }}
           />
-          <Input
+          <InputCitricaAdmin
+             label="clave"
             type={showPassword ? "text" : "password"}
             placeholder="Contraseña"
             {...register("password")}
             disabled={isLoading}
             required
+            classNames={{
+              label: "!text-[#FF5B00]"
+            }}
             endContent={
               <Icon name="Eye"
                 className="text-[#66666666] cursor-pointer w-5 h-5"
