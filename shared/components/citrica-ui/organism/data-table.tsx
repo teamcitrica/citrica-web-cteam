@@ -143,9 +143,9 @@ export function DataTable<T extends Record<string, any>>({
   );
 
   return (
-    <div className="container-blue-principal">
+    <div className="container-blue-principal h-full flex flex-col">
       {/* Barra de búsqueda y acciones */}
-      <div className="flex items-center justify-between w-full pb-6 pt-3">
+      <div className="flex items-center justify-between w-full pb-6 pt-3 flex-shrink-0">
           <div className="flex items-center gap-4 ">
             {/* Filtro de empresa */}
             {showCompanyFilter && companies.length > 0 && (
@@ -190,7 +190,7 @@ export function DataTable<T extends Record<string, any>>({
               </SelectCitricaAdmin>
             )}
 
-            {searchFields.length > 0 && (
+            {/* {searchFields.length > 0 && (
               <div className="search-input-wrapper">
                 <InputCitricaAdmin
                   placeholder={searchPlaceholder}
@@ -205,6 +205,13 @@ export function DataTable<T extends Record<string, any>>({
                   }}
                 />
               </div>
+            )} */}
+
+            {/* Mostrar total de registros para paginación del servidor */}
+            {serverSidePagination && totalRecords > 0 && (
+              <p className="text-sm font-medium text-[#265197]">
+                Total de registros: {totalRecords}
+              </p>
             )}
 
             {/* {showRowsPerPageSelector && (
@@ -227,11 +234,12 @@ export function DataTable<T extends Record<string, any>>({
               <Dropdown>
                 <DropdownTrigger>
                   <ButtonCitricaAdmin
-                    variant="export"
+                    variant="primary"
                     startContent={<Icon className="w-4 h-4" name="Download" />}
                     size="sm"
+                    className="!bg-[#265197] text-white !w-[158px]"
                   >
-                    Exportar
+                    Descargar
                   </ButtonCitricaAdmin>
                 </DropdownTrigger>
                 <DropdownMenu
@@ -285,8 +293,8 @@ export function DataTable<T extends Record<string, any>>({
           </div>
         </div>
 
-      {/* Contenedor de tabla con scroll horizontal */}
-      <div className="overflow-x-auto">
+      {/* Contenedor de tabla con scroll horizontal y vertical */}
+      <div className="table-scroll-container flex-1">
         {/* Tabla */}
         <Table
         isStriped
@@ -356,7 +364,7 @@ export function DataTable<T extends Record<string, any>>({
       {serverSidePagination ? (
         // Paginación del servidor
         totalRecords > 0 && (
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-4 flex-shrink-0">
             <Pagination
               isCompact
               showControls
@@ -380,7 +388,7 @@ export function DataTable<T extends Record<string, any>>({
       ) : (
         // Paginación del cliente
         tableFeatures.pages > 1 && (
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-4 flex-shrink-0">
             <Pagination
               isCompact
               showControls

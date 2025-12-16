@@ -125,11 +125,11 @@ export const siteConfig = {
 			],
 		},
 		{
-			title: "MIS DATOS",
+			title: "PROYECTOS",
 			icon: "ClipboardCheck",
 			href: "/admin/client/mis-datos",
 			allowedRoles: [ROL_CLIENTE],
-			subItems: [], 
+			subItems: [],
 		},
 
 	],

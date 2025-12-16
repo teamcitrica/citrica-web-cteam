@@ -48,10 +48,28 @@ export default function CreateContactModal({
   };
 
   const handleSubmit = async () => {
+    if (!formData.company_id) {
+      addToast({
+        title: "Error",
+        description: "La empresa es requerida",
+        color: "danger",
+      });
+      return;
+    }
+
     if (!formData.name) {
       addToast({
         title: "Error",
         description: "El nombre del contacto es requerido",
+        color: "danger",
+      });
+      return;
+    }
+
+    if (!formData.email) {
+      addToast({
+        title: "Error",
+        description: "El email del contacto es requerido",
         color: "danger",
       });
       return;
@@ -125,6 +143,7 @@ export default function CreateContactModal({
             trigger: "bg-white !border-[#D4DEED]",
             selectorIcon: "text-[#678CC5]",
           }}
+          isRequired
         >
           {companies.map((company) => (
             <SelectItem key={String(company.id)} className="text-[#265197]">
@@ -152,6 +171,7 @@ export default function CreateContactModal({
           type="email"
           value={formData.email || ""}
           onChange={(e) => handleInputChange("email", e.target.value)}
+          isRequired
         />
         <InputCitricaAdmin
           label="Teléfono"

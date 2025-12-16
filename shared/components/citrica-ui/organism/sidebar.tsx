@@ -65,7 +65,7 @@ export function Sidebar({ items }: SidebarProps) {
   const NavItems = () => (
     <div className="h-[100svh] w-full overflow-y-auto px-2 py-4 bg-sidebar">
       {/* Logo - solo visible en pantallas grandes */}
-      <div className="hidden lg:flex justify-start items-center mb-6">
+      <div className="hidden lg:flex justify-start items-center">
         <img
           src="/img/citrica-logo.png"
           alt="Citrica Logo"
