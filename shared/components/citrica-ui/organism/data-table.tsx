@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -103,6 +103,8 @@ export function DataTable<T extends Record<string, any>>({
   searchValue: searchValueServer,
   onSortChange: onSortChangeServer,
 }: DataTableProps<T>) {
+  const [isExporting, setIsExporting] = useState(false);
+
   const tableFeatures = useTableFeatures({
     data,
     initialRowsPerPage: itemsPerPage,
@@ -141,10 +143,9 @@ export function DataTable<T extends Record<string, any>>({
   );
 
   return (
-    <div className="container-blue-principal overflow-x-auto">
+    <div className="container-blue-principal">
       {/* Barra de búsqueda y acciones */}
-
-        <div className="flex items-center justify-between w-full pb-6 pt-3">
+      <div className="flex items-center justify-between w-full pb-6 pt-3">
           <div className="flex items-center gap-4 ">
             {/* Filtro de empresa */}
             {showCompanyFilter && companies.length > 0 && (
@@ -283,10 +284,12 @@ export function DataTable<T extends Record<string, any>>({
             )}
           </div>
         </div>
-     
+      </div>
 
-      {/* Tabla */}
-      <Table
+      {/* Contenedor de tabla con scroll horizontal */}
+      <div className="overflow-x-auto">
+        {/* Tabla */}
+        <Table
         isStriped
         removeWrapper
         aria-label="Tabla de datos"
@@ -348,6 +351,7 @@ export function DataTable<T extends Record<string, any>>({
           )}
         </TableBody>
       </Table>
+      </div>
 
       {/* Paginación */}
       {serverSidePagination ? (
@@ -404,13 +408,19 @@ export function DataTable<T extends Record<string, any>>({
           exportFormat={tableFeatures.exportFormat}
           fileName={tableFeatures.fileName}
           onFileNameChange={tableFeatures.setFileName}
+          isLoading={isExporting}
           onConfirm={async () => {
-            if (serverSidePagination && onExport) {
-              // Para paginación de backend, usar onExport custom
-              await onExport(tableFeatures.exportFormat, tableFeatures.fileName);
-              tableFeatures.setIsExportModalOpen(false);
-            } else {
-              tableFeatures.handleConfirmExport(exportColumns, exportTitle);
+            try {
+              setIsExporting(true);
+              if (serverSidePagination && onExport) {
+                // Para paginación de backend, usar onExport custom
+                await onExport(tableFeatures.exportFormat, tableFeatures.fileName);
+                tableFeatures.setIsExportModalOpen(false);
+              } else {
+                tableFeatures.handleConfirmExport(exportColumns, exportTitle);
+              }
+            } finally {
+              setIsExporting(false);
             }
           }}
         />

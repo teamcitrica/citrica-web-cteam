@@ -379,11 +379,16 @@ export default function AssetDataPage() {
 
       case "pdf":
         const doc = new jsPDF();
+
+        // Título
         doc.setFontSize(16);
         doc.text(selectedAsset?.name || "Mis Datos", 14, 20);
+
+        // Fecha
         doc.setFontSize(10);
         doc.text(`Generado: ${format(new Date(), "dd/MM/yyyy")}`, 14, 30);
 
+        // Datos de la tabla
         const tableData = allData.map((item: ExternalTableData) =>
           columns.map((col) => formatCellValue(item[col.uid], col.uid))
         );
@@ -397,7 +402,7 @@ export default function AssetDataPage() {
             cellPadding: 2,
           },
           headStyles: {
-            fillColor: [66, 102, 138],
+            fillColor: [94, 166, 103],
             textColor: 255,
           },
         });
