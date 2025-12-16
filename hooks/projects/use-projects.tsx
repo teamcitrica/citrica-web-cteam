@@ -21,6 +21,14 @@ export interface Project {
   supabase_anon_key: string | null;
   access_count?: number;
   asset_count?: number;
+  created_at?: string;
+  created_by?: string;
+  created_by_user?: {
+    id: string;
+    first_name: string | null;
+    last_name: string | null;
+    email: string;
+  };
 }
 
 export type ProjectInput = Omit<Project, "id" | "company">;
@@ -41,6 +49,12 @@ export const useProjectCRUD = () => {
           company:company_id (
             id,
             name
+          ),
+          created_by_user:created_by (
+            id,
+            first_name,
+            last_name,
+            email
           )
         `);
 
@@ -114,9 +128,19 @@ export const useProjectCRUD = () => {
     try {
       setIsLoading(true);
 
+      // Obtener el usuario actual
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData?.user?.id;
+
+      // Agregar created_by al proyecto
+      const projectWithCreator = {
+        ...newProject,
+        created_by: userId || null,
+      };
+
       const { data, error } = await supabase
         .from("projects")
-        .insert([newProject])
+        .insert([projectWithCreator])
         .select();
 
       if (error) {
