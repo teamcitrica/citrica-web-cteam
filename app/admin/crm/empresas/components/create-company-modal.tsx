@@ -13,11 +13,13 @@ import { useCompanyCRUD, CompanyInput } from "@/hooks/companies/use-companies";
 interface CreateCompanyModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 export default function CreateCompanyModal({
   isOpen,
   onClose,
+  onSuccess,
 }: CreateCompanyModalProps) {
   const { createCompany, isLoading } = useCompanyCRUD();
   const [formData, setFormData] = useState<CompanyInput>({
@@ -69,6 +71,7 @@ export default function CreateCompanyModal({
           address_number: null,
           contact_position: null,
         });
+        onSuccess?.();
         onClose();
       }
     } catch (error) {

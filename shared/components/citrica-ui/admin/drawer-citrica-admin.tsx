@@ -8,6 +8,7 @@ import {
   DrawerFooter,
   DrawerProps,
 } from "@heroui/react";
+import Text from "../atoms/text";
 
 export interface DrawerCitricaAdminProps extends Omit<DrawerProps, 'placement' | 'classNames'> {
   isOpen: boolean;
@@ -16,6 +17,7 @@ export interface DrawerCitricaAdminProps extends Omit<DrawerProps, 'placement' |
   children: React.ReactNode;
   footer?: React.ReactNode;
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "full";
+  customWidth?: string;
 }
 
 /**
@@ -34,6 +36,7 @@ export const DrawerCitricaAdmin: React.FC<DrawerCitricaAdminProps> = ({
   children,
   footer,
   size = "2xl",
+  customWidth,
   ...props
 }) => {
   return (
@@ -41,16 +44,25 @@ export const DrawerCitricaAdmin: React.FC<DrawerCitricaAdminProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       placement="right"
-      size={size}
+      size={customWidth ? undefined : size}
+      style={customWidth ? { width: customWidth, maxWidth: '400px' } : undefined}
+      classNames={{
+        closeButton: "w-8 h-8 min-w-8 text-[#265197] border-2 border-[#265197] rounded-full hover:bg-[#265197] hover:text-white transition-colors flex items-center justify-center items-center my-auto",
+      }}
       {...props}
     >
       <DrawerContent>
         {title && (
           <DrawerHeader className="flex flex-col gap-1 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+            <h3>
+              <Text variant="subtitle" color="#16305A" weight="bold">
+                {title}
+              </Text>
+            </h3>
+
           </DrawerHeader>
         )}
-        <DrawerBody className="py-6">{children}</DrawerBody>
+        <DrawerBody className="bg-[#EEF1F7] py-6">{children}</DrawerBody>
         {footer && (
           <DrawerFooter className="border-t border-gray-200">{footer}</DrawerFooter>
         )}

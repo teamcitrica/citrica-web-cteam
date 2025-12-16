@@ -13,12 +13,14 @@ interface EditCompanyModalProps {
   isOpen: boolean;
   company: Company;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 export default function EditCompanyModal({
   isOpen,
   company,
   onClose,
+  onSuccess,
 }: EditCompanyModalProps) {
   const { updateCompany, isLoading } = useCompanyCRUD();
   const [formData, setFormData] = useState<CompanyInput>({
@@ -63,6 +65,7 @@ export default function EditCompanyModal({
   const handleSubmit = async () => {
     try {
       await updateCompany(company.id, formData);
+      onSuccess?.();
       onClose();
     } catch (error) {
       console.error("Error al actualizar empresa:", error);
