@@ -4,12 +4,13 @@ import { useParams } from "next/navigation";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { useUserAssets } from "@/hooks/user-assets/use-user-assets";
-import { Spinner } from "@heroui/react";
+import { Spinner, DateRangePicker, Chip, Input } from "@heroui/react";
 import { Col, Container } from "@/styles/07-objects/objects";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { format } from "date-fns";
+import { parseDate } from "@internationalized/date";
 
 interface ExternalTableData {
   [key: string]: any;
@@ -36,6 +37,23 @@ export default function AssetDataPage() {
   const [sortDirection, setSortDirection] = useState<"ascending" | "descending">("ascending");
   const [isExporting, setIsExporting] = useState(false);
   const { supabase } = useSupabase();
+
+  // Estados para buscadores personalizados
+  const [textSearchValue, setTextSearchValue] = useState("");
+  const [textSearchInput, setTextSearchInput] = useState(""); // Para el input sin debounce
+  const [dateRange, setDateRange] = useState<{start: any, end: any} | null>(null);
+
+  // Debounce para el buscador de texto
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTextSearchValue(textSearchInput);
+      if (textSearchInput !== textSearchValue) {
+        setCurrentPage(1);
+      }
+    }, 500); // 500ms de delay
+
+    return () => clearTimeout(timer);
+  }, [textSearchInput]);
 
   // Obtener el usuario actual
   useEffect(() => {
@@ -94,12 +112,18 @@ export default function AssetDataPage() {
 
         const selectQuery = columnsToSelect.join(",");
 
-        // Construir filtros desde assets_options
+        // Construir filtros desde assets_options (soportar formato antiguo y nuevo)
+        const filter = selectedAsset.assets_options?.filter || null;
         const filters = selectedAsset.assets_options?.filters || [];
         let filterQuery = "";
-        if (filters.length > 0) {
-          const filterParams = filters.map((filter: any) =>
-            `${filter.column}=eq.${filter.value}`
+
+        // Priorizar formato nuevo (filter único)
+        if (filter) {
+          filterQuery = `&${filter.column}=eq.${filter.value}`;
+        } else if (filters.length > 0) {
+          // Formato antiguo (array de filtros)
+          const filterParams = filters.map((f: any) =>
+            `${f.column}=eq.${f.value}`
           ).join("&");
           filterQuery = `&${filterParams}`;
         }
@@ -108,13 +132,20 @@ export default function AssetDataPage() {
         const offset = (currentPage - 1) * pageSize;
         const paginationQuery = `&limit=${pageSize}&offset=${offset}`;
 
-        // Búsqueda en el backend (ilike para búsqueda insensible a mayúsculas)
-        let searchQuery = "";
-        if (searchValue && columnsToSelect.length > 0) {
-          const searchConditions = columnsToSelect
-            .map((col) => `${col}.ilike.*${searchValue}*`)
-            .join(",");
-          searchQuery = `&or=(${searchConditions})`;
+        // Obtener configuración de búsqueda
+        const searchConfig = selectedAsset.assets_options?.searchConfig;
+        const textColumns = searchConfig?.textColumns || [];
+        const dateColumn = searchConfig?.dateColumn || null;
+
+        // La búsqueda por texto se hará del lado del cliente después del fetch
+        // No agregamos query params de búsqueda aquí
+
+        // Búsqueda por rango de fechas
+        let dateSearchQuery = "";
+        if (dateRange && dateColumn) {
+          const startDate = new Date(dateRange.start.year, dateRange.start.month - 1, dateRange.start.day).toISOString();
+          const endDate = new Date(dateRange.end.year, dateRange.end.month - 1, dateRange.end.day, 23, 59, 59).toISOString();
+          dateSearchQuery = `&${dateColumn}=gte.${startDate}&${dateColumn}=lte.${endDate}`;
         }
 
         // Ordenamiento
@@ -124,9 +155,12 @@ export default function AssetDataPage() {
           orderQuery = `&order=${sortColumn}.${direction}`;
         }
 
-        // Fetch de la tabla externa con filtros, búsqueda, ordenamiento y paginación
+        // Fetch de la tabla externa con filtros, ordenamiento y paginación
+        const fetchUrl = `${cleanUrl}/rest/v1/${selectedAsset.tabla}?select=${selectQuery}${filterQuery}${dateSearchQuery}${orderQuery}${paginationQuery}`;
+        console.log("Fetch URL:", fetchUrl);
+
         const response = await fetch(
-          `${cleanUrl}/rest/v1/${selectedAsset.tabla}?select=${selectQuery}${filterQuery}${searchQuery}${orderQuery}${paginationQuery}`,
+          fetchUrl,
           {
             method: "GET",
             headers: {
@@ -149,7 +183,20 @@ export default function AssetDataPage() {
           setTotalRecords(total);
         }
 
-        const data = await response.json();
+        let data = await response.json();
+
+        // Filtrar por texto/número del lado del cliente
+        if (textSearchValue && textSearchValue.trim() && textColumns.length > 0) {
+          const searchValue = textSearchValue.trim().toLowerCase();
+          data = data.filter((row: any) => {
+            return textColumns.some((col: string) => {
+              const value = row[col];
+              if (value === null || value === undefined) return false;
+              return String(value).toLowerCase().includes(searchValue);
+            });
+          });
+        }
+
         setTableData(data || []);
 
         // Generar columnas dinámicamente
@@ -234,13 +281,15 @@ export default function AssetDataPage() {
         }
       } catch (err: any) {
         console.error("Error al obtener datos de la tabla externa:", err);
+        console.error("Error message:", err.message);
+        console.error("Error stack:", err.stack);
       } finally {
         setIsLoadingData(false);
       }
     };
 
     fetchExternalData();
-  }, [assetId, assets, supabase, currentPage, pageSize, searchValue, sortColumn, sortDirection]);
+  }, [assetId, assets, supabase, currentPage, pageSize, searchValue, sortColumn, sortDirection, textSearchValue, dateRange]);
 
   const selectedAsset = assets.find((a) => a.id === assetId);
   const isLoading = isLoadingAssets || !currentUser || isLoadingData;
@@ -268,23 +317,35 @@ export default function AssetDataPage() {
 
       const selectQuery = columnsToSelect.join(",");
 
-      // Construir filtros desde assets_options
+      // Construir filtros desde assets_options (soportar formato antiguo y nuevo)
+      const filter = selectedAsset.assets_options?.filter || null;
       const filters = selectedAsset.assets_options?.filters || [];
       let filterQuery = "";
-      if (filters.length > 0) {
-        const filterParams = filters.map((filter: any) =>
-          `${filter.column}=eq.${filter.value}`
+
+      // Priorizar formato nuevo (filter único)
+      if (filter) {
+        filterQuery = `&${filter.column}=eq.${filter.value}`;
+      } else if (filters.length > 0) {
+        // Formato antiguo (array de filtros)
+        const filterParams = filters.map((f: any) =>
+          `${f.column}=eq.${f.value}`
         ).join("&");
         filterQuery = `&${filterParams}`;
       }
 
-      // Búsqueda en el backend
-      let searchQuery = "";
-      if (searchValue && columnsToSelect.length > 0) {
-        const searchConditions = columnsToSelect
-          .map((col) => `${col}.ilike.*${searchValue}*`)
-          .join(",");
-        searchQuery = `&or=(${searchConditions})`;
+      // Obtener configuración de búsqueda
+      const searchConfig = selectedAsset.assets_options?.searchConfig;
+      const textColumns = searchConfig?.textColumns || [];
+      const dateColumn = searchConfig?.dateColumn || null;
+
+      // La búsqueda por texto se hará del lado del cliente después del fetch
+
+      // Búsqueda por rango de fechas
+      let dateSearchQuery = "";
+      if (dateRange && dateColumn) {
+        const startDate = new Date(dateRange.start.year, dateRange.start.month - 1, dateRange.start.day).toISOString();
+        const endDate = new Date(dateRange.end.year, dateRange.end.month - 1, dateRange.end.day, 23, 59, 59).toISOString();
+        dateSearchQuery = `&${dateColumn}=gte.${startDate}&${dateColumn}=lte.${endDate}`;
       }
 
       // Ordenamiento
@@ -304,7 +365,7 @@ export default function AssetDataPage() {
         const paginationQuery = `&limit=${pageSize}&offset=${offset}`;
 
         const response = await fetch(
-          `${cleanUrl}/rest/v1/${selectedAsset.tabla}?select=${selectQuery}${filterQuery}${searchQuery}${orderQuery}${paginationQuery}`,
+          `${cleanUrl}/rest/v1/${selectedAsset.tabla}?select=${selectQuery}${filterQuery}${dateSearchQuery}${orderQuery}${paginationQuery}`,
           {
             method: "GET",
             headers: {
@@ -317,7 +378,9 @@ export default function AssetDataPage() {
         );
 
         if (!response.ok) {
-          throw new Error(`Error HTTP: ${response.status}`);
+          const errorText = await response.text();
+          console.error("Error en la respuesta:", response.status, errorText);
+          throw new Error(`Error HTTP: ${response.status} - ${errorText}`);
         }
 
         const data = await response.json();
@@ -333,6 +396,18 @@ export default function AssetDataPage() {
         } else {
           hasMoreData = false;
         }
+      }
+
+      // Filtrar por texto/número del lado del cliente
+      if (textSearchValue && textSearchValue.trim() && textColumns.length > 0) {
+        const searchValue = textSearchValue.trim().toLowerCase();
+        return allData.filter((row: any) => {
+          return textColumns.some((col: string) => {
+            const value = row[col];
+            if (value === null || value === undefined) return false;
+            return String(value).toLowerCase().includes(searchValue);
+          });
+        });
       }
 
       return allData;
@@ -493,6 +568,130 @@ export default function AssetDataPage() {
                   <p className="text-sm text-blue-700 font-medium">
                     Exportando {totalRecords} registros... Por favor espera.
                   </p>
+                </div>
+              )}
+
+              {/* Buscadores personalizados */}
+              {selectedAsset && selectedAsset.assets_options?.searchConfig && (
+                <div className="mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    {/* Buscador por texto/número */}
+                    {selectedAsset.assets_options.searchConfig.textColumns &&
+                     selectedAsset.assets_options.searchConfig.textColumns.length > 0 && (
+                      <div>
+                        <Input
+                          type="text"
+                          label="Buscar por texto/número"
+                          labelPlacement="inside"
+                          placeholder={`Buscar en: ${selectedAsset.assets_options.searchConfig.textColumns.join(", ")}`}
+                          value={textSearchInput}
+                          onValueChange={setTextSearchInput}
+                          isClearable
+                          startContent={
+                            <svg
+                              className="w-4 h-4 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                              />
+                            </svg>
+                          }
+                          classNames={{
+                            base: "w-full",
+                            label: "!text-[#265197] font-medium",
+                            inputWrapper: "bg-white border-[#D4DEED]",
+                            input: "!text-[#265197]",
+                          }}
+                          description="Escribe para buscar (búsqueda automática después de 0.5s)"
+                        />
+                      </div>
+                    )}
+
+                    {/* Buscador por fecha */}
+                    {selectedAsset.assets_options.searchConfig.dateColumn && (
+                      <div>
+                        <DateRangePicker
+                          label="Buscar por rango de fechas"
+                          labelPlacement="inside"
+                          aria-label="Buscar por rango de fechas"
+                          value={dateRange}
+                          onChange={(value) => {
+                            setDateRange(value);
+                            setCurrentPage(1);
+                          }}
+                          classNames={{
+                            base: "w-full",
+                            label: "!text-[#265197] font-medium mb-1",
+                            inputWrapper: "bg-white !border-[#D4DEED]",
+                            input: "!text-[#265197]",
+                          }}
+                          description={`Columna: ${selectedAsset.assets_options.searchConfig.dateColumn}`}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Indicadores de filtros activos */}
+                  <div className="space-y-2">
+                    {/* Filtro permanente del asset */}
+                    {(selectedAsset.assets_options?.filter ||
+                      (selectedAsset.assets_options?.filters && selectedAsset.assets_options.filters.length > 0)) && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600 font-medium">Filtro activo:</span>
+                        {selectedAsset.assets_options?.filter ? (
+                          <Chip color="default"  variant="flat" size="sm">
+                            {selectedAsset.assets_options.filter.column} = {selectedAsset.assets_options.filter.value}
+                          </Chip>
+                        ) : (
+                          selectedAsset.assets_options?.filters?.map((filter: any, index: number) => (
+                            <Chip key={index} color="default" variant="flat" size="sm">
+                              {filter.column} = {filter.value}
+                            </Chip>
+                          ))
+                        )}
+                      </div>
+                    )}
+
+                    {/* Buscadores activos */}
+                    {(textSearchValue || dateRange) && (
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm text-gray-600 font-medium">Búsqueda activa:</span>
+                        {textSearchValue && (
+                          <Chip
+                           color="default" 
+                            variant="flat"
+                            size="sm"
+                            onClose={() => {
+                              setTextSearchInput("");
+                              setTextSearchValue("");
+                              setCurrentPage(1);
+                            }}
+                          >
+                            Texto: "{textSearchValue}"
+                          </Chip>
+                        )}
+                        {dateRange && (
+                          <Chip
+                            color="default" 
+                            variant="flat"
+                            size="sm"
+                            onClose={() => {
+                              setDateRange(null);
+                              setCurrentPage(1);
+                            }}
+                          >
+                            Fecha: {dateRange.start.day}/{dateRange.start.month}/{dateRange.start.year} - {dateRange.end.day}/{dateRange.end.month}/{dateRange.end.year}
+                          </Chip>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 

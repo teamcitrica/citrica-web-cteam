@@ -68,10 +68,9 @@ export function Sidebar({ items }: SidebarProps) {
           .from('contact')
           .select('company_id')
           .eq('user_id', userInfo.id)
-          .single();
+          .maybeSingle();
 
         if (contactError || !contactData?.company_id) {
-          console.log('No se encontró empresa para este usuario');
           return;
         }
 
@@ -80,7 +79,7 @@ export function Sidebar({ items }: SidebarProps) {
           .from('company')
           .select('name')
           .eq('id', contactData.company_id)
-          .single();
+          .maybeSingle();
 
         if (companyError) {
           console.error('Error al obtener empresa:', companyError);
