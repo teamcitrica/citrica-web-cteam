@@ -18,7 +18,7 @@ type ContactColumnsConfig = {
   onView: (contact: Contact) => void;
   onEdit: (contact: Contact) => void;
   onDelete: (contact: Contact) => void;
-  onToggleAccess: (contact: Contact) => void;
+  onAccessCredentials: (contact: Contact) => void;
 };
 
 type ContactExportConfig = {
@@ -65,7 +65,7 @@ export const getContactColumns = ({
   onView,
   onEdit,
   onDelete,
-  onToggleAccess,
+  onAccessCredentials,
 }: ContactColumnsConfig): Column<Contact>[] => [
   {
     name: "NOMBRE Y CARGO",
@@ -184,8 +184,8 @@ export const getContactColumns = ({
                 case "edit":
                   onEdit(contact);
                   break;
-                case "toggle-access":
-                  onToggleAccess(contact);
+                case "access-credentials":
+                  onAccessCredentials(contact);
                   break;
                 case "delete":
                   onDelete(contact);
@@ -197,12 +197,9 @@ export const getContactColumns = ({
               Editar
             </DropdownItem>
             <DropdownItem
-              key="toggle-access"
-              className={contact.active_users ? "text-warning" : "text-success"}
+              key="access-credentials"
             >
-              {contact.active_users
-                ? "Quitar acceso al sistema"
-                : "Dar acceso al sistema"}
+              Accesos
             </DropdownItem>
             <DropdownItem
               key="delete"

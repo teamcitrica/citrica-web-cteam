@@ -10,6 +10,7 @@ export { default as Icon } from './atoms/icon';
 export { default as Button } from './molecules/button';
 export { default as Carousel } from './molecules/carousel';
 export { default as Modal } from './molecules/modal';
+export { default as DetailModal } from './molecules/detail-modal';
 // Organisms
 export { default as Header } from './organism/header';
 export { default as Footer } from './organism/footer';

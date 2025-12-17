@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from "react";
 import UserFormModal from "../components/modal-user-form";
 import UserDetailModal from "../components/modal-details-users";
 import ModalDeleteUser from "../components/modal-delete-user";
+import AccessCredentialsModal from "../components/access-credentials-modal";
 import { getUserColumns, getUserExportColumns } from "../columns/user-columns";
 import { useUserCRUD } from "@/hooks/users/use-users";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
@@ -23,6 +24,7 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isAccessCredentialsModalOpen, setIsAccessCredentialsModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<UserType | null>(null);
 
   // Filtrar usuarios con role_id === 5
@@ -65,37 +67,10 @@ export default function UsersPage() {
     setIsDeleteModalOpen(true);
   }, [userSession]);
 
-  const handleToggleAccess = useCallback(
-    async (user: UserType) => {
-      if (!user.id) return;
-
-      const newActiveStatus = !user.active_users;
-      const userName =
-        user.full_name || user.name || `${user.first_name} ${user.last_name}`;
-
-      try {
-        await updateUserByRole(
-          user.id,
-          { active_users: newActiveStatus },
-          String(user.role_id),
-        );
-
-        addToast({
-          title: newActiveStatus ? "Acceso activado" : "Acceso desactivado",
-          description: `El acceso al sistema para ${userName} ha sido ${newActiveStatus ? "activado" : "desactivado"}`,
-          color: "success",
-        });
-      } catch (error) {
-        console.error("Error al cambiar acceso:", error);
-        addToast({
-          title: "Error",
-          description: "No se pudo cambiar el acceso del usuario",
-          color: "danger",
-        });
-      }
-    },
-    [updateUserByRole],
-  );
+  const handleAccessCredentials = useCallback((user: UserType) => {
+    setSelectedUser(user);
+    setIsAccessCredentialsModalOpen(true);
+  }, []);
 
   const columns = useMemo(
     () =>
@@ -103,9 +78,9 @@ export default function UsersPage() {
         onView: handleViewUser,
         onEdit: handleEditUser,
         onDelete: handleDeleteUser,
-        onToggleAccess: handleToggleAccess,
+        onAccessCredentials: handleAccessCredentials,
       }),
-    [handleViewUser, handleEditUser, handleDeleteUser, handleToggleAccess],
+    [handleViewUser, handleEditUser, handleDeleteUser, handleAccessCredentials],
   );
 
   const exportColumns = useMemo(() => getUserExportColumns(), []);
@@ -222,6 +197,19 @@ export default function UsersPage() {
               user={userToDelete}
               onConfirm={handleConfirmDelete}
               onCancel={handleCancelDelete}
+            />
+          )}
+
+          {isAccessCredentialsModalOpen && selectedUser && (
+            <AccessCredentialsModal
+              user={selectedUser}
+              onClose={() => {
+                setIsAccessCredentialsModalOpen(false);
+                setSelectedUser(null);
+              }}
+              onSuccess={() => {
+                refreshUsers();
+              }}
             />
           )}
         </div>
