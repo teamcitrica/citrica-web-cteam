@@ -118,7 +118,7 @@ export default function EmpresasPage() {
                 setIsDetailModalOpen(false);
                 setSelectedCompany(null);
               }}
-              width="360px"
+            
             />
           )}
 
