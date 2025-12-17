@@ -105,7 +105,7 @@ export default function ContactosPage() {
           <DataTable<Contact>
             data={contacts}
             columns={columns}
-            isLoading={isLoading}
+            isLoading={isLoading || isLoadingCompanies}
             searchPlaceholder="Buscar contactos..."
             searchFields={["name", "email", "phone", "cargo", "address"]}
             onAdd={handleOpenCreateModal}
