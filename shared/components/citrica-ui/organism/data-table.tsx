@@ -14,6 +14,8 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Autocomplete,
+  AutocompleteItem,
 } from "@heroui/react";
 import { ButtonCitricaAdmin, SelectCitricaAdmin, InputCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import Icon from "@ui/atoms/icon";
@@ -149,45 +151,36 @@ export function DataTable<T extends Record<string, any>>({
         <div className="flex items-center gap-4 ">
           {/* Filtro de empresa */}
           {showCompanyFilter && companies.length > 0 && (
-            <SelectCitricaAdmin
+            <Autocomplete
               aria-label="Filtrar por empresa"
-              placeholder="Filtrar por empresa"
-              selectedKeys={tableFeatures.companyFilter && tableFeatures.companyFilter !== "" ? [tableFeatures.companyFilter] : ["all"]}
-              onSelectionChange={tableFeatures.onCompanyFilterChange}
-            >
-              {[
-                <SelectItem
-                  key="all"
-                  classNames={{
-                    base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
-                    wrapper: "!border-none",
-                  }}
-                  style={{
-                    border: 'none',
-                    borderColor: 'transparent',
-                    borderWidth: '0',
-                  } as React.CSSProperties}
-                >
-                  Todas las empresas
-                </SelectItem>,
-                ...companies.map((company) => (
-                  <SelectItem
-                    key={String(company.id)}
-                    classNames={{
-                      base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
-                      wrapper: "!border-none",
-                    }}
-                    style={{
-                      border: 'none',
-                      borderColor: 'transparent',
-                      borderWidth: '0',
-                    } as React.CSSProperties}
-                  >
-                    {company.name || "Sin nombre"}
-                  </SelectItem>
-                )),
+              placeholder={companyFilterPlaceholder}
+              defaultItems={[
+                { id: 'all', name: 'Todas las empresas' },
+                ...companies.map(c => ({ id: String(c.id), name: c.name || 'Sin nombre' }))
               ]}
-            </SelectCitricaAdmin>
+              selectedKey={tableFeatures.companyFilter && tableFeatures.companyFilter !== "" ? tableFeatures.companyFilter : "all"}
+              onSelectionChange={(key) => {
+                tableFeatures.onCompanyFilterChange(key ? new Set([String(key)]) : new Set(["all"]));
+              }}
+              className="w-64"
+              classNames={{
+                base: "!border-none",
+                listboxWrapper: "!border-none",
+                popoverContent: "!border-none",
+              }}
+              isClearable={false}
+            >
+              {(item) => (
+                <AutocompleteItem
+                  key={item.id}
+                  classNames={{
+                    base: "!border-none data-[hover=true]:bg-gray-100 data-[focus=true]:bg-gray-200 !outline-none",
+                  }}
+                >
+                  {item.name}
+                </AutocompleteItem>
+              )}
+            </Autocomplete>
           )}
 
           {/* {searchFields.length > 0 && (
