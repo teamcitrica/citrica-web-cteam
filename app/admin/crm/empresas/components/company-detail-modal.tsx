@@ -5,6 +5,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalBody,
+  ModalFooter,
   Divider,
 } from "@heroui/react";
 
@@ -48,22 +49,18 @@ export default function CompanyDetailModal({
     <Modal
       isOpen={true}
       onClose={onClose}
-      size={width || height ? undefined : "md"}
+       className="w-[360px]"
       scrollBehavior="inside"
-      style={width || height ? customStyle : undefined}
-      classNames={{
-        closeButton: "w-5 h-5 min-w-5 !text-base text-[#265197] border border-[#265197] rounded-full hover:bg-[#265197] hover:text-white transition-colors flex items-center justify-center",
-        base: "rounded-2xl",
-        body: "rounded-b-2xl",
-      }}
+      
+      
     >
-      <ModalContent className="rounded-2xl">
+      <ModalContent className="!">
         <ModalHeader className="flex flex-col gap-1">
           <h3 className="text-lg font-semibold text-[#265197]">
             {company.name}
           </h3>
         </ModalHeader>
-        <ModalBody className="bg-[#EEF1F7]">
+        <ModalBody className="bg-[#EEF1F7] rounded-xl">
           <h3>
             <Text variant="subtitle" color="#265197" weight="bold" >Datos de la empresa</Text>
           </h3>
@@ -134,6 +131,7 @@ export default function CompanyDetailModal({
             </div>
           </div>
         </ModalBody>
+        
       </ModalContent>
     </Modal>
   );
