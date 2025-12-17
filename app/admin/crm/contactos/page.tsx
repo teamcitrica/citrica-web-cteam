@@ -5,7 +5,7 @@ import CreateContactModal from "./components/create-contact-modal";
 import ContactDetailModal from "./components/contact-detail-modal";
 import EditContactModal from "./components/edit-contact-modal";
 import DeleteContactModal from "./components/delete-contact-modal";
-import GrantAccessModal from "./components/grant-access-modal";
+import AccessCredentialsModal from "./components/access-credentials-modal";
 import { getContactColumns, getContactExportColumns } from "./columns/contact-columns";
 
 import { useContactCRUD, Contact } from "@/hooks/contact/use-contact";
@@ -21,7 +21,7 @@ export default function ContactosPage() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isGrantAccessModalOpen, setIsGrantAccessModalOpen] = useState(false);
+  const [isAccessCredentialsModalOpen, setIsAccessCredentialsModalOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
 
   const getCompanyName = useCallback(
@@ -50,9 +50,9 @@ export default function ContactosPage() {
     setIsEditModalOpen(true);
   }, []);
 
-  const handleToggleAccess = useCallback((contact: Contact) => {
+  const handleAccessCredentials = useCallback((contact: Contact) => {
     setSelectedContact(contact);
-    setIsGrantAccessModalOpen(true);
+    setIsAccessCredentialsModalOpen(true);
   }, []);
 
   const handleDeleteContact = useCallback((contact: Contact) => {
@@ -67,9 +67,9 @@ export default function ContactosPage() {
         onView: handleViewContact,
         onEdit: handleEditContact,
         onDelete: handleDeleteContact,
-        onToggleAccess: handleToggleAccess,
+        onAccessCredentials: handleAccessCredentials,
       }),
-    [getCompanyName, handleViewContact, handleEditContact, handleDeleteContact, handleToggleAccess]
+    [getCompanyName, handleViewContact, handleEditContact, handleDeleteContact, handleAccessCredentials]
   );
 
   const exportColumns = useMemo(
@@ -158,12 +158,11 @@ export default function ContactosPage() {
             />
           )}
 
-          {isGrantAccessModalOpen && selectedContact && (
-            <GrantAccessModal
-              isOpen={isGrantAccessModalOpen}
+          {isAccessCredentialsModalOpen && selectedContact && (
+            <AccessCredentialsModal
               contact={selectedContact}
               onClose={() => {
-                setIsGrantAccessModalOpen(false);
+                setIsAccessCredentialsModalOpen(false);
                 setSelectedContact(null);
               }}
               onSuccess={() => {

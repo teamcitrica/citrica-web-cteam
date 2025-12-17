@@ -47,7 +47,7 @@ export default function ProjectFormModal({
   const [formData, setFormData] = useState<ProjectInput>({
     name: project?.name || null,
     company_id: project?.company_id || null,
-    status: project?.status || null,
+    status: project?.status || "abierto",
     nombre_responsable: project?.nombre_responsable || null,
     email_responsable: project?.email_responsable || null,
     phone_responsable: project?.phone_responsable || null,
@@ -124,9 +124,33 @@ export default function ProjectFormModal({
       loadProjectContacts();
       loadProjectUsers();
     } else {
-      // Limpiar selección cuando es modo crear
+      // Limpiar todo el formulario cuando es modo crear
+      setFormData({
+        name: null,
+        company_id: null,
+        status: "abierto",
+        nombre_responsable: null,
+        email_responsable: null,
+        phone_responsable: null,
+        tabla: null,
+        supabase_url: null,
+        supabase_anon_key: null,
+      });
+      setOriginalData({
+        name: null,
+        company_id: null,
+        status: null,
+        nombre_responsable: null,
+        email_responsable: null,
+        phone_responsable: null,
+        tabla: null,
+        supabase_url: null,
+        supabase_anon_key: null,
+      });
       setSelectedContactIds(new Set());
       setSelectedUserIds([]);
+      setOriginalUserIds([]);
+      setSearchValue('');
     }
   }, [project, mode, getProjectContacts, getProjectUsers]);
 
@@ -198,11 +222,29 @@ export default function ProjectFormModal({
     setSelectedUserIds(prev => prev.filter(id => id !== userId));
   };
 
+  // Validar si el formulario está completo
+  const isFormValid = () => {
+    if (mode === "create") {
+      return !!(formData.name && formData.company_id);
+    }
+    // En modo edit, verificar si hay cambios
+    return hasChanges();
+  };
+
   const handleSubmit = async () => {
     if (!formData.name) {
       addToast({
         title: "Error",
         description: "El nombre del proyecto es requerido",
+        color: "danger",
+      });
+      return;
+    }
+
+    if (!formData.company_id) {
+      addToast({
+        title: "Error",
+        description: "La empresa es requerida",
         color: "danger",
       });
       return;
@@ -283,7 +325,7 @@ export default function ProjectFormModal({
             className="bg-[#42668A]"
             onPress={handleSubmit}
             isLoading={isLoading}
-            isDisabled={mode === "edit" ? !hasChanges() : false}
+            isDisabled={!isFormValid() || isLoading}
           >
             {mode === "create" ? "Crear Proyecto" : "Guardar Cambios"}
           </ButtonCitricaAdmin>
@@ -291,21 +333,14 @@ export default function ProjectFormModal({
       }
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <InputCitricaAdmin
-          label="Nombre del Proyecto"
-          placeholder="Ingrese el nombre"
-          value={formData.name || ""}
-          onChange={(e) => handleInputChange("name", e.target.value)}
-          isRequired
-        />
-
             <Select
-              label="Empresa (Opcional)"
+              label="Empresa"
               placeholder="Seleccione una empresa"
               selectedKeys={formData.company_id ? [formData.company_id.toString()] : []}
               onChange={(e) => {
                 handleInputChange("company_id", parseInt(e.target.value));
               }}
+              isRequired
               classNames={{
                 label: "text-gray-700",
                 value: "text-gray-800",
@@ -317,6 +352,14 @@ export default function ProjectFormModal({
                 </SelectItem>
               ))}
             </Select>
+
+        <InputCitricaAdmin
+          label="Nombre del Proyecto"
+          placeholder="Ingrese el nombre"
+          value={formData.name || ""}
+          onChange={(e) => handleInputChange("name", e.target.value)}
+          isRequired
+        />
 
             <div className="col-span-2">
               <Autocomplete
@@ -399,21 +442,6 @@ export default function ProjectFormModal({
               value={formData.phone_responsable || ""}
               onChange={(e) => handleInputChange("phone_responsable", e.target.value)}
             />
-
-            <Select
-              label="Estado"
-              placeholder="Seleccione un estado"
-              selectedKeys={formData.status ? [formData.status] : []}
-              onChange={(e) => handleInputChange("status", e.target.value)}
-              classNames={{
-                label: "text-gray-700",
-                value: "text-gray-800",
-              }}
-            >
-              <SelectItem key="abierto">Abierto</SelectItem>
-              <SelectItem key="inactivo">Inactivo</SelectItem>
-              <SelectItem key="cerrado">Cerrado</SelectItem>
-            </Select>
           </div>
     </DrawerCitricaAdmin>
   );
