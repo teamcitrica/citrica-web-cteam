@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import ProjectFormModal from "./components/project-form-modal";
 import ProjectDetailModal from "./components/project-detail-modal";
 import DeleteProjectModal from "./components/delete-project-modal";
+import ManageUsersDrawer from "./components/manage-users-drawer";
 
 import { useProjectCRUD, Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
@@ -22,6 +23,8 @@ export default function ProyectosPage() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [isManageUsersDrawerOpen, setIsManageUsersDrawerOpen] = useState(false);
+  const [projectToManageUsers, setProjectToManageUsers] = useState<Project | null>(null);
 
   // Crear mapas de conteos a partir de los proyectos
   const assetCounts = useMemo(() => {
@@ -95,6 +98,16 @@ export default function ProyectosPage() {
     setProjectToDelete(null);
   }, []);
 
+  const handleManageUsers = useCallback((project: Project) => {
+    setProjectToManageUsers(project);
+    setIsManageUsersDrawerOpen(true);
+  }, []);
+
+  const handleCloseManageUsers = useCallback(() => {
+    setIsManageUsersDrawerOpen(false);
+    setProjectToManageUsers(null);
+  }, []);
+
   const handleNavigateToAssets = useCallback((projectId: string) => {
     router.push(`/admin/crm/proyectos/${projectId}/assets`);
   }, [router]);
@@ -106,11 +119,12 @@ export default function ProyectosPage() {
         onView: handleViewProject,
         onEdit: handleEditProject,
         onDelete: handleDeleteProject,
+        onManageUsers: handleManageUsers,
         onNavigateToAssets: handleNavigateToAssets,
         assetCounts,
         accessCounts,
       }),
-    [getCompanyName, handleViewProject, handleEditProject, handleDeleteProject, handleNavigateToAssets, assetCounts, accessCounts]
+    [getCompanyName, handleViewProject, handleEditProject, handleDeleteProject, handleManageUsers, handleNavigateToAssets, assetCounts, accessCounts]
   );
 
   return (
@@ -134,6 +148,10 @@ export default function ProyectosPage() {
             headerTextColor="#ffffff"
             paginationColor="#42668A"
             getRowKey={(project) => project.id}
+            showCompanyFilter={true}
+            companies={companies}
+            companyFilterField="company_id"
+            companyFilterPlaceholder="Filtrar por empresa"
           />
 
           <ProjectFormModal
@@ -159,6 +177,15 @@ export default function ProyectosPage() {
               project={projectToDelete}
               onConfirm={handleConfirmDelete}
               onCancel={handleCancelDelete}
+            />
+          )}
+
+          {isManageUsersDrawerOpen && projectToManageUsers && (
+            <ManageUsersDrawer
+              isOpen={isManageUsersDrawerOpen}
+              project={projectToManageUsers}
+              onClose={handleCloseManageUsers}
+              onSuccess={refreshProjects}
             />
           )}
         </div>

@@ -3,10 +3,7 @@ import { useState, useEffect } from "react";
 import {
   Select,
   SelectItem,
-  Chip,
-  Divider,
 } from "@heroui/react";
-import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
@@ -16,8 +13,6 @@ import { useProjectCRUD, ProjectInput, Project } from "@/hooks/projects/use-proj
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { useContactCRUD } from "@/hooks/contact/use-contact";
 import { useProjectContacts } from "@/hooks/project-contacts/use-project-contacts";
-import { useUserCRUD } from "@/hooks/users/use-users";
-import { useUserProjects } from "@/hooks/user-projects/use-user-projects";
 
 interface ProjectFormModalProps {
   isOpen: boolean;
@@ -37,12 +32,8 @@ export default function ProjectFormModal({
   const { createProject, updateProject, isLoading } = useProjectCRUD();
   const { companies } = useCompanyCRUD();
   const { contacts } = useContactCRUD();
-  const { users } = useUserCRUD();
   const { getProjectContacts, syncProjectContacts } = useProjectContacts();
-  const { getProjectUsers, syncProjectUsers } = useUserProjects();
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
-  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
-  const [searchValue, setSearchValue] = useState('');
 
   const [formData, setFormData] = useState<ProjectInput>({
     name: project?.name || null,
@@ -67,8 +58,6 @@ export default function ProjectFormModal({
     supabase_url: project?.supabase_url || null,
     supabase_anon_key: project?.supabase_anon_key || null,
   });
-
-  const [originalUserIds, setOriginalUserIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (mode === "edit" && project) {
@@ -102,27 +91,7 @@ export default function ProjectFormModal({
         }
       };
 
-      // Cargar usuarios asociados al proyecto
-      const loadProjectUsers = async () => {
-        try {
-          const projectUsers = await getProjectUsers(project.id);
-          if (projectUsers && projectUsers.length > 0) {
-            const userIds = projectUsers.map(u => u.id).filter((id): id is string => !!id);
-            setSelectedUserIds(userIds);
-            setOriginalUserIds(userIds);
-          } else {
-            setSelectedUserIds([]);
-            setOriginalUserIds([]);
-          }
-        } catch (error) {
-          console.log("No hay usuarios asociados al proyecto");
-          setSelectedUserIds([]);
-          setOriginalUserIds([]);
-        }
-      };
-
       loadProjectContacts();
-      loadProjectUsers();
     } else {
       // Limpiar todo el formulario cuando es modo crear
       setFormData({
@@ -148,11 +117,8 @@ export default function ProjectFormModal({
         supabase_anon_key: null,
       });
       setSelectedContactIds(new Set());
-      setSelectedUserIds([]);
-      setOriginalUserIds([]);
-      setSearchValue('');
     }
-  }, [project, mode, getProjectContacts, getProjectUsers]);
+  }, [project, mode, getProjectContacts]);
 
   const handleInputChange = (field: keyof ProjectInput, value: string | number) => {
     setFormData((prev) => ({
@@ -164,7 +130,7 @@ export default function ProjectFormModal({
   // Verificar si hay cambios en el formulario
   const hasChanges = () => {
     // Comparar campos del formulario
-    const formChanged = (
+    return (
       formData.name !== originalData.name ||
       formData.company_id !== originalData.company_id ||
       formData.status !== originalData.status ||
@@ -175,51 +141,6 @@ export default function ProjectFormModal({
       formData.supabase_url !== originalData.supabase_url ||
       formData.supabase_anon_key !== originalData.supabase_anon_key
     );
-
-    // Comparar usuarios asignados
-    const usersChanged = (
-      selectedUserIds.length !== originalUserIds.length ||
-      !selectedUserIds.every(id => originalUserIds.includes(id))
-    );
-
-    return formChanged || usersChanged;
-  };
-
-  // Obtener usuarios ordenados alfabéticamente
-  // Solo mostrar usuarios de la empresa seleccionada en el proyecto
-  const clientUsers = users
-    .filter(user => user.company_id === formData.company_id)
-    .sort((a, b) => {
-      const nameA = a.first_name || '';
-      const nameB = b.first_name || '';
-      return nameA.localeCompare(nameB);
-    });
-
-  // Obtener usuarios seleccionados
-  const selectedUsers = clientUsers.filter(u => u.id && selectedUserIds.includes(u.id));
-
-  // Agregar usuario a la selección
-  const handleAddUser = (key: React.Key | null) => {
-    const userId = key?.toString() || null;
-    if (!userId) return;
-
-    // No agregar si ya está seleccionado
-    if (selectedUserIds.includes(userId)) {
-      addToast({
-        title: "Usuario ya seleccionado",
-        description: "Este usuario ya está asignado al proyecto",
-        color: "warning",
-      });
-      return;
-    }
-
-    setSelectedUserIds(prev => [...prev, userId]);
-    setSearchValue(''); // Limpiar búsqueda
-  };
-
-  // Remover usuario de la selección
-  const handleRemoveUser = (userId: string) => {
-    setSelectedUserIds(prev => prev.filter(id => id !== userId));
   };
 
   // Validar si el formulario está completo
@@ -270,11 +191,6 @@ export default function ProjectFormModal({
             await syncProjectContacts(projectId, Array.from(selectedContactIds));
           }
 
-          // Si hay usuarios seleccionados, asociarlos
-          if (selectedUserIds.length > 0) {
-            await syncProjectUsers(projectId, selectedUserIds);
-          }
-
           setFormData({
             name: null,
             company_id: null,
@@ -287,8 +203,6 @@ export default function ProjectFormModal({
             supabase_anon_key: null,
           });
           setSelectedContactIds(new Set());
-          setSelectedUserIds([]);
-          setSearchValue('');
           onSuccess?.();
           onClose();
         }
@@ -297,9 +211,6 @@ export default function ProjectFormModal({
 
         // Sincronizar contactos del proyecto (sin toast individual)
         await syncProjectContacts(project!.id, Array.from(selectedContactIds), false);
-
-        // Sincronizar usuarios del proyecto (sin toast individual)
-        await syncProjectUsers(project!.id, selectedUserIds, false);
 
         onSuccess?.();
         onClose();
@@ -361,67 +272,7 @@ export default function ProjectFormModal({
           isRequired
         />
 
-            <div className="col-span-2">
-              <Autocomplete
-                aria-label='Seleccione usuarios'
-                label="Usuarios Asignados al Proyecto"
-                listboxProps={{
-                  emptyContent: "No hay coincidencias",
-                }}
-                inputValue={searchValue}
-                onInputChange={setSearchValue}
-                placeholder="Buscar y seleccionar usuarios"
-                onSelectionChange={handleAddUser}
-                allowsCustomValue={false}
-                menuTrigger="input"
-                classNames={{
-                  base: "w-full",
-                }}
-              >
-                {clientUsers
-                  .filter(user => user.id && !selectedUserIds.includes(user.id))
-                  .map((user) => (
-                    <AutocompleteItem key={user.id}>
-                      {user.first_name && user.last_name
-                        ? `${user.first_name} ${user.last_name}`
-                        : user.email}
-                    </AutocompleteItem>
-                  ))}
-              </Autocomplete>
-
-              {/* Chips de usuarios seleccionados */}
-              {selectedUsers.length > 0 && (
-                <div className="mt-4">
-                  <p className="text-sm text-gray-600 mb-2">
-                    Seleccionados ({selectedUsers.length}):
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedUsers.map((user) => (
-                      <Chip
-                        key={user.id}
-                        onClose={() => handleRemoveUser(user.id!)}
-                        variant="flat"
-                        color="primary"
-                      >
-                        {user.first_name && user.last_name
-                          ? `${user.first_name} ${user.last_name}`
-                          : user.email}
-                      </Chip>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {clientUsers.length === 0 && (
-                <p className="text-sm text-gray-500 mt-2">
-                  No hay usuarios disponibles para esta empresa
-                </p>
-              )}
-
-              <Divider className="my-4" />
-            </div>
-
-            <InputCitricaAdmin
+        <InputCitricaAdmin
               label="Nombre del Responsable"
               placeholder="Ingrese el nombre del responsable"
               value={formData.nombre_responsable || ""}

@@ -65,18 +65,18 @@ export default function AssetFormModal({
   // Estados para acordeones y filtros
   const [showColumnSelection, setShowColumnSelection] = useState(true);
   const [showAliasManagement, setShowAliasManagement] = useState(false);
+  const [showSearchConfiguration, setShowSearchConfiguration] = useState(false);
   const [showFilterSelection, setShowFilterSelection] = useState(false);
-  const [filters, setFilters] = useState<Array<{ column: string; value: string }>>([]);
+  const [filter, setFilter] = useState<{ column: string; value: string } | null>(null);
   const [selectedFilterColumn, setSelectedFilterColumn] = useState<string>("");
-  const [filterColumnValues, setFilterColumnValues] = useState<string[]>([]);
-  const [selectedFilterValue, setSelectedFilterValue] = useState<string>("");
-  const [isLoadingFilterValues, setIsLoadingFilterValues] = useState(false);
+  const [filterValue, setFilterValue] = useState<string>("");
+
+  // Estados para buscadores
+  const [dateSearchColumn, setDateSearchColumn] = useState<string | null>(null);
+  const [textSearchColumns, setTextSearchColumns] = useState<string[]>([]);
 
   // Estados para gestión de alias
   const [columnsWithAlias, setColumnsWithAlias] = useState<ColumnWithAlias[]>([]);
-
-  // Cache de valores de columnas
-  const [columnValuesCache, setColumnValuesCache] = useState<Record<string, string[]>>({});
 
   const handleInputChange = (field: keyof AssetInput, value: string | number | Record<string, any> | null) => {
     // Para strings vacíos, mantener el string vacío en lugar de null para permitir escritura
@@ -271,6 +271,7 @@ export default function AssetFormModal({
     // Si hay columnas seleccionadas, abrir acordeón de alias y crear/actualizar array de columnas con alias
     if (newColumns.length > 0) {
       setShowAliasManagement(true);
+      setShowSearchConfiguration(true);
       setShowFilterSelection(true);
 
       // Crear array de columnas con alias (usar alias existente o campo como default)
@@ -279,10 +280,19 @@ export default function AssetFormModal({
         return existing || { field: col, alias: col, visible: true };
       });
       setColumnsWithAlias(newColumnsWithAlias);
+
+      // Limpiar columnas de búsqueda si ya no están en las columnas seleccionadas
+      if (dateSearchColumn && !newColumns.includes(dateSearchColumn)) {
+        setDateSearchColumn(null);
+      }
+      setTextSearchColumns(prev => prev.filter(col => newColumns.includes(col)));
     } else {
       setShowAliasManagement(false);
+      setShowSearchConfiguration(false);
       setShowFilterSelection(false);
       setColumnsWithAlias([]);
+      setDateSearchColumn(null);
+      setTextSearchColumns([]);
     }
   };
 
@@ -296,179 +306,94 @@ export default function AssetFormModal({
     // Actualizar assets_options en tiempo real para no perder cambios
     const options = {
       columns: updatedColumns,
-      filters: filters,
-      columnValues: columnValuesCache
+      searchConfig: {
+        dateColumn: dateSearchColumn,
+        textColumns: textSearchColumns
+      },
+      filter: filter
     };
     handleInputChange("assets_options", options);
   };
 
-  // Función para obtener valores únicos de una columna
-  const fetchColumnValues = useCallback(async (columnName: string, showToast = true, forceRefresh = false) => {
-    if (!formData.supabase_url || !formData.supabase_anon_key || !formData.tabla || !columnName) {
-      return;
-    }
 
-    // Si ya tenemos valores en cache y no es un refresh forzado, usar el cache
-    if (!forceRefresh && columnValuesCache[columnName]) {
-      setFilterColumnValues(columnValuesCache[columnName]);
-      if (showToast) {
-        addToast({
-          title: "Valores cargados desde caché",
-          description: `${columnValuesCache[columnName].length} valores únicos`,
-          color: "success",
-        });
-      }
-      return;
-    }
+  // Función para manejar la columna de búsqueda por fecha
+  const handleDateSearchColumnChange = (column: string) => {
+    setDateSearchColumn(column || null);
 
-    try {
-      setIsLoadingFilterValues(true);
-      setFilterColumnValues([]);
+    // Actualizar assets_options
+    const options = {
+      columns: columnsWithAlias,
+      searchConfig: {
+        dateColumn: column || null,
+        textColumns: textSearchColumns
+      },
+      filter: filter
+    };
+    handleInputChange("assets_options", options);
+  };
 
-      const cleanUrl = formData.supabase_url.replace(/\/$/, "");
-      const uniqueValuesSet = new Set<string>();
+  // Función para manejar las columnas de búsqueda por texto/número
+  const handleTextSearchColumnsChange = (columns: string[]) => {
+    setTextSearchColumns(columns);
 
-      // Parámetros de paginación
-      const pageSize = 1000; // Número de registros por página
-      const maxPages = 100; // Máximo 100 páginas (100,000 registros)
-      let currentPage = 0;
-      let hasMoreData = true;
+    // Actualizar assets_options
+    const options = {
+      columns: columnsWithAlias,
+      searchConfig: {
+        dateColumn: dateSearchColumn,
+        textColumns: columns
+      },
+      filter: filter
+    };
+    handleInputChange("assets_options", options);
+  };
 
-      // Hacer múltiples peticiones paginadas para obtener valores únicos
-      while (hasMoreData && currentPage < maxPages) {
-        const offset = currentPage * pageSize;
-
-        const response = await fetch(
-          `${cleanUrl}/rest/v1/${formData.tabla}?select=${columnName}&limit=${pageSize}&offset=${offset}`,
-          {
-            method: "GET",
-            headers: {
-              apikey: formData.supabase_anon_key,
-              "Content-Type": "application/json",
-              "Prefer": "count=exact"
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Error HTTP: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        // Si no hay más datos, terminar el loop
-        if (data.length === 0) {
-          hasMoreData = false;
-          break;
-        }
-
-        // Agregar valores únicos al Set
-        data.forEach((item: any) => {
-          const value = item[columnName];
-          if (value !== null && value !== undefined) {
-            uniqueValuesSet.add(String(value));
-          }
-        });
-
-        // Si recibimos menos registros que el pageSize, ya no hay más datos
-        if (data.length < pageSize) {
-          hasMoreData = false;
-        }
-
-        currentPage++;
-
-        // Actualizar la UI mientras se cargan más valores
-        if (showToast && currentPage % 10 === 0) {
-          setFilterColumnValues(Array.from(uniqueValuesSet).sort());
-        }
-      }
-
-      // Convertir el Set a Array, ordenar y actualizar
-      const uniqueValues = Array.from(uniqueValuesSet).sort();
-      setFilterColumnValues(uniqueValues);
-
-      // Guardar en cache
-      setColumnValuesCache(prev => ({
-        ...prev,
-        [columnName]: uniqueValues
-      }));
-
-      // También actualizar assets_options inmediatamente con el nuevo cache
-      const updatedCache = { ...columnValuesCache, [columnName]: uniqueValues };
-      const options = {
-        columns: columnsWithAlias.length > 0 ? columnsWithAlias : selectedColumns.map(col => ({ field: col, alias: col, visible: true })),
-        filters: filters,
-        columnValues: updatedCache
-      };
-      handleInputChange("assets_options", options);
-
-      if (showToast) {
-        const totalScanned = currentPage * pageSize;
-        addToast({
-          title: "Valores cargados",
-          description: `Se encontraron ${uniqueValues.length} valores únicos (escaneados ${Math.min(totalScanned, uniqueValues.length * pageSize)} registros)`,
-          color: "success",
-        });
-      }
-    } catch (err: any) {
-      console.error("Error al obtener valores de columna:", err);
-      if (showToast) {
-        addToast({
-          title: "Error",
-          description: "No se pudieron obtener los valores de la columna",
-          color: "danger",
-        });
-      }
-    } finally {
-      setIsLoadingFilterValues(false);
-    }
-  }, [formData.supabase_url, formData.supabase_anon_key, formData.tabla, columnValuesCache, selectedColumns, filters]);
-
-  // Función para agregar filtro
-  const handleAddFilter = () => {
-    if (!selectedFilterColumn || !selectedFilterValue) {
+  // Función para agregar/actualizar filtro
+  const handleSetFilter = () => {
+    if (!selectedFilterColumn || !filterValue.trim()) {
       addToast({
         title: "Campos requeridos",
-        description: "Selecciona una columna y un valor para el filtro",
+        description: "Selecciona una columna e ingresa un valor para el filtro",
         color: "warning",
       });
       return;
     }
 
-    const newFilter = { column: selectedFilterColumn, value: selectedFilterValue };
-    const updatedFilters = [...filters, newFilter];
-    setFilters(updatedFilters);
+    const newFilter = { column: selectedFilterColumn, value: filterValue };
+    setFilter(newFilter);
 
     // Actualizar assets_options con columnas con alias
     const options = {
       columns: columnsWithAlias,
-      filters: updatedFilters,
-      columnValues: columnValuesCache
+      searchConfig: {
+        dateColumn: dateSearchColumn,
+        textColumns: textSearchColumns
+      },
+      filter: newFilter
     };
     handleInputChange("assets_options", options);
 
-    // Limpiar selección
-    setSelectedFilterColumn("");
-    setSelectedFilterValue("");
-    setFilterColumnValues([]);
-
     addToast({
-      title: "Filtro agregado",
-      description: `Filtro: ${selectedFilterColumn} = ${selectedFilterValue}`,
+      title: "Filtro configurado",
+      description: `Filtro: ${selectedFilterColumn} = ${filterValue}`,
       color: "success",
     });
   };
 
   // Función para eliminar filtro
-  const handleRemoveFilter = (index: number) => {
-    const updatedFilters = filters.filter((_, i) => i !== index);
-    setFilters(updatedFilters);
+  const handleRemoveFilter = () => {
+    setFilter(null);
+    setSelectedFilterColumn("");
+    setFilterValue("");
 
     // Actualizar assets_options con columnas con alias
     const options = {
       columns: columnsWithAlias,
-      filters: updatedFilters,
-      columnValues: columnValuesCache
+      searchConfig: {
+        dateColumn: dateSearchColumn,
+        textColumns: textSearchColumns
+      },
+      filter: null
     };
     handleInputChange("assets_options", options);
 
@@ -502,15 +427,22 @@ export default function AssetFormModal({
         }
       }
 
-      // Extraer los filtros guardados
-      const savedFilters = asset.assets_options?.filters && Array.isArray(asset.assets_options.filters)
-        ? asset.assets_options.filters
-        : [];
+      // Extraer el filtro guardado (soportar formato antiguo con filtros array y nuevo con filter)
+      let savedFilter: { column: string; value: string } | null = null;
+      if (asset.assets_options?.filter && typeof asset.assets_options.filter === 'object') {
+        // Formato nuevo (filter único)
+        savedFilter = asset.assets_options.filter;
+      } else if (asset.assets_options?.filters && Array.isArray(asset.assets_options.filters) && asset.assets_options.filters.length > 0) {
+        // Formato antiguo (array de filtros, tomar el primero)
+        savedFilter = asset.assets_options.filters[0];
+      }
 
-      // Extraer el cache de valores de columnas guardado
-      const savedColumnValues = asset.assets_options?.columnValues && typeof asset.assets_options.columnValues === 'object'
-        ? asset.assets_options.columnValues
-        : {};
+      // Extraer la configuración de búsqueda guardada
+      const savedSearchConfig = asset.assets_options?.searchConfig;
+      const savedDateColumn = savedSearchConfig?.dateColumn || null;
+      const savedTextColumns = savedSearchConfig?.textColumns && Array.isArray(savedSearchConfig.textColumns)
+        ? savedSearchConfig.textColumns
+        : [];
 
       // Configurar estados primero
       if (savedColumns.length > 0) {
@@ -518,27 +450,30 @@ export default function AssetFormModal({
         setColumnsWithAlias(savedColumnsWithAlias);
         setShowColumnSelection(true); // Mantener abierto para que se vea en edición
         setShowAliasManagement(savedColumnsWithAlias.length > 0);
+        setShowSearchConfiguration(true);
         setShowFilterSelection(true);
       } else {
         setSelectedColumns([]);
         setColumnsWithAlias([]);
         setShowColumnSelection(true);
         setShowAliasManagement(false);
+        setShowSearchConfiguration(false);
         setShowFilterSelection(false);
       }
 
-      // Si tiene filtros, cargarlos
-      if (savedFilters.length > 0) {
-        setFilters(savedFilters);
-      } else {
-        setFilters([]);
-      }
+      // Si tiene configuración de búsqueda, cargarla
+      setDateSearchColumn(savedDateColumn);
+      setTextSearchColumns(savedTextColumns);
 
-      // Si tiene cache de valores, cargarlo
-      if (Object.keys(savedColumnValues).length > 0) {
-        setColumnValuesCache(savedColumnValues);
+      // Si tiene filtro, cargarlo
+      if (savedFilter) {
+        setFilter(savedFilter);
+        setSelectedFilterColumn(savedFilter.column);
+        setFilterValue(savedFilter.value);
       } else {
-        setColumnValuesCache({});
+        setFilter(null);
+        setSelectedFilterColumn("");
+        setFilterValue("");
       }
 
       // Establecer formData después de configurar los estados
@@ -581,12 +516,13 @@ export default function AssetFormModal({
       setTableColumns([]);
       setShowColumnSelection(true);
       setShowAliasManagement(false);
+      setShowSearchConfiguration(false);
       setShowFilterSelection(false);
-      setFilters([]);
-      setColumnValuesCache({});
-      setFilterColumnValues([]);
+      setDateSearchColumn(null);
+      setTextSearchColumns([]);
+      setFilter(null);
       setSelectedFilterColumn("");
-      setSelectedFilterValue("");
+      setFilterValue("");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asset, mode, projectId, isOpen]);
@@ -615,11 +551,14 @@ export default function AssetFormModal({
       return;
     }
 
-    // Actualizar assets_options con las columnas con alias y filtros actuales antes de guardar
+    // Actualizar assets_options con las columnas con alias, configuración de búsqueda y filtro actual antes de guardar
     const updatedOptions = {
       columns: columnsWithAlias.length > 0 ? columnsWithAlias : selectedColumns.map(col => ({ field: col, alias: col, visible: true })),
-      filters: filters,
-      columnValues: columnValuesCache
+      searchConfig: {
+        dateColumn: dateSearchColumn,
+        textColumns: textSearchColumns
+      },
+      filter: filter
     };
 
     try {
@@ -633,7 +572,7 @@ export default function AssetFormModal({
       });
 
       // Actualizar assets_options con los valores actuales
-      if (selectedColumns.length > 0 || filters.length > 0 || Object.keys(columnValuesCache).length > 0) {
+      if (selectedColumns.length > 0 || dateSearchColumn || textSearchColumns.length > 0 || filter) {
         cleanedData.assets_options = updatedOptions;
       }
 
@@ -658,12 +597,13 @@ export default function AssetFormModal({
           setTableColumns([]);
           setShowColumnSelection(true);
           setShowAliasManagement(false);
+          setShowSearchConfiguration(false);
           setShowFilterSelection(false);
-          setFilters([]);
-          setColumnValuesCache({});
-          setFilterColumnValues([]);
+          setDateSearchColumn(null);
+          setTextSearchColumns([]);
+          setFilter(null);
           setSelectedFilterColumn("");
-          setSelectedFilterValue("");
+          setFilterValue("");
           onClose();
         }
       } else {
@@ -961,6 +901,151 @@ export default function AssetFormModal({
               </div>
             )}
 
+            {/* Acordeón: Configuración de buscadores */}
+            {selectedColumns.length > 0 && (
+              <div>
+                <div className="border rounded-lg bg-white">
+                  {/* Header del acordeón de buscadores */}
+                  <button
+                    type="button"
+                    onClick={() => setShowSearchConfiguration(!showSearchConfiguration)}
+                    className="w-full flex justify-between items-center p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <h4 className="text-sm font-semibold text-gray-700">
+                      3. Configura buscadores (opcional)
+                    </h4>
+                    <span className="text-gray-500">
+                      {showSearchConfiguration ? "▼" : "▶"}
+                    </span>
+                  </button>
+
+                  {/* Contenido del acordeón de buscadores */}
+                  {showSearchConfiguration && (
+                    <div className="p-4 border-t bg-gray-50">
+                      <p className="text-xs text-gray-600 mb-4">
+                        Configura los buscadores que estarán disponibles para el usuario en la vista de datos
+                      </p>
+
+                      {/* Información de ayuda */}
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                        <p className="text-xs text-blue-800">
+                          <strong>💡 Tip:</strong> Los buscadores permiten al usuario filtrar los datos dinámicamente.
+                        </p>
+                      </div>
+
+                      {/* Buscador por fecha */}
+                      <div className="mb-6">
+                        <h5 className="text-sm font-semibold text-gray-700 mb-3">
+                          📅 Buscador por fecha
+                        </h5>
+                        <p className="text-xs text-gray-600 mb-3">
+                          Selecciona una columna de tipo fecha para activar el filtro de fechas (solo una columna permitida)
+                        </p>
+                        <Select
+                          label="Columna de fecha"
+                          placeholder="Selecciona una columna"
+                          selectedKeys={dateSearchColumn ? [dateSearchColumn] : []}
+                          onChange={(e) => handleDateSearchColumnChange(e.target.value)}
+                          classNames={{
+                            label: "!text-[#265197]",
+                            value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
+                            trigger: "bg-white !border-[#D4DEED]",
+                            selectorIcon: "text-[#678CC5]",
+                          }}
+                        >
+                          {["", ...selectedColumns].map((column) => (
+                            <SelectItem key={column}>
+                              {column === "" ? "Ninguna" : column}
+                            </SelectItem>
+                          ))}
+                        </Select>
+                        {dateSearchColumn && (
+                          <div className="mt-2">
+                            <Chip color="primary" variant="flat" size="sm">
+                              Buscador de fecha activo: {dateSearchColumn}
+                            </Chip>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Buscador por texto/número */}
+                      <div>
+                        <h5 className="text-sm font-semibold text-gray-700 mb-3">
+                          🔍 Buscador por texto/número
+                        </h5>
+                        <p className="text-xs text-gray-600 mb-3">
+                          Selecciona las columnas donde se podrá buscar texto o números
+                        </p>
+                        <div className="flex justify-between items-center mb-3">
+                          <p className="text-xs text-gray-600">
+                            Selecciona las columnas para búsqueda
+                          </p>
+                          <Button
+                            size="sm"
+                            color="primary"
+                            variant="flat"
+                            onPress={() => {
+                              const allSelected = textSearchColumns.length === selectedColumns.length;
+                              handleTextSearchColumnsChange(allSelected ? [] : selectedColumns);
+                            }}
+                          >
+                            {textSearchColumns.length === selectedColumns.length ? "Ninguna" : "Todas"}
+                          </Button>
+                        </div>
+                        <CheckboxGroup
+                          value={textSearchColumns}
+                          onValueChange={handleTextSearchColumnsChange}
+                          classNames={{
+                            base: "w-full",
+                          }}
+                        >
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {selectedColumns.map((column) => (
+                              <Checkbox
+                                key={column}
+                                value={column}
+                                classNames={{
+                                  label: "text-sm text-gray-700 truncate",
+                                }}
+                              >
+                                <span className="truncate max-w-[150px] block" title={column}>
+                                  {column}
+                                </span>
+                              </Checkbox>
+                            ))}
+                          </div>
+                        </CheckboxGroup>
+                        {textSearchColumns.length > 0 && (
+                          <div className="mt-3">
+                            <p className="text-xs text-gray-600 mb-2">
+                              Columnas seleccionadas ({textSearchColumns.length}):
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {textSearchColumns.map((column) => (
+                                <Chip
+                                  key={column}
+                                  onClose={() => {
+                                    handleTextSearchColumnsChange(
+                                      textSearchColumns.filter(c => c !== column)
+                                    );
+                                  }}
+                                  variant="flat"
+                                  color="primary"
+                                  size="sm"
+                                >
+                                  {column}
+                                </Chip>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Acordeón: Filtros de datos */}
             {selectedColumns.length > 0 && (
               <div>
@@ -972,7 +1057,7 @@ export default function AssetFormModal({
                     className="w-full flex justify-between items-center p-4 hover:bg-gray-50 transition-colors"
                   >
                     <h4 className="text-sm font-semibold text-gray-700">
-                      3. Configura filtros (opcional)
+                      4. Configura filtros (opcional)
                     </h4>
                     <span className="text-gray-500">
                       {showFilterSelection ? "▼" : "▶"}
@@ -983,7 +1068,7 @@ export default function AssetFormModal({
                   {showFilterSelection && (
                     <div className="p-4 border-t bg-gray-50">
                       <p className="text-xs text-gray-600 mb-4">
-                        Selecciona una columna y su valor para filtrar los datos
+                        Selecciona una columna e ingresa el valor para filtrar los datos
                       </p>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -995,10 +1080,6 @@ export default function AssetFormModal({
                           onChange={(e) => {
                             const column = e.target.value;
                             setSelectedFilterColumn(column);
-                            setSelectedFilterValue("");
-                            if (column) {
-                              fetchColumnValues(column);
-                            }
                           }}
                           classNames={{
                             label: "!text-[#265197]",
@@ -1014,83 +1095,43 @@ export default function AssetFormModal({
                           ))}
                         </Select>
 
-                        {/* Select de valores con botón de refresh */}
-                        <div className="flex gap-2">
-                          <Select
-                            label="Valor"
-                            placeholder="Selecciona un valor"
-                            selectedKeys={selectedFilterValue ? [selectedFilterValue] : []}
-                            onChange={(e) => setSelectedFilterValue(e.target.value)}
-                            isDisabled={!selectedFilterColumn || isLoadingFilterValues}
-                            isLoading={isLoadingFilterValues}
-                            classNames={{
-                              label: "!text-[#265197]",
-                              value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
-                              trigger: "bg-white !border-[#D4DEED]",
-                              selectorIcon: "text-[#678CC5]",
-                              base: "flex-1",
-                            }}
-                          >
-                            {filterColumnValues.map((value) => (
-                              <SelectItem key={value}>
-                                {value}
-                              </SelectItem>
-                            ))}
-                          </Select>
-
-                          {selectedFilterColumn && columnValuesCache[selectedFilterColumn] && (
-                            <div className="flex items-end">
-                              <Tooltip content="Refrescar valores desde Supabase" placement="top">
-                                <Button
-                                  size="md"
-                                  color="primary"
-                                  variant="flat"
-                                  onPress={() => fetchColumnValues(selectedFilterColumn, true, true)}
-                                  isDisabled={isLoadingFilterValues}
-                                  className="h-14"
-                                >
-                                  🔄
-                                </Button>
-                              </Tooltip>
-                            </div>
-                          )}
-                        </div>
+                        {/* Input de valor */}
+                        <InputCitricaAdmin
+                          label="Valor"
+                          placeholder="Ingresa el valor del filtro"
+                          value={filterValue}
+                          onChange={(e) => setFilterValue(e.target.value)}
+                          isDisabled={!selectedFilterColumn}
+                        />
                       </div>
 
-                      {/* Botón para agregar filtro */}
+                      {/* Botón para configurar filtro */}
                       <Button
                         className="bg-[#42668A] text-white w-full mb-4"
-                        onPress={handleAddFilter}
-                        isDisabled={!selectedFilterColumn || !selectedFilterValue}
+                        onPress={handleSetFilter}
+                        isDisabled={!selectedFilterColumn || !filterValue.trim()}
                       >
-                        Agregar Filtro
+                        {filter ? "Actualizar Filtro" : "Configurar Filtro"}
                       </Button>
 
-                      {/* Lista de filtros agregados */}
-                      {filters.length > 0 && (
+                      {/* Filtro configurado */}
+                      {filter && (
                         <div className="mt-4 pt-4 border-t border-gray-200">
                           <p className="text-xs text-gray-600 mb-2 font-medium">
-                            Filtros aplicados ({filters.length}):
+                            Filtro configurado:
                           </p>
-                          <div className="space-y-2">
-                            {filters.map((filter, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center justify-between bg-white p-3 rounded-lg border"
-                              >
-                                <span className="text-sm text-gray-700">
-                                  <strong>{filter.column}</strong> = {filter.value}
-                                </span>
-                                <Button
-                                  size="sm"
-                                  color="danger"
-                                  variant="light"
-                                  onPress={() => handleRemoveFilter(index)}
-                                >
-                                  Eliminar
-                                </Button>
-                              </div>
-                            ))}
+                          <div className="flex items-center justify-between bg-white p-3 rounded-lg border">
+                            <span className="text-sm text-gray-700">
+                              <strong>{filter.column}</strong> = {filter.value}
+                            </span>
+                            <Button
+                              size="sm"
+                              color="danger"
+                              variant="light"
+                              onPress={() => handleRemoveFilter()}
+                            >
+                              Eliminar
+                            </Button>
                           </div>
                         </div>
                       )}

@@ -15,6 +15,7 @@ type ProjectColumnsConfig = {
   onView: (project: Project) => void;
   onEdit: (project: Project) => void;
   onDelete: (project: Project) => void;
+  onManageUsers: (project: Project) => void;
   onNavigateToAssets?: (projectId: string) => void;
   assetCounts: Record<string, number>;
   accessCounts: Record<string, number>;
@@ -25,6 +26,7 @@ export const getProjectColumns = ({
   onView,
   onEdit,
   onDelete,
+  onManageUsers,
   onNavigateToAssets,
   assetCounts,
   accessCounts,
@@ -126,6 +128,9 @@ export const getProjectColumns = ({
                 case "edit":
                   onEdit(project);
                   break;
+                case "manageUsers":
+                  onManageUsers(project);
+                  break;
                 case "delete":
                   onDelete(project);
                   break;
@@ -136,6 +141,11 @@ export const getProjectColumns = ({
               key="edit"
             >
               Editar
+            </DropdownItem>
+            <DropdownItem
+              key="manageUsers"
+            >
+              Gestionar Usuarios
             </DropdownItem>
             <DropdownItem
               key="delete"
