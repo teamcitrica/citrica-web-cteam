@@ -77,8 +77,8 @@ export default function EmpresasPage() {
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div className="p-4">
-          <h1 className="text-2xl font-bold text-[#265197] mb-6">
+        <div className="">
+          <h1 className="text-2xl font-bold text-[#265197] mb-5">
             <span className="text-[#678CC5]">CRM</span> {'>'} Gestión de Empresas
           </h1>
 

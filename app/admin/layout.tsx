@@ -73,7 +73,7 @@ export default function PanelLayout({
           <Sidebar items={sidebarItemsWithAssets} session={userSession} />
           <div className="bg-[#ECF0F9] flex-1 text-white w-[80%] ">
             <Navbar session={userSession} />
-            <div className="pt-3">
+            <div>
               {children}
             </div>
           </div>

@@ -143,7 +143,7 @@ export const getUserColumns = ({
     uid: "actions",
     sortable: false,
     render: (user) => (
-      <div className="relative flex justify-center items-center gap-2">
+      <div className="relative flex justify-end items-end gap-2">
         <Button
           isIconOnly
           size="sm"

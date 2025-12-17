@@ -318,7 +318,7 @@ export function DataTable<T extends Record<string, any>>({
             {(column) => (
               <TableColumn
                 key={column.uid}
-                align="center"
+                align="start"
                 allowsSorting={column.sortable}
                 style={{
                   backgroundColor: headerColor,
