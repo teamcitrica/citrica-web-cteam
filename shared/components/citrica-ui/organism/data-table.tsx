@@ -146,18 +146,33 @@ export function DataTable<T extends Record<string, any>>({
     <div className="container-blue-principal h-full flex flex-col">
       {/* Barra de búsqueda y acciones */}
       <div className="flex items-center justify-between w-full pb-6 pt-3 flex-shrink-0">
-          <div className="flex items-center gap-4 ">
-            {/* Filtro de empresa */}
-            {showCompanyFilter && companies.length > 0 && (
-              <SelectCitricaAdmin
-                aria-label="Filtrar por empresa"
-                placeholder="Filtrar por empresa"
-                selectedKeys={tableFeatures.companyFilter && tableFeatures.companyFilter !== "" ? [tableFeatures.companyFilter] : ["all"]}
-                onSelectionChange={tableFeatures.onCompanyFilterChange}
-              >
-                {[
+        <div className="flex items-center gap-4 ">
+          {/* Filtro de empresa */}
+          {showCompanyFilter && companies.length > 0 && (
+            <SelectCitricaAdmin
+              aria-label="Filtrar por empresa"
+              placeholder="Filtrar por empresa"
+              selectedKeys={tableFeatures.companyFilter && tableFeatures.companyFilter !== "" ? [tableFeatures.companyFilter] : ["all"]}
+              onSelectionChange={tableFeatures.onCompanyFilterChange}
+            >
+              {[
+                <SelectItem
+                  key="all"
+                  classNames={{
+                    base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
+                    wrapper: "!border-none",
+                  }}
+                  style={{
+                    border: 'none',
+                    borderColor: 'transparent',
+                    borderWidth: '0',
+                  } as React.CSSProperties}
+                >
+                  Todas las empresas
+                </SelectItem>,
+                ...companies.map((company) => (
                   <SelectItem
-                    key="all"
+                    key={String(company.id)}
                     classNames={{
                       base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
                       wrapper: "!border-none",
@@ -168,29 +183,14 @@ export function DataTable<T extends Record<string, any>>({
                       borderWidth: '0',
                     } as React.CSSProperties}
                   >
-                    Todas las empresas
-                  </SelectItem>,
-                  ...companies.map((company) => (
-                    <SelectItem
-                      key={String(company.id)}
-                      classNames={{
-                        base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
-                        wrapper: "!border-none",
-                      }}
-                      style={{
-                        border: 'none',
-                        borderColor: 'transparent',
-                        borderWidth: '0',
-                      } as React.CSSProperties}
-                    >
-                      {company.name || "Sin nombre"}
-                    </SelectItem>
-                  )),
-                ]}
-              </SelectCitricaAdmin>
-            )}
+                    {company.name || "Sin nombre"}
+                  </SelectItem>
+                )),
+              ]}
+            </SelectCitricaAdmin>
+          )}
 
-            {/* {searchFields.length > 0 && (
+          {/* {searchFields.length > 0 && (
               <div className="search-input-wrapper">
                 <InputCitricaAdmin
                   placeholder={searchPlaceholder}
@@ -207,14 +207,14 @@ export function DataTable<T extends Record<string, any>>({
               </div>
             )} */}
 
-            {/* Mostrar total de registros para paginación del servidor */}
-            {serverSidePagination && totalRecords > 0 && (
-              <p className="text-sm font-medium text-[#265197]">
-                Total de registros: {totalRecords}
-              </p>
-            )}
+          {/* Mostrar total de registros para paginación del servidor */}
+          {serverSidePagination && totalRecords > 0 && (
+            <p className="text-sm font-medium text-[#265197]">
+              Total de registros: {totalRecords}
+            </p>
+          )}
 
-            {/* {showRowsPerPageSelector && (
+          {/* {showRowsPerPageSelector && (
               <Select
                 label="Filas por página"
                 className="min-w-[150px]"
@@ -227,137 +227,139 @@ export function DataTable<T extends Record<string, any>>({
                 <SelectItem key="50">50</SelectItem>
               </Select>
             )} */}
-          </div>
-
-          <div className="flex items-center gap-2">
-            {enableExport && (
-              <Dropdown>
-                <DropdownTrigger>
-                  <ButtonCitricaAdmin
-                    variant="primary"
-                    startContent={<Icon className="w-4 h-4" name="Download" />}
-                    size="sm"
-                    className="!bg-[#265197] text-white !w-[158px]"
-                  >
-                    Descargar
-                  </ButtonCitricaAdmin>
-                </DropdownTrigger>
-                <DropdownMenu
-                  aria-label="Opciones de exportación"
-                  onAction={(key) => {
-                    if (serverSidePagination && onExport) {
-                      // Para paginación de backend, usar onExport custom
-                      const fileName = tableFeatures.getDefaultFileName(tableName);
-                      tableFeatures.setFileName(fileName);
-                      tableFeatures.setExportFormat(key as string);
-                      tableFeatures.setIsExportModalOpen(true);
-                    } else {
-                      tableFeatures.handleOpenExportModal(key as string, tableName);
-                    }
-                  }}
-                >
-                  <DropdownItem
-                    key="excel"
-                    startContent={<Icon className="w-4 h-4" name="FileSpreadsheet" />}
-                  >
-                    Excel (.xlsx)
-                  </DropdownItem>
-                  <DropdownItem
-                    key="csv"
-                    startContent={<Icon className="w-4 h-4" name="FileText" />}
-                  >
-                    CSV (.csv)
-                  </DropdownItem>
-                  <DropdownItem
-                    key="pdf"
-                    startContent={<Icon className="w-4 h-4" name="FileDown" />}
-                  >
-                    PDF (.pdf)
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            )}
-
-            {onAdd && (
-              <ButtonCitricaAdmin
-                variant="primary"
-                style={{ backgroundColor: headerColor }}
-                startContent={<Icon className="w-4 h-4" name="Plus" />}
-                onPress={onAdd}
-              >
-                <Text color="white" variant="label">
-                  {addButtonText}
-                </Text>
-              </ButtonCitricaAdmin>
-            )}
-          </div>
         </div>
+
+        <div className="flex items-center gap-2">
+          {enableExport && (
+            <Dropdown>
+              <DropdownTrigger>
+                <ButtonCitricaAdmin
+                  variant="primary"
+                  style={{ backgroundColor: headerColor }}
+                  startContent={<Icon className="w-4 h-4" name="Download" />}
+                // className="!bg-[#265197] text-white !w-[158px]"
+                >
+                  <Text color="white" variant="label">
+                    Descargar
+                  </Text>
+                </ButtonCitricaAdmin>
+              </DropdownTrigger>
+              <DropdownMenu
+                aria-label="Opciones de exportación"
+                onAction={(key) => {
+                  if (serverSidePagination && onExport) {
+                    // Para paginación de backend, usar onExport custom
+                    const fileName = tableFeatures.getDefaultFileName(tableName);
+                    tableFeatures.setFileName(fileName);
+                    tableFeatures.setExportFormat(key as string);
+                    tableFeatures.setIsExportModalOpen(true);
+                  } else {
+                    tableFeatures.handleOpenExportModal(key as string, tableName);
+                  }
+                }}
+              >
+                <DropdownItem
+                  key="excel"
+                  startContent={<Icon className="w-4 h-4" name="FileSpreadsheet" />}
+                >
+                  Excel (.xlsx)
+                </DropdownItem>
+                <DropdownItem
+                  key="csv"
+                  startContent={<Icon className="w-4 h-4" name="FileText" />}
+                >
+                  CSV (.csv)
+                </DropdownItem>
+                <DropdownItem
+                  key="pdf"
+                  startContent={<Icon className="w-4 h-4" name="FileDown" />}
+                >
+                  PDF (.pdf)
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          )}
+
+          {onAdd && (
+            <ButtonCitricaAdmin
+              variant="primary"
+              style={{ backgroundColor: headerColor }}
+              startContent={<Icon className="w-4 h-4" name="Plus" />}
+              onPress={onAdd}
+            >
+              <Text color="white" variant="label">
+                {addButtonText}
+              </Text>
+            </ButtonCitricaAdmin>
+          )}
+        </div>
+      </div>
 
       {/* Contenedor de tabla con scroll horizontal y vertical */}
       <div className="table-scroll-container flex-1">
         {/* Tabla */}
         <Table
-        isStriped
-        removeWrapper
-        aria-label="Tabla de datos"
-        selectionMode="none"
-        sortDescriptor={tableFeatures.sortDescriptor}
-        onSortChange={(descriptor) => {
-          if (serverSidePagination && onSortChangeServer) {
-            // Para paginación de backend, usar onSortChange custom
-            if (descriptor.column) {
-              onSortChangeServer(
-                descriptor.column as string,
-                descriptor.direction as "ascending" | "descending"
-              );
+          isStriped
+          removeWrapper
+          aria-label="Tabla de datos"
+          selectionMode="none"
+          sortDescriptor={tableFeatures.sortDescriptor}
+          onSortChange={(descriptor) => {
+            if (serverSidePagination && onSortChangeServer) {
+              // Para paginación de backend, usar onSortChange custom
+              if (descriptor.column) {
+                onSortChangeServer(
+                  descriptor.column as string,
+                  descriptor.direction as "ascending" | "descending"
+                );
+              }
+            } else {
+              tableFeatures.setSortDescriptor(descriptor);
             }
-          } else {
-            tableFeatures.setSortDescriptor(descriptor);
-          }
-        }}
-        classNames={{
-          tr: "data-[odd=true]:bg-[#EEF1F7]",
-        }}
-      >
-        <TableHeader columns={tableColumns}>
-          {(column) => (
-            <TableColumn
-              key={column.uid}
-              align="center"
-              allowsSorting={column.sortable}
-              style={{
-                backgroundColor: headerColor,
-                color: headerTextColor,
-              }}
-            >
-              {column.name}
-            </TableColumn>
-          )}
-        </TableHeader>
-        <TableBody
-          emptyContent={emptyContent}
-          items={tableFeatures.paginatedItems}
+          }}
+          classNames={{
+            tr: "data-[odd=true]:bg-[#EEF1F7]",
+          }}
         >
-          {isLoading ? (
-            // Skeleton rows durante la carga
-            Array.from({ length: Math.min(itemsPerPage, 10) }).map((_, index) => (
-              <TableRow key={`skeleton-${index}`}>
-                {tableColumns.map((col) => (
-                  <TableCell key={col.uid}>
-                    <Skeleton className="h-6 w-full rounded-lg" />
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            (item: any) => (
-              <TableRow key={getRowKey(item)} className="items-center">
-                {(columnKey: React.Key) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-              </TableRow>
-            )
-          )}
-        </TableBody>
-      </Table>
+          <TableHeader columns={tableColumns}>
+            {(column) => (
+              <TableColumn
+                key={column.uid}
+                align="center"
+                allowsSorting={column.sortable}
+                style={{
+                  backgroundColor: headerColor,
+                  color: headerTextColor,
+                }}
+              >
+                {column.name}
+              </TableColumn>
+            )}
+          </TableHeader>
+          <TableBody
+            emptyContent={emptyContent}
+            items={tableFeatures.paginatedItems}
+          >
+            {isLoading ? (
+              // Skeleton rows durante la carga
+              Array.from({ length: Math.min(itemsPerPage, 10) }).map((_, index) => (
+                <TableRow key={`skeleton-${index}`}>
+                  {tableColumns.map((col) => (
+                    <TableCell key={col.uid}>
+                      <Skeleton className="h-6 w-full rounded-lg" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              (item: any) => (
+                <TableRow key={getRowKey(item)} className="items-center">
+                  {(columnKey: React.Key) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                </TableRow>
+              )
+            )}
+          </TableBody>
+        </Table>
       </div>
 
       {/* Paginación */}
