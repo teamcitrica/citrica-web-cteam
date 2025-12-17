@@ -8,6 +8,13 @@ import {
   Chip,
   Tooltip,
   Button,
+  Input,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
@@ -15,6 +22,13 @@ import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
 
 import { useAssetCRUD, AssetInput, Asset } from "@/hooks/assets/use-assets";
+
+// Tipo para columnas con alias
+interface ColumnWithAlias {
+  field: string;
+  alias: string;
+  visible: boolean;
+}
 
 interface AssetFormModalProps {
   isOpen: boolean;
@@ -49,15 +63,17 @@ export default function AssetFormModal({
   const [isLoadingColumns, setIsLoadingColumns] = useState(false);
 
   // Estados para acordeones y filtros
-  const [columnsConfirmed, setColumnsConfirmed] = useState(false);
   const [showColumnSelection, setShowColumnSelection] = useState(true);
+  const [showAliasManagement, setShowAliasManagement] = useState(false);
   const [showFilterSelection, setShowFilterSelection] = useState(false);
   const [filters, setFilters] = useState<Array<{ column: string; value: string }>>([]);
   const [selectedFilterColumn, setSelectedFilterColumn] = useState<string>("");
   const [filterColumnValues, setFilterColumnValues] = useState<string[]>([]);
   const [selectedFilterValue, setSelectedFilterValue] = useState<string>("");
   const [isLoadingFilterValues, setIsLoadingFilterValues] = useState(false);
-  const [lastConfirmedColumns, setLastConfirmedColumns] = useState<string[]>([]);
+
+  // Estados para gestión de alias
+  const [columnsWithAlias, setColumnsWithAlias] = useState<ColumnWithAlias[]>([]);
 
   // Cache de valores de columnas
   const [columnValuesCache, setColumnValuesCache] = useState<Record<string, string[]>>({});
@@ -248,53 +264,42 @@ export default function AssetFormModal({
     }
   }, [formData.supabase_url, formData.supabase_anon_key]);
 
-  // Función para confirmar columnas seleccionadas
-  const handleConfirmColumns = () => {
-    if (selectedColumns.length === 0) {
-      addToast({
-        title: "Selecciona columnas",
-        description: "Debes seleccionar al menos una columna",
-        color: "warning",
+  // Función para manejar cambio de columnas seleccionadas
+  const handleColumnsChange = (newColumns: string[]) => {
+    setSelectedColumns(newColumns);
+
+    // Si hay columnas seleccionadas, abrir acordeón de alias y crear/actualizar array de columnas con alias
+    if (newColumns.length > 0) {
+      setShowAliasManagement(true);
+      setShowFilterSelection(true);
+
+      // Crear array de columnas con alias (usar alias existente o campo como default)
+      const newColumnsWithAlias: ColumnWithAlias[] = newColumns.map(col => {
+        const existing = columnsWithAlias.find(c => c.field === col);
+        return existing || { field: col, alias: col, visible: true };
       });
-      return;
+      setColumnsWithAlias(newColumnsWithAlias);
+    } else {
+      setShowAliasManagement(false);
+      setShowFilterSelection(false);
+      setColumnsWithAlias([]);
     }
+  };
 
-    setColumnsConfirmed(true);
-    // No cerramos el acordeón, lo dejamos abierto
-    setShowFilterSelection(true);
-    setLastConfirmedColumns([...selectedColumns]);
+  // Función para actualizar alias de una columna
+  const handleAliasChange = (field: string, newAlias: string) => {
+    const updatedColumns = columnsWithAlias.map(col =>
+      col.field === field ? { ...col, alias: newAlias } : col
+    );
+    setColumnsWithAlias(updatedColumns);
 
-    // Actualizar assets_options con las columnas y el cache de valores
+    // Actualizar assets_options en tiempo real para no perder cambios
     const options = {
-      columns: selectedColumns,
+      columns: updatedColumns,
       filters: filters,
       columnValues: columnValuesCache
     };
     handleInputChange("assets_options", options);
-
-    addToast({
-      title: "Columnas confirmadas",
-      description: `Se confirmaron ${selectedColumns.length} columnas`,
-      color: "success",
-    });
-  };
-
-  // Verificar si las columnas han cambiado desde la última confirmación
-  const columnsHaveChanged = () => {
-    // Si no hay columnas confirmadas previamente, no hay cambios
-    if (lastConfirmedColumns.length === 0 && selectedColumns.length === 0) {
-      return false;
-    }
-
-    // Si las longitudes son diferentes, hay cambios
-    if (selectedColumns.length !== lastConfirmedColumns.length) {
-      return true;
-    }
-
-    // Si las columnas son diferentes, hay cambios
-    const sortedSelected = [...selectedColumns].sort();
-    const sortedConfirmed = [...lastConfirmedColumns].sort();
-    return !sortedSelected.every((col, index) => col === sortedConfirmed[index]);
   };
 
   // Función para obtener valores únicos de una columna
@@ -391,7 +396,7 @@ export default function AssetFormModal({
       // También actualizar assets_options inmediatamente con el nuevo cache
       const updatedCache = { ...columnValuesCache, [columnName]: uniqueValues };
       const options = {
-        columns: selectedColumns,
+        columns: columnsWithAlias.length > 0 ? columnsWithAlias : selectedColumns.map(col => ({ field: col, alias: col, visible: true })),
         filters: filters,
         columnValues: updatedCache
       };
@@ -434,9 +439,9 @@ export default function AssetFormModal({
     const updatedFilters = [...filters, newFilter];
     setFilters(updatedFilters);
 
-    // Actualizar assets_options con cache incluido
+    // Actualizar assets_options con columnas con alias
     const options = {
-      columns: selectedColumns,
+      columns: columnsWithAlias,
       filters: updatedFilters,
       columnValues: columnValuesCache
     };
@@ -459,9 +464,9 @@ export default function AssetFormModal({
     const updatedFilters = filters.filter((_, i) => i !== index);
     setFilters(updatedFilters);
 
-    // Actualizar assets_options con cache incluido
+    // Actualizar assets_options con columnas con alias
     const options = {
-      columns: selectedColumns,
+      columns: columnsWithAlias,
       filters: updatedFilters,
       columnValues: columnValuesCache
     };
@@ -480,10 +485,22 @@ export default function AssetFormModal({
     }
 
     if (mode === "edit" && asset) {
-      // Extraer las columnas guardadas
-      const savedColumns = asset.assets_options?.columns && Array.isArray(asset.assets_options.columns)
-        ? asset.assets_options.columns
-        : [];
+      // Extraer las columnas guardadas (soportar formato nuevo y antiguo)
+      let savedColumns: string[] = [];
+      let savedColumnsWithAlias: ColumnWithAlias[] = [];
+
+      if (asset.assets_options?.columns && Array.isArray(asset.assets_options.columns)) {
+        // Verificar si es el formato nuevo (con alias) o antiguo (solo strings)
+        if (asset.assets_options.columns.length > 0 && typeof asset.assets_options.columns[0] === 'object') {
+          // Formato nuevo con alias
+          savedColumnsWithAlias = asset.assets_options.columns as ColumnWithAlias[];
+          savedColumns = savedColumnsWithAlias.map(c => c.field);
+        } else {
+          // Formato antiguo (array de strings)
+          savedColumns = asset.assets_options.columns as string[];
+          savedColumnsWithAlias = savedColumns.map(col => ({ field: col, alias: col, visible: true }));
+        }
+      }
 
       // Extraer los filtros guardados
       const savedFilters = asset.assets_options?.filters && Array.isArray(asset.assets_options.filters)
@@ -498,15 +515,15 @@ export default function AssetFormModal({
       // Configurar estados primero
       if (savedColumns.length > 0) {
         setSelectedColumns(savedColumns);
-        setLastConfirmedColumns(savedColumns);
-        setColumnsConfirmed(true);
+        setColumnsWithAlias(savedColumnsWithAlias);
         setShowColumnSelection(true); // Mantener abierto para que se vea en edición
+        setShowAliasManagement(savedColumnsWithAlias.length > 0);
         setShowFilterSelection(true);
       } else {
         setSelectedColumns([]);
-        setLastConfirmedColumns([]);
-        setColumnsConfirmed(false);
+        setColumnsWithAlias([]);
         setShowColumnSelection(true);
+        setShowAliasManagement(false);
         setShowFilterSelection(false);
       }
 
@@ -559,11 +576,11 @@ export default function AssetFormModal({
         project_id: projectId,
       });
       setSelectedColumns([]);
-      setLastConfirmedColumns([]);
+      setColumnsWithAlias([]);
       setTables([]);
       setTableColumns([]);
-      setColumnsConfirmed(false);
       setShowColumnSelection(true);
+      setShowAliasManagement(false);
       setShowFilterSelection(false);
       setFilters([]);
       setColumnValuesCache({});
@@ -584,9 +601,9 @@ export default function AssetFormModal({
       return;
     }
 
-    // Actualizar assets_options con las columnas y filtros actuales antes de guardar
+    // Actualizar assets_options con las columnas con alias y filtros actuales antes de guardar
     const updatedOptions = {
-      columns: selectedColumns,
+      columns: columnsWithAlias.length > 0 ? columnsWithAlias : selectedColumns.map(col => ({ field: col, alias: col, visible: true })),
       filters: filters,
       columnValues: columnValuesCache
     };
@@ -622,11 +639,11 @@ export default function AssetFormModal({
             project_id: projectId,
           });
           setSelectedColumns([]);
-          setLastConfirmedColumns([]);
+          setColumnsWithAlias([]);
           setTables([]);
           setTableColumns([]);
-          setColumnsConfirmed(false);
           setShowColumnSelection(true);
+          setShowAliasManagement(false);
           setShowFilterSelection(false);
           setFilters([]);
           setColumnValuesCache({});
@@ -649,7 +666,7 @@ export default function AssetFormModal({
       isOpen={isOpen}
       onClose={onClose}
       title={mode === "create" ? "AGREGAR ASSET" : "EDITAR ASSET"}
-      customWidth="max-w-[500px]"
+      customWidth="max-w-[700px]"
       footer={
         <>
           <ButtonCitricaAdmin
@@ -664,7 +681,6 @@ export default function AssetFormModal({
             className="bg-[#42668A] w-[162px]"
             onPress={handleSubmit}
             isLoading={isLoading}
-            isDisabled={tableColumns.length > 0 && selectedColumns.length > 0 && columnsHaveChanged()}
           >
             {mode === "create" ? "Agregar" : "Guardar"}
           </ButtonCitricaAdmin>
@@ -699,7 +715,7 @@ export default function AssetFormModal({
             {mode === "create" && (
               <div>
                 <Button
-                  className="bg-green-600 text-white w-full"
+                  className="bg-[#42668A] text-white w-full"
                   onPress={() => handleConsultTables()}
                   isLoading={isLoadingTables}
                   isDisabled={!formData.supabase_url || !formData.supabase_anon_key}
@@ -757,8 +773,8 @@ export default function AssetFormModal({
                     onClick={() => setShowColumnSelection(!showColumnSelection)}
                     className="w-full flex justify-between items-center p-4 hover:bg-gray-50 transition-colors"
                   >
-                    <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                      {columnsConfirmed && "✓"} 1. Selecciona las columnas visibles
+                    <h4 className="text-sm font-semibold text-gray-700">
+                      1. Selecciona las columnas visibles
                     </h4>
                     <span className="text-gray-500">
                       {showColumnSelection ? "▼" : "▶"}
@@ -779,10 +795,10 @@ export default function AssetFormModal({
                           onPress={() => {
                             const allSelected = selectedColumns.length === tableColumns.length;
                             const newSelection = allSelected ? [] : tableColumns;
-                            setSelectedColumns(newSelection);
+                            handleColumnsChange(newSelection);
                           }}
                         >
-                          {selectedColumns.length === tableColumns.length ? "Deseleccionar todos" : "Seleccionar todos"}
+                          {selectedColumns.length === tableColumns.length ? "Ninguno" : "Todos"}
                         </Button>
                       </div>
 
@@ -793,7 +809,7 @@ export default function AssetFormModal({
                           <CheckboxGroup
                             value={selectedColumns}
                             onValueChange={(values) => {
-                              setSelectedColumns(values);
+                              handleColumnsChange(values);
                             }}
                             classNames={{
                               base: "w-full",
@@ -828,7 +844,7 @@ export default function AssetFormModal({
                                     key={column}
                                     onClose={() => {
                                       const newSelection = selectedColumns.filter(c => c !== column);
-                                      setSelectedColumns(newSelection);
+                                      handleColumnsChange(newSelection);
                                     }}
                                     variant="flat"
                                     color="primary"
@@ -838,15 +854,6 @@ export default function AssetFormModal({
                                   </Chip>
                                 ))}
                               </div>
-
-                              {/* Botón de confirmar columnas */}
-                              <Button
-                                className="bg-green-600 text-white w-full"
-                                onPress={handleConfirmColumns}
-                                isDisabled={columnsConfirmed && !columnsHaveChanged()}
-                              >
-                                {columnsConfirmed && !columnsHaveChanged() ? "Columnas Confirmadas ✓" : "Confirmar Columnas"}
-                              </Button>
                             </div>
                           )}
                         </>
@@ -857,8 +864,87 @@ export default function AssetFormModal({
               </div>
             )}
 
+            {/* Acordeón: Gestión de Alias */}
+            {selectedColumns.length > 0 && (
+              <div>
+                <div className="border rounded-lg bg-white">
+                  {/* Header del acordeón de alias */}
+                  <button
+                    type="button"
+                    onClick={() => setShowAliasManagement(!showAliasManagement)}
+                    className="w-full flex justify-between items-center p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <h4 className="text-sm font-semibold text-gray-700">
+                      2. Gestiona alias de columnas
+                    </h4>
+                    <span className="text-gray-500">
+                      {showAliasManagement ? "▼" : "▶"}
+                    </span>
+                  </button>
+
+                  {/* Contenido del acordeón de alias */}
+                  {showAliasManagement && (
+                    <div className="p-4 border-t bg-gray-50">
+                      <p className="text-xs text-gray-600 mb-4">
+                        Asigna alias amigables para cada columna. Estos nombres se mostrarán al cliente en lugar de los nombres técnicos.
+                      </p>
+
+                      {/* Información de ayuda */}
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                        <p className="text-xs text-blue-800">
+                          <strong>💡 Tip:</strong> Los alias son opcionales. Si dejas un campo vacío o igual al nombre original, se mostrará el nombre de la columna original.
+                        </p>
+                      </div>
+
+                      {/* Tabla editable de alias */}
+                      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-4">
+                        <Table
+                          aria-label="Tabla de alias de columnas"
+                          removeWrapper
+                          classNames={{
+                            th: "bg-gray-100 text-gray-700 font-semibold text-xs",
+                            td: "text-sm",
+                          }}
+                        >
+                          <TableHeader>
+                            <TableColumn>COLUMNA ORIGINAL</TableColumn>
+                            <TableColumn>ALIAS PERSONALIZADO</TableColumn>
+                          </TableHeader>
+                          <TableBody>
+                            {columnsWithAlias.map((col) => (
+                              <TableRow key={col.field}>
+                                <TableCell>
+                                  <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                                    {col.field}
+                                  </span>
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    value={col.alias}
+                                    onChange={(e) => handleAliasChange(col.field, e.target.value)}
+                                    placeholder="Ingresa un alias"
+                                    size="sm"
+                                    variant="bordered"
+                                    classNames={{
+                                      input: "text-sm",
+                                      inputWrapper: "border-gray-300 hover:border-blue-400 focus-within:border-blue-500",
+                                    }}
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Acordeón: Filtros de datos */}
-            {columnsConfirmed && (
+            {selectedColumns.length > 0 && (
               <div>
                 <div className="border rounded-lg bg-white">
                   {/* Header del acordeón de filtros */}
@@ -868,7 +954,7 @@ export default function AssetFormModal({
                     className="w-full flex justify-between items-center p-4 hover:bg-gray-50 transition-colors"
                   >
                     <h4 className="text-sm font-semibold text-gray-700">
-                      2. Configura filtros (opcional)
+                      3. Configura filtros (opcional)
                     </h4>
                     <span className="text-gray-500">
                       {showFilterSelection ? "▼" : "▶"}
@@ -955,7 +1041,7 @@ export default function AssetFormModal({
 
                       {/* Botón para agregar filtro */}
                       <Button
-                        className="bg-blue-600 text-white w-full mb-4"
+                        className="bg-[#42668A] text-white w-full mb-4"
                         onPress={handleAddFilter}
                         isDisabled={!selectedFilterColumn || !selectedFilterValue}
                       >

@@ -35,7 +35,7 @@ export const DrawerCitricaAdmin: React.FC<DrawerCitricaAdminProps> = ({
   title,
   children,
   footer,
-  size = "2xl",
+  size = "xl",
   customWidth,
   ...props
 }) => {
@@ -45,7 +45,7 @@ export const DrawerCitricaAdmin: React.FC<DrawerCitricaAdminProps> = ({
       onClose={onClose}
       placement="right"
       size={customWidth ? undefined : size}
-      style={customWidth ? { width: customWidth, maxWidth: '400px' } : undefined}
+      style={customWidth ? { width: customWidth, maxWidth: '600px' } : undefined}
       classNames={{
         closeButton: "w-8 h-8 min-w-8 text-[#265197] border-2 border-[#265197] rounded-full hover:bg-[#265197] hover:text-white transition-colors flex items-center justify-center items-center my-auto",
       }}

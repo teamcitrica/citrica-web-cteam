@@ -15,6 +15,12 @@ interface ExternalTableData {
   [key: string]: any;
 }
 
+interface ColumnWithAlias {
+  field: string;
+  alias: string;
+  visible: boolean;
+}
+
 export default function AssetDataPage() {
   const params = useParams();
   const assetId = params.assetId as string;
@@ -73,7 +79,19 @@ export default function AssetDataPage() {
         setIsLoadingData(true);
 
         const cleanUrl = selectedAsset.supabase_url.replace(/\/$/, "");
-        const columnsToSelect = selectedAsset.assets_options?.columns || ["*"];
+
+        // Detectar formato de columnas (nuevo con alias o antiguo)
+        const columnsConfig: (ColumnWithAlias | string)[] = selectedAsset.assets_options?.columns || ["*"];
+        let columnsToSelect: string[];
+
+        if (columnsConfig.length > 0 && typeof columnsConfig[0] === 'object') {
+          // Formato nuevo: array de objetos con alias
+          columnsToSelect = (columnsConfig as ColumnWithAlias[]).map((col) => col.field);
+        } else {
+          // Formato antiguo: array de strings
+          columnsToSelect = columnsConfig as string[];
+        }
+
         const selectQuery = columnsToSelect.join(",");
 
         // Construir filtros desde assets_options
@@ -136,12 +154,24 @@ export default function AssetDataPage() {
 
         // Generar columnas dinámicamente
         if (data && data.length > 0) {
-          const dynamicColumns = columnsToSelect.map((col) => ({
-            name: col.toUpperCase().replace(/_/g, " "),
-            uid: col,
-            sortable: true,
-            render: (row: ExternalTableData) => {
-              const value = row[col];
+          const dynamicColumns = columnsToSelect.map((col) => {
+            // Obtener el alias si existe
+            let columnName = col.toUpperCase().replace(/_/g, " ");
+
+            if (columnsConfig.length > 0 && typeof columnsConfig[0] === 'object') {
+              // Buscar el alias en la configuración
+              const columnConfig = (columnsConfig as ColumnWithAlias[]).find((c) => c.field === col);
+              if (columnConfig && columnConfig.alias) {
+                columnName = columnConfig.alias;
+              }
+            }
+
+            return {
+              name: columnName,
+              uid: col,
+              sortable: true,
+              render: (row: ExternalTableData) => {
+                const value = row[col];
 
               // Formatear fechas
               if (col.includes("_at") || col.includes("date")) {
@@ -197,7 +227,8 @@ export default function AssetDataPage() {
                 <div className="text-black font-medium">{String(value)}</div>
               );
             },
-          }));
+          };
+        });
 
           setColumns(dynamicColumns);
         }
@@ -222,7 +253,19 @@ export default function AssetDataPage() {
 
     try {
       const cleanUrl = selectedAsset.supabase_url.replace(/\/$/, "");
-      const columnsToSelect = selectedAsset.assets_options?.columns || ["*"];
+
+      // Detectar formato de columnas (nuevo con alias o antiguo)
+      const columnsConfig: (ColumnWithAlias | string)[] = selectedAsset.assets_options?.columns || ["*"];
+      let columnsToSelect: string[];
+
+      if (columnsConfig.length > 0 && typeof columnsConfig[0] === 'object') {
+        // Formato nuevo: array de objetos con alias
+        columnsToSelect = (columnsConfig as ColumnWithAlias[]).map((col) => col.field);
+      } else {
+        // Formato antiguo: array de strings
+        columnsToSelect = columnsConfig as string[];
+      }
+
       const selectQuery = columnsToSelect.join(",");
 
       // Construir filtros desde assets_options
