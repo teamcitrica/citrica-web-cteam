@@ -105,7 +105,7 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose }) => {
             {/* Información detallada */}
             <h3>
               <Text variant="subtitle" color="#265197" weight="bold">Datos del usuario</Text>
-            </h3>x  
+            </h3> 
             <div className="flex flex-col gap-1 mb-[24px]">
               <p className="text-sm text-[#265197]">Nombre: {user.first_name || "-"}</p>
               <p className="text-sm text-[#265197]">Apellido: {user.last_name || "-"}</p>

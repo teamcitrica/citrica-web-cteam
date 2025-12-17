@@ -85,7 +85,7 @@ const LoginPage = () => {
         </span>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center gap-5 mt-7'>
           <InputCitricaAdmin
-            label="email"
+            label="Email"
             type="email"
             placeholder="Correo electónico"
             {...register("email")}
@@ -96,7 +96,7 @@ const LoginPage = () => {
             }}
           />
           <InputCitricaAdmin
-             label="clave"
+             label="Clave"
             type={showPassword ? "text" : "password"}
             placeholder="Contraseña"
             {...register("password")}

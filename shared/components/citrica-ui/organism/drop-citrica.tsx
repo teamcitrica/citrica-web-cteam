@@ -3,6 +3,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/d
 import { Avatar } from '@heroui/react';
 import Icon, { IconName } from "@/shared/components/citrica-ui/atoms/icon";
 import { useRouter } from 'next/navigation';
+import Text from '../atoms/text';
 
 // Tipos para los items del dropdown
 export interface DropdownItemConfig {
@@ -126,10 +127,12 @@ export const DropCitrica: React.FC<DropCitricaProps> = ({
           className={`flex items-center gap-3 rounded-full cursor-pointer px-3 py-2 ${triggerClassName}`}
           style={defaultTriggerStyle}
         >
-          <div className="rounded-full flex items-center justify-center overflow-hidden" style={{ width: '48px', height: '48px' }}>
-            <img src="/avatar-logueo-citrica.png" alt="Avatar" width="48" height="48" />
+          <div className="rounded-full flex items-center justify-center overflow-hidden" style={{ width: '32px', height: '32px' }}>
+            <img src="/avatar-logueo-citrica.png" alt="Avatar" width="32" height="32" />
           </div>
-          <span className="text-sm font-medium flex-1" style={{ color: '#16305A' }}>{userName}</span>
+          <span className="flex-1" style={{ color: '#16305A' }}>
+            <Text variant="label">{userName}</Text>
+          </span>
           <Icon name="ChevronDown" size={16} style={{ color: '#16305A' }} />
         </div>
       </DropdownTrigger>
