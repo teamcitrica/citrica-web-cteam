@@ -591,6 +591,20 @@ export default function AssetFormModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asset, mode, projectId, isOpen]);
 
+  // Validar si el formulario está completo
+  const isFormValid = () => {
+    if (mode === "create") {
+      return !!(
+        formData.name &&
+        formData.supabase_url &&
+        formData.supabase_anon_key &&
+        formData.tabla
+      );
+    }
+    // En modo edit, solo requerir el nombre
+    return !!formData.name;
+  };
+
   const handleSubmit = async () => {
     if (!formData.name) {
       addToast({
@@ -681,6 +695,7 @@ export default function AssetFormModal({
             className="bg-[#42668A] w-[162px]"
             onPress={handleSubmit}
             isLoading={isLoading}
+            isDisabled={!isFormValid() || isLoading}
           >
             {mode === "create" ? "Agregar" : "Guardar"}
           </ButtonCitricaAdmin>
@@ -702,6 +717,7 @@ export default function AssetFormModal({
               value={formData.supabase_url || ""}
               onChange={(e) => handleInputChange("supabase_url", e.target.value)}
               isDisabled={mode === "edit"}
+              isRequired={mode === "create"}
             />
 
             <InputCitricaAdmin
@@ -710,6 +726,7 @@ export default function AssetFormModal({
               value={formData.supabase_anon_key || ""}
               onChange={(e) => handleInputChange("supabase_anon_key", e.target.value)}
               isDisabled={mode === "edit"}
+              isRequired={mode === "create"}
             />
 
             {mode === "create" && (
@@ -738,6 +755,7 @@ export default function AssetFormModal({
                       fetchTableColumns(tableName);
                     }
                   }}
+                  isRequired={mode === "create"}
                   classNames={{
                     label: "!text-[#265197]",
                     value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2] truncate",

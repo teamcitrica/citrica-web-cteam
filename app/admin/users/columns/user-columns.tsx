@@ -17,7 +17,7 @@ type UserColumnsConfig = {
   onView: (user: UserType) => void;
   onEdit: (user: UserType) => void;
   onDelete: (user: UserType) => void;
-  onToggleAccess: (user: UserType) => void;
+  onAccessCredentials: (user: UserType) => void;
 };
 
 type UserExportConfig = Record<string, never>;
@@ -59,7 +59,7 @@ export const getUserColumns = ({
   onView,
   onEdit,
   onDelete,
-  onToggleAccess,
+  onAccessCredentials,
 }: UserColumnsConfig): Column<UserType>[] => [
   {
     name: "USUARIO",
@@ -169,8 +169,8 @@ export const getUserColumns = ({
                 case "edit":
                   onEdit(user);
                   break;
-                case "toggle-access":
-                  onToggleAccess(user);
+                case "access-credentials":
+                  onAccessCredentials(user);
                   break;
                 case "delete":
                   onDelete(user);
@@ -180,12 +180,9 @@ export const getUserColumns = ({
           >
             <DropdownItem key="edit">Editar</DropdownItem>
             <DropdownItem
-              key="toggle-access"
-              className={user.active_users ? "text-warning" : "text-success"}
+              key="access-credentials"
             >
-              {user.active_users
-                ? "Quitar acceso al sistema"
-                : "Dar acceso al sistema"}
+              Accesos
             </DropdownItem>
             <DropdownItem key="delete" className="text-danger" color="danger">
               Eliminar
