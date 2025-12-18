@@ -206,8 +206,8 @@ export default function AssetFormModal({
 
       if (data.definitions) {
         Object.keys(data.definitions).forEach((key) => {
-          // Filtrar solo las vistas que terminan en "_vista"
-          if (key.endsWith("_vista")) {
+          // Filtrar solo las vistas que empiezan con "view_"
+          if (key.startsWith("view_")) {
             allTableNames.push(key);
           }
         });
@@ -219,7 +219,7 @@ export default function AssetFormModal({
           const tableName = path.replace("/", "");
           if (
             tableName &&
-            tableName.endsWith("_vista") &&
+            tableName.startsWith("view_") &&
             !allTableNames.includes(tableName)
           ) {
             allTableNames.push(tableName);
@@ -231,7 +231,7 @@ export default function AssetFormModal({
         if (showToast) {
           addToast({
             title: "Sin vistas",
-            description: "No se encontraron vistas que terminen en '_vista' en este Supabase.",
+            description: "No se encontraron vistas que empiecen con 'view_' en este Supabase.",
             color: "warning",
           });
         }
