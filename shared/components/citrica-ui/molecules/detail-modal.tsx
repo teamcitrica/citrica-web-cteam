@@ -18,7 +18,7 @@ interface DetailModalSection {
 interface DetailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title: string | ReactNode;
   sections: DetailModalSection[];
   footer?: ReactNode;
   width?: string;
@@ -42,7 +42,8 @@ export default function DetailModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className="w-[360px]"
+      className={width ? "" : "w-[360px]"}
+      style={customStyle}
       scrollBehavior="inside"
     >
       <ModalContent className="!">
@@ -51,7 +52,12 @@ export default function DetailModal({
             {title}
           </h3>
         </ModalHeader>
-        <ModalBody className="bg-[#EEF1F7] rounded-xl">
+        <ModalBody
+          className="rounded-xl"
+          style={{
+            background: 'linear-gradient(180deg, #EEF1F7 0%, #FFFFFF 15%, #FFFFFF 85%, #EEF1F7 100%)'
+          }}
+        >
           {sections.map((section, index) => (
             <div key={index}>
               {section.title && (
@@ -62,11 +68,15 @@ export default function DetailModal({
                 </h3>
               )}
               {section.content}
-              {index < sections.length - 1 && <Divider className="" />}
+              {index < sections.length - 1 && <Divider className="bg-[#A7BDE2]" />}
             </div>
           ))}
         </ModalBody>
-        {footer && <ModalFooter>{footer}</ModalFooter>}
+        {footer && (
+          <ModalFooter className="flex justify-end items-center py-4">
+            {footer}
+          </ModalFooter>
+        )}
       </ModalContent>
     </Modal>
   );

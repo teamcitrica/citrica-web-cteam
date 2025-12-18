@@ -243,7 +243,7 @@ export default function ProjectFormModal({
         </>
       }
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
             <Select
               label="Empresa"
               placeholder="Seleccione una empresa"
