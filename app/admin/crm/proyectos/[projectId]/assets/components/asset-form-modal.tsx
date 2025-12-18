@@ -659,7 +659,7 @@ export default function AssetFormModal({
       isOpen={isOpen}
       onClose={onClose}
       title={mode === "create" ? "AGREGAR ASSET" : "EDITAR ASSET"}
-      customWidth="max-w-[700px]"
+      customWidth="700px"
       footer={
         <>
           <ButtonCitricaAdmin

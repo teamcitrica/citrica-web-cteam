@@ -149,7 +149,7 @@ export function DataTable<T extends Record<string, any>>({
       {/* Barra de búsqueda y acciones */}
       <div className="flex items-center justify-between w-full pb-6 pt-3 flex-shrink-0">
         <div className="flex items-center gap-4 ">
-          {/* Filtro de empresa */}
+          {/* Filtro de empresa con Autocomplete */}
           {showCompanyFilter && companies.length > 0 && (
             <Autocomplete
               aria-label="Filtrar por empresa"

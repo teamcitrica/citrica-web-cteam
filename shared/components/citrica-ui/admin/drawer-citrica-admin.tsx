@@ -45,7 +45,7 @@ export const DrawerCitricaAdmin: React.FC<DrawerCitricaAdminProps> = ({
       onClose={onClose}
       placement="right"
       size={customWidth ? undefined : size}
-      style={customWidth ? { width: customWidth, maxWidth: '600px' } : undefined}
+      style={customWidth ? { width: customWidth, maxWidth: customWidth } : { width: '400px', maxWidth: '400px' }}
       classNames={{
         closeButton: "w-8 h-8 min-w-8 text-[#265197] border-2 border-[#265197] rounded-full hover:bg-[#265197] hover:text-white transition-colors flex items-center justify-center items-center my-auto",
       }}
@@ -62,7 +62,14 @@ export const DrawerCitricaAdmin: React.FC<DrawerCitricaAdminProps> = ({
 
           </DrawerHeader>
         )}
-        <DrawerBody className="bg-[#EEF1F7] py-6">{children}</DrawerBody>
+        <DrawerBody
+          className="py-6"
+          style={{
+            background: 'linear-gradient(180deg, #EEF1F7 0%, #FFFFFF 15%, #FFFFFF 85%, #EEF1F7 100%)'
+          }}
+        >
+          {children}
+        </DrawerBody>
         {footer && (
           <DrawerFooter className="border-t border-gray-200">{footer}</DrawerFooter>
         )}

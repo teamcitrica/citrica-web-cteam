@@ -74,7 +74,11 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose }) => {
           <h3 className="text-lg font-semibold text-[#265197]">Detalles del Usuario</h3>
         </ModalHeader>
 
-        <ModalBody className="bg-[#EEF1F7]">
+        <ModalBody
+          style={{
+            background: 'linear-gradient(180deg, #EEF1F7 0%, #FFFFFF 15%, #FFFFFF 85%, #EEF1F7 100%)'
+          }}
+        >
           <div className="flex flex-col gap-4">
             {/* Información principal con avatar centrado */}
             <div className="flex flex-col items-center gap-3 pb-4 border-b border-gray-300">

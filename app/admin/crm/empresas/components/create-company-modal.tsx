@@ -82,7 +82,6 @@ export default function CreateCompanyModal({
       isOpen={isOpen}
       onClose={onClose}
       title="AGREGAR EMPRESA"
-      customWidth="max-w-[400px]"
       footer={
         <>
           <ButtonCitricaAdmin
@@ -111,32 +110,33 @@ export default function CreateCompanyModal({
           onChange={(e) => handleInputChange("name", e.target.value)}
           isRequired
         />
-        <InputCitricaAdmin
+        {/* <InputCitricaAdmin
           label="RUC"
           placeholder="Ingrese el RUC"
           value={formData.ruc || ""}
           onChange={(e) => handleInputChange("ruc", e.target.value)}
-        />
-        <InputCitricaAdmin
+        /> */}
+        {/* <InputCitricaAdmin
           label="Nombre del Contacto"
           placeholder="Nombre completo"
           value={formData.contact_name || ""}
           onChange={(e) => handleInputChange("contact_name", e.target.value)}
-        />
-        <InputCitricaAdmin
+        /> */}
+        {/* <InputCitricaAdmin
           label="Cargo del Contacto"
           placeholder="Cargo o posición"
           value={formData.contact_position || ""}
           onChange={(e) => handleInputChange("contact_position", e.target.value)}
-        />
+        /> */}
+
         <InputCitricaAdmin
-          label="Teléfono del Contacto"
+          label="Teléfono"
           placeholder="Número de teléfono"
           value={formData.contact_phone || ""}
           onChange={(e) => handleInputChange("contact_phone", e.target.value)}
         />
         <InputCitricaAdmin
-          label="Email del Contacto"
+          label="Email"
           placeholder="correo@ejemplo.com"
           type="email"
           value={formData.contact_email || ""}
