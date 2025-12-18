@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { useUserAssets } from "@/hooks/user-assets/use-user-assets";
-import { Spinner, DateRangePicker, Chip, Input } from "@heroui/react";
+import { Spinner, DateRangePicker, Chip, Input, ButtonGroup, Button } from "@heroui/react";
 import { Col, Container } from "@/styles/07-objects/objects";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
@@ -42,6 +42,7 @@ export default function AssetDataPage() {
   const [textSearchValue, setTextSearchValue] = useState("");
   const [textSearchInput, setTextSearchInput] = useState(""); // Para el input sin debounce
   const [dateRange, setDateRange] = useState<{start: any, end: any} | null>(null);
+  const [numericSearchOperator, setNumericSearchOperator] = useState<"eq" | "gte" | "lte">("eq"); // Operador para búsqueda numérica
 
   // Debounce para el buscador de texto
   useEffect(() => {
@@ -160,10 +161,10 @@ export default function AssetDataPage() {
             });
           }
 
-          // Si el término de búsqueda es numérico, agregar búsqueda exacta en columnas numéricas
+          // Si el término de búsqueda es numérico, agregar búsqueda con el operador seleccionado en columnas numéricas
           if (!isNaN(Number(searchTerm)) && numericColumns.length > 0) {
             numericColumns.forEach((col: string) => {
-              orConditions.push(`${col}.eq.${searchTerm}`);
+              orConditions.push(`${col}.${numericSearchOperator}.${searchTerm}`);
             });
           }
 
@@ -307,7 +308,7 @@ export default function AssetDataPage() {
     };
 
     fetchExternalData();
-  }, [assetId, assets, supabase, currentPage, pageSize, searchValue, sortColumn, sortDirection, textSearchValue, dateRange]);
+  }, [assetId, assets, supabase, currentPage, pageSize, searchValue, sortColumn, sortDirection, textSearchValue, dateRange, numericSearchOperator]);
 
   const selectedAsset = assets.find((a) => a.id === assetId);
   const isLoading = isLoadingAssets || !currentUser || isLoadingData;
@@ -378,10 +379,10 @@ export default function AssetDataPage() {
           });
         }
 
-        // Si el término de búsqueda es numérico, agregar búsqueda exacta en columnas numéricas
+        // Si el término de búsqueda es numérico, agregar búsqueda con el operador seleccionado en columnas numéricas
         if (!isNaN(Number(searchTerm)) && numericColumns.length > 0) {
           numericColumns.forEach((col: string) => {
-            orConditions.push(`${col}.eq.${searchTerm}`);
+            orConditions.push(`${col}.${numericSearchOperator}.${searchTerm}`);
           });
         }
 
@@ -648,6 +649,56 @@ export default function AssetDataPage() {
                           }}
                           description="Escribe para buscar (búsqueda automática después de 0.5s)"
                         />
+
+                        {/* Botones de operador numérico - solo visible cuando el input tiene un número */}
+                        {textSearchInput && !isNaN(Number(textSearchInput)) && (
+                          <div className="mt-3">
+                            <p className="text-xs text-[#265197] font-medium mb-2">
+                              Tipo de búsqueda numérica:
+                            </p>
+                            <ButtonGroup size="sm" className="w-full">
+                              <Button
+                                className={`flex-1 ${
+                                  numericSearchOperator === "eq"
+                                    ? "bg-[#42668A] text-white"
+                                    : "bg-white text-[#265197] border border-[#D4DEED]"
+                                }`}
+                                onPress={() => {
+                                  setNumericSearchOperator("eq");
+                                  setCurrentPage(1);
+                                }}
+                              >
+                                = Igual
+                              </Button>
+                              <Button
+                                className={`flex-1 ${
+                                  numericSearchOperator === "gte"
+                                    ? "bg-[#42668A] text-white"
+                                    : "bg-white text-[#265197] border border-[#D4DEED]"
+                                }`}
+                                onPress={() => {
+                                  setNumericSearchOperator("gte");
+                                  setCurrentPage(1);
+                                }}
+                              >
+                                ≥ Mayor o igual
+                              </Button>
+                              <Button
+                                className={`flex-1 ${
+                                  numericSearchOperator === "lte"
+                                    ? "bg-[#42668A] text-white"
+                                    : "bg-white text-[#265197] border border-[#D4DEED]"
+                                }`}
+                                onPress={() => {
+                                  setNumericSearchOperator("lte");
+                                  setCurrentPage(1);
+                                }}
+                              >
+                                ≤ Menor o igual
+                              </Button>
+                            </ButtonGroup>
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -702,16 +753,25 @@ export default function AssetDataPage() {
                         <span className="text-sm text-gray-600 font-medium">Búsqueda activa:</span>
                         {textSearchValue && (
                           <Chip
-                           color="default" 
+                           color="default"
                             variant="flat"
                             size="sm"
                             onClose={() => {
                               setTextSearchInput("");
                               setTextSearchValue("");
+                              setNumericSearchOperator("eq"); // Reset operador
                               setCurrentPage(1);
                             }}
                           >
-                            Texto: "{textSearchValue}"
+                            {!isNaN(Number(textSearchValue)) ? (
+                              <>
+                                {numericSearchOperator === "eq" && `Número = ${textSearchValue}`}
+                                {numericSearchOperator === "gte" && `Número ≥ ${textSearchValue}`}
+                                {numericSearchOperator === "lte" && `Número ≤ ${textSearchValue}`}
+                              </>
+                            ) : (
+                              `Texto: "${textSearchValue}"`
+                            )}
                           </Chip>
                         )}
                         {dateRange && (
