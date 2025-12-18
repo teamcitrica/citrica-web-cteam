@@ -137,8 +137,40 @@ export default function AssetDataPage() {
         const textColumns = searchConfig?.textColumns || [];
         const dateColumn = searchConfig?.dateColumn || null;
 
-        // La búsqueda por texto se hará del lado del cliente después del fetch
-        // No agregamos query params de búsqueda aquí
+        // Búsqueda por texto en backend usando operador 'or' de PostgREST
+        let textSearchQuery = "";
+        if (textSearchValue && textSearchValue.trim() && textColumns.length > 0) {
+          const searchTerm = textSearchValue.trim();
+
+          // Separar columnas de texto y numéricas
+          // Las columnas que terminan con _id, id, o contienen números son consideradas numéricas
+          const numericColumns = textColumns.filter((col: string) =>
+            col === 'id' || col.endsWith('_id') || col.match(/^(number|count|total|amount)/i)
+          );
+          const textOnlyColumns = textColumns.filter((col: string) =>
+            !numericColumns.includes(col)
+          );
+
+          const orConditions: string[] = [];
+
+          // Agregar búsqueda ilike solo para columnas de texto
+          if (textOnlyColumns.length > 0) {
+            textOnlyColumns.forEach((col: string) => {
+              orConditions.push(`${col}.ilike.*${searchTerm}*`);
+            });
+          }
+
+          // Si el término de búsqueda es numérico, agregar búsqueda exacta en columnas numéricas
+          if (!isNaN(Number(searchTerm)) && numericColumns.length > 0) {
+            numericColumns.forEach((col: string) => {
+              orConditions.push(`${col}.eq.${searchTerm}`);
+            });
+          }
+
+          if (orConditions.length > 0) {
+            textSearchQuery = `&or=(${orConditions.join(',')})`;
+          }
+        }
 
         // Búsqueda por rango de fechas
         let dateSearchQuery = "";
@@ -155,9 +187,8 @@ export default function AssetDataPage() {
           orderQuery = `&order=${sortColumn}.${direction}`;
         }
 
-        // Fetch de la tabla externa con filtros, ordenamiento y paginación
-        const fetchUrl = `${cleanUrl}/rest/v1/${selectedAsset.tabla}?select=${selectQuery}${filterQuery}${dateSearchQuery}${orderQuery}${paginationQuery}`;
-        console.log("Fetch URL:", fetchUrl);
+        // Fetch de la tabla externa con filtros, búsqueda, ordenamiento y paginación
+        const fetchUrl = `${cleanUrl}/rest/v1/${selectedAsset.tabla}?select=${selectQuery}${filterQuery}${textSearchQuery}${dateSearchQuery}${orderQuery}${paginationQuery}`;
 
         const response = await fetch(
           fetchUrl,
@@ -183,20 +214,7 @@ export default function AssetDataPage() {
           setTotalRecords(total);
         }
 
-        let data = await response.json();
-
-        // Filtrar por texto/número del lado del cliente
-        if (textSearchValue && textSearchValue.trim() && textColumns.length > 0) {
-          const searchValue = textSearchValue.trim().toLowerCase();
-          data = data.filter((row: any) => {
-            return textColumns.some((col: string) => {
-              const value = row[col];
-              if (value === null || value === undefined) return false;
-              return String(value).toLowerCase().includes(searchValue);
-            });
-          });
-        }
-
+        const data = await response.json();
         setTableData(data || []);
 
         // Generar columnas dinámicamente
@@ -338,7 +356,39 @@ export default function AssetDataPage() {
       const textColumns = searchConfig?.textColumns || [];
       const dateColumn = searchConfig?.dateColumn || null;
 
-      // La búsqueda por texto se hará del lado del cliente después del fetch
+      // Búsqueda por texto en backend usando operador 'or' de PostgREST
+      let textSearchQuery = "";
+      if (textSearchValue && textSearchValue.trim() && textColumns.length > 0) {
+        const searchTerm = textSearchValue.trim();
+
+        // Separar columnas de texto y numéricas
+        const numericColumns = textColumns.filter((col: string) =>
+          col === 'id' || col.endsWith('_id') || col.match(/^(number|count|total|amount)/i)
+        );
+        const textOnlyColumns = textColumns.filter((col: string) =>
+          !numericColumns.includes(col)
+        );
+
+        const orConditions: string[] = [];
+
+        // Agregar búsqueda ilike solo para columnas de texto
+        if (textOnlyColumns.length > 0) {
+          textOnlyColumns.forEach((col: string) => {
+            orConditions.push(`${col}.ilike.*${searchTerm}*`);
+          });
+        }
+
+        // Si el término de búsqueda es numérico, agregar búsqueda exacta en columnas numéricas
+        if (!isNaN(Number(searchTerm)) && numericColumns.length > 0) {
+          numericColumns.forEach((col: string) => {
+            orConditions.push(`${col}.eq.${searchTerm}`);
+          });
+        }
+
+        if (orConditions.length > 0) {
+          textSearchQuery = `&or=(${orConditions.join(',')})`;
+        }
+      }
 
       // Búsqueda por rango de fechas
       let dateSearchQuery = "";
@@ -365,7 +415,7 @@ export default function AssetDataPage() {
         const paginationQuery = `&limit=${pageSize}&offset=${offset}`;
 
         const response = await fetch(
-          `${cleanUrl}/rest/v1/${selectedAsset.tabla}?select=${selectQuery}${filterQuery}${dateSearchQuery}${orderQuery}${paginationQuery}`,
+          `${cleanUrl}/rest/v1/${selectedAsset.tabla}?select=${selectQuery}${filterQuery}${textSearchQuery}${dateSearchQuery}${orderQuery}${paginationQuery}`,
           {
             method: "GET",
             headers: {
@@ -396,18 +446,6 @@ export default function AssetDataPage() {
         } else {
           hasMoreData = false;
         }
-      }
-
-      // Filtrar por texto/número del lado del cliente
-      if (textSearchValue && textSearchValue.trim() && textColumns.length > 0) {
-        const searchValue = textSearchValue.trim().toLowerCase();
-        return allData.filter((row: any) => {
-          return textColumns.some((col: string) => {
-            const value = row[col];
-            if (value === null || value === undefined) return false;
-            return String(value).toLowerCase().includes(searchValue);
-          });
-        });
       }
 
       return allData;

@@ -108,8 +108,8 @@ export default function ManageUsersDrawer({
 
     try {
       setIsLoading(true);
-      // Sincronizar usuarios del proyecto
-      await syncProjectUsers(project.id, selectedUserIds);
+      // Sincronizar usuarios del proyecto (sin toast interno)
+      await syncProjectUsers(project.id, selectedUserIds, false);
 
       addToast({
         title: "Éxito",

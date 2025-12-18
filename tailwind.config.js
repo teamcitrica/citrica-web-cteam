@@ -34,7 +34,7 @@ module.exports = {
               DEFAULT: "#BEF264",
               foreground: "#000000",
             },
-            focus: "#BEF264",
+            focus: "#3b82f6",
           },
         },
         light: {
@@ -44,7 +44,7 @@ module.exports = {
               DEFAULT: "#BEF264",
               foreground: "#000000",
             },
-            focus: "#BEF264",
+            focus: "#3b82f6",
           },
         },
       },
