@@ -104,7 +104,6 @@ export default function CreateContactModal({
       isOpen={isOpen}
       onClose={onClose}
       title="AGREGAR CONTACTO"
-      customWidth="max-w-[400px]"
       footer={
         <>
           <ButtonCitricaAdmin
