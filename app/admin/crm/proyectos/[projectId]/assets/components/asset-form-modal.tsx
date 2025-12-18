@@ -186,7 +186,7 @@ export default function AssetFormModal({
       // Limpiar la URL si tiene barra al final
       const cleanUrl = supabaseUrl.replace(/\/$/, "");
 
-      // Intentar obtener el schema OpenAPI de Supabase
+      // Obtener el schema OpenAPI de Supabase
       const response = await fetch(`${cleanUrl}/rest/v1/`, {
         method: "GET",
         headers: {
@@ -204,11 +204,10 @@ export default function AssetFormModal({
 
       const tableNames: string[] = [];
 
-      // El schema OpenAPI tiene las tablas en la propiedad "definitions"
       if (data.definitions) {
         Object.keys(data.definitions).forEach((key) => {
-          // Filtrar tablas internas que empiezan con "_"
-          if (!key.startsWith("_") && !key.includes("pg_")) {
+          // Filtrar solo las vistas que terminan en "_vista"
+          if (key.endsWith("_vista")) {
             tableNames.push(key);
           }
         });
@@ -220,9 +219,7 @@ export default function AssetFormModal({
           const tableName = path.replace("/", "");
           if (
             tableName &&
-            !tableName.includes("{") &&
-            !tableName.includes("rpc") &&
-            !tableName.startsWith("_") &&
+            tableName.endsWith("_vista") &&
             !tableNames.includes(tableName)
           ) {
             tableNames.push(tableName);
@@ -233,8 +230,8 @@ export default function AssetFormModal({
       if (tableNames.length === 0) {
         if (showToast) {
           addToast({
-            title: "Sin tablas",
-            description: "No se encontraron tablas en este Supabase.",
+            title: "Sin vistas",
+            description: "No se encontraron vistas que terminen en '_vista' en este Supabase.",
             color: "warning",
           });
         }
@@ -243,7 +240,7 @@ export default function AssetFormModal({
         if (showToast) {
           addToast({
             title: "Éxito",
-            description: `Se encontraron ${tableNames.length} tablas`,
+            description: `Se encontraron ${tableNames.length} vistas`,
             color: "success",
           });
         }
