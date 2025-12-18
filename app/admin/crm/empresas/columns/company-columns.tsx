@@ -165,9 +165,6 @@ export const getCompanyColumns = ({
           >
             <DropdownItem
               key="edit"
-              startContent={
-                <Icon className="w-4 h-4 text-green-500" name="SquarePen" />
-              }
             >
               Editar
             </DropdownItem>
@@ -175,7 +172,6 @@ export const getCompanyColumns = ({
               key="delete"
               className="text-danger"
               color="danger"
-              startContent={<Icon className="w-4 h-4" name="Trash2" />}
             >
               Eliminar
             </DropdownItem>

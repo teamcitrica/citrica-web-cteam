@@ -34,7 +34,7 @@ export default function ContactDetailModal({
             <p className="text-sm text-[#265197]">Apellido: {contact.last_name || "-"}</p>
           </div>
           <div className="flex">
-            <p className="text-sm text-[#265197]">Cargo: {contact.cargo || "-"}</p>
+
           </div>
           <div className="flex">
             <p className="text-sm text-[#265197]">Teléfono: {contact.phone || "-"}</p>
@@ -57,7 +57,17 @@ export default function ContactDetailModal({
     <DetailModal
       isOpen={true}
       onClose={onClose}
-      title={contact.name || "Sin nombre"}
+      title={
+        <div className="flex items-center gap-3">
+          <div className="rounded-full flex items-center justify-center overflow-hidden" style={{ width: '32px', height: '32px' }}>
+            <img src="/avatar-logueo-citrica.png" alt="Avatar" width="32" height="32" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-lg font-semibold text-[#265197]">{contact.name || "Sin nombre"}</span>
+            <span className="text-sm text-[#678CC5]">{contact.cargo || "-"}</span>
+          </div>
+        </div>
+      }
       sections={sections}
     />
   );

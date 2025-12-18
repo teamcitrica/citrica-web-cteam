@@ -18,7 +18,7 @@ interface DetailModalSection {
 interface DetailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title: string | ReactNode;
   sections: DetailModalSection[];
   footer?: ReactNode;
   width?: string;
@@ -62,7 +62,7 @@ export default function DetailModal({
                 </h3>
               )}
               {section.content}
-              {index < sections.length - 1 && <Divider className="" />}
+              {index < sections.length - 1 && <Divider className="bg-[#A7BDE2]" />}
             </div>
           ))}
         </ModalBody>
