@@ -202,32 +202,32 @@ export default function AssetFormModal({
       const data = await response.json();
       console.log("Respuesta de Supabase:", data);
 
-      const tableNames: string[] = [];
+      const allTableNames: string[] = [];
 
       if (data.definitions) {
         Object.keys(data.definitions).forEach((key) => {
           // Filtrar solo las vistas que terminan en "_vista"
           if (key.endsWith("_vista")) {
-            tableNames.push(key);
+            allTableNames.push(key);
           }
         });
       }
 
       // También revisar en "paths" por si las tablas están ahí
-      if (data.paths && tableNames.length === 0) {
+      if (data.paths && allTableNames.length === 0) {
         Object.keys(data.paths).forEach((path) => {
           const tableName = path.replace("/", "");
           if (
             tableName &&
             tableName.endsWith("_vista") &&
-            !tableNames.includes(tableName)
+            !allTableNames.includes(tableName)
           ) {
-            tableNames.push(tableName);
+            allTableNames.push(tableName);
           }
         });
       }
 
-      if (tableNames.length === 0) {
+      if (allTableNames.length === 0) {
         if (showToast) {
           addToast({
             title: "Sin vistas",
@@ -235,12 +235,54 @@ export default function AssetFormModal({
             color: "warning",
           });
         }
+        return;
+      }
+
+      // Validar permisos de cada vista
+      const tableNames: string[] = [];
+      const tablesWithoutPermissions: string[] = [];
+
+      for (const tableName of allTableNames) {
+        try {
+          const testResponse = await fetch(`${cleanUrl}/rest/v1/${tableName}?limit=1`, {
+            method: "GET",
+            headers: {
+              apikey: supabaseKey,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (testResponse.ok) {
+            // La vista tiene permisos configurados
+            tableNames.push(tableName);
+          } else {
+            // La vista no tiene permisos
+            tablesWithoutPermissions.push(tableName);
+          }
+        } catch (error) {
+          // Error al validar, asumir que no tiene permisos
+          tablesWithoutPermissions.push(tableName);
+        }
+      }
+
+      if (tableNames.length === 0) {
+        if (showToast) {
+          addToast({
+            title: "Sin vistas con permisos",
+            description: `Se encontraron ${allTableNames.length} vistas pero ninguna tiene permisos configurados para el rol 'anon'.`,
+            color: "warning",
+          });
+        }
       } else {
         setTables(tableNames);
         if (showToast) {
+          let description = `Se encontraron ${tableNames.length} vistas con permisos configurados`;
+          if (tablesWithoutPermissions.length > 0) {
+            description += `. ${tablesWithoutPermissions.length} vistas sin permisos fueron omitidas: ${tablesWithoutPermissions.join(", ")}`;
+          }
           addToast({
             title: "Éxito",
-            description: `Se encontraron ${tableNames.length} vistas`,
+            description,
             color: "success",
           });
         }
