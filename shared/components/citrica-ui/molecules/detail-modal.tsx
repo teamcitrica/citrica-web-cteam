@@ -42,7 +42,8 @@ export default function DetailModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className="w-[360px]"
+      className={width ? "" : "w-[360px]"}
+      style={customStyle}
       scrollBehavior="inside"
     >
       <ModalContent className="!">
@@ -51,7 +52,12 @@ export default function DetailModal({
             {title}
           </h3>
         </ModalHeader>
-        <ModalBody className="bg-[#EEF1F7] rounded-xl">
+        <ModalBody
+          className="rounded-xl"
+          style={{
+            background: 'linear-gradient(180deg, #EEF1F7 0%, #FFFFFF 15%, #FFFFFF 85%, #EEF1F7 100%)'
+          }}
+        >
           {sections.map((section, index) => (
             <div key={index}>
               {section.title && (
@@ -66,7 +72,11 @@ export default function DetailModal({
             </div>
           ))}
         </ModalBody>
-        {footer && <ModalFooter>{footer}</ModalFooter>}
+        {footer && (
+          <ModalFooter className="flex justify-end items-center py-4">
+            {footer}
+          </ModalFooter>
+        )}
       </ModalContent>
     </Modal>
   );

@@ -62,7 +62,14 @@ export const DrawerCitricaAdmin: React.FC<DrawerCitricaAdminProps> = ({
 
           </DrawerHeader>
         )}
-        <DrawerBody className="bg-[#EEF1F7] py-6">{children}</DrawerBody>
+        <DrawerBody
+          className="py-6"
+          style={{
+            background: 'linear-gradient(180deg, #EEF1F7 0%, #FFFFFF 15%, #FFFFFF 85%, #EEF1F7 100%)'
+          }}
+        >
+          {children}
+        </DrawerBody>
         {footer && (
           <DrawerFooter className="border-t border-gray-200">{footer}</DrawerFooter>
         )}
