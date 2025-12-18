@@ -186,7 +186,7 @@ export default function AssetFormModal({
       // Limpiar la URL si tiene barra al final
       const cleanUrl = supabaseUrl.replace(/\/$/, "");
 
-      // Intentar obtener el schema OpenAPI de Supabase
+      // Obtener el schema OpenAPI de Supabase
       const response = await fetch(`${cleanUrl}/rest/v1/`, {
         method: "GET",
         headers: {
@@ -202,48 +202,87 @@ export default function AssetFormModal({
       const data = await response.json();
       console.log("Respuesta de Supabase:", data);
 
-      const tableNames: string[] = [];
+      const allTableNames: string[] = [];
 
-      // El schema OpenAPI tiene las tablas en la propiedad "definitions"
       if (data.definitions) {
         Object.keys(data.definitions).forEach((key) => {
-          // Filtrar tablas internas que empiezan con "_"
-          if (!key.startsWith("_") && !key.includes("pg_")) {
-            tableNames.push(key);
+          // Filtrar solo las vistas que terminan en "_vista"
+          if (key.endsWith("_vista")) {
+            allTableNames.push(key);
           }
         });
       }
 
       // También revisar en "paths" por si las tablas están ahí
-      if (data.paths && tableNames.length === 0) {
+      if (data.paths && allTableNames.length === 0) {
         Object.keys(data.paths).forEach((path) => {
           const tableName = path.replace("/", "");
           if (
             tableName &&
-            !tableName.includes("{") &&
-            !tableName.includes("rpc") &&
-            !tableName.startsWith("_") &&
-            !tableNames.includes(tableName)
+            tableName.endsWith("_vista") &&
+            !allTableNames.includes(tableName)
           ) {
-            tableNames.push(tableName);
+            allTableNames.push(tableName);
           }
         });
+      }
+
+      if (allTableNames.length === 0) {
+        if (showToast) {
+          addToast({
+            title: "Sin vistas",
+            description: "No se encontraron vistas que terminen en '_vista' en este Supabase.",
+            color: "warning",
+          });
+        }
+        return;
+      }
+
+      // Validar permisos de cada vista
+      const tableNames: string[] = [];
+      const tablesWithoutPermissions: string[] = [];
+
+      for (const tableName of allTableNames) {
+        try {
+          const testResponse = await fetch(`${cleanUrl}/rest/v1/${tableName}?limit=1`, {
+            method: "GET",
+            headers: {
+              apikey: supabaseKey,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (testResponse.ok) {
+            // La vista tiene permisos configurados
+            tableNames.push(tableName);
+          } else {
+            // La vista no tiene permisos
+            tablesWithoutPermissions.push(tableName);
+          }
+        } catch (error) {
+          // Error al validar, asumir que no tiene permisos
+          tablesWithoutPermissions.push(tableName);
+        }
       }
 
       if (tableNames.length === 0) {
         if (showToast) {
           addToast({
-            title: "Sin tablas",
-            description: "No se encontraron tablas en este Supabase.",
+            title: "Sin vistas con permisos",
+            description: `Se encontraron ${allTableNames.length} vistas pero ninguna tiene permisos configurados para el rol 'anon'.`,
             color: "warning",
           });
         }
       } else {
         setTables(tableNames);
         if (showToast) {
+          let description = `Se encontraron ${tableNames.length} vistas con permisos configurados`;
+          if (tablesWithoutPermissions.length > 0) {
+            description += `. ${tablesWithoutPermissions.length} vistas sin permisos fueron omitidas: ${tablesWithoutPermissions.join(", ")}`;
+          }
           addToast({
             title: "Éxito",
-            description: `Se encontraron ${tableNames.length} tablas`,
+            description,
             color: "success",
           });
         }
