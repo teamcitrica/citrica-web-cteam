@@ -5,6 +5,7 @@ import { useSupabase } from "@/shared/context/supabase-context";
 import { useUserAssets } from "@/hooks/user-assets/use-user-assets";
 import { Spinner } from "@heroui/react";
 import { Col, Container } from "@/styles/07-objects/objects";
+import { Text } from "@/shared/components/citrica-ui";
 
 export default function MisDatosPage() {
   const router = useRouter();
@@ -46,14 +47,12 @@ export default function MisDatosPage() {
     return (
       <Container>
         <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-          <div className="p-4">
-            <h1 className="text-2xl font-bold text-[#265197] mb-6">
-              Mis Datos
-            </h1>
-            <p className="text-gray-600">
-              No tienes acceso a ningún proyecto o asset en este momento.
-            </p>
-          </div>
+          <h1 className="mb-4">
+            <Text variant="title" color="#265197" weight="bold">Mis Datos</Text>
+          </h1>
+          <p>
+            <Text variant="body" color="#678CC5">No tienes acceso a ningún proyecto o asset en este momento.</Text>
+          </p>
         </Col>
       </Container>
     );

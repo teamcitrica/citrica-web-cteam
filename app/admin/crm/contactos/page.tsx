@@ -1,13 +1,11 @@
 "use client";
 import { useState, useCallback, useMemo } from "react";
-
 import CreateContactModal from "./components/create-contact-modal";
 import ContactDetailModal from "./components/contact-detail-modal";
 import EditContactModal from "./components/edit-contact-modal";
 import DeleteContactModal from "./components/delete-contact-modal";
 import AccessCredentialsModal from "./components/access-credentials-modal";
 import { getContactColumns, getContactExportColumns } from "./columns/contact-columns";
-
 import { useContactCRUD, Contact } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
@@ -112,9 +110,9 @@ export default function ContactosPage() {
             onAdd={handleOpenCreateModal}
             addButtonText="Agregar Contacto"
             emptyContent="No se encontraron contactos"
-            headerColor="#42668A"
+            headerColor="#265197"
             headerTextColor="#ffffff"
-            paginationColor="#42668A"
+            paginationColor="#265197"
             getRowKey={(contact) => contact.id}
             enableExport={true}
             exportColumns={exportColumns}

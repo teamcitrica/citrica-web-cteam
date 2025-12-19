@@ -78,9 +78,9 @@ export function DataTable<T extends Record<string, any>>({
   onAdd,
   addButtonText = "Agregar",
   emptyContent = "No se encontraron registros",
-  headerColor = "#42668A",
+  headerColor = "#265197",
   headerTextColor = "#ffffff",
-  paginationColor = "#42668A",
+  paginationColor = "#265197",
   getRowKey,
   renderActions,
   enableExport = false,
@@ -145,7 +145,7 @@ export function DataTable<T extends Record<string, any>>({
   return (
     <div className={`${customContainerClass} container-blue-principal2 h-full flex flex-col`}>
       {/* Barra de búsqueda y acciones */}
-      <div className="flex items-center justify-between w-full pb-6 pt-3 flex-shrink-0">
+      <div className="flex items-center justify-between w-full pb-3 pt-3 flex-shrink-0">
         <div className="flex items-center gap-4 ">
           {/* Filtro de empresa con Autocomplete */}
           {showCompanyFilter && companies.length > 0 && (

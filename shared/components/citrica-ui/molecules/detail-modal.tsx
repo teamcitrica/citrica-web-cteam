@@ -48,8 +48,8 @@ export default function DetailModal({
     >
       <ModalContent className="!">
         <ModalHeader className="flex flex-col gap-1">
-          <h3 className="text-lg font-semibold text-[#265197]">
-            {title}
+          <h3>
+            <Text variant="body" weight="bold" color="#265197">{title}</Text>
           </h3>
         </ModalHeader>
         <ModalBody

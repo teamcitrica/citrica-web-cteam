@@ -13,6 +13,7 @@ import autoTable from "jspdf-autotable";
 import { format } from "date-fns";
 import { parseDate } from "@internationalized/date";
 import Image from "next/image";
+import { Text } from "@/shared/components/citrica-ui";
 
 interface ExternalTableData {
   [key: string]: any;
@@ -589,11 +590,11 @@ export default function AssetDataPage() {
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div className="p-4">
+        <div>
           {/* Breadcrumb similar a contactos */}
           {selectedAsset && (
-            <h1 className="text-2xl font-bold text-[#265197] mb-6">
-              <span className="text-[#678CC5]">Proyectos</span> {'>'} {selectedAsset.name || "Sin nombre"}
+            <h1 className="text-2xl font-bold text-[#265197] mb-5">
+              <Text variant="title" weight="bold" color="#678CC5">Proyectos</Text> {'>'}  <Text variant="title" weight="bold" color="#265197">{selectedAsset.name || "Sin nombre"}</Text>
             </h1>
           )}
 
@@ -616,18 +617,20 @@ export default function AssetDataPage() {
                 {selectedAsset && selectedAsset.assets_options?.searchConfig && (
                   <>
                     <div className="flex gap-2 items-center pb-4">
-                      <p className="text-sm font-medium text-[#265197]">
-                        Total de registros: {totalRecords}
+                      <p>
+                        <Text variant="label" color="#265197">Total de registros: {totalRecords}</Text>
                       </p>
                       <Divider className="h-[20px] bg-[#A7BDE2] " orientation="vertical" />
                       {/* Filtro permanente del asset */}
                       {(selectedAsset.assets_options?.filter ||
                         (selectedAsset.assets_options?.filters && selectedAsset.assets_options.filters.length > 0)) && (
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-[#265197]">Filtro activo:</span>
+                            <span>
+                              <Text variant="label" color="#265197">Filtro activo:</Text>
+                            </span>
                             {selectedAsset.assets_options?.filter ? (
-                              <span className="text-sm font-medium text-[#265197]">
-                                {selectedAsset.assets_options.filter.column} = {selectedAsset.assets_options.filter.value}
+                              <span>
+                                <Text variant="label" color="#265197">{selectedAsset.assets_options.filter.column} = {selectedAsset.assets_options.filter.value}</Text>
                               </span>
                             ) : (
                               selectedAsset.assets_options?.filters?.map((filter: any, index: number) => (
@@ -707,8 +710,8 @@ export default function AssetDataPage() {
                   customContainerClass=""
                   columns={columns.length > 0 ? columns : [{ name: "CARGANDO", uid: "loading", sortable: false }]}
                   isLoading={isLoading}
-                  paginationColor="#42668A"
-                  headerColor="#42668A"
+                  paginationColor="#265197"
+                  headerColor="#265197"
                   headerTextColor="#ffffff"
                   searchPlaceholder="Buscar..."
                   getRowKey={(item) => item.id || JSON.stringify(item)}
@@ -804,6 +807,7 @@ export default function AssetDataPage() {
                                   }
                                   classNames={{
                                     base: "w-full max-w-[348px]",
+                                    label: "!text-[#265197] font-medium mb-1",
                                     inputWrapper: "bg-white !border-[#D4DEED] border-[2px]",
                                   }}
                                 />

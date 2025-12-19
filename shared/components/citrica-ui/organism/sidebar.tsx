@@ -35,7 +35,7 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
               <Button
                 key={subItem.title}
                 variant="light"
-                className={`justify-start px-4 py-2 transition-colors hover:bg-gray-100 ${isActive ? "bg-gray-100" : ""}`}
+                className={`justify-start px-4 py-2 transition-colors hover:bg-[#EEF1F7] ${isActive ? "bg-[#EEF1F7]" : ""}`}
                 onPress={() => router.push(subItem.href)}
               >
                 <Text variant="label" color={isActive ? "#000" : "#8099B2"}>{subItem.title}</Text>
@@ -108,7 +108,7 @@ export function Sidebar({ items }: SidebarProps) {
   const NavItems = () => (
     <div className="h-[100svh] w-full overflow-y-auto px-2 py-4 bg-sidebar">
       {/* Logo - solo visible en pantallas grandes */}
-      <div className="hidden lg:flex flex-col justify-start items-start mb-4">
+      <div className="hidden lg:flex flex-col justify-start items-start mb-2">
         <img
           src="/img/citrica-logo.png"
           alt="Citrica Logo"

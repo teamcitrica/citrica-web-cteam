@@ -77,26 +77,6 @@ export const siteConfig = {
 			],
 		},
 		{
-			title: "CMS",
-			icon: "ClipboardCheck",
-			href: "/admin/CMS",
-			allowedRoles: [ROL_ADMIN],
-			subItems: [
-				{
-					title: "Proyectos",
-					href: "/admin/CMS/proyectos",
-				},
-				{
-					title: "Solution card",
-					href: "/admin/CMS/solution_card",
-				},
-				{
-					title: "Configuración",
-					href: "/admin/CMS/configuracion",
-				},
-			],
-		},
-		{
 			title: "CRM",
 			icon: "UserStar",
 			href: "/admin/crm",
@@ -130,6 +110,26 @@ export const siteConfig = {
 			href: "/admin/client/mis-datos",
 			allowedRoles: [ROL_CLIENTE],
 			subItems: [],
+		},
+		{
+			title: "CMS",
+			icon: "ClipboardCheck",
+			href: "/admin/CMS",
+			allowedRoles: [ROL_ADMIN],
+			subItems: [
+				{
+					title: "Proyectos",
+					href: "/admin/CMS/proyectos",
+				},
+				{
+					title: "Solution card",
+					href: "/admin/CMS/solution_card",
+				},
+				{
+					title: "Configuración",
+					href: "/admin/CMS/configuracion",
+				},
+			],
 		},
 
 	],

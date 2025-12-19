@@ -31,26 +31,34 @@ export default function ContactDetailModal({
           <div className="flex flex-col gap-[8px]">
             <div className="flex flex-col">
               <p>
-                <Text variant="label" color="#678CC5">Nombre:</Text>
+                <Text variant="label" color="#678CC5">Relación</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{contact.name || "-"}</Text>
-              </p>
-            </div>
-            <div className="flex flex-col">
-              <p>
-                <Text variant="label" color="#678CC5">Apellido:</Text>
-              </p>
-              <p>
-                <Text variant="body" color="#16305A">{contact.last_name || "-"}</Text>
+                <Text variant="body" color="#16305A">.</Text>
               </p>
             </div>
             <div className="flex flex-col">
               <p>
-                <Text variant="label" color="#678CC5">Empresa:</Text>
+                <Text variant="label" color="#678CC5">Empresa</Text>
               </p>
               <p>
                 <Text variant="body" color="#16305A">{getCompanyName(contact.company_id)}</Text>
+              </p>
+            </div>
+            <div className="flex flex-col">
+              <p>
+                <Text variant="label" color="#678CC5">Email</Text>
+              </p>
+              <p>
+                <Text variant="body" color="#16305A">{contact.email || "-"}</Text>
+              </p>
+            </div>
+            <div className="flex flex-col">
+              <p>
+                <Text variant="label" color="#678CC5">WhatsApp</Text>
+              </p>
+              <p>
+                <Text variant="body" color="#16305A">{contact.phone || "-"}</Text>
               </p>
             </div>
           </div>
@@ -59,18 +67,18 @@ export default function ContactDetailModal({
           <div className="flex flex-col gap-[8px]">
             <div className="flex flex-col">
               <p>
-                <Text variant="label" color="#678CC5">Teléfono:</Text>
+                <Text variant="label" color="#678CC5">País</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{contact.phone || "-"}</Text>
+                <Text variant="body" color="#16305A">.</Text>
               </p>
             </div>
             <div className="flex flex-col">
               <p>
-                <Text variant="label" color="#678CC5">Email:</Text>
+                <Text variant="label" color="#678CC5">Ciudad</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{contact.email || "-"}</Text>
+                <Text variant="body" color="#16305A">.</Text>
               </p>
             </div>
             <div className="flex flex-col">
