@@ -96,7 +96,7 @@ const LoginPage = () => {
             }}
           />
           <InputCitricaAdmin
-             label="Clave"
+            label="Clave"
             type={showPassword ? "text" : "password"}
             placeholder="Contraseña"
             {...register("password")}

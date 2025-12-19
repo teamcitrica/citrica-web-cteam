@@ -1,9 +1,8 @@
 "use client";
 import { useMemo } from "react";
-
 import { Company } from "@/hooks/companies/use-companies";
 import { useUserCRUD } from "@/hooks/users/use-users";
-import { DetailModal } from "@/shared/components/citrica-ui";
+import { DetailModal, Text } from "@/shared/components/citrica-ui";
 
 interface CompanyDetailModalProps {
   company: Company;
@@ -55,28 +54,47 @@ export default function CompanyDetailModal({
             <p className="text-sm text-[#265197]">Cargo: {company.contact_position || "-"}</p>
           </div> */}
           <div className="flex flex-col pt-[12px]">
-            <p className="text-sm text-[#678CC5]">Sector:</p>
-            <p className="text-sm text-[#000000]">{company.description || "-"}</p>
-
+            <p>
+              <Text variant="label" color="#678CC5">Sector:</Text>
+            </p>
+            <p>
+              <Text variant="body" color="#16305A">{company.description || "-"}</Text>
+            </p>
           </div>
           <div className="flex flex-col pt-[8px]">
-            <p className="text-sm text-[#678CC5]">Teléfono:</p>
-            <p className="text-sm text-[#000000]">{company.contact_phone || "-"}</p>
+            <p>
+              <Text variant="label" color="#678CC5">Teléfono:</Text>
+            </p>
+            <p>
+              <Text variant="body" color="#16305A">{company.contact_phone || "-"}</Text>
+            </p>
           </div>
           <div className="flex flex-col pt-[8px]">
-            <p className="text-sm text-[rgb(103,140,197)]">Email:</p>
-            <p className="text-sm text-[#000000]"> {company.contact_email || "-"}</p>
+            <p>
+              <Text variant="label" color="#678CC5">Email:</Text>
+            </p>
+            <p>
+              <Text variant="body" color="#16305A">{company.contact_email || "-"}</Text>
+            </p>
           </div>
           <div className="flex flex-col pt-[8px]">
-            <p className="text-sm text-[#678CC5]">Ubicación:</p>
-            <p className="text-sm text-[#000000]">{company.country || "-"}</p>
+            <p>
+              <Text variant="label" color="#678CC5">Ubicación:</Text>
+            </p>
+            <p>
+              <Text variant="body" color="#16305A">{company.country || "-"}</Text>
+            </p>
           </div>
           <div className="flex flex-col pt-[8px] pb-[16px]">
-            <p className="text-sm text-[#678CC5]">Dirección:</p>
-            <p className="text-sm text-[#000000]">
-              {company.street_or_avenue
-                ? ` ${company.street_or_avenue} ${company.address_number || ""}`
-                : " -"}
+            <p>
+              <Text variant="label" color="#678CC5">Dirección:</Text>
+            </p>
+            <p>
+              <Text variant="body" color="#16305A">
+                {company.street_or_avenue
+                  ? ` ${company.street_or_avenue} ${company.address_number || ""}`
+                  : " -"}
+              </Text>
             </p>
           </div>
 
@@ -88,16 +106,28 @@ export default function CompanyDetailModal({
       content: (
         <div className="flex gap-4 mb-[24px] mt-[12px]">
           <div className="flex items-center gap-2">
-            <p className="text-sm text-[#265197]">Usuarios:</p>
-            <p className="text-lg text-[#265197]">{userStats.withAccess}</p>
+            <p>
+              <Text variant="label" color="#265197">Usuarios:</Text>
+            </p>
+            <p>
+              <Text variant="body" color="#265197" weight="bold">{userStats.withAccess}</Text>
+            </p>
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-sm text-[#265197]">Sin Acceso:</p>
-            <p className="text-lg  text-[#265197]">{userStats.withoutAccess}</p>
+            <p>
+              <Text variant="label" color="#265197">Sin Acceso:</Text>
+            </p>
+            <p>
+              <Text variant="body" color="#265197" weight="bold">{userStats.withoutAccess}</Text>
+            </p>
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-sm text-[#265197]">Total:</p>
-            <p className="text-lg font-bold text-[#265197]">{userStats.total}</p>
+            <p>
+              <Text variant="label" color="#265197">Total:</Text>
+            </p>
+            <p>
+              <Text variant="body" color="#265197" weight="bold">{userStats.total}</Text>
+            </p>
           </div>
         </div>
       ),
