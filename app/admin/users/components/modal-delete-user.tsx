@@ -61,7 +61,7 @@ const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
           <ButtonCitricaAdmin
             variant="primary"
             className="bg-[#F04242] w-[162px] !border-0"
-            onPress={onCancel}
+            onPress={onConfirm}
           >
             Eliminar
           </ButtonCitricaAdmin>
