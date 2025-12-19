@@ -5,10 +5,11 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Button,
+  Divider,
 } from "@heroui/react";
-
 import { Contact } from "@/hooks/contact/use-contact";
+import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
+import { Icon, Text } from "@/shared/components/citrica-ui";
 
 interface DeleteContactModalProps {
   contact: Contact;
@@ -24,27 +25,41 @@ export default function DeleteContactModal({
   return (
     <Modal isOpen={true} onClose={onCancel} size="md">
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
-          <h3 className="text-lg font-semibold text-gray-800">
-            Eliminar Contacto
-          </h3>
+        <ModalHeader className="flex flex-col gap-1 mt-4">
+          <div className="flex items-center justify-center mb-2">
+            <Icon size={28} className=" text-red-500" name="TriangleAlert" />
+          </div>
+          <h2 className="text-center">
+            <Text variant="title" color="#F04242" weight="bold">Eliminar Contacto</Text>
+          </h2>
         </ModalHeader>
         <ModalBody>
           <p className="text-gray-600">
-            ¿Estás seguro de que deseas eliminar el contacto{" "}
-            <span className="font-semibold">{contact.name || "este contacto"}</span>?
+            <Text variant="body" color="#16305A">¿Estás seguro de que deseas eliminar el contacto{" "}
+            <span className="font-semibold">{contact.name || "este contacto"}</span>?</Text>
           </p>
-          <p className="text-sm text-gray-500 mt-2">
-            Esta acción no se puede deshacer.
+          <p className="text-sm text-gray-500 my-2">
+            <Text variant="label" color="#16305A">Esta acción no se puede deshacer.</Text>
           </p>
+        <Divider className="bg-[#A7BDE2]" />
         </ModalBody>
         <ModalFooter>
-          <Button color="default" variant="light" onPress={onCancel}>
+        <div className="flex gap-3 justify-end">
+          <ButtonCitricaAdmin
+            variant="modalv2"
+            className="w-[162px]"
+            onPress={onCancel}
+          >
             Cancelar
-          </Button>
-          <Button color="danger" onPress={onConfirm}>
+          </ButtonCitricaAdmin>
+          <ButtonCitricaAdmin
+            variant="primary"
+            className="bg-[#F04242] w-[162px] !border-0"
+            onPress={onConfirm}
+          >
             Eliminar
-          </Button>
+          </ButtonCitricaAdmin>
+        </div>
         </ModalFooter>
       </ModalContent>
     </Modal>
