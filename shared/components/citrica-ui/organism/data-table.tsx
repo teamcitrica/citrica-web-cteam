@@ -66,6 +66,7 @@ export interface DataTableProps<T extends Record<string, any>> {
   onSortChange?: (column: string, direction: "ascending" | "descending") => void;
   removeWrapper?: boolean;
   customContainerClass?: string;
+  customFilters?: React.ReactNode;
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -100,6 +101,7 @@ export function DataTable<T extends Record<string, any>>({
   onSortChange: onSortChangeServer,
   removeWrapper = false,
   customContainerClass = "container-blue-principal",
+  customFilters,
 }: DataTableProps<T>) {
   const [isExporting, setIsExporting] = useState(false);
 
@@ -179,7 +181,8 @@ export function DataTable<T extends Record<string, any>>({
             </Autocomplete>
           )}
 
-
+          {/* Custom Filters */}
+          {customFilters}
         </div>
 
         <div className="flex items-center gap-2">
