@@ -51,24 +51,22 @@ export interface DataTableProps<T extends Record<string, any>> {
   exportTitle?: string;
   tableName?: string;
   showRowsPerPageSelector?: boolean;
-  // Filtro de empresa
   showCompanyFilter?: boolean;
   companies?: Array<{ id: number; name: string | null }>;
   companyFilterField?: keyof T;
   companyFilterPlaceholder?: string;
-  // Paginación del servidor
   serverSidePagination?: boolean;
   totalRecords?: number;
   currentPage?: number;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
-  // Custom export para paginación de backend
   onExport?: (format: string, fileName: string) => Promise<void>;
-  // Búsqueda del servidor
   onSearchChange?: (searchValue: string) => void;
   searchValue?: string;
-  // Ordenamiento del servidor
   onSortChange?: (column: string, direction: "ascending" | "descending") => void;
+  removeWrapper?: boolean;
+  customContainerClass?: string;
+  customFilters?: React.ReactNode;
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -76,7 +74,6 @@ export function DataTable<T extends Record<string, any>>({
   columns,
   isLoading = false,
   itemsPerPage = 50,
-  searchPlaceholder = "Buscar...",
   searchFields = [],
   onAdd,
   addButtonText = "Agregar",
@@ -90,7 +87,6 @@ export function DataTable<T extends Record<string, any>>({
   exportColumns = [],
   exportTitle = "Tabla de datos",
   tableName = "tabla",
-  showRowsPerPageSelector = false,
   showCompanyFilter = false,
   companies = [],
   companyFilterField,
@@ -99,11 +95,13 @@ export function DataTable<T extends Record<string, any>>({
   totalRecords = 0,
   currentPage = 1,
   onPageChange,
-  onPageSizeChange,
   onExport,
   onSearchChange: onSearchChangeServer,
   searchValue: searchValueServer,
   onSortChange: onSortChangeServer,
+  removeWrapper = false,
+  customContainerClass = "container-blue-principal",
+  customFilters,
 }: DataTableProps<T>) {
   const [isExporting, setIsExporting] = useState(false);
 
@@ -145,7 +143,7 @@ export function DataTable<T extends Record<string, any>>({
   );
 
   return (
-    <div className="container-blue-principal h-full flex flex-col">
+    <div className={`${customContainerClass} container-blue-principal2 h-full flex flex-col`}>
       {/* Barra de búsqueda y acciones */}
       <div className="flex items-center justify-between w-full pb-6 pt-3 flex-shrink-0">
         <div className="flex items-center gap-4 ">
@@ -183,43 +181,8 @@ export function DataTable<T extends Record<string, any>>({
             </Autocomplete>
           )}
 
-          {/* {searchFields.length > 0 && (
-              <div className="search-input-wrapper">
-                <InputCitricaAdmin
-                  placeholder={searchPlaceholder}
-                  endContent={<Icon className="ml-2" color="#719BC1" name="Search" />}
-                  value={serverSidePagination && onSearchChangeServer ? (searchValueServer || "") : tableFeatures.filterValue}
-                  onChange={(e) => {
-                    if (serverSidePagination && onSearchChangeServer) {
-                      onSearchChangeServer(e.target.value);
-                    } else {
-                      tableFeatures.onSearchChange(e.target.value);
-                    }
-                  }}
-                />
-              </div>
-            )} */}
-
-          {/* Mostrar total de registros para paginación del servidor */}
-          {serverSidePagination && totalRecords > 0 && (
-            <p className="text-sm font-medium text-[#265197]">
-              Total de registros: {totalRecords}
-            </p>
-          )}
-
-          {/* {showRowsPerPageSelector && (
-              <Select
-                label="Filas por página"
-                className="min-w-[150px]"
-                selectedKeys={[String(tableFeatures.rowsPerPage)]}
-                onChange={tableFeatures.onRowsPerPageChange}
-              >
-                <SelectItem key="10">10</SelectItem>
-                <SelectItem key="15">15</SelectItem>
-                <SelectItem key="20">20</SelectItem>
-                <SelectItem key="50">50</SelectItem>
-              </Select>
-            )} */}
+          {/* Custom Filters */}
+          {customFilters}
         </div>
 
         <div className="flex items-center gap-2">
@@ -293,7 +256,7 @@ export function DataTable<T extends Record<string, any>>({
         {/* Tabla */}
         <Table
           isStriped
-          removeWrapper
+          removeWrapper={removeWrapper}
           aria-label="Tabla de datos"
           selectionMode="none"
           sortDescriptor={tableFeatures.sortDescriptor}
