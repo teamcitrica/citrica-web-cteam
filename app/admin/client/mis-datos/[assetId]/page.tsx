@@ -4,7 +4,8 @@ import { useParams } from "next/navigation";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { useUserAssets } from "@/hooks/user-assets/use-user-assets";
-import { Spinner, DateRangePicker, Chip, Input, ButtonGroup, Button, Divider } from "@heroui/react";
+import { Spinner, DateRangePicker, Chip, ButtonGroup, Button, Divider } from "@heroui/react";
+import Input from "@/shared/components/citrica-ui/atoms/input";
 import { Col, Container } from "@/styles/07-objects/objects";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
@@ -697,7 +698,8 @@ export default function AssetDataPage() {
                       </div>
                     </div>
                     <Divider />
-                    <div className="flex gap-2 items-center pt-4">
+
+                    <div className="flex gap-6 items-center pt-4">
                       {/* Buscador por texto/número */}
                       {selectedAsset.assets_options.searchConfig.textColumns &&
                         selectedAsset.assets_options.searchConfig.textColumns.length > 0 && (
@@ -728,43 +730,48 @@ export default function AssetDataPage() {
 
                           </div>
                         )}
-                      <Divider className="h-[50px] bg-[#A7BDE2] mx-6 " orientation="vertical" />
-                      <Input
-                        type="text"
-                        label="Buscar por texto/número"
-                        labelPlacement="inside"
-                        placeholder={`Buscar en: ${selectedAsset.assets_options.searchConfig.textColumns.join(", ")}`}
-                        value={textSearchInput}
-                        onValueChange={setTextSearchInput}
-                        isClearable
-                        startContent={
-                          <svg
-                            className="w-4 h-4 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                          </svg>
-                        }
-                        classNames={{
-                          base: "w-full max-w-[348px]",
-                          label: "!text-[#265197] font-medium",
-                          inputWrapper: "bg-white border-[#D4DEED]  border-[2px]",
-                          input: "!text-[#265197]",
-                        }}
-                      />
+                      <Divider className="h-[50px] bg-[#A7BDE2] " orientation="vertical" />
+                      <div className="search-input-wrapper">
+                        <style jsx>{`
+                          .search-input-wrapper :global([data-focus="true"]) {
+                            border-color: #265197 !important;
+                          }
+                          .search-input-wrapper :global([data-slot="input-wrapper"]:hover) {
+                            border-color: #265197 !important;
+                          }
+                        `}</style>
+                        <Input
+                          type="text"
+                          label="Buscar por texto/número"
+                          placeholder={`Buscar en: ${selectedAsset.assets_options.searchConfig.textColumns.join(", ")}`}
+                          value={textSearchInput}
+                          onValueChange={setTextSearchInput}
+                          clearable
+                          variant="primary"
+                          startContent={
+                            <svg
+                              className="w-4 h-4 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                              />
+                            </svg>
+                          }
+                          classNames={{
+                            base: "w-full max-w-[348px]",
+                            inputWrapper: "bg-white !border-[#D4DEED] border-[2px]",
+                          }}
+                        />
+                      </div>
                       {/* Botones de operador numérico - solo visible cuando el input tiene un número */}
                       {textSearchInput && !isNaN(Number(textSearchInput)) && (
-                        <div className="mt-3">
-                          <p className="text-xs text-[#265197] font-medium mb-2">
-                            Tipo de búsqueda numérica:
-                          </p>
+                        <div className="">
                           <ButtonGroup size="sm" className="w-full">
                             <Button
                               className={`flex-1 ${numericSearchOperator === "eq"
@@ -806,9 +813,6 @@ export default function AssetDataPage() {
                         </div>
                       )}
                     </div>
-
-
-
                   </>
                 )}
 
