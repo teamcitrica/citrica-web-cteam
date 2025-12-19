@@ -166,9 +166,9 @@ export default function AssetsPage() {
             onAdd={handleOpenCreateModal}
             addButtonText="Agregar Asset"
             emptyContent="No se encontraron assets para este proyecto"
-            headerColor="#42668A"
+            headerColor="#265197"
             headerTextColor="#ffffff"
-            paginationColor="#42668A"
+            paginationColor="#265197"
             getRowKey={(asset) => asset.id}
           />
 

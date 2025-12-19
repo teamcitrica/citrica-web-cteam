@@ -3,6 +3,8 @@ import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
+import Text from "../atoms/text";
+import { Divider } from "@heroui/react";
 
 type ExportModalProps = {
   isOpen: boolean;
@@ -28,24 +30,25 @@ const ExportModal: React.FC<ExportModalProps> = ({
       <ModalContent>
         {(onCloseModal) => (
           <>
-            <ModalHeader className="flex flex-col gap-1 h-[64px] text-[#16305A] bg-white">
-              EXPORTAR TABLA
+            <ModalHeader className="flex flex-col gap-1 h-[64px] bg-white">
+              <Text variant="subtitle" weight="bold" color="#16305A">EXPORTAR TABLA</Text>
             </ModalHeader>
             <ModalBody className="bg-[#EDF1F7] h-[156px]">
               <div className="flex flex-col gap-4">
-                <p className="text-sm text-[#265197] font-bold">
-                  Formato seleccionado:{" "}
-                  <span className="font-semibold uppercase">{exportFormat}</span>
+                <p>
+                  <Text variant="body" weight="bold" color="#265197">Formato seleccionado:{" "}</Text>
+                  <Text variant="body" weight="bold" color="#265197" className="!uppercase">{exportFormat}</Text>
                 </p>
-                <div>
+                <Divider className="bg-[#A7BDE2]"/>
+                <div className="mb-4">
                   <InputCitricaAdmin
                     label="Nombre del archivo"
                     placeholder="Ingrese el nombre del archivo"
                     value={fileName}
                     onChange={(e) => onFileNameChange(e.target.value)}
                   />
-                  <span className="text-label !text-[12px] text-[#678CC5] bg-[#EDF1F7] block mt-1">
-                    El nombre por defecto incluye la fecha actual.
+                  <span className="bg-[#EDF1F7] block">
+                    <Text variant="label" color="#678CC5">El nombre por defecto incluye la fecha actual.</Text>
                   </span>
                 </div>
               </div>

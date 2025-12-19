@@ -158,9 +158,9 @@ export default function UsersPage() {
             onAdd={handleOpenCreateModal}
             addButtonText="Crear Usuario"
             emptyContent="No se encontraron usuarios"
-            headerColor="#42668A"
+            headerColor="#265197"
             headerTextColor="#ffffff"
-            paginationColor="#42668A"
+            paginationColor="#265197"
             getRowKey={(user) => user.id || ""}
             enableExport={true}
             exportColumns={exportColumns}
