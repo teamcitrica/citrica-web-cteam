@@ -138,7 +138,7 @@ export default function UsersPage() {
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div className="p-4">
+        <div>
           <h1 className="text-2xl font-bold text-[#265197] mb-6">
             <span className="text-[#678CC5]"></span>Usuarios
           </h1>

@@ -10,7 +10,7 @@ import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { useUserProjects } from "@/hooks/user-projects/use-user-projects";
 import { UserType } from "@/shared/types/types";
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
-import { DetailModal } from "@/shared/components/citrica-ui";
+import { DetailModal, Text } from "@/shared/components/citrica-ui";
 
 interface ProjectDetailModalProps {
   project: Project;
@@ -57,22 +57,25 @@ export default function ProjectDetailModal({
       title: "",
       content: (
         <div className="flex flex-col">
-          <p className="text-sm font-semibold text-[#265197] pb-2">
-            Nombre: {toCamelCase(project.name) || "-"}
+          <p className="pb-2">
+            <Text variant="body" color="#265197" weight="bold">Nombre: {toCamelCase(project.name) || "-"}</Text>
           </p>
           <div className="flex flex-col gap-1">
             {isLoadingCompany ? (
               <Skeleton className="h-5 w-48 rounded-lg" />
             ) : (
-              <p className="text-sm text-[#265197]">
-                Empresa: {companyName ? toCamelCase(companyName) : "Sin empresa"}
+              <p className="flex flex-col pb-2">
+                <Text variant="label" color="#678CC5">Empresa:</Text>
+                <Text variant="body" color="#265197" weight="bold">{companyName ? toCamelCase(companyName) : "Sin empresa"}</Text>
               </p>
             )}
-            <p className="text-sm text-[#265197]">
-              Estado: {toCamelCase(project.status) || "-"}
+            <p className="flex flex-col pb-2">
+              <Text variant="label" color="#678CC5">Estado:</Text>
+              <Text variant="body" color="#265197" weight="bold">{toCamelCase(project.status) || "-"}</Text>
             </p>
-            <p className="text-sm text-[#265197]">
-              Assets: {project.asset_count ?? 0}
+            <p className="flex flex-col pb-2">
+              <Text variant="label" color="#678CC5">Assets:</Text>
+              <Text variant="body" color="#265197" weight="bold">{project.asset_count ?? 0}</Text>
             </p>
           </div>
         </div>
@@ -90,12 +93,14 @@ export default function ProjectDetailModal({
             </>
           ) : projectUsers.length > 0 ? (
             projectUsers.map((user) => (
-              <p key={user.id} className="text-sm text-[#265197]">
-                {toCamelCase(user.first_name)} {toCamelCase(user.last_name)}
+              <p key={user.id} className="py-2">
+                <Text variant="label" color="#678CC5">{toCamelCase(user.first_name)} {toCamelCase(user.last_name)}</Text>
               </p>
             ))
           ) : (
-            <p className="text-sm text-[#265197]">No hay usuarios asignados</p>
+            <p className="py-2">
+              <Text variant="label" color="#678CC5">No hay usuarios asignados</Text>
+            </p>
           )}
         </div>
       ),
@@ -105,11 +110,13 @@ export default function ProjectDetailModal({
       content: (
         <div className="flex items-center gap-2 text-sm text-[#678CC5]">
           <span>
-            Creado el: {project.created_at ? new Date(project.created_at).toLocaleDateString('es-ES') : '-'}
+            <Text variant="label" color="#678CC5">Creado el: </Text>
+            <Text variant="label" color="#678CC5">{project.created_at ? new Date(project.created_at).toLocaleDateString('es-ES') : '-'}</Text>
           </span>
           <Divider orientation="vertical" className="h-4" />
           <span>
-            Por: {project.created_by_user ? `${toCamelCase(project.created_by_user.first_name)} ${toCamelCase(project.created_by_user.last_name)}` : '-'}
+            <Text variant="label" color="#678CC5">Por: </Text>
+            <Text variant="label" color="#678CC5">{project.created_by_user ? `${toCamelCase(project.created_by_user.first_name)} ${toCamelCase(project.created_by_user.last_name)}` : '-'}</Text>
           </span>
         </div>
       ),

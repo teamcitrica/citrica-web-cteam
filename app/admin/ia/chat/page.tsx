@@ -245,7 +245,7 @@ export default function ChatPage() {
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div className="p-4 h-[calc(100vh-120px)] flex flex-col">
+        <div className="h-[calc(100vh-120px)] flex flex-col">
           <h1 className="text-2xl font-bold text-[#265197] mb-4">
             <span className="text-[#678CC5]">IA</span> {'>'} Chat RAG
           </h1>
