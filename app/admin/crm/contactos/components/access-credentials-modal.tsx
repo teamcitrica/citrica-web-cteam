@@ -8,6 +8,7 @@ import {
   ModalFooter,
   Tooltip,
   Button,
+  Divider,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 
@@ -207,26 +208,35 @@ export default function AccessCredentialsModal({
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
-          <h3 className="text-lg font-semibold text-[#265197]">
-            Credenciales de Acceso
-          </h3>
+          <div className="flex items-center gap-3">
+            <div className="rounded-full flex items-center justify-center overflow-hidden" style={{ width: '46px', height: '46px' }}>
+              <img src="/avatar-logueo-citrica.png" alt="Avatar" width="46" height="46" />
+            </div>
+            <div className="flex flex-col">
+              <Text variant="body" weight="bold" color="#265197">{`${contact.name || "Sin nombre"} ${contact.last_name || ""}`}</Text>
+              <Text variant="label" weight="bold" color="#678CC5">{contact.cargo || "-"}</Text>
+            </div>
+          </div>
         </ModalHeader>
 
         <ModalBody className="bg-[#EEF1F7] rounded-xl">
           <div className="flex flex-col gap-4">
             {/* Información del contacto */}
+            <div className="flex flex-row gap-2">
+              <Text variant="body" weight="bold" color="#265197">Empresa</Text>
+              <Text variant="body" weight="bold" color="#265197">.</Text>
+            </div>
             <div className="flex flex-col gap-1">
-              <Text variant="label" color="#666">Nombre del Contacto</Text>
-              <Text variant="body" color="#265197" weight="bold">{contact.name || "-"}</Text>
+              <Text variant="label" color="#678CC5">Rol</Text>
+              <Text variant="body" color="#16305A">.</Text>
             </div>
 
             {hasUserAccess ? (
               <>
                 {/* Email de Acceso */}
-                <div className="flex flex-col gap-2">
-                  <Text variant="label" color="#666">Email de Acceso</Text>
-                  <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-gray-200">
-                    <Icon className="w-4 h-4 text-gray-500" name="Mail" />
+                <div className="flex flex-col">
+                  <Text variant="label" color="#678CC5">Email de Acceso</Text>
+                  <div className="flex items-center gap-2 ">
                     <Text variant="body" color="#333" className="flex-1 font-mono text-sm">
                       {contact.email_access || contact.email || "-"}
                     </Text>
@@ -236,7 +246,7 @@ export default function AccessCredentialsModal({
                           className="cursor-pointer hover:bg-gray-100 p-1 rounded"
                           onClick={() => handleCopyToClipboard(contact.email_access || contact.email || "", "Email")}
                         >
-                          <Icon name="Copy" className="text-gray-500 w-4 h-4" />
+                          <Icon name="Copy" color="#678CC5" size={20} />
                         </div>
                       </Tooltip>
                     )}
@@ -245,10 +255,9 @@ export default function AccessCredentialsModal({
 
                 {/* Contraseña */}
                 {contact.code && (
-                  <div className="flex flex-col gap-2">
-                    <Text variant="label" color="#666">Contraseña</Text>
-                    <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-gray-200">
-                      <Icon className="w-4 h-4 text-gray-500" name="Lock" />
+                  <div className="flex flex-col">
+                    <Text variant="label" color="#678CC5">Clave</Text>
+                    <div className="flex items-center gap-2">
                       <Text variant="body" color="#333" className="flex-1 font-mono text-sm">
                         {showPassword ? contact.code : "••••••••••••"}
                       </Text>
@@ -258,10 +267,7 @@ export default function AccessCredentialsModal({
                             className="cursor-pointer hover:bg-gray-100 p-1 rounded"
                             onClick={() => setShowPassword(!showPassword)}
                           >
-                            <Icon
-                              name={showPassword ? "EyeOff" : "Eye"}
-                              className="text-gray-500 w-4 h-4"
-                            />
+                            <Icon name={showPassword ? "EyeOff" : "Eye"} color="#678CC5" size={20} />
                           </div>
                         </Tooltip>
                         <Tooltip content="Copiar contraseña">
@@ -269,37 +275,39 @@ export default function AccessCredentialsModal({
                             className="cursor-pointer hover:bg-gray-100 p-1 rounded"
                             onClick={() => handleCopyToClipboard(contact.code || "", "Contraseña")}
                           >
-                            <Icon name="Copy" className="text-gray-500 w-4 h-4" />
+                            <Icon name="Copy" color="#678CC5" size={20} />
                           </div>
                         </Tooltip>
                       </div>
                     </div>
-                    <p className="text-xs text-blue-700">
-                      Esta es la contraseña generada cuando se dio acceso al sistema.
-                    </p>
                   </div>
                 )}
+                <Divider className="bg-[#A7BDE2]" />
 
                 {/* Estado del Usuario */}
-                <div className="flex items-center gap-2 p-3 rounded-lg border" style={{
-                  backgroundColor: isActive ? '#f0fdf4' : '#fef2f2',
-                  borderColor: isActive ? '#86efac' : '#fca5a5'
-                }}>
-                  <Icon
-                    className={`w-5 h-5 ${isActive ? "text-green-600" : "text-red-600"}`}
-                    name={isActive ? "CheckCircle" : "XCircle"}
-                  />
-                  <Text variant="body" color={isActive ? "#059669" : "#DC2626"}>
-                    {isActive ? "Acceso activo al sistema" : "Acceso desactivado"}
+                <div className="flex flex-col gap-2 mb-4 ">
+                  <div className="flex flex-row gap-2">
+                    <Text variant="body" weight="bold" color="#265197">Acceso:</Text>
+                    <div className="flex flex-row gap-1">
+                      <Icon size={20} className={`${isActive ? "text-[#10E5A4]" : "text-[#F04242]"}`}
+                        name={isActive ? "ShieldCheck" : "ShieldX"}
+                      />
+                      <Text variant="body" weight="bold" color={isActive ? "#059669" : "#DC2626"}>{isActive ? "Habilitado" : "Inhabilitado"}</Text>
+                    </div>
+                  </div>
+
+                  <Text variant="label" color="#678CC5">
+                    {isActive ? "" : "Este usuario tiene el acceso inhabilitado. Puedes reactivarlo para permitirle iniciar sesión nuevamente."}
                   </Text>
                 </div>
               </>
             ) : (
               <>
                 {/* Mensaje cuando no tiene acceso */}
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-yellow-800">
-                    Este contacto aún no tiene acceso al sistema.
+                <div className="mb-4">
+                  <Divider className="bg-[#A7BDE2]"/>
+                  <p className="mt-2">
+                    <Text variant="label" color="#678CC5">Este contacto aún no tiene acceso al sistema.</Text>
                   </p>
                 </div>
 
@@ -378,16 +386,16 @@ export default function AccessCredentialsModal({
           {isActive ? (
             <ButtonCitricaAdmin
               variant="primary"
-              className="bg-[#42668A] w-[162px]"
+              className="bg-[#F04242] w-[162px] !border-0"
               onPress={handleToggleAccess}
               isLoading={isLoading}
             >
-              Quitar Acceso
+              Inhabilitar
             </ButtonCitricaAdmin>
           ) : (
             <ButtonCitricaAdmin
               variant="primary"
-              className="bg-[#42668A] w-[162px]"
+              className="bg-[#10E5A4] text-[#16305A] w-[162px] !border-0"
               onPress={() => {
                 if (isFirstTime && !showNewPasswordInput) {
                   setShowNewPasswordInput(true);
@@ -398,7 +406,7 @@ export default function AccessCredentialsModal({
               isLoading={isLoading}
               isDisabled={isFirstTime && showNewPasswordInput && !newPassword}
             >
-              {isReactivation ? "Reactivar Acceso" : "Dar Acceso"}
+              {isReactivation ? "Habilitar" : "Habilitar"}
             </ButtonCitricaAdmin>
           )}
         </ModalFooter>

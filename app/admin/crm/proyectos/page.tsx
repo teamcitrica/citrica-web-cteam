@@ -145,9 +145,9 @@ export default function ProyectosPage() {
             onAdd={handleOpenCreateModal}
             addButtonText="Agregar Proyecto"
             emptyContent="No se encontraron proyectos"
-            headerColor="#42668A"
+            headerColor="#265197"
             headerTextColor="#ffffff"
-            paginationColor="#42668A"
+            paginationColor="#265197"
             getRowKey={(project) => project.id}
             showCompanyFilter={true}
             companies={companies}

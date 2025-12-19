@@ -91,9 +91,9 @@ export default function EmpresasPage() {
             onAdd={handleOpenCreateModal}
             addButtonText="Agregar Empresa"
             emptyContent="No se encontraron empresas"
-            headerColor="#42668A"
+            headerColor="#265197"
             headerTextColor="#ffffff"
-            paginationColor="#42668A"
+            paginationColor="#265197"
             getRowKey={(company) => company.id}
             enableExport={true}
             exportColumns={exportColumns}

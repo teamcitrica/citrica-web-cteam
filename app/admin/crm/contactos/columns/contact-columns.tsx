@@ -109,7 +109,7 @@ export const getContactColumns = ({
     ),
   },
   {
-    name: "EMPRESA Y LOCACIÓN",
+    name: "EMPRESA",
     uid: "company",
     sortable: false,
     render: (contact) => (
