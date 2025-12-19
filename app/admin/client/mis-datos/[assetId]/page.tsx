@@ -781,8 +781,8 @@ export default function AssetDataPage() {
                                 `}</style>
                                 <Input
                                   type="text"
-                                  label="Buscar por texto/número"
-                                  placeholder={`Buscar en: ${selectedAsset.assets_options.searchConfig.textColumns.join(", ")}`}
+                                  label="Búsqueda alfanumérica"
+                                  placeholder={`Buscar`}
                                   value={textSearchInput}
                                   onValueChange={setTextSearchInput}
                                   clearable
