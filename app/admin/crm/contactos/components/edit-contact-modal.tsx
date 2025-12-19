@@ -138,38 +138,6 @@ export default function EditContactModal({
       }
     >
       <div className="grid grid-cols-1 gap-4">
-        <InputCitricaAdmin
-          label="Nombre del Contacto"
-          placeholder="Ingrese el nombre completo"
-          value={formData.name || ""}
-          onChange={(e) => handleInputChange("name", e.target.value)}
-          isRequired
-        />
-        <InputCitricaAdmin
-          label="Cargo"
-          placeholder="Cargo o posición"
-          value={formData.cargo || ""}
-          onChange={(e) => handleInputChange("cargo", e.target.value)}
-        />
-        <InputCitricaAdmin
-          label="Email"
-          placeholder="correo@ejemplo.com"
-          type="email"
-          value={formData.email || ""}
-          onChange={(e) => handleInputChange("email", e.target.value)}
-        />
-        <InputCitricaAdmin
-          label="Teléfono"
-          placeholder="Número de teléfono"
-          value={formData.phone || ""}
-          onChange={(e) => handleInputChange("phone", e.target.value)}
-        />
-        <InputCitricaAdmin
-          label="Dirección"
-          placeholder="Dirección completa"
-          value={formData.address || ""}
-          onChange={(e) => handleInputChange("address", e.target.value)}
-        />
         <div>
           <Select
             label="Empresa"
@@ -198,10 +166,43 @@ export default function EditContactModal({
           </Select>
           {contact.user_id && (
             <p className="text-xs text-gray-500 mt-1">
-              No se puede cambiar la empresa porque este contacto ya tiene un usuario creado. Para cambiar la empresa, edítalo desde el menú de usuarios.
+              Este contacto ya se convirtió en usuario del sistema. La empresa se edita desde Usuarios.
             </p>
           )}
         </div>
+        <InputCitricaAdmin
+          label="Nombre del Contacto"
+          placeholder="Ingrese el nombre completo"
+          value={formData.name || ""}
+          onChange={(e) => handleInputChange("name", e.target.value)}
+          isRequired
+        />
+        <InputCitricaAdmin
+          label="Cargo"
+          placeholder="Cargo o posición"
+          value={formData.cargo || ""}
+          onChange={(e) => handleInputChange("cargo", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="Email"
+          placeholder="correo@ejemplo.com"
+          type="email"
+          value={formData.email || ""}
+          onChange={(e) => handleInputChange("email", e.target.value)}
+          isRequired
+        />
+        <InputCitricaAdmin
+          label="Teléfono"
+          placeholder="Número de teléfono"
+          value={formData.phone || ""}
+          onChange={(e) => handleInputChange("phone", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="Dirección"
+          placeholder="Dirección completa"
+          value={formData.address || ""}
+          onChange={(e) => handleInputChange("address", e.target.value)}
+        />
       </div>
     </DrawerCitricaAdmin>
   );

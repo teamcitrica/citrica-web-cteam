@@ -10,6 +10,7 @@ import { getCompanyColumns, getCompanyExportColumns } from "./columns/company-co
 import { useCompanyCRUD, Company } from "@/hooks/companies/use-companies";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Col, Container } from "@/styles/07-objects/objects";
+import { Text } from "@/shared/components/citrica-ui";
 
 export default function EmpresasPage() {
   const { companies, isLoading, refreshCompanies, deleteCompany } = useCompanyCRUD();
@@ -79,7 +80,7 @@ export default function EmpresasPage() {
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="">
           <h1 className="text-2xl font-bold text-[#265197] mb-5">
-            <span className="text-[#678CC5]">CRM</span> {'>'} Gestión de Empresas
+            <Text variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text variant="title" weight="bold" color="#265197"> Gestión de Empresas</Text>
           </h1>
 
           <DataTable<Company>

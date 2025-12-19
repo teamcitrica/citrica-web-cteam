@@ -208,7 +208,7 @@ export default function DatabasesRAGPage() {
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div className="p-4">
+        <div>
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-[#265197] mb-2">

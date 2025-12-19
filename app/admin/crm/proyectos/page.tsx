@@ -12,6 +12,7 @@ import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { getProjectColumns } from "./columns/project-columns";
 import { Col, Container } from "@/styles/07-objects/objects";
+import { Text } from "@/shared/components/citrica-ui";
 
 export default function ProyectosPage() {
   const router = useRouter();
@@ -132,7 +133,7 @@ export default function ProyectosPage() {
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="">
           <h1 className="text-2xl font-bold text-[#265197] mb-5">
-            <span className="text-[#678CC5]">CRM</span> {'>'} Gestión de Proyectos
+            <Text variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text variant="title" weight="bold" color="#265197"> Gestión de Proyectos</Text>
           </h1>
 
           <DataTable<Project>
