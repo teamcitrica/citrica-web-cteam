@@ -41,12 +41,12 @@ li[data-focus="true"] {
 }
 
 /* Estilos de paginación - Asegurar color azul */
-.container-blue-principal [data-slot="item"][data-active="true"] {
+.container-blue-principal2 [data-slot="item"][data-active="true"] {
   background-color: #42668A !important;
   color: white !important;
 }
 
-.container-blue-principal [data-slot="cursor"] {
+.container-blue-principal2 [data-slot="cursor"] {
   background-color: #42668A !important;
   color: white !important;
 }

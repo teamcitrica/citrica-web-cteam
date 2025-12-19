@@ -4,13 +4,15 @@ import { useParams } from "next/navigation";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { useUserAssets } from "@/hooks/user-assets/use-user-assets";
-import { Spinner, DateRangePicker, Chip, Input, ButtonGroup, Button } from "@heroui/react";
+import { Spinner, DateRangePicker, Chip, ButtonGroup, Button, Divider } from "@heroui/react";
+import Input from "@/shared/components/citrica-ui/atoms/input";
 import { Col, Container } from "@/styles/07-objects/objects";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { format } from "date-fns";
 import { parseDate } from "@internationalized/date";
+import Image from "next/image";
 
 interface ExternalTableData {
   [key: string]: any;
@@ -41,7 +43,7 @@ export default function AssetDataPage() {
   // Estados para buscadores personalizados
   const [textSearchValue, setTextSearchValue] = useState("");
   const [textSearchInput, setTextSearchInput] = useState(""); // Para el input sin debounce
-  const [dateRange, setDateRange] = useState<{start: any, end: any} | null>(null);
+  const [dateRange, setDateRange] = useState<{ start: any, end: any } | null>(null);
   const [numericSearchOperator, setNumericSearchOperator] = useState<"eq" | "gte" | "lte">("eq"); // Operador para búsqueda numérica
 
   // Debounce para el buscador de texto
@@ -239,62 +241,62 @@ export default function AssetDataPage() {
               render: (row: ExternalTableData) => {
                 const value = row[col];
 
-              // Formatear fechas
-              if (col.includes("_at") || col.includes("date")) {
-                if (value) {
+                // Formatear fechas
+                if (col.includes("_at") || col.includes("date")) {
+                  if (value) {
+                    return (
+                      <div className="text-black font-medium">
+                        {new Date(value).toLocaleString("es-ES", {
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </div>
+                    );
+                  }
+                  return <div className="text-black font-medium">-</div>;
+                }
+
+                // Formatear valores nulos
+                if (value === null || value === undefined) {
+                  return <div className="text-black font-medium">-</div>;
+                }
+
+                // Formatear booleanos
+                if (typeof value === "boolean") {
                   return (
                     <div className="text-black font-medium">
-                      {new Date(value).toLocaleString("es-ES", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      {value ? "Sí" : "No"}
                     </div>
                   );
                 }
-                return <div className="text-black font-medium">-</div>;
-              }
 
-              // Formatear valores nulos
-              if (value === null || value === undefined) {
-                return <div className="text-black font-medium">-</div>;
-              }
+                // Formatear objetos/arrays como JSON
+                if (typeof value === "object") {
+                  return (
+                    <div className="text-black font-medium">
+                      {JSON.stringify(value)}
+                    </div>
+                  );
+                }
 
-              // Formatear booleanos
-              if (typeof value === "boolean") {
+                // Formatear URLs con truncado
+                if (col.toLowerCase().includes("url") || col.toLowerCase().includes("image")) {
+                  return (
+                    <div className="text-black font-medium max-w-[200px] truncate cursor-pointer select-text" title={String(value)}>
+                      {String(value)}
+                    </div>
+                  );
+                }
+
                 return (
-                  <div className="text-black font-medium">
-                    {value ? "Sí" : "No"}
-                  </div>
+                  <div className="text-black font-medium">{String(value)}</div>
                 );
-              }
-
-              // Formatear objetos/arrays como JSON
-              if (typeof value === "object") {
-                return (
-                  <div className="text-black font-medium">
-                    {JSON.stringify(value)}
-                  </div>
-                );
-              }
-
-              // Formatear URLs con truncado
-              if (col.toLowerCase().includes("url") || col.toLowerCase().includes("image")) {
-                return (
-                  <div className="text-black font-medium max-w-[200px] truncate cursor-pointer select-text" title={String(value)}>
-                    {String(value)}
-                  </div>
-                );
-              }
-
-              return (
-                <div className="text-black font-medium">{String(value)}</div>
-              );
-            },
-          };
-        });
+              },
+            };
+          });
 
           setColumns(dynamicColumns);
         }
@@ -308,7 +310,7 @@ export default function AssetDataPage() {
     };
 
     fetchExternalData();
-  }, [assetId, assets, supabase, currentPage, pageSize, searchValue, sortColumn, sortDirection, textSearchValue, dateRange, numericSearchOperator]);
+  }, [assetId, assets, currentPage, pageSize, searchValue, sortColumn, sortDirection, textSearchValue, dateRange, numericSearchOperator]);
 
   const selectedAsset = assets.find((a) => a.id === assetId);
   const isLoading = isLoadingAssets || !currentUser || isLoadingData;
@@ -503,79 +505,79 @@ export default function AssetDataPage() {
 
       console.log(`Exportando ${allData.length} registros...`);
 
-    // Preparar datos para exportar
-    const dataToExport = allData.map((item: ExternalTableData) => {
-      const row: Record<string, any> = {};
-      columns.forEach((col) => {
-        row[col.name] = formatCellValue(item[col.uid], col.uid);
+      // Preparar datos para exportar
+      const dataToExport = allData.map((item: ExternalTableData) => {
+        const row: Record<string, any> = {};
+        columns.forEach((col) => {
+          row[col.name] = formatCellValue(item[col.uid], col.uid);
+        });
+        return row;
       });
-      return row;
-    });
 
-    // Función auxiliar para descargar archivos
-    const downloadFile = (data: Blob, filename: string) => {
-      const url = window.URL.createObjectURL(data);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    };
+      // Función auxiliar para descargar archivos
+      const downloadFile = (data: Blob, filename: string) => {
+        const url = window.URL.createObjectURL(data);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      };
 
-    switch (exportFormat) {
-      case "excel":
-        const ws = XLSX.utils.json_to_sheet(dataToExport);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Datos");
-        const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-        const excelData = new Blob([excelBuffer], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
-        downloadFile(excelData, `${fileName}.xlsx`);
-        break;
+      switch (exportFormat) {
+        case "excel":
+          const ws = XLSX.utils.json_to_sheet(dataToExport);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Datos");
+          const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+          const excelData = new Blob([excelBuffer], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          });
+          downloadFile(excelData, `${fileName}.xlsx`);
+          break;
 
-      case "csv":
-        const csvWs = XLSX.utils.json_to_sheet(dataToExport);
-        const csv = XLSX.utils.sheet_to_csv(csvWs);
-        const csvData = new Blob([csv], { type: "text/csv" });
-        downloadFile(csvData, `${fileName}.csv`);
-        break;
+        case "csv":
+          const csvWs = XLSX.utils.json_to_sheet(dataToExport);
+          const csv = XLSX.utils.sheet_to_csv(csvWs);
+          const csvData = new Blob([csv], { type: "text/csv" });
+          downloadFile(csvData, `${fileName}.csv`);
+          break;
 
-      case "pdf":
-        const doc = new jsPDF();
+        case "pdf":
+          const doc = new jsPDF();
 
-        // Título
-        doc.setFontSize(16);
-        doc.text(selectedAsset?.name || "Mis Datos", 14, 20);
+          // Título
+          doc.setFontSize(16);
+          doc.text(selectedAsset?.name || "Mis Datos", 14, 20);
 
-        // Fecha
-        doc.setFontSize(10);
-        doc.text(`Generado: ${format(new Date(), "dd/MM/yyyy")}`, 14, 30);
+          // Fecha
+          doc.setFontSize(10);
+          doc.text(`Generado: ${format(new Date(), "dd/MM/yyyy")}`, 14, 30);
 
-        // Datos de la tabla
-        const tableData = allData.map((item: ExternalTableData) =>
-          columns.map((col) => formatCellValue(item[col.uid], col.uid))
-        );
+          // Datos de la tabla
+          const tableData = allData.map((item: ExternalTableData) =>
+            columns.map((col) => formatCellValue(item[col.uid], col.uid))
+          );
 
-        autoTable(doc, {
-          head: [columns.map((col) => col.name)],
-          body: tableData,
-          startY: 40,
-          styles: {
-            fontSize: 8,
-            cellPadding: 2,
-          },
-          headStyles: {
-            fillColor: [94, 166, 103],
-            textColor: 255,
-          },
-        });
+          autoTable(doc, {
+            head: [columns.map((col) => col.name)],
+            body: tableData,
+            startY: 40,
+            styles: {
+              fontSize: 8,
+              cellPadding: 2,
+            },
+            headStyles: {
+              fillColor: [94, 166, 103],
+              textColor: 255,
+            },
+          });
 
-        doc.save(`${fileName}.pdf`);
-        break;
-    }
+          doc.save(`${fileName}.pdf`);
+          break;
+      }
     } catch (error) {
       console.error("Error al exportar:", error);
       alert("Error al exportar los datos. Por favor intenta de nuevo.");
@@ -609,228 +611,255 @@ export default function AssetDataPage() {
                   </p>
                 </div>
               )}
+              <div className="bg-white rounded-2xl p-4">
+                {/* Buscadores personalizados */}
+                {selectedAsset && selectedAsset.assets_options?.searchConfig && (
+                  <>
+                    <div className="flex gap-2 items-center pb-4">
+                      <p className="text-sm font-medium text-[#265197]">
+                        Total de registros: {totalRecords}
+                      </p>
+                      <Divider className="h-[20px] bg-[#A7BDE2] " orientation="vertical" />
+                      {/* Filtro permanente del asset */}
+                      {(selectedAsset.assets_options?.filter ||
+                        (selectedAsset.assets_options?.filters && selectedAsset.assets_options.filters.length > 0)) && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-[#265197]">Filtro activo:</span>
+                            {selectedAsset.assets_options?.filter ? (
+                              <span className="text-sm font-medium text-[#265197]">
+                                {selectedAsset.assets_options.filter.column} = {selectedAsset.assets_options.filter.value}
+                              </span>
+                            ) : (
+                              selectedAsset.assets_options?.filters?.map((filter: any, index: number) => (
+                                <span key={index} className="text-sm font-medium text-[#265197]">
+                                  {filter.column} = {filter.value}
+                                </span>
+                              ))
+                            )}
+                          </div>
+                        )}
+                      <Divider className="h-[20px] bg-[#A7BDE2] " orientation="vertical" />
 
-              {/* Buscadores personalizados */}
-              {selectedAsset && selectedAsset.assets_options?.searchConfig && (
-                <div className="mb-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    {/* Buscador por texto/número */}
-                    {selectedAsset.assets_options.searchConfig.textColumns &&
-                     selectedAsset.assets_options.searchConfig.textColumns.length > 0 && (
-                      <div>
-                        <Input
-                          type="text"
-                          label="Buscar por texto/número"
-                          labelPlacement="inside"
-                          placeholder={`Buscar en: ${selectedAsset.assets_options.searchConfig.textColumns.join(", ")}`}
-                          value={textSearchInput}
-                          onValueChange={setTextSearchInput}
-                          isClearable
-                          startContent={
-                            <svg
-                              className="w-4 h-4 text-gray-400"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                              />
-                            </svg>
-                          }
-                          classNames={{
-                            base: "w-full",
-                            label: "!text-[#265197] font-medium",
-                            inputWrapper: "bg-white border-[#D4DEED]",
-                            input: "!text-[#265197]",
-                          }}
-                          description="Escribe para buscar (búsqueda automática después de 0.5s)"
-                        />
-
-                        {/* Botones de operador numérico - solo visible cuando el input tiene un número */}
-                        {textSearchInput && !isNaN(Number(textSearchInput)) && (
-                          <div className="mt-3">
-                            <p className="text-xs text-[#265197] font-medium mb-2">
-                              Tipo de búsqueda numérica:
-                            </p>
-                            <ButtonGroup size="sm" className="w-full">
-                              <Button
-                                className={`flex-1 ${
-                                  numericSearchOperator === "eq"
-                                    ? "bg-[#42668A] text-white"
-                                    : "bg-white text-[#265197] border border-[#D4DEED]"
-                                }`}
-                                onPress={() => {
+                      {/* Indicadores de filtros activos */}
+                      <div className="space-y-2">
+                        {/* Buscadores activos */}
+                        {(textSearchValue || dateRange) && (
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {textSearchValue && (
+                              <Chip
+                                color="default"
+                                variant="bordered"
+                                size="sm"
+                                classNames={{
+                                  base: "!border-[#A7BDE2]",
+                                }}
+                                onClose={() => {
+                                  setTextSearchInput("");
+                                  setTextSearchValue("");
                                   setNumericSearchOperator("eq");
                                   setCurrentPage(1);
                                 }}
+                                endContent={
+                                  <Image src="/img/x.svg" alt="Cerrar" width={16} height={16} className="cursor-pointer" />
+                                }
                               >
-                                = Igual
-                              </Button>
-                              <Button
-                                className={`flex-1 ${
-                                  numericSearchOperator === "gte"
-                                    ? "bg-[#42668A] text-white"
-                                    : "bg-white text-[#265197] border border-[#D4DEED]"
-                                }`}
-                                onPress={() => {
-                                  setNumericSearchOperator("gte");
+                                {!isNaN(Number(textSearchValue)) ? (
+                                  <>
+                                    {numericSearchOperator === "eq" && `Número = ${textSearchValue}`}
+                                    {numericSearchOperator === "gte" && `Número ≥ ${textSearchValue}`}
+                                    {numericSearchOperator === "lte" && `Número ≤ ${textSearchValue}`}
+                                  </>
+                                ) : (
+                                  `"${textSearchValue}"`
+                                )}
+                              </Chip>
+                            )}
+                            {dateRange && (
+                              <Chip
+                                color="default"
+                                variant="bordered"
+                                size="sm"
+                                classNames={{
+                                  base: "!border-[#A7BDE2]",
+                                }}
+                                onClose={() => {
+                                  setDateRange(null);
                                   setCurrentPage(1);
                                 }}
+                                endContent={
+                                  <Image src="/img/x.svg" alt="Cerrar" width={16} height={16} className="cursor-pointer" />
+                                }
                               >
-                                ≥ Mayor o igual
-                              </Button>
-                              <Button
-                                className={`flex-1 ${
-                                  numericSearchOperator === "lte"
-                                    ? "bg-[#42668A] text-white"
-                                    : "bg-white text-[#265197] border border-[#D4DEED]"
-                                }`}
-                                onPress={() => {
-                                  setNumericSearchOperator("lte");
-                                  setCurrentPage(1);
-                                }}
-                              >
-                                ≤ Menor o igual
-                              </Button>
-                            </ButtonGroup>
+                                Fecha: {dateRange.start.day}/{dateRange.start.month}/{dateRange.start.year} - {dateRange.end.day}/{dateRange.end.month}/{dateRange.end.year}
+                              </Chip>
+                            )}
                           </div>
                         )}
                       </div>
-                    )}
+                    </div>
+                    <Divider />
+                  </>
+                )}
 
-                    {/* Buscador por fecha */}
-                    {selectedAsset.assets_options.searchConfig.dateColumn && (
-                      <div>
-                        <DateRangePicker
-                          label="Buscar por rango de fechas"
-                          labelPlacement="inside"
-                          aria-label="Buscar por rango de fechas"
-                          value={dateRange}
-                          onChange={(value) => {
-                            setDateRange(value);
-                            setCurrentPage(1);
-                          }}
-                          classNames={{
-                            base: "w-full",
-                            label: "!text-[#265197] font-medium mb-1",
-                            inputWrapper: "bg-white !border-[#D4DEED]",
-                            input: "!text-[#265197]",
-                          }}
-                          description={`Columna: ${selectedAsset.assets_options.searchConfig.dateColumn}`}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Indicadores de filtros activos */}
-                  <div className="space-y-2">
-                    {/* Filtro permanente del asset */}
-                    {(selectedAsset.assets_options?.filter ||
-                      (selectedAsset.assets_options?.filters && selectedAsset.assets_options.filters.length > 0)) && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600 font-medium">Filtro activo:</span>
-                        {selectedAsset.assets_options?.filter ? (
-                          <Chip color="default"  variant="flat" size="sm">
-                            {selectedAsset.assets_options.filter.column} = {selectedAsset.assets_options.filter.value}
-                          </Chip>
-                        ) : (
-                          selectedAsset.assets_options?.filters?.map((filter: any, index: number) => (
-                            <Chip key={index} color="default" variant="flat" size="sm">
-                              {filter.column} = {filter.value}
-                            </Chip>
-                          ))
+                <DataTable
+                  data={tableData}
+                  removeWrapper={true}
+                  customContainerClass=""
+                  columns={columns.length > 0 ? columns : [{ name: "CARGANDO", uid: "loading", sortable: false }]}
+                  isLoading={isLoading}
+                  paginationColor="#42668A"
+                  headerColor="#42668A"
+                  headerTextColor="#ffffff"
+                  searchPlaceholder="Buscar..."
+                  getRowKey={(item) => item.id || JSON.stringify(item)}
+                  searchFields={columns.map(col => col.uid as any)}
+                  emptyContent="No hay datos disponibles en esta tabla."
+                  serverSidePagination={true}
+                  totalRecords={totalRecords}
+                  currentPage={currentPage}
+                  itemsPerPage={pageSize}
+                  onPageChange={(page) => setCurrentPage(page)}
+                  onPageSizeChange={(size) => {
+                    setPageSize(size);
+                    setCurrentPage(1); // Resetear a la primera página cuando cambia el tamaño
+                  }}
+                  // Exportación
+                  enableExport={true}
+                  exportColumns={[]} // No necesario, usamos onExport custom
+                  tableName={selectedAsset?.name || "mis-datos"}
+                  onExport={handleExport}
+                  // Búsqueda del servidor
+                  onSearchChange={(value) => {
+                    setSearchValue(value);
+                    setCurrentPage(1); // Resetear a la primera página cuando se busca
+                  }}
+                  searchValue={searchValue}
+                  // Ordenamiento del servidor
+                  onSortChange={(column, direction) => {
+                    setSortColumn(column);
+                    setSortDirection(direction);
+                    setCurrentPage(1); // Resetear a la primera página cuando se ordena
+                  }}
+                  // Custom Filters
+                  customFilters={
+                    selectedAsset?.assets_options?.searchConfig && (
+                      <div className="flex gap-6 items-center">
+                        {/* Buscador por fecha */}
+                        {selectedAsset.assets_options.searchConfig.dateColumn && (
+                          <div>
+                            <DateRangePicker
+                              label="Buscar por rango de fechas"
+                              labelPlacement="inside"
+                              aria-label="Buscar por rango de fechas"
+                              value={dateRange}
+                              onChange={(value) => {
+                                setDateRange(value);
+                                setCurrentPage(1);
+                              }}
+                              classNames={{
+                                base: "w-full",
+                                label: "!text-[#265197] font-medium mb-1",
+                                inputWrapper: "bg-white !border-[#D4DEED] border-[2px]",
+                                input: "!text-[#265197]",
+                              }}
+                            />
+                          </div>
                         )}
-                      </div>
-                    )}
 
-                    {/* Buscadores activos */}
-                    {(textSearchValue || dateRange) && (
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm text-gray-600 font-medium">Búsqueda activa:</span>
-                        {textSearchValue && (
-                          <Chip
-                           color="default"
-                            variant="flat"
-                            size="sm"
-                            onClose={() => {
-                              setTextSearchInput("");
-                              setTextSearchValue("");
-                              setNumericSearchOperator("eq"); // Reset operador
-                              setCurrentPage(1);
-                            }}
-                          >
-                            {!isNaN(Number(textSearchValue)) ? (
-                              <>
-                                {numericSearchOperator === "eq" && `Número = ${textSearchValue}`}
-                                {numericSearchOperator === "gte" && `Número ≥ ${textSearchValue}`}
-                                {numericSearchOperator === "lte" && `Número ≤ ${textSearchValue}`}
-                              </>
-                            ) : (
-                              `Texto: "${textSearchValue}"`
-                            )}
-                          </Chip>
-                        )}
-                        {dateRange && (
-                          <Chip
-                            color="default" 
-                            variant="flat"
-                            size="sm"
-                            onClose={() => {
-                              setDateRange(null);
-                              setCurrentPage(1);
-                            }}
-                          >
-                            Fecha: {dateRange.start.day}/{dateRange.start.month}/{dateRange.start.year} - {dateRange.end.day}/{dateRange.end.month}/{dateRange.end.year}
-                          </Chip>
-                        )}
+                        {selectedAsset.assets_options.searchConfig.textColumns &&
+                          selectedAsset.assets_options.searchConfig.textColumns.length > 0 && (
+                            <>
+                              <Divider className="h-[50px] bg-[#A7BDE2]" orientation="vertical" />
+                              <div className="search-input-wrapper">
+                                <style jsx>{`
+                                  .search-input-wrapper :global([data-focus="true"]) {
+                                    border-color: #265197 !important;
+                                  }
+                                  .search-input-wrapper :global([data-slot="input-wrapper"]:hover) {
+                                    border-color: #265197 !important;
+                                  }
+                                `}</style>
+                                <Input
+                                  type="text"
+                                  label="Buscar por texto/número"
+                                  placeholder={`Buscar en: ${selectedAsset.assets_options.searchConfig.textColumns.join(", ")}`}
+                                  value={textSearchInput}
+                                  onValueChange={setTextSearchInput}
+                                  clearable
+                                  variant="primary"
+                                  startContent={
+                                    <svg
+                                      className="w-4 h-4 text-gray-400"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                      />
+                                    </svg>
+                                  }
+                                  classNames={{
+                                    base: "w-full max-w-[348px]",
+                                    inputWrapper: "bg-white !border-[#D4DEED] border-[2px]",
+                                  }}
+                                />
+                              </div>
+                              {/* Botones de operador numérico */}
+                              {textSearchInput && !isNaN(Number(textSearchInput)) && (
+                                <div className="bg-[#D4DEED] p-2 rounded-md">
+                                  <ButtonGroup size="sm" className="w-full">
+                                    <Button
+                                      className={`flex-1 ${numericSearchOperator === "eq"
+                                        ? "bg-white text-[#265197]"
+                                        : "bg-[#D4DEED] text-[#265197] border border-[#D4DEED]"
+                                        }`}
+                                      onPress={() => {
+                                        setNumericSearchOperator("eq");
+                                        setCurrentPage(1);
+                                      }}
+                                    >
+                                      = Igual
+                                    </Button>
+                                    <Button
+                                      className={`flex-1 ${numericSearchOperator === "gte"
+                                        ? "bg-white text-[#265197]"
+                                        : "bg-[#D4DEED] text-[#265197] border border-[#D4DEED]"
+                                        }`}
+                                      onPress={() => {
+                                        setNumericSearchOperator("gte");
+                                        setCurrentPage(1);
+                                      }}
+                                    >
+                                      ≥ Mayor o igual
+                                    </Button>
+                                    <Button
+                                      className={`flex-1 ${numericSearchOperator === "lte"
+                                        ? "bg-white text-[#265197]"
+                                        : "bg-[#D4DEED] text-[#265197] border border-[#D4DEED]"
+                                        }`}
+                                      onPress={() => {
+                                        setNumericSearchOperator("lte");
+                                        setCurrentPage(1);
+                                      }}
+                                    >
+                                      ≤ Menor o igual
+                                    </Button>
+                                  </ButtonGroup>
+                                </div>
+                              )}
+                            </>
+                          )}
                       </div>
-                    )}
-                  </div>
-                </div>
-              )}
+                    )
+                  }
+                />
 
-              <DataTable
-                data={tableData}
-                columns={columns.length > 0 ? columns : [{ name: "CARGANDO", uid: "loading", sortable: false }]}
-                isLoading={isLoading}
-                paginationColor="#42668A"
-                headerColor="#42668A"
-                headerTextColor="#ffffff"
-                searchPlaceholder="Buscar..."
-                getRowKey={(item) => item.id || JSON.stringify(item)}
-                searchFields={columns.map(col => col.uid as any)}
-                emptyContent="No hay datos disponibles en esta tabla."
-                serverSidePagination={true}
-                totalRecords={totalRecords}
-                currentPage={currentPage}
-                itemsPerPage={pageSize}
-                onPageChange={(page) => setCurrentPage(page)}
-                onPageSizeChange={(size) => {
-                  setPageSize(size);
-                  setCurrentPage(1); // Resetear a la primera página cuando cambia el tamaño
-                }}
-                // Exportación
-                enableExport={true}
-                exportColumns={[]} // No necesario, usamos onExport custom
-                tableName={selectedAsset?.name || "mis-datos"}
-                onExport={handleExport}
-                // Búsqueda del servidor
-                onSearchChange={(value) => {
-                  setSearchValue(value);
-                  setCurrentPage(1); // Resetear a la primera página cuando se busca
-                }}
-                searchValue={searchValue}
-                // Ordenamiento del servidor
-                onSortChange={(column, direction) => {
-                  setSortColumn(column);
-                  setSortDirection(direction);
-                  setCurrentPage(1); // Resetear a la primera página cuando se ordena
-                }}
-              />
+              </div>
+
             </>
           )}
         </div>
