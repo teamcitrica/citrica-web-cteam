@@ -36,11 +36,11 @@ export default function DeleteAssetModal({
           </h2>
         </ModalHeader>
         <ModalBody>
-          <p className="text-gray-700">
+          <p>
             <Text variant="body" color="#16305A">¿Está seguro de que desea eliminar el asset{" "}
               <span className="font-semibold">{asset.name || "Sin nombre"}</span>?</Text>
           </p>
-          <p className="text-gray-600 text-sm my-2">
+          <p className="mb-2">
             <Text variant="label" color="#16305A">Esta acción no se puede deshacer.</Text>
           </p>
           <Divider className="bg-[#A7BDE2]" />

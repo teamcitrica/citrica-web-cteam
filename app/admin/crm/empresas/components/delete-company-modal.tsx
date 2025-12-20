@@ -36,10 +36,13 @@ export default function DeleteCompanyModal({
           </h2>
         </ModalHeader>
         <ModalBody>
-          <p className="text-gray-700 mb-2">
+          <p>
             <Text variant="body" color="#16305A">¿Está seguro que desea eliminar la empresa{" "}
-            <strong>{company.name}</strong>? Esta acción no se puede deshacer.</Text>
+            <strong>{company.name}</strong>?</Text>
           </p>
+          <p className="mb-2">
+            <Text variant="label" color="#16305A">Esta acción no se puede deshacer.</Text>
+          </p>  
           <Divider className="bg-[#A7BDE2]" />
         </ModalBody>
         <ModalFooter>

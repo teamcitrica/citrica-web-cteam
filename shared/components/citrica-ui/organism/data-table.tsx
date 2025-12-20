@@ -274,6 +274,7 @@ export function DataTable<T extends Record<string, any>>({
             }
           }}
           classNames={{
+            wrapper: "!p-0 rounded-none",
             tr: "data-[odd=true]:bg-[#EEF1F7]",
           }}
         >

@@ -9,6 +9,7 @@ import {
   Chip,
 } from "@heroui/react";
 import Icon from "@ui/atoms/icon";
+import { Text } from "@/shared/components/citrica-ui";
 
 type ProjectColumnsConfig = {
   getCompanyName: (companyId: number | null) => string;
@@ -41,13 +42,13 @@ export const getProjectColumns = ({
 
       return (
         <div
-          className="flex flex-col gap-1 cursor-pointer hover:opacity-70 transition-opacity items-start"
+          className="flex flex-col cursor-pointer hover:opacity-70 transition-opacity items-start"
           onClick={() => onNavigateToAssets?.(project.id)}
         >
-          <div className="text-[#16305A] font-medium">{name}</div>
-          <div className="text-[#678CC5] text-sm">
+          <Text variant="body" weight="bold" color="#16305A">{name}</Text>
+          <Text variant="label" color="#678CC5">
             Assets: {assetCount}
-          </div>
+          </Text>
         </div>
       );
     },
@@ -63,11 +64,11 @@ export const getProjectColumns = ({
       const companyName = project.company?.name || getCompanyName(project.company_id);
 
       return (
-        <div className="flex flex-col gap-1">
-          <div className="text-[#16305A] font-medium">{companyName}</div>
-          <div className="text-[#678CC5] text-sm">
+        <div className="flex flex-col">
+          <Text variant="body" weight="bold" color="#16305A">{companyName}</Text>
+          <Text variant="label" color="#678CC5">
             Accesos: {accessCount}
-          </div>
+          </Text>
         </div>
       );
     },
