@@ -34,11 +34,11 @@ export default function DeleteContactModal({
           </h2>
         </ModalHeader>
         <ModalBody>
-          <p className="text-gray-600">
+          <p>
             <Text variant="body" color="#16305A">¿Estás seguro de que deseas eliminar el contacto{" "}
             <span className="font-semibold">{contact.name || "este contacto"}</span>?</Text>
           </p>
-          <p className="text-sm text-gray-500 my-2">
+          <p className="mb-2">
             <Text variant="label" color="#16305A">Esta acción no se puede deshacer.</Text>
           </p>
         <Divider className="bg-[#A7BDE2]" />

@@ -75,7 +75,7 @@ export const getCompanyColumns = ({
         />
         <div className="flex flex-col">
           <Text variant="body" weight="bold" color="#16305A">{company.name || "-"}</Text>
-          <Text variant="label" color="#678CC5" className="truncate max-w-[200px]">{company.description || "-"}</Text>
+          <Text variant="label" color="#678CC5" className="truncate max-w-[200px]">.</Text>
         </div>
       </div>
     ),
@@ -89,9 +89,9 @@ export const getCompanyColumns = ({
         .filter(Boolean)
         .join(", ") || "-";
       return (
-        <div className="flex flex-col gap-1 items-start">
+        <div className="flex flex-col items-start">
           <Text variant="body" weight="bold" color="#16305A">{location}</Text>
-          <Text variant="label" color="#678CC5" className="truncate max-w-[200px]">.</Text>
+          <Text variant="label" color="#678CC5">.</Text>
         </div>
       );
     },
@@ -101,7 +101,7 @@ export const getCompanyColumns = ({
     uid: "contact_info",
     sortable: false,
     render: (company) => (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col">
         {company.contact_phone && (
           <a
             href={`https://wa.me/${company.contact_phone.replace(/\D/g, "")}`}
@@ -109,8 +109,8 @@ export const getCompanyColumns = ({
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-[#16305A] hover:text-green-700"
           >
-            <Icon className="w-4 h-4" name="Phone" />
-            <span className="text-sm">{company.contact_phone}</span>
+            <Icon size={12} name="Phone" />
+            <Text variant="body" weight="bold" color="#16305A">{company.contact_phone}</Text>
           </a>
         )}
         {company.contact_email && (
@@ -118,8 +118,8 @@ export const getCompanyColumns = ({
             href={`mailto:${company.contact_email}`}
             className="flex items-center gap-2 text-[#678CC5] hover:text-blue-700"
           >
-            <Icon className="w-4 h-4" name="Mail" />
-            <span className="text-sm">{company.contact_email}</span>
+            <Icon size={12} name="Mail" />
+            <Text variant="label" color="#678CC5">{company.contact_email}</Text>
           </a>
         )}
         {!company.contact_phone && !company.contact_email && (

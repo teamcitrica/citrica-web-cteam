@@ -12,6 +12,7 @@ import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { ExportColumn } from "@/shared/hooks/useTableFeatures";
 import { Contact } from "@/hooks/contact/use-contact";
+import { Text } from "@/shared/components/citrica-ui";
 
 type ContactColumnsConfig = {
   getCompanyName: (companyId: number | null) => string;
@@ -81,9 +82,9 @@ export const getContactColumns = ({
           name={getInitials(contact.name || "?")}
           size="sm"
         />
-        <div className="flex flex-col items-start gap-1">
+        <div className="flex flex-col items-start">
           <div className="flex items-center gap-2">
-            <span className="text-[#16305A] font-medium">{contact.name || "-"}</span>
+            <Text variant="body" weight="bold" color="#16305A">{contact.name || "-"}</Text>
             {contact.user_id !== null && (
               <Tooltip
                 content={
@@ -103,7 +104,7 @@ export const getContactColumns = ({
               </Tooltip>
             )}
           </div>
-          <div className="text-[#678CC5] text-sm">{contact.cargo || "-"}</div>
+          <Text variant="label" color="#678CC5">{contact.cargo || "-"}</Text>
         </div>
       </div>
     ),
@@ -113,11 +114,11 @@ export const getContactColumns = ({
     uid: "company",
     sortable: false,
     render: (contact) => (
-      <div className="flex flex-col gap-1 items-start">
+      <div className="flex flex-col items-start">
         <div className="text-[#16305A] font-medium">
-          {getCompanyName(contact.company_id)}
+          <Text variant="body" weight="bold" color="#16305A">{getCompanyName(contact.company_id)}</Text>
         </div>
-        <div className="text-[#678CC5] text-sm">{contact.address || "-"}</div>
+        <Text variant="label" color="#678CC5">Relación.</Text>
       </div>
     ),
   },
@@ -126,7 +127,7 @@ export const getContactColumns = ({
     uid: "contact_info",
     sortable: false,
     render: (contact) => (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col ">
         {contact.phone && (
           <a
             href={`https://wa.me/${contact.phone.replace(/\D/g, "")}`}
@@ -134,8 +135,8 @@ export const getContactColumns = ({
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-[#16305A] hover:text-green-700"
           >
-            <Icon className="w-4 h-4" name="Phone" />
-            <span className="text-sm">{contact.phone}</span>
+            <Icon size={12} name="Phone" />
+            <Text variant="body" weight="bold" color="#16305A">{contact.phone}</Text>
           </a>
         )}
         {contact.email && (
@@ -143,8 +144,8 @@ export const getContactColumns = ({
             href={`mailto:${contact.email}`}
             className="flex items-center gap-2 text-[#678CC5] hover:text-blue-700"
           >
-            <Icon className="w-4 h-4" name="Mail" />
-            <span className="text-sm">{contact.email}</span>
+            <Icon size={12} name="Mail" />
+            <Text variant="label" color="#678CC5">{contact.email}</Text>
           </a>
         )}
         {!contact.phone && !contact.email && (

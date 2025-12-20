@@ -144,7 +144,7 @@ export default function AssetsPage() {
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div className="p-4">
+        <div>
           <div className="flex items-center gap-3 mb-6">
             <h1 className="text-2xl font-bold text-[#265197]">
               <span className="text-[#678CC5]">CRM</span> {'>'}{" "}
