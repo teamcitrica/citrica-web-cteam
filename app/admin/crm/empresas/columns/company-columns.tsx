@@ -11,6 +11,7 @@ import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { ExportColumn } from "@/shared/hooks/useTableFeatures";
 import { Company } from "@/hooks/companies/use-companies";
+import { Text } from "@/shared/components/citrica-ui";
 
 type CompanyColumnsConfig = {
   onView: (company: Company) => void;
@@ -59,7 +60,7 @@ export const getCompanyColumns = ({
   onDelete,
 }: CompanyColumnsConfig): Column<Company>[] => [
   {
-    name: "EMPRESA",
+    name: "EMPRESA Y SECTOR",
     uid: "name",
     sortable: true,
     render: (company) => (
@@ -72,12 +73,15 @@ export const getCompanyColumns = ({
           name={getInitials(company.name || "?")}
           size="sm"
         />
-        <div className="text-[#16305A] font-medium">{company.name || "-"}</div>
+        <div className="flex flex-col">
+          <Text variant="body" weight="bold" color="#16305A">{company.name || "-"}</Text>
+          <Text variant="label" color="#678CC5" className="truncate max-w-[200px]">{company.description || "-"}</Text>
+        </div>
       </div>
     ),
   },
   {
-    name: "UBICACIÓN Y SECTOR",
+    name: "RELACIÓN Y UBICACIÓN",
     uid: "location",
     sortable: false,
     render: (company) => {
@@ -86,10 +90,8 @@ export const getCompanyColumns = ({
         .join(", ") || "-";
       return (
         <div className="flex flex-col gap-1 items-start">
-          <div className="text-[#16305A] font-medium">{location}</div>
-          <div className="text-[#678CC5] text-sm truncate max-w-[200px]">
-            {company.description || "-"}
-          </div>
+          <Text variant="body" weight="bold" color="#16305A">{location}</Text>
+          <Text variant="label" color="#678CC5" className="truncate max-w-[200px]">.</Text>
         </div>
       );
     },
