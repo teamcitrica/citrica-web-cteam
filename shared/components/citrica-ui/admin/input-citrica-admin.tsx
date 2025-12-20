@@ -16,14 +16,14 @@ export interface InputCitricaAdminProps extends Omit<HeroUIInputProps, 'variant'
  * - Support for end content (e.g., search icon)
  */
 export const InputCitricaAdmin: React.FC<InputCitricaAdminProps> = ({
-  className = "text-[#265197] min-w-[264px] bg-white",
+  className = "text-[#265197] min-w-[264px] bg-white hover:!border-[#D4DEED]",
   endContent,
   classNames: customClassNames,
   ...props
 }) => {
   const defaultClassNames = {
     inputWrapper:
-      "!text-[#3E688E] !rounded-[12px] !border-[#D4DEED] data-[focus=true]:!border-[#D4DEED] data-[hover=true]:!border-[#B8D4E5] focus-within:!border-[#D4DEED]",
+      "!text-[#3E688E] !rounded-[12px] !border-[#D4DEED] data-[focus=true]:!border-[#D4DEED] data-[hover=true]:!border-[#D4DEED] focus-within:!border-[#D4DEED]",
     mainWrapper: "",
     label: "!text-[#265197]",
     input: "placeholder:text-[#A7BDE2] !rounded-[12px]",

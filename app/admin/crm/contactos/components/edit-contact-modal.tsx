@@ -138,38 +138,62 @@ export default function EditContactModal({
       }
     >
       <div className="grid grid-cols-1 gap-4">
-        <div>
-          <Select
-            label="Empresa"
-            placeholder="Seleccione una empresa"
-            selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
-            onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0];
-              const newCompanyId = selected ? Number(selected) : null;
-
-              setFormData((prev) => ({
-                ...prev,
-                company_id: newCompanyId,
-              }));
-            }}
-            isDisabled={!!contact.user_id}
-            classNames={{
-              label: "text-gray-700",
-              value: "text-gray-800",
-            }}
-          >
-            {companies.map((company) => (
-              <SelectItem key={String(company.id)}>
-                {company.name || `Empresa ${company.id}`}
-              </SelectItem>
-            ))}
-          </Select>
-          {contact.user_id && (
+        <Select
+          label="Empresa"
+          placeholder="Seleccione una empresa"
+          description={contact.user_id && (
             <p className="text-xs text-gray-500 mt-1">
               Este contacto ya se convirtió en usuario del sistema. La empresa se edita desde Usuarios.
             </p>
           )}
-        </div>
+          selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0];
+            const newCompanyId = selected ? Number(selected) : null;
+
+            setFormData((prev) => ({
+              ...prev,
+              company_id: newCompanyId,
+            }));
+          }}
+          isDisabled={!!contact.user_id}
+          classNames={{
+            label: "text-gray-700",
+            value: "text-gray-800",
+            trigger: "bg-white !border-[#D4DEED]",
+          }}
+        >
+          {companies.map((company) => (
+            <SelectItem key={String(company.id)}>
+              {company.name || `Empresa ${company.id}`}
+            </SelectItem>
+          ))}
+        </Select>
+        <Select
+          label="Relación"
+          placeholder="Seleccione una empresa"
+          selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0];
+            setFormData((prev) => ({
+              ...prev,
+              company_id: selected ? Number(selected) : null,
+            }));
+          }}
+          classNames={{
+            label: "!text-[#265197]",
+            value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
+            trigger: "bg-white !border-[#D4DEED]",
+            selectorIcon: "text-[#678CC5]",
+          }}
+          isRequired
+        >
+          {companies.map((company) => (
+            <SelectItem key={String(company.id)} className="text-[#265197]">
+              Relación: Cliente, Proveedor, Interno
+            </SelectItem>
+          ))}
+        </Select>
         <InputCitricaAdmin
           label="Nombre del Contacto"
           placeholder="Ingrese el nombre completo"
@@ -192,10 +216,28 @@ export default function EditContactModal({
           isRequired
         />
         <InputCitricaAdmin
-          label="Teléfono"
+          label="WhatsApp"
           placeholder="Número de teléfono"
           value={formData.phone || ""}
           onChange={(e) => handleInputChange("phone", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="Fecha de cumpleaños"
+          placeholder="Fecha de cumpleaños"
+          value="."
+        //onChange={(e) => handleInputChange("phone", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="País"
+          placeholder="País"
+          value="."
+        //onChange={(e) => handleInputChange("country", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="Ciudad"
+          placeholder="Ciudad"
+          value="."
+        //onChange={(e) => handleInputChange("city", e.target.value)}
         />
         <InputCitricaAdmin
           label="Dirección"

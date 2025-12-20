@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Textarea } from "@heroui/react";
+import { Select, SelectItem, Textarea } from "@heroui/react";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
@@ -100,12 +100,58 @@ export default function EditCompanyModal({
           onChange={(e) => handleInputChange("name", e.target.value)}
           isRequired
         />
-        <InputCitricaAdmin
+        <Select
+          label="Sector"
+          placeholder="Tecnología y Software"
+          selectedKeys=""
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0];
+            setFormData((prev) => ({
+              ...prev,
+              company_id: selected ? Number(selected) : null,
+            }));
+          }}
+          classNames={{
+            label: "!text-[#265197]",
+            value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
+            trigger: "bg-white !border-[#D4DEED]",
+            selectorIcon: "text-[#678CC5]",
+          }}
+          isRequired
+        >
+            <SelectItem className="text-[#265197]">
+              Sector de la economía...
+            </SelectItem>
+        </Select>
+        <Select
+          label="Relación"
+          placeholder="Seleccione una empresa"
+          selectedKeys=""
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0];
+            setFormData((prev) => ({
+              ...prev,
+              company_id: selected ? Number(selected) : null,
+            }));
+          }}
+          classNames={{
+            label: "!text-[#265197]",
+            value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
+            trigger: "bg-white !border-[#D4DEED]",
+            selectorIcon: "text-[#678CC5]",
+          }}
+          isRequired
+        >
+            <SelectItem className="text-[#265197]">
+              Relación: Cliente, Proveedor
+            </SelectItem>
+        </Select>
+        {/* <InputCitricaAdmin
           label="RUC"
           placeholder="Ingrese el RUC"
           value={formData.ruc || ""}
           onChange={(e) => handleInputChange("ruc", e.target.value)}
-        />
+        /> 
         <InputCitricaAdmin
           label="Nombre del Contacto"
           placeholder="Nombre completo"
@@ -117,15 +163,21 @@ export default function EditCompanyModal({
           placeholder="Cargo o posición"
           value={formData.contact_position || ""}
           onChange={(e) => handleInputChange("contact_position", e.target.value)}
+        /> */}
+        <InputCitricaAdmin
+          label="Website"
+          placeholder="Website"
+          value="."
+          //onChange={(e) => handleInputChange("contact_phone", e.target.value)}
         />
         <InputCitricaAdmin
-          label="Teléfono del Contacto"
+          label="Teléfono"
           placeholder="Número de teléfono"
           value={formData.contact_phone || ""}
           onChange={(e) => handleInputChange("contact_phone", e.target.value)}
         />
         <InputCitricaAdmin
-          label="Email del Contacto"
+          label="Email"
           placeholder="correo@ejemplo.com"
           type="email"
           value={formData.contact_email || ""}
@@ -138,33 +190,33 @@ export default function EditCompanyModal({
           onChange={(e) => handleInputChange("country", e.target.value)}
         />
         <InputCitricaAdmin
-          label="Departamento"
-          placeholder="Departamento o Región"
+          label="Ciudad o localidad"
+          placeholder="Lima"
           value={formData.departament || ""}
           onChange={(e) => handleInputChange("departament", e.target.value)}
         />
         <InputCitricaAdmin
-          label="Distrito"
-          placeholder="Distrito"
-          value={formData.district || ""}
-          onChange={(e) => handleInputChange("district", e.target.value)}
-        />
-        <InputCitricaAdmin
-          label="Calle o Avenida"
+          label="Calle y Número"
           placeholder="Nombre de la calle"
           value={formData.street_or_avenue || ""}
           onChange={(e) => handleInputChange("street_or_avenue", e.target.value)}
         />
         <InputCitricaAdmin
-          label="Número de Dirección"
-          placeholder="Número"
+          label="Distrito o Barrio"
+          placeholder="Distrito"
+          value={formData.district || ""}
+          onChange={(e) => handleInputChange("district", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="Código Postal"
+          placeholder="123456"
           value={formData.address_number || ""}
           onChange={(e) => handleInputChange("address_number", e.target.value)}
         />
       </div>
       <Textarea
         label="Descripción"
-        placeholder="Descripción de la empresa"
+        placeholder="Agrega una descripción"
         value={formData.description || ""}
         onChange={(e) => handleInputChange("description", e.target.value)}
         classNames={{

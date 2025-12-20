@@ -96,7 +96,7 @@ export default function ContactosPage() {
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div className="">
+        <div>
           <h1 className="text-2xl font-bold text-[#265197] mb-5">
             <Text variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text variant="title" weight="bold" color="#265197"> Gestión de Contactos</Text>
           </h1>
