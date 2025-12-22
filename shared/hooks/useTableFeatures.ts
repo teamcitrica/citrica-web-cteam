@@ -211,37 +211,120 @@ export function useTableFeatures<T extends Record<string, any>>({
     columns: ExportColumn[],
     title: string
   ) => {
-    const doc = new jsPDF();
-
-    // Título
-    doc.setFontSize(16);
-    doc.text(title, 14, 20);
-
-    // Fecha
-    doc.setFontSize(10);
-    doc.text(`Generado: ${format(new Date(), "dd/MM/yyyy")}`, 14, 30);
-
-    // Datos de la tabla
-    const tableData = filteredItems.map((item) =>
-      columns.map((col) => {
-        const value = item[col.key];
-        return col.format ? col.format(value, item) : String(value ?? "");
-      })
-    );
-
-    autoTable(doc, {
-      head: [columns.map((col) => col.header)],
-      body: tableData,
-      startY: 40,
-      styles: {
-        fontSize: 8,
-        cellPadding: 2,
-      },
-      headStyles: {
-        fillColor: [66, 102, 138],
-        textColor: 255,
-      },
+    // Determinar orientación según número de columnas
+    const orientation = columns.length > 6 ? 'landscape' : 'portrait';
+    const doc = new jsPDF({
+      orientation,
+      unit: 'mm',
+      format: 'a4'
     });
+
+    // Calcular tamaño de fuente dinámico según número de columnas
+    const baseFontSize = columns.length > 20 ? 4 : columns.length > 15 ? 5 : columns.length > 10 ? 6 : columns.length > 6 ? 7 : 8;
+
+    // Si hay demasiadas columnas, dividir en múltiples tablas
+    const maxColumnsPerPage = orientation === 'landscape' ? 18 : 12;
+
+    if (columns.length > maxColumnsPerPage) {
+      // Dividir columnas en grupos
+      const columnGroups: ExportColumn[][] = [];
+      for (let i = 0; i < columns.length; i += maxColumnsPerPage) {
+        columnGroups.push(columns.slice(i, i + maxColumnsPerPage));
+      }
+
+      // Generar una página por cada grupo de columnas
+      columnGroups.forEach((columnGroup, groupIndex) => {
+        if (groupIndex > 0) {
+          doc.addPage();
+        }
+
+        // Título
+        doc.setFontSize(16);
+        doc.text(title, 14, 20);
+
+        // Subtítulo indicando la sección
+        doc.setFontSize(10);
+        doc.text(`Parte ${groupIndex + 1} de ${columnGroups.length}`, 14, 27);
+        doc.text(`Generado: ${format(new Date(), "dd/MM/yyyy")}`, 14, 34);
+
+        // Datos de la tabla para este grupo de columnas
+        const tableData = filteredItems.map((item) =>
+          columnGroup.map((col) => {
+            const value = item[col.key];
+            return col.format ? col.format(value, item) : String(value ?? "");
+          })
+        );
+
+        autoTable(doc, {
+          head: [columnGroup.map((col) => col.header)],
+          body: tableData,
+          startY: 42,
+          styles: {
+            fontSize: baseFontSize,
+            cellPadding: columnGroup.length > 15 ? 1 : 1.5,
+            overflow: 'linebreak',
+            cellWidth: 'auto',
+            minCellHeight: columnGroup.length > 15 ? 5 : 6,
+            halign: 'left',
+            valign: 'middle',
+          },
+          headStyles: {
+            fillColor: [38, 81, 151], // Color azul #265197
+            textColor: 255,
+            fontStyle: 'bold',
+            halign: 'center',
+            minCellHeight: columnGroup.length > 15 ? 6 : 8,
+            fontSize: baseFontSize,
+          },
+          tableWidth: 'auto',
+          margin: { left: 5, right: 5 },
+          theme: 'grid',
+        });
+      });
+    } else {
+      // Tabla normal sin división
+      // Título
+      doc.setFontSize(16);
+      doc.text(title, 14, 20);
+
+      // Fecha
+      doc.setFontSize(10);
+      doc.text(`Generado: ${format(new Date(), "dd/MM/yyyy")}`, 14, 30);
+
+      // Datos de la tabla
+      const tableData = filteredItems.map((item) =>
+        columns.map((col) => {
+          const value = item[col.key];
+          return col.format ? col.format(value, item) : String(value ?? "");
+        })
+      );
+
+      autoTable(doc, {
+        head: [columns.map((col) => col.header)],
+        body: tableData,
+        startY: 40,
+        styles: {
+          fontSize: baseFontSize,
+          cellPadding: columns.length > 15 ? 1 : 1.5,
+          overflow: 'linebreak',
+          cellWidth: 'auto',
+          minCellHeight: columns.length > 15 ? 5 : 6,
+          halign: 'left',
+          valign: 'middle',
+        },
+        headStyles: {
+          fillColor: [38, 81, 151], // Color azul #265197
+          textColor: 255,
+          fontStyle: 'bold',
+          halign: 'center',
+          minCellHeight: columns.length > 15 ? 6 : 8,
+          fontSize: baseFontSize,
+        },
+        tableWidth: 'auto',
+        margin: { left: 5, right: 5 },
+        theme: 'grid',
+      });
+    }
 
     doc.save(`${customFileName}.pdf`);
   };
@@ -264,9 +347,9 @@ export function useTableFeatures<T extends Record<string, any>>({
       case "csv":
         exportToCSV(fileName, columns);
         break;
-      case "pdf":
-        exportToPDF(fileName, columns, pdfTitle);
-        break;
+      // case "pdf":
+      //   exportToPDF(fileName, columns, pdfTitle);
+      //   break;
     }
 
     setIsExportModalOpen(false);
