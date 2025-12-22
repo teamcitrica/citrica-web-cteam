@@ -158,9 +158,10 @@ export const getContactColumns = ({
     name: "ACCIONES",
     uid: "actions",
     sortable: false,
+    align: "end",
     render: (contact) => (
       <div
-        className="relative flex justify-center items-center gap-2"
+        className="relative flex justify-end items-center gap-2"
         onClick={(e) => e.stopPropagation()}
       >
         <Button
@@ -168,14 +169,14 @@ export const getContactColumns = ({
           size="sm"
           variant="light"
           onPress={() => onView(contact)}
-          className="text-blue-500 hover:bg-blue-100"
+          className="text-[#265197] hover:bg-blue-100"
         >
           <Icon className="w-5 h-5" name="Eye" />
         </Button>
         <Dropdown>
           <DropdownTrigger>
             <Button isIconOnly size="sm" variant="light">
-              <Icon className="text-default-400 w-5 h-5" name="EllipsisVertical" />
+              <Icon className="text-[#265197] w-5 h-5" name="EllipsisVertical" />
             </Button>
           </DropdownTrigger>
           <DropdownMenu
@@ -194,10 +195,10 @@ export const getContactColumns = ({
               }
             }}
           >
-            <DropdownItem key="edit">
+            <DropdownItem className="text-[#265197]" key="edit">
               Editar
             </DropdownItem>
-            <DropdownItem
+            <DropdownItem className="text-[#265197]"
               key="access-credentials"
             >
               Accesos

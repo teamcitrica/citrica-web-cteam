@@ -33,7 +33,7 @@ export default function FilterButtonGroup({
         {buttons.map((button) => (
           <Button
             key={button.value}
-            className={`flex-1 h-full ${
+            className={`flex-1 h-full px-4 ${
               selectedValue === button.value
                 ? activeButtonClassName
                 : inactiveButtonClassName
