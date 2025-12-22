@@ -29,27 +29,31 @@ export default function UsersPage() {
   const [isAccessCredentialsModalOpen, setIsAccessCredentialsModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<UserType | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
 
   // IDs de roles
   const CITRICA_ROLE_ID = 1;
   const CLIENTE_ROLE_ID = 12;
 
-  // Filtrar usuarios por rol seleccionado
+  // Filtrar usuarios por rol seleccionado y búsqueda por nombre
   const filteredUsers = useMemo(() => {
     // Primero excluir usuarios con role_id === 5
-    const usersWithoutRole5 = users.filter((user) => user.role_id !== 5);
+    let filtered = users.filter((user) => user.role_id !== 5);
 
-    // Luego filtrar según el rol seleccionado
-    if (roleFilter === "all") {
-      return usersWithoutRole5;
-    } else if (roleFilter === "citrica") {
-      return usersWithoutRole5.filter((user) => user.role_id === CITRICA_ROLE_ID);
+    // Filtrar según el rol seleccionado
+    if (roleFilter === "citrica") {
+      filtered = filtered.filter((user) => user.role_id === CITRICA_ROLE_ID);
     } else if (roleFilter === "cliente") {
-      return usersWithoutRole5.filter((user) => user.role_id === CLIENTE_ROLE_ID);
+      filtered = filtered.filter((user) => user.role_id === CLIENTE_ROLE_ID);
     }
 
-    return usersWithoutRole5;
-  }, [users, roleFilter]);
+    // Filtrar por usuario seleccionado en el autocomplete
+    if (selectedUserId && selectedUserId !== "all") {
+      filtered = filtered.filter((user) => user.id === selectedUserId);
+    }
+
+    return filtered;
+  }, [users, roleFilter, selectedUserId]);
 
   const handleOpenCreateModal = () => {
     setUserToEdit(null);
@@ -166,14 +170,6 @@ export default function UsersPage() {
             data={filteredUsers}
             columns={columns}
             isLoading={isLoading}
-            searchFields={[
-              "full_name",
-              "name",
-              "first_name",
-              "last_name",
-              "email",
-            ]}
-            searchPlaceholder="Buscar por nombre o email..."
             onAdd={handleOpenCreateModal}
             addButtonText="Crear Usuario"
             emptyContent="No se encontraron usuarios"
@@ -186,11 +182,21 @@ export default function UsersPage() {
             exportTitle="Usuarios del S"
             tableName="usuarios"
             showRowsPerPageSelector={true}
-            showCompanyFilter={true}
-            companies={companies}
-            companyFilterField="company_id"
-                        customFilters={
-              <div className="w-full">
+            showCustomAutocomplete={true}
+            customAutocompleteItems={[
+              { id: 'all', name: 'Todos los usuarios' },
+              ...users
+                .filter((user) => user.role_id !== 5)
+                .map(u => ({
+                  id: String(u.id),
+                  name: u.full_name || u.name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || 'Sin nombre'
+                }))
+            ]}
+            customAutocompletePlaceholder="Buscar por nombre..."
+            customAutocompleteSelectedKey={selectedUserId || "all"}
+            onCustomAutocompleteChange={(key) => setSelectedUserId(key)}
+            customFilters={
+              <div className="w-full flex flex-col">
                 <div style={{ width: "245px" }}>
                   <FilterButtonGroup
                     buttons={[
@@ -207,14 +213,12 @@ export default function UsersPage() {
                   className="bg-[#D4DEED]"
                   style={{
                     marginTop: "16px",
-                    marginBottom: "0px",
+                    marginBottom: "12px",
                     height: "1px"
                   }}
                 />
               </div>
             }
-            companyFilterPlaceholder="Filtrar por empresa..."
-
           />
 
           <UserFormModal
