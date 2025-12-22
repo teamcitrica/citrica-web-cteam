@@ -16,7 +16,10 @@ import {
   DropdownItem,
   Autocomplete,
   AutocompleteItem,
+  Chip,
+  Divider,
 } from "@heroui/react";
+import Image from "next/image";
 import { ButtonCitricaAdmin, SelectCitricaAdmin, InputCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import Icon from "@ui/atoms/icon";
 import Text from "@/shared/components/citrica-ui/atoms/text";
@@ -67,6 +70,17 @@ export interface DataTableProps<T extends Record<string, any>> {
   removeWrapper?: boolean;
   customContainerClass?: string;
   customFilters?: React.ReactNode;
+  showFilterIndicators?: boolean;
+  totalRecordsLabel?: string;
+  activeFilters?: Array<{
+    label: string;
+    value: string;
+    onClear: () => void;
+  }>;
+  permanentFilters?: Array<{
+    column: string;
+    value: string;
+  }>;
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -102,6 +116,10 @@ export function DataTable<T extends Record<string, any>>({
   removeWrapper = false,
   customContainerClass = "container-blue-principal",
   customFilters,
+  showFilterIndicators = false,
+  totalRecordsLabel,
+  activeFilters = [],
+  permanentFilters = [],
 }: DataTableProps<T>) {
   const [isExporting, setIsExporting] = useState(false);
 
@@ -250,6 +268,67 @@ export function DataTable<T extends Record<string, any>>({
           )}
         </div>
       </div>
+
+      {/* Indicadores de filtros activos - solo para client table */}
+      {showFilterIndicators && (
+        <>
+         <Divider className="mb-4" />
+          <div className="flex gap-2 items-center pb-4">
+             
+            {totalRecordsLabel && (
+              <p>
+                <Text variant="label" color="#265197">{totalRecordsLabel}</Text>
+              </p>
+            )}
+            {totalRecordsLabel && (permanentFilters.length > 0 || activeFilters.length > 0) && (
+              <Divider className="h-[20px] bg-[#A7BDE2]" orientation="vertical" />
+            )}
+
+            {/* Filtros permanentes del asset */}
+            {permanentFilters.length > 0 && (
+              <div className="flex items-center gap-2">
+                <span>
+                  <Text variant="label" color="#265197">Filtro activo:</Text>
+                </span>
+                {permanentFilters.map((filter, index) => (
+                  <span key={index}>
+                    <Text variant="label" color="#265197">{filter.column} = {filter.value}</Text>
+                  </span>
+                ))}
+              </div>
+            )}
+            {permanentFilters.length > 0 && activeFilters.length > 0 && (
+              <Divider className="h-[20px] bg-[#A7BDE2]" orientation="vertical" />
+            )}
+
+            {/* Indicadores de filtros activos */}
+            <div className="space-y-2">
+              {activeFilters.length > 0 && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  {activeFilters.map((filter, index) => (
+                    <Chip
+                      key={index}
+                      color="default"
+                      variant="bordered"
+                      size="sm"
+                      classNames={{
+                        base: "!border-[#A7BDE2]",
+                      }}
+                      onClose={filter.onClear}
+                      endContent={
+                        <Image src="/img/x.svg" alt="Cerrar" width={16} height={16} className="cursor-pointer" />
+                      }
+                    >
+                      {filter.value}
+                    </Chip>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+         
+        </>
+      )}
 
       {/* Contenedor de tabla con scroll horizontal y vertical */}
       <div className="table-scroll-container flex-1">
