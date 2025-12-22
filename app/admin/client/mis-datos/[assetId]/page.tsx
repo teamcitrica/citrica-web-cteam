@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { useUserAssets } from "@/hooks/user-assets/use-user-assets";
-import { Spinner, DateRangePicker, Chip, ButtonGroup, Button, Divider } from "@heroui/react";
+import { Spinner, DateRangePicker, ButtonGroup, Button, Divider } from "@heroui/react";
 import Input from "@/shared/components/citrica-ui/atoms/input";
 import { Col, Container } from "@/styles/07-objects/objects";
 import * as XLSX from "xlsx";
@@ -12,7 +12,6 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { format } from "date-fns";
 import { parseDate } from "@internationalized/date";
-import Image from "next/image";
 import { Text } from "@/shared/components/citrica-ui";
 
 interface ExternalTableData {
@@ -613,97 +612,6 @@ export default function AssetDataPage() {
                 </div>
               )}
               <div className="bg-white rounded-2xl p-4">
-                {/* Buscadores personalizados */}
-                {selectedAsset && selectedAsset.assets_options?.searchConfig && (
-                  <>
-                    <div className="flex gap-2 items-center pb-4">
-                      <p>
-                        <Text variant="label" color="#265197">Total de registros: {totalRecords}</Text>
-                      </p>
-                      <Divider className="h-[20px] bg-[#A7BDE2] " orientation="vertical" />
-                      {/* Filtro permanente del asset */}
-                      {(selectedAsset.assets_options?.filter ||
-                        (selectedAsset.assets_options?.filters && selectedAsset.assets_options.filters.length > 0)) && (
-                          <div className="flex items-center gap-2">
-                            <span>
-                              <Text variant="label" color="#265197">Filtro activo:</Text>
-                            </span>
-                            {selectedAsset.assets_options?.filter ? (
-                              <span>
-                                <Text variant="label" color="#265197">{selectedAsset.assets_options.filter.column} = {selectedAsset.assets_options.filter.value}</Text>
-                              </span>
-                            ) : (
-                              selectedAsset.assets_options?.filters?.map((filter: any, index: number) => (
-                                <span key={index} className="text-sm font-medium text-[#265197]">
-                                  {filter.column} = {filter.value}
-                                </span>
-                              ))
-                            )}
-                          </div>
-                        )}
-                      <Divider className="h-[20px] bg-[#A7BDE2] " orientation="vertical" />
-
-                      {/* Indicadores de filtros activos */}
-                      <div className="space-y-2">
-                        {/* Buscadores activos */}
-                        {(textSearchValue || dateRange) && (
-                          <div className="flex items-center gap-2 flex-wrap">
-                            {textSearchValue && (
-                              <Chip
-                                color="default"
-                                variant="bordered"
-                                size="sm"
-                                classNames={{
-                                  base: "!border-[#A7BDE2]",
-                                }}
-                                onClose={() => {
-                                  setTextSearchInput("");
-                                  setTextSearchValue("");
-                                  setNumericSearchOperator("eq");
-                                  setCurrentPage(1);
-                                }}
-                                endContent={
-                                  <Image src="/img/x.svg" alt="Cerrar" width={16} height={16} className="cursor-pointer" />
-                                }
-                              >
-                                {!isNaN(Number(textSearchValue)) ? (
-                                  <>
-                                    {numericSearchOperator === "eq" && `Número = ${textSearchValue}`}
-                                    {numericSearchOperator === "gte" && `Número ≥ ${textSearchValue}`}
-                                    {numericSearchOperator === "lte" && `Número ≤ ${textSearchValue}`}
-                                  </>
-                                ) : (
-                                  `"${textSearchValue}"`
-                                )}
-                              </Chip>
-                            )}
-                            {dateRange && (
-                              <Chip
-                                color="default"
-                                variant="bordered"
-                                size="sm"
-                                classNames={{
-                                  base: "!border-[#A7BDE2]",
-                                }}
-                                onClose={() => {
-                                  setDateRange(null);
-                                  setCurrentPage(1);
-                                }}
-                                endContent={
-                                  <Image src="/img/x.svg" alt="Cerrar" width={16} height={16} className="cursor-pointer" />
-                                }
-                              >
-                                Fecha: {dateRange.start.day}/{dateRange.start.month}/{dateRange.start.year} - {dateRange.end.day}/{dateRange.end.month}/{dateRange.end.year}
-                              </Chip>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <Divider />
-                  </>
-                )}
-
                 <DataTable
                   data={tableData}
                   removeWrapper={true}
@@ -743,6 +651,48 @@ export default function AssetDataPage() {
                     setSortDirection(direction);
                     setCurrentPage(1); // Resetear a la primera página cuando se ordena
                   }}
+                  // Indicadores de filtros
+                  showFilterIndicators={!!selectedAsset?.assets_options?.searchConfig}
+                  totalRecordsLabel={`Total de registros: ${totalRecords}`}
+                  permanentFilters={
+                    selectedAsset?.assets_options?.filter
+                      ? [selectedAsset.assets_options.filter]
+                      : selectedAsset?.assets_options?.filters || []
+                  }
+                  activeFilters={[
+                    ...(textSearchValue
+                      ? [
+                          {
+                            label: "Búsqueda de texto",
+                            value: !isNaN(Number(textSearchValue))
+                              ? numericSearchOperator === "eq"
+                                ? `Número = ${textSearchValue}`
+                                : numericSearchOperator === "gte"
+                                ? `Número ≥ ${textSearchValue}`
+                                : `Número ≤ ${textSearchValue}`
+                              : `"${textSearchValue}"`,
+                            onClear: () => {
+                              setTextSearchInput("");
+                              setTextSearchValue("");
+                              setNumericSearchOperator("eq");
+                              setCurrentPage(1);
+                            },
+                          },
+                        ]
+                      : []),
+                    ...(dateRange
+                      ? [
+                          {
+                            label: "Rango de fechas",
+                            value: `Fecha: ${dateRange.start.day}/${dateRange.start.month}/${dateRange.start.year} - ${dateRange.end.day}/${dateRange.end.month}/${dateRange.end.year}`,
+                            onClear: () => {
+                              setDateRange(null);
+                              setCurrentPage(1);
+                            },
+                          },
+                        ]
+                      : []),
+                  ]}
                   // Custom Filters
                   customFilters={
                     selectedAsset?.assets_options?.searchConfig && (
