@@ -158,7 +158,7 @@ export const getContactColumns = ({
     name: "ACCIONES",
     uid: "actions",
     sortable: false,
-    // align: "end",
+    align: "end",
     render: (contact) => (
       <div
         className="relative flex justify-end items-center gap-2"

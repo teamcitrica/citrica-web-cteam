@@ -11,6 +11,8 @@ import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { Text } from "@/shared/components/citrica-ui";
+import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
+import { Divider } from "@heroui/react";
 
 export default function ContactosPage() {
   const { contacts, isLoading, refreshContacts, deleteContact } = useContactCRUD();
@@ -22,6 +24,8 @@ export default function ContactosPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAccessCredentialsModalOpen, setIsAccessCredentialsModalOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
+  const [accessFilter, setAccessFilter] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
 
   const getCompanyName = useCallback(
     (companyId: number | null) => {
@@ -93,6 +97,25 @@ export default function ContactosPage() {
     setContactToDelete(null);
   }, []);
 
+  // Filtrar contactos según filtros activos
+  const filteredContacts = useMemo(() => {
+    let filtered = contacts;
+
+    // Filtro de acceso
+    if (accessFilter === "con-acceso") {
+      filtered = filtered.filter((contact) => contact.user_id !== null && contact.active_users === true);
+    } else if (accessFilter === "sin-acceso") {
+      filtered = filtered.filter((contact) => contact.user_id === null || contact.active_users === false);
+    }
+
+    // Filtro de tipo
+    if (typeFilter !== "all") {
+      filtered = filtered.filter((contact) => contact.type_id === Number(typeFilter));
+    }
+
+    return filtered;
+  }, [contacts, accessFilter, typeFilter]);
+
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
@@ -102,7 +125,31 @@ export default function ContactosPage() {
           </h1>
 
           <DataTable<Contact>
-            data={contacts}
+            data={filteredContacts}
+            customFilters={
+              <div className="flex gap-4">
+                <FilterButtonGroup
+                  buttons={[
+                    { value: "all", label: "Todos" },
+                    { value: "con-acceso", label: "Con acceso" },
+                    { value: "sin-acceso", label: "Sin acceso" },
+                  ]}
+                  selectedValue={accessFilter}
+                  onValueChange={setAccessFilter}
+                />
+                <Divider className="h-[36px]" orientation="vertical"/>
+                <FilterButtonGroup
+                  buttons={[
+                    { value: "all", label: "Todos" },
+                    { value: "4", label: "Internos" },
+                    { value: "1", label: "Cliente" },
+                    { value: "5", label: "Proveedores" },
+                  ]}
+                  selectedValue={typeFilter}
+                  onValueChange={setTypeFilter}
+                />
+              </div>
+            }
             columns={columns}
             isLoading={isLoading || isLoadingCompanies}
             searchPlaceholder="Buscar contactos..."

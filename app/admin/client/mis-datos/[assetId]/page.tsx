@@ -67,7 +67,7 @@ export default function AssetDataPage() {
       }
     };
     getCurrentUser();
-  }, [supabase]);
+  }, []);
 
   // Obtener los assets del usuario
   const { assets, isLoading: isLoadingAssets } = useUserAssets(currentUser?.id);
