@@ -324,18 +324,9 @@ export default function AssetDataPage() {
     try {
       const cleanUrl = selectedAsset.supabase_url.replace(/\/$/, "");
 
-      // Detectar formato de columnas (nuevo con alias o antiguo)
-      const columnsConfig: (ColumnWithAlias | string)[] = selectedAsset.assets_options?.columns || ["*"];
-      let columnsToSelect: string[];
-
-      if (columnsConfig.length > 0 && typeof columnsConfig[0] === 'object') {
-        // Formato nuevo: array de objetos con alias
-        columnsToSelect = (columnsConfig as ColumnWithAlias[]).map((col) => col.field);
-      } else {
-        // Formato antiguo: array de strings
-        columnsToSelect = columnsConfig as string[];
-      }
-
+      // Usar las columnas visibles en la tabla actual (columns state)
+      // en lugar de todas las columnas del asset
+      const columnsToSelect = columns.map(col => col.uid);
       const selectQuery = columnsToSelect.join(",");
 
       // Construir filtros desde assets_options (soportar formato antiguo y nuevo)
@@ -546,34 +537,114 @@ export default function AssetDataPage() {
           break;
 
         case "pdf":
-          const doc = new jsPDF();
-
-          // Título
-          doc.setFontSize(16);
-          doc.text(selectedAsset?.name || "Mis Datos", 14, 20);
-
-          // Fecha
-          doc.setFontSize(10);
-          doc.text(`Generado: ${format(new Date(), "dd/MM/yyyy")}`, 14, 30);
-
-          // Datos de la tabla
-          const tableData = allData.map((item: ExternalTableData) =>
-            columns.map((col) => formatCellValue(item[col.uid], col.uid))
-          );
-
-          autoTable(doc, {
-            head: [columns.map((col) => col.name)],
-            body: tableData,
-            startY: 40,
-            styles: {
-              fontSize: 8,
-              cellPadding: 2,
-            },
-            headStyles: {
-              fillColor: [94, 166, 103],
-              textColor: 255,
-            },
+          // Determinar orientación según número de columnas
+          const orientation = columns.length > 6 ? 'landscape' : 'portrait';
+          const doc = new jsPDF({
+            orientation,
+            unit: 'mm',
+            format: 'a4'
           });
+
+          // Calcular tamaño de fuente dinámico según número de columnas
+          const baseFontSize = columns.length > 20 ? 4 : columns.length > 15 ? 5 : columns.length > 10 ? 6 : columns.length > 6 ? 7 : 8;
+
+          // Si hay demasiadas columnas, dividir en múltiples tablas
+          const maxColumnsPerPage = orientation === 'landscape' ? 18 : 12;
+
+          if (columns.length > maxColumnsPerPage) {
+            // Dividir columnas en grupos
+            const columnGroups: typeof columns[] = [];
+            for (let i = 0; i < columns.length; i += maxColumnsPerPage) {
+              columnGroups.push(columns.slice(i, i + maxColumnsPerPage));
+            }
+
+            // Generar una página por cada grupo de columnas
+            columnGroups.forEach((columnGroup, groupIndex) => {
+              if (groupIndex > 0) {
+                doc.addPage();
+              }
+
+              // Título
+              doc.setFontSize(16);
+              doc.text(selectedAsset?.name || "Mis Datos", 14, 20);
+
+              // Subtítulo indicando la sección
+              doc.setFontSize(10);
+              doc.text(`Parte ${groupIndex + 1} de ${columnGroups.length}`, 14, 27);
+              doc.text(`Generado: ${format(new Date(), "dd/MM/yyyy")}`, 14, 34);
+
+              // Datos de la tabla para este grupo de columnas
+              const tableData = allData.map((item: ExternalTableData) =>
+                columnGroup.map((col) => formatCellValue(item[col.uid], col.uid))
+              );
+
+              autoTable(doc, {
+                head: [columnGroup.map((col) => col.name)],
+                body: tableData,
+                startY: 42,
+                styles: {
+                  fontSize: baseFontSize,
+                  cellPadding: columnGroup.length > 15 ? 1 : 1.5,
+                  overflow: 'linebreak',
+                  cellWidth: 'auto',
+                  minCellHeight: columnGroup.length > 15 ? 5 : 6,
+                  halign: 'left',
+                  valign: 'middle',
+                },
+                headStyles: {
+                  fillColor: [38, 81, 151], // Color azul #265197
+                  textColor: 255,
+                  fontStyle: 'bold',
+                  halign: 'center',
+                  minCellHeight: columnGroup.length > 15 ? 6 : 8,
+                  fontSize: baseFontSize,
+                },
+                tableWidth: 'auto',
+                margin: { left: 5, right: 5 },
+                theme: 'grid',
+              });
+            });
+          } else {
+            // Tabla normal sin división
+            // Título
+            doc.setFontSize(16);
+            doc.text(selectedAsset?.name || "Mis Datos", 14, 20);
+
+            // Fecha
+            doc.setFontSize(10);
+            doc.text(`Generado: ${format(new Date(), "dd/MM/yyyy")}`, 14, 30);
+
+            // Datos de la tabla
+            const tableData = allData.map((item: ExternalTableData) =>
+              columns.map((col) => formatCellValue(item[col.uid], col.uid))
+            );
+
+            autoTable(doc, {
+              head: [columns.map((col) => col.name)],
+              body: tableData,
+              startY: 40,
+              styles: {
+                fontSize: baseFontSize,
+                cellPadding: columns.length > 15 ? 1 : 1.5,
+                overflow: 'linebreak',
+                cellWidth: 'auto',
+                minCellHeight: columns.length > 15 ? 5 : 6,
+                halign: 'left',
+                valign: 'middle',
+              },
+              headStyles: {
+                fillColor: [38, 81, 151], // Color azul #265197
+                textColor: 255,
+                fontStyle: 'bold',
+                halign: 'center',
+                minCellHeight: columns.length > 15 ? 6 : 8,
+                fontSize: baseFontSize,
+              },
+              tableWidth: 'auto',
+              margin: { left: 5, right: 5 },
+              theme: 'grid',
+            });
+          }
 
           doc.save(`${fileName}.pdf`);
           break;
