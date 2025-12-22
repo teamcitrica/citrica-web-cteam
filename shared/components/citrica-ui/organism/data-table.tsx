@@ -43,6 +43,8 @@ export interface DataTableProps<T extends Record<string, any>> {
   searchFields?: (keyof T)[];
   onAdd?: () => void;
   addButtonText?: string;
+  addButtonIcon?: React.ReactNode;
+  exportButtonIcon?: React.ReactNode;
   emptyContent?: string;
   headerColor?: string;
   headerTextColor?: string;
@@ -58,6 +60,11 @@ export interface DataTableProps<T extends Record<string, any>> {
   companies?: Array<{ id: number; name: string | null }>;
   companyFilterField?: keyof T;
   companyFilterPlaceholder?: string;
+  showCustomAutocomplete?: boolean;
+  customAutocompleteItems?: Array<{ id: string; name: string }>;
+  customAutocompletePlaceholder?: string;
+  customAutocompleteSelectedKey?: string;
+  onCustomAutocompleteChange?: (key: string) => void;
   serverSidePagination?: boolean;
   totalRecords?: number;
   currentPage?: number;
@@ -91,6 +98,8 @@ export function DataTable<T extends Record<string, any>>({
   searchFields = [],
   onAdd,
   addButtonText = "Agregar",
+  addButtonIcon,
+  exportButtonIcon,
   emptyContent = "No se encontraron registros",
   headerColor = "#265197",
   headerTextColor = "#ffffff",
@@ -105,6 +114,11 @@ export function DataTable<T extends Record<string, any>>({
   companies = [],
   companyFilterField,
   companyFilterPlaceholder = "Filtrar por empresa...",
+  showCustomAutocomplete = false,
+  customAutocompleteItems = [],
+  customAutocompletePlaceholder = "Buscar...",
+  customAutocompleteSelectedKey = "",
+  onCustomAutocompleteChange,
   serverSidePagination = false,
   totalRecords = 0,
   currentPage = 1,
@@ -162,11 +176,45 @@ export function DataTable<T extends Record<string, any>>({
 
   return (
     <div className={`${customContainerClass} container-blue-principal2 h-full flex flex-col`}>
+      {/* Custom Filters en su propia fila */}
+      {customFilters && (
+        <div className="w-full pt-3 flex-shrink-0">
+          {customFilters}
+        </div>
+      )}
+
       {/* Barra de búsqueda y acciones */}
       <div className="flex items-center justify-between w-full pb-3 pt-3 flex-shrink-0">
         <div className="flex items-center gap-4 ">
-          {/* Filtro de empresa con Autocomplete */}
-          {showCompanyFilter && companies.length > 0 && (
+          {/* Autocomplete personalizado O Filtro de empresa */}
+          {showCustomAutocomplete && customAutocompleteItems.length > 0 ? (
+            <Autocomplete
+              aria-label={customAutocompletePlaceholder}
+              placeholder={customAutocompletePlaceholder}
+              defaultItems={customAutocompleteItems}
+              selectedKey={customAutocompleteSelectedKey || "all"}
+              onSelectionChange={(key) => {
+                onCustomAutocompleteChange?.(key ? String(key) : "all");
+              }}
+              className="w-64"
+              classNames={{
+                base: "!border-none",
+                listboxWrapper: "!border-none",
+                popoverContent: "!border-none",
+              }}
+            >
+              {(item) => (
+                <AutocompleteItem
+                  key={item.id}
+                  classNames={{
+                    base: "!border-none data-[hover=true]:bg-gray-100 data-[focus=true]:bg-gray-200 !outline-none",
+                  }}
+                >
+                  {item.name}
+                </AutocompleteItem>
+              )}
+            </Autocomplete>
+          ) : showCompanyFilter && companies.length > 0 ? (
             <Autocomplete
               aria-label="Filtrar por empresa"
               placeholder={companyFilterPlaceholder}
@@ -197,10 +245,7 @@ export function DataTable<T extends Record<string, any>>({
                 </AutocompleteItem>
               )}
             </Autocomplete>
-          )}
-
-          {/* Custom Filters */}
-          {customFilters}
+          ) : null}
         </div>
 
         <div className="flex items-center gap-2">
@@ -210,8 +255,8 @@ export function DataTable<T extends Record<string, any>>({
                 <ButtonCitricaAdmin
                   variant="primary"
                   style={{ backgroundColor: headerColor }}
-                  startContent={<Icon className="w-4 h-4" name="Download" />}
-                // className="!bg-[#265197] text-white !w-[158px]"
+                  startContent={exportButtonIcon || <Icon className="w-4 h-4" name="Download" />}
+                className=" !w-[158px]"
                 >
                   <Text color="white" variant="label">
                     Descargar
@@ -257,8 +302,8 @@ export function DataTable<T extends Record<string, any>>({
           {onAdd && (
             <ButtonCitricaAdmin
               variant="primary"
-              style={{ backgroundColor: headerColor }}
-              startContent={<Icon className="w-4 h-4" name="Plus" />}
+              style={{ backgroundColor: headerColor, width: '205px' }}
+              startContent={addButtonIcon || <Icon className="w-4 h-4" name="Plus" />}
               onPress={onAdd}
             >
               <Text color="white" variant="label">

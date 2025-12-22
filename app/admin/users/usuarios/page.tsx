@@ -13,6 +13,8 @@ import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { addToast } from "@heroui/toast";
 import { UserAuth } from "@/shared/context/auth-context";
+import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
+import { Divider } from "@heroui/react";
 
 export default function UsersPage() {
   const { users, isLoading, refreshUsers, deleteUser, updateUserByRole } =
@@ -26,11 +28,32 @@ export default function UsersPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAccessCredentialsModalOpen, setIsAccessCredentialsModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<UserType | null>(null);
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
 
-  // Filtrar usuarios con role_id === 5
+  // IDs de roles
+  const CITRICA_ROLE_ID = 1;
+  const CLIENTE_ROLE_ID = 12;
+
+  // Filtrar usuarios por rol seleccionado y búsqueda por nombre
   const filteredUsers = useMemo(() => {
-    return users.filter((user) => user.role_id !== 5);
-  }, [users]);
+    // Primero excluir usuarios con role_id === 5
+    let filtered = users.filter((user) => user.role_id !== 5);
+
+    // Filtrar según el rol seleccionado
+    if (roleFilter === "citrica") {
+      filtered = filtered.filter((user) => user.role_id === CITRICA_ROLE_ID);
+    } else if (roleFilter === "cliente") {
+      filtered = filtered.filter((user) => user.role_id === CLIENTE_ROLE_ID);
+    }
+
+    // Filtrar por usuario seleccionado en el autocomplete
+    if (selectedUserId && selectedUserId !== "all") {
+      filtered = filtered.filter((user) => user.id === selectedUserId);
+    }
+
+    return filtered;
+  }, [users, roleFilter, selectedUserId]);
 
   const handleOpenCreateModal = () => {
     setUserToEdit(null);
@@ -147,14 +170,6 @@ export default function UsersPage() {
             data={filteredUsers}
             columns={columns}
             isLoading={isLoading}
-            searchFields={[
-              "full_name",
-              "name",
-              "first_name",
-              "last_name",
-              "email",
-            ]}
-            searchPlaceholder="Buscar por nombre o email..."
             onAdd={handleOpenCreateModal}
             addButtonText="Crear Usuario"
             emptyContent="No se encontraron usuarios"
@@ -164,13 +179,46 @@ export default function UsersPage() {
             getRowKey={(user) => user.id || ""}
             enableExport={true}
             exportColumns={exportColumns}
-            exportTitle="Gestión de Usuarios"
+            exportTitle="Usuarios del S"
             tableName="usuarios"
             showRowsPerPageSelector={true}
-            showCompanyFilter={true}
-            companies={companies}
-            companyFilterField="company_id"
-            companyFilterPlaceholder="Filtrar por empresa..."
+            showCustomAutocomplete={true}
+            customAutocompleteItems={[
+              { id: 'all', name: 'Todos los usuarios' },
+              ...users
+                .filter((user) => user.role_id !== 5)
+                .map(u => ({
+                  id: String(u.id),
+                  name: u.full_name || u.name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || 'Sin nombre'
+                }))
+            ]}
+            customAutocompletePlaceholder="Buscar por nombre..."
+            customAutocompleteSelectedKey={selectedUserId || "all"}
+            onCustomAutocompleteChange={(key) => setSelectedUserId(key)}
+            customFilters={
+              <div className="w-full flex flex-col">
+                <div style={{ width: "245px" }}>
+                  <FilterButtonGroup
+                    buttons={[
+                      { value: "all", label: "Todos" },
+                      { value: "citrica", label: "Citrica" },
+                      { value: "cliente", label: "Clientes" },
+                    ]}
+                    selectedValue={roleFilter}
+                    onValueChange={setRoleFilter}
+                    height="38px"
+                  />
+                </div>
+                <Divider
+                  className="bg-[#D4DEED]"
+                  style={{
+                    marginTop: "16px",
+                    marginBottom: "12px",
+                    height: "1px"
+                  }}
+                />
+              </div>
+            }
           />
 
           <UserFormModal
