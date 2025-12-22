@@ -162,6 +162,13 @@ export function DataTable<T extends Record<string, any>>({
 
   return (
     <div className={`${customContainerClass} container-blue-principal2 h-full flex flex-col`}>
+      {/* Custom Filters en su propia fila */}
+      {customFilters && (
+        <div className="w-full pt-3 flex-shrink-0">
+          {customFilters}
+        </div>
+      )}
+
       {/* Barra de búsqueda y acciones */}
       <div className="flex items-center justify-between w-full pb-3 pt-3 flex-shrink-0">
         <div className="flex items-center gap-4 ">
@@ -198,9 +205,6 @@ export function DataTable<T extends Record<string, any>>({
               )}
             </Autocomplete>
           )}
-
-          {/* Custom Filters */}
-          {customFilters}
         </div>
 
         <div className="flex items-center gap-2">
