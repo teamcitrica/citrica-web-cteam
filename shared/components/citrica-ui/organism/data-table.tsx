@@ -31,6 +31,7 @@ export interface Column<T extends Record<string, any>> {
   name: string;
   uid: string;
   sortable?: boolean;
+  align?: "start" | "center" | "end";
   render?: (item: T) => React.ReactNode;
 }
 
@@ -256,7 +257,7 @@ export function DataTable<T extends Record<string, any>>({
                   variant="primary"
                   style={{ backgroundColor: headerColor }}
                   startContent={exportButtonIcon || <Icon className="w-4 h-4" name="Download" />}
-                className=" !w-[158px]"
+                  className=" !w-[158px]"
                 >
                   <Text color="white" variant="label">
                     Descargar
@@ -317,9 +318,9 @@ export function DataTable<T extends Record<string, any>>({
       {/* Indicadores de filtros activos - solo para client table */}
       {showFilterIndicators && (
         <>
-         <Divider className="mb-4" />
+          <Divider className="mb-4" />
           <div className="flex gap-2 items-center pb-4">
-             
+
             {totalRecordsLabel && (
               <p>
                 <Text variant="label" color="#265197">{totalRecordsLabel}</Text>
@@ -371,7 +372,7 @@ export function DataTable<T extends Record<string, any>>({
               )}
             </div>
           </div>
-         
+
         </>
       )}
 
@@ -406,7 +407,7 @@ export function DataTable<T extends Record<string, any>>({
             {(column) => (
               <TableColumn
                 key={column.uid}
-                align="start"
+                align={column.align || "start"}
                 allowsSorting={column.sortable}
                 style={{
                   backgroundColor: headerColor,
