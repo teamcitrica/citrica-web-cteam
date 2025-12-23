@@ -13,6 +13,9 @@ import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { getProjectColumns } from "./columns/project-columns";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { Text } from "@/shared/components/citrica-ui";
+import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
+import { Divider } from "@heroui/react";
+import { createUsers } from "@/public/icon-svg/create-users";
 
 export default function ProyectosPage() {
   const router = useRouter();
@@ -26,6 +29,7 @@ export default function ProyectosPage() {
   const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
   const [isManageUsersDrawerOpen, setIsManageUsersDrawerOpen] = useState(false);
   const [projectToManageUsers, setProjectToManageUsers] = useState<Project | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>("abiertos");
 
   // Crear mapas de conteos a partir de los proyectos
   const assetCounts = useMemo(() => {
@@ -43,6 +47,18 @@ export default function ProyectosPage() {
     });
     return counts;
   }, [projects]);
+
+  // Filtrar proyectos por estado
+  const filteredProjects = useMemo(() => {
+    if (statusFilter === "abiertos") {
+      return projects.filter((project) => project.status === "abierto");
+    } else if (statusFilter === "inactivos") {
+      return projects.filter((project) => project.status === "inactivo");
+    } else if (statusFilter === "cerrados") {
+      return projects.filter((project) => project.status === "cerrado");
+    }
+    return projects;
+  }, [projects, statusFilter]);
 
   const getCompanyName = useCallback((companyId: number | null) => {
     if (!companyId) return "-";
@@ -133,17 +149,18 @@ export default function ProyectosPage() {
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="">
           <h1 className="text-2xl font-bold text-[#265197] mb-5">
-            <Text variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text variant="title" weight="bold" color="#265197"> Gestión de Proyectos</Text>
+            <Text variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text variant="title" weight="bold" color="#265197">Proyectos</Text>
           </h1>
 
           <DataTable<Project>
-            data={projects}
+            data={filteredProjects}
             columns={columns}
             isLoading={isLoading}
             searchPlaceholder="Buscar proyectos..."
             searchFields={["name", "status", "tabla"]}
             onAdd={handleOpenCreateModal}
             addButtonText="Agregar Proyecto"
+            addButtonIcon={createUsers()}
             emptyContent="No se encontraron proyectos"
             headerColor="#265197"
             headerTextColor="#ffffff"
@@ -153,6 +170,30 @@ export default function ProyectosPage() {
             companies={companies}
             companyFilterField="company_id"
             companyFilterPlaceholder="Filtrar por empresa"
+            customFilters={
+              <div className="w-full flex flex-col">
+                <div style={{ width: "245px" }}>
+                  <FilterButtonGroup
+                    buttons={[
+                      { value: "abiertos", label: "Abiertos" },
+                      { value: "inactivos", label: "Inactivos" },
+                      { value: "cerrados", label: "Cerrados" },
+                    ]}
+                    selectedValue={statusFilter}
+                    onValueChange={setStatusFilter}
+                    height="38px"
+                  />
+                </div>
+                <Divider
+                  className="bg-[#D4DEED]"
+                  style={{
+                    marginTop: "16px",
+                    marginBottom: "12px",
+                    height: "1px"
+                  }}
+                />
+              </div>
+            }
           />
 
           <ProjectFormModal
