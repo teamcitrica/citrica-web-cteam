@@ -100,6 +100,14 @@ export default function ContactDetailModal({
             </div>
             <div className="flex flex-col">
               <p>
+                <Text variant="label" color="#678CC5">Ciudad</Text>
+              </p>
+              <p>
+                <Text variant="body" color="#16305A">{contact.city || "-"}</Text>
+              </p>
+            </div>
+            <div className="flex flex-col">
+              <p>
                 <Text variant="label" color="#678CC5">Dirección</Text>
               </p>
               <p>
@@ -116,7 +124,7 @@ export default function ContactDetailModal({
     <DetailModal
       isOpen={true}
       onClose={onClose}
-      width="560px"
+      width="512px"
       title={
         <div className="flex items-center gap-3">
           <div className="rounded-full flex items-center justify-center overflow-hidden" style={{ width: '46px', height: '46px' }}>
@@ -130,13 +138,14 @@ export default function ContactDetailModal({
       }
       sections={sections}
       footer={
-        <Button
-          onClick={onClose}
-          style={{ width: '140px', backgroundColor: '#265197' }}
-          className="text-white"
-        >
-          Cerrar
-        </Button>
+        <></>
+        // <Button
+        //   onClick={onClose}
+        //   style={{ width: '140px', backgroundColor: '#265197' }}
+        //   className="text-white"
+        // >
+        //   Cerrar
+        // </Button>
       }
     />
   );

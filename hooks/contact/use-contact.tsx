@@ -20,6 +20,7 @@ export interface Contact {
   last_name: string | null;
   birth_date: string | null;
   country: string | null;
+  city: string | null;
   active_users?: boolean;
   types_contact?: {
     id: number;

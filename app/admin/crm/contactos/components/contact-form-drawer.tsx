@@ -67,6 +67,7 @@ export default function ContactFormDrawer({
     last_name: null,
     birth_date: null,
     country: null,
+    city: null,
   });
 
   // Cargar datos del contacto cuando está en modo edición
@@ -86,6 +87,7 @@ export default function ContactFormDrawer({
         last_name: contact.last_name,
         birth_date: contact.birth_date,
         country: contact.country,
+        city: contact.city,
       });
     } else {
       // Resetear formulario en modo crear
@@ -103,6 +105,7 @@ export default function ContactFormDrawer({
         last_name: null,
         birth_date: null,
         country: null,
+        city: null,
       });
     }
   }, [mode, contact, isOpen]);
@@ -344,6 +347,14 @@ export default function ContactFormDrawer({
             </SelectItem>
           ))}
         </Select>
+
+        {/* Ciudad */}
+        <InputCitricaAdmin
+          label="Ciudad"
+          placeholder="Ingrese la ciudad"
+          value={formData.city || ""}
+          onChange={(e) => handleInputChange("city", e.target.value)}
+        />
 
         {/* Dirección */}
         <InputCitricaAdmin
