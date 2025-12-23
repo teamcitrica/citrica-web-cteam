@@ -6,6 +6,8 @@ export type UserType = {
   first_name: string;
   last_name: string;
   email: string;
+  cargo?: string; // Cargo del usuario
+  phone?: string; // Teléfono del usuario
   role?: { name: string };
   role_id: number;
   company?: { id: number; name: string };

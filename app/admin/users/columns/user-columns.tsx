@@ -82,25 +82,30 @@ export const getUserColumns = ({
             name={getInitials(userName || "?")}
             size="sm"
           />
-          <div className="flex items-center gap-2">
-            <span className="text-black font-medium">{userName || "-"}</span>
-            {user.active_users !== undefined && (
-              <Tooltip
-                content={
-                  isActive
-                    ? "Usuario con acceso activo"
-                    : "Usuario sin acceso activo"
-                }
-                delay={200}
-                closeDelay={0}
-              >
-                <div className="flex items-center">
-                  <Icon
-                    className={`w-4 h-4 ${isActive ? "text-green-600" : "text-[#b5b5b5]"}`}
-                    name="ShieldCheck"
-                  />
-                </div>
-              </Tooltip>
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2">
+              <span className="text-black font-medium">{userName || "-"}</span>
+              {user.active_users !== undefined && (
+                <Tooltip
+                  content={
+                    isActive
+                      ? "Usuario con acceso activo"
+                      : "Usuario sin acceso activo"
+                  }
+                  delay={200}
+                  closeDelay={0}
+                >
+                  <div className="flex items-center">
+                    <Icon
+                      className={`w-4 h-4 ${isActive ? "text-green-600" : "text-[#b5b5b5]"}`}
+                      name="ShieldCheck"
+                    />
+                  </div>
+                </Tooltip>
+              )}
+            </div>
+            {user.cargo && (
+              <span className="text-gray-500 text-xs">{user.cargo}</span>
             )}
           </div>
         </div>
@@ -124,17 +129,12 @@ export const getUserColumns = ({
     ),
   },
   {
-    name: "ROL Y ACCESO",
+    name: "ROL",
     uid: "rol_acceso",
     sortable: true,
     render: (user) => (
-      <div className="flex flex-col gap-1 text-left">
-        <div className="text-black font-medium capitalize">
-          {user.role?.name || "-"}
-        </div>
-        <div className="text-gray-500 text-xs">
-          Accesos: {user.user_metadata?.project_access_count || 0}
-        </div>
+      <div className="text-black font-medium capitalize">
+        {user.role?.name || "-"}
       </div>
     ),
   },
@@ -142,6 +142,7 @@ export const getUserColumns = ({
     name: "ACCIONES",
     uid: "actions",
     sortable: false,
+    align: "end",
     render: (user) => (
       <div className="relative flex justify-end items-end gap-2">
         <Button
