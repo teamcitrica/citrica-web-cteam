@@ -596,7 +596,8 @@ $rest-technology-img: (
   }
 
   .swiper-slide {
-    height: auto;
+    height: auto; 
+
     display: flex;
     justify-content: center;
     align-items: stretch;
@@ -682,3 +683,4 @@ $rest-technology-img: (
   background-position: center;
   background-repeat: no-repeat;
 }
+
