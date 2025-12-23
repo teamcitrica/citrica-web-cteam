@@ -15,6 +15,7 @@ import { addToast } from "@heroui/toast";
 import { UserAuth } from "@/shared/context/auth-context";
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
 import { Divider } from "@heroui/react";
+import { createUsers } from "@/public/icon-svg/create-users";
 
 export default function UsersPage() {
   const { users, isLoading, refreshUsers, deleteUser, updateUserByRole } =
@@ -172,6 +173,7 @@ export default function UsersPage() {
             isLoading={isLoading}
             onAdd={handleOpenCreateModal}
             addButtonText="Crear Usuario"
+            addButtonIcon={createUsers()}
             emptyContent="No se encontraron usuarios"
             headerColor="#265197"
             headerTextColor="#ffffff"
@@ -240,8 +242,9 @@ export default function UsersPage() {
             />
           )}
 
-          {isDeleteModalOpen && userToDelete && (
+          {userToDelete && (
             <ModalDeleteUser
+              isOpen={isDeleteModalOpen}
               user={userToDelete}
               onConfirm={handleConfirmDelete}
               onCancel={handleCancelDelete}
