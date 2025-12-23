@@ -127,7 +127,8 @@ export default function ContactosPage() {
           <DataTable<Contact>
             data={filteredContacts}
             customFilters={
-              <div className="flex gap-4">
+              <>
+              <div className="flex gap-4 pb-[18px]">
                 <FilterButtonGroup
                   buttons={[
                     { value: "all", label: "Todos" },
@@ -149,6 +150,9 @@ export default function ContactosPage() {
                   onValueChange={setTypeFilter}
                 />
               </div>
+              <Divider/>
+              </>
+              
             }
             columns={columns}
             isLoading={isLoading || isLoadingCompanies}
@@ -169,7 +173,7 @@ export default function ContactosPage() {
             showCompanyFilter={true}
             companies={companies}
             companyFilterField="company_id"
-            companyFilterPlaceholder="Filtrar por empresa"
+            companyFilterPlaceholder="Seleccione empresa"
           />
 
           <CreateContactModal
