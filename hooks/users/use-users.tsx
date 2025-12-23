@@ -118,6 +118,8 @@ export const useUserCRUD = () => {
           email: newUser.email,
           first_name: newUser.first_name,
           last_name: newUser.last_name,
+          cargo: newUser.cargo,
+          phone: newUser.phone,
           role_id: newUser.role_id,
           company_id: newUser.company_id,
         },
@@ -257,6 +259,8 @@ export const useUserCRUD = () => {
           password: user_data.password,
           first_name: user_data.first_name,
           last_name: user_data.last_name,
+          cargo: user_data.cargo,
+          phone: user_data.phone,
           role_id: Number(role_id),
           company_id: user_data.company_id ? Number(user_data.company_id) : null,
         }),
@@ -305,6 +309,8 @@ export const useUserCRUD = () => {
         if (user_data.first_name !== undefined) updatePayload.first_name = user_data.first_name;
         if (user_data.last_name !== undefined) updatePayload.last_name = user_data.last_name;
         if (user_data.email !== undefined) updatePayload.email = user_data.email;
+        if (user_data.cargo !== undefined) updatePayload.cargo = user_data.cargo;
+        if (user_data.phone !== undefined) updatePayload.phone = user_data.phone;
         if (user_data.company_id !== undefined) updatePayload.company_id = user_data.company_id;
         if (user_data.active_users !== undefined) updatePayload.active_users = user_data.active_users;
       }

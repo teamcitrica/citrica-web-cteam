@@ -82,26 +82,29 @@ export const getUserColumns = ({
             name={getInitials(userName || "?")}
             size="sm"
           />
-          <div className="flex items-center gap-2">
-            <span className="text-black font-medium">{userName || "-"}</span>
-            {user.active_users !== undefined && (
-              <Tooltip
-                content={
-                  isActive
-                    ? "Usuario con acceso activo"
-                    : "Usuario sin acceso activo"
-                }
-                delay={200}
-                closeDelay={0}
-              >
-                <div className="flex items-center">
-                  <Icon
-                    className={`w-4 h-4 ${isActive ? "text-green-600" : "text-[#b5b5b5]"}`}
-                    name="ShieldCheck"
-                  />
-                </div>
-              </Tooltip>
-            )}
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2">
+              <span className="text-black font-medium">{userName || "-"}</span>
+              {user.active_users !== undefined && (
+                <Tooltip
+                  content={
+                    isActive
+                      ? "Usuario con acceso activo"
+                      : "Usuario sin acceso activo"
+                  }
+                  delay={200}
+                  closeDelay={0}
+                >
+                  <div className="flex items-center">
+                    <Icon
+                      className={`w-4 h-4 ${isActive ? "text-green-600" : "text-[#b5b5b5]"}`}
+                      name="ShieldCheck"
+                    />
+                  </div>
+                </Tooltip>
+              )}
+            </div>
+            <span className="text-[#678CC5] text-xs">{user.cargo || "-"}</span>
           </div>
         </div>
       );
@@ -112,29 +115,18 @@ export const getUserColumns = ({
     uid: "empresa",
     sortable: true,
     render: (user) => (
-      <div className="flex flex-col gap-1 text-left">
-        <div className="text-black font-medium">
-          {user.company?.name || "-"}
-        </div>
-        <div className="flex items-center gap-1 text-gray-500 text-xs">
-          <Icon className="w-3 h-3" name="Mail" />
-          <span>{user.email || "-"}</span>
-        </div>
+      <div className="text-black font-medium">
+        {user.company?.name || "-"}
       </div>
     ),
   },
   {
-    name: "ROL Y ACCESO",
+    name: "ROL",
     uid: "rol_acceso",
     sortable: true,
     render: (user) => (
-      <div className="flex flex-col gap-1 text-left">
-        <div className="text-black font-medium capitalize">
-          {user.role?.name || "-"}
-        </div>
-        <div className="text-gray-500 text-xs">
-          Accesos: {user.user_metadata?.project_access_count || 0}
-        </div>
+      <div className="text-black font-medium capitalize">
+        {user.role?.name || "-"}
       </div>
     ),
   },
@@ -142,6 +134,7 @@ export const getUserColumns = ({
     name: "ACCIONES",
     uid: "actions",
     sortable: false,
+    align: "end",
     render: (user) => (
       <div className="relative flex justify-end items-end gap-2">
         <Button
@@ -149,7 +142,7 @@ export const getUserColumns = ({
           size="sm"
           variant="light"
           onPress={() => onView(user)}
-          className="text-blue-500 hover:bg-blue-100"
+          className="text-[#265197] hover:bg-blue-100"
         >
           <Icon className="w-5 h-5" name="Eye" />
         </Button>
@@ -157,7 +150,7 @@ export const getUserColumns = ({
           <DropdownTrigger>
             <Button isIconOnly size="sm" variant="light">
               <Icon
-                className="text-default-400 w-5 h-5"
+                className="text-[#265197] w-5 h-5"
                 name="EllipsisVertical"
               />
             </Button>
@@ -178,8 +171,11 @@ export const getUserColumns = ({
               }
             }}
           >
-            <DropdownItem key="edit">Editar</DropdownItem>
+            <DropdownItem className="text-[#265197]" key="edit">
+              Editar
+            </DropdownItem>
             <DropdownItem
+              className="text-[#265197]"
               key="access-credentials"
             >
               Accesos

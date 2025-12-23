@@ -53,7 +53,7 @@ export const DrawerCitricaAdmin: React.FC<DrawerCitricaAdminProps> = ({
     >
       <DrawerContent>
         {title && (
-          <DrawerHeader className="flex flex-col gap-1 border-b border-gray-200">
+          <DrawerHeader className="flex flex-col gap-1 border-b" style={{ borderColor: '#D4DEED' }}>
             <h3>
               <Text variant="subtitle" color="#16305A" weight="bold">
                 {title}
@@ -65,13 +65,13 @@ export const DrawerCitricaAdmin: React.FC<DrawerCitricaAdminProps> = ({
         <DrawerBody
           className="py-6"
           style={{
-            background: 'linear-gradient(180deg, #EEF1F7 0%, #FFFFFF 15%, #FFFFFF 85%, #EEF1F7 100%)'
+            background: '#EEF1F7'
           }}
         >
           {children}
         </DrawerBody>
         {footer && (
-          <DrawerFooter className="border-t border-gray-200">{footer}</DrawerFooter>
+          <DrawerFooter className="border-t" style={{ borderColor: '#D4DEED' }}>{footer}</DrawerFooter>
         )}
       </DrawerContent>
     </Drawer>
