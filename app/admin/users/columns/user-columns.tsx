@@ -104,9 +104,7 @@ export const getUserColumns = ({
                 </Tooltip>
               )}
             </div>
-            {user.cargo && (
-              <span className="text-gray-500 text-xs">{user.cargo}</span>
-            )}
+            <span className="text-[#678CC5] text-xs">{user.cargo || "-"}</span>
           </div>
         </div>
       );
@@ -117,14 +115,8 @@ export const getUserColumns = ({
     uid: "empresa",
     sortable: true,
     render: (user) => (
-      <div className="flex flex-col gap-1 text-left">
-        <div className="text-black font-medium">
-          {user.company?.name || "-"}
-        </div>
-        <div className="flex items-center gap-1 text-gray-500 text-xs">
-          <Icon className="w-3 h-3" name="Mail" />
-          <span>{user.email || "-"}</span>
-        </div>
+      <div className="text-black font-medium">
+        {user.company?.name || "-"}
       </div>
     ),
   },
@@ -150,7 +142,7 @@ export const getUserColumns = ({
           size="sm"
           variant="light"
           onPress={() => onView(user)}
-          className="text-blue-500 hover:bg-blue-100"
+          className="text-[#265197] hover:bg-blue-100"
         >
           <Icon className="w-5 h-5" name="Eye" />
         </Button>
@@ -158,7 +150,7 @@ export const getUserColumns = ({
           <DropdownTrigger>
             <Button isIconOnly size="sm" variant="light">
               <Icon
-                className="text-default-400 w-5 h-5"
+                className="text-[#265197] w-5 h-5"
                 name="EllipsisVertical"
               />
             </Button>
@@ -179,8 +171,11 @@ export const getUserColumns = ({
               }
             }}
           >
-            <DropdownItem key="edit">Editar</DropdownItem>
+            <DropdownItem className="text-[#265197]" key="edit">
+              Editar
+            </DropdownItem>
             <DropdownItem
+              className="text-[#265197]"
               key="access-credentials"
             >
               Accesos
