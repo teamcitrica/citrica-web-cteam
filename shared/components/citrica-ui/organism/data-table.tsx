@@ -97,6 +97,7 @@ export function DataTable<T extends Record<string, any>>({
   isLoading = false,
   itemsPerPage = 50,
   searchFields = [],
+  searchPlaceholder = "Buscar...",
   onAdd,
   addButtonText = "Agregar",
   addButtonIcon,
@@ -217,19 +218,20 @@ export function DataTable<T extends Record<string, any>>({
             </Autocomplete>
           ) : showCompanyFilter && companies.length > 0 ? (
             <Autocomplete
+              variant="bordered"
               aria-label="Filtrar por empresa"
               placeholder={companyFilterPlaceholder}
               defaultItems={[
                 { id: 'all', name: 'Todas las empresas' },
                 ...companies.map(c => ({ id: String(c.id), name: c.name || 'Sin nombre' }))
               ]}
-              selectedKey={tableFeatures.companyFilter && tableFeatures.companyFilter !== "" ? tableFeatures.companyFilter : "all"}
+              selectedKey={tableFeatures.companyFilter && tableFeatures.companyFilter !== "" && tableFeatures.companyFilter !== "all" ? tableFeatures.companyFilter : null}
               onSelectionChange={(key) => {
                 tableFeatures.onCompanyFilterChange(key ? new Set([String(key)]) : new Set(["all"]));
               }}
-              className="w-64"
+              className="w-64 [&_[data-slot='input-wrapper']]:bg-transparent [&_[data-slot='input-wrapper']]:!border-[#D4DEED] [&_[data-slot='input-wrapper']:hover]:!border-[#265197] [&_[data-slot='input-wrapper'][data-hover=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus-visible=true]]:!border-[#265197] [&_[data-slot='input-wrapper']:focus-within]:!border-[#265197] [&_input]:text-[#265197]"
               classNames={{
-                base: "!border-none",
+                base: "bg-transparent",
                 listboxWrapper: "!border-none",
                 popoverContent: "!border-none",
               }}
@@ -247,6 +249,24 @@ export function DataTable<T extends Record<string, any>>({
               )}
             </Autocomplete>
           ) : null}
+
+          {/* Input de búsqueda */}
+          {searchFields.length > 0 && (
+            <InputCitricaAdmin
+              type="text"
+              placeholder={searchPlaceholder || "Buscar..."}
+              value={serverSidePagination ? (searchValueServer || "") : tableFeatures.filterValue}
+              onChange={(e) => {
+                if (serverSidePagination && onSearchChangeServer) {
+                  onSearchChangeServer(e.target.value);
+                } else {
+                  tableFeatures.setFilterValue(e.target.value);
+                }
+              }}
+              startContent={<Icon className="w-4 h-4 text-[#265197]" name="Search" />}
+              className="w-64"
+            />
+          )}
         </div>
 
         <div className="flex items-center gap-2">

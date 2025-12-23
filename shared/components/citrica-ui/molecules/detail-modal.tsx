@@ -42,21 +42,20 @@ export default function DetailModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      className={width ? "" : "w-[360px]"}
-      style={customStyle}
       scrollBehavior="inside"
+      classNames={{
+        base: width ? `max-w-none` : "w-[360px]",
+      }}
     >
-      <ModalContent className="!">
-        <ModalHeader className="flex flex-col gap-1">
+      <ModalContent style={customStyle} className={width ? "max-w-none" : ""}>
+        <ModalHeader className="flex flex-col gap-1 pb-2">
           <h3>
             <Text variant="body" weight="bold" color="#265197">{title}</Text>
           </h3>
         </ModalHeader>
+          <Divider className="bg-[#A7BDE2] mt-2" />
         <ModalBody
           className="rounded-xl"
-          style={{
-            background: 'linear-gradient(180deg, #EEF1F7 0%, #FFFFFF 15%, #FFFFFF 85%, #EEF1F7 100%)'
-          }}
         >
           {sections.map((section, index) => (
             <div key={index}>

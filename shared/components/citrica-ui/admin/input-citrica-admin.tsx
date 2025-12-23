@@ -16,14 +16,14 @@ export interface InputCitricaAdminProps extends Omit<HeroUIInputProps, 'variant'
  * - Support for end content (e.g., search icon)
  */
 export const InputCitricaAdmin: React.FC<InputCitricaAdminProps> = ({
-  className = "text-[#265197] min-w-[264px] bg-white hover:!border-[#D4DEED]",
+  className = "text-[#265197] min-w-[264px] bg-white [--color-primary-textarea-border-hover:#265197]",
   endContent,
   classNames: customClassNames,
   ...props
 }) => {
   const defaultClassNames = {
     inputWrapper:
-      "!text-[#3E688E] !rounded-[12px] !border-[#D4DEED] data-[focus=true]:!border-[#D4DEED] data-[hover=true]:!border-[#D4DEED] focus-within:!border-[#D4DEED]",
+      "!text-[#3E688E] !rounded-[12px] !border-[#D4DEED] data-[hover=true]:!border-[#265197] data-[focus=true]:!border-[#265197] data-[focus-visible=true]:!border-[#265197] focus-within:!border-[#265197]",
     mainWrapper: "",
     label: "!text-[#265197]",
     input: "placeholder:text-[#A7BDE2] !rounded-[12px]",
@@ -32,16 +32,18 @@ export const InputCitricaAdmin: React.FC<InputCitricaAdminProps> = ({
   };
 
   return (
-    <HeroUIInput
-      className={className}
-      classNames={{
-        ...defaultClassNames,
-        ...customClassNames,
-      }}
-      variant="bordered"
-      endContent={endContent}
-      {...props}
-    />
+    <div style={{ "--color-primary-textarea-border-hover": "#265197" } as React.CSSProperties}>
+      <HeroUIInput
+        className={className}
+        classNames={{
+          ...defaultClassNames,
+          ...customClassNames,
+        }}
+        variant="bordered"
+        endContent={endContent}
+        {...props}
+      />
+    </div>
   );
 };
 
