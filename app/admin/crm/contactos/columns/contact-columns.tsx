@@ -118,7 +118,7 @@ export const getContactColumns = ({
         <div className="text-[#16305A] font-medium">
           <Text variant="body" weight="bold" color="#16305A">{getCompanyName(contact.company_id)}</Text>
         </div>
-        <Text variant="label" color="#678CC5">Relación.</Text>
+        <Text variant="label" color="#678CC5">{contact.types_contact?.name || "-"}</Text>
       </div>
     ),
   },

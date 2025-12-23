@@ -1,8 +1,7 @@
 "use client";
 import { useState, useCallback, useMemo } from "react";
-import CreateContactModal from "./components/create-contact-modal";
+import ContactFormDrawer from "./components/contact-form-drawer";
 import ContactDetailModal from "./components/contact-detail-modal";
-import EditContactModal from "./components/edit-contact-modal";
 import DeleteContactModal from "./components/delete-contact-modal";
 import AccessCredentialsModal from "./components/access-credentials-modal";
 import { getContactColumns, getContactExportColumns } from "./columns/contact-columns";
@@ -17,10 +16,10 @@ import { Divider } from "@heroui/react";
 export default function ContactosPage() {
   const { contacts, isLoading, refreshContacts, deleteContact } = useContactCRUD();
   const { companies, isLoading: isLoadingCompanies } = useCompanyCRUD();
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isFormDrawerOpen, setIsFormDrawerOpen] = useState(false);
+  const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAccessCredentialsModalOpen, setIsAccessCredentialsModalOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
@@ -37,10 +36,10 @@ export default function ContactosPage() {
     [companies, isLoadingCompanies]
   );
 
-  const handleOpenCreateModal = () => setIsCreateModalOpen(true);
-
-  const handleCloseCreateModal = () => {
-    setIsCreateModalOpen(false);
+  const handleOpenCreateModal = () => {
+    setFormMode("create");
+    setSelectedContact(null);
+    setIsFormDrawerOpen(true);
   };
 
   const handleViewContact = useCallback((contact: Contact) => {
@@ -49,8 +48,9 @@ export default function ContactosPage() {
   }, []);
 
   const handleEditContact = useCallback((contact: Contact) => {
+    setFormMode("edit");
     setSelectedContact(contact);
-    setIsEditModalOpen(true);
+    setIsFormDrawerOpen(true);
   }, []);
 
   const handleAccessCredentials = useCallback((contact: Contact) => {
@@ -176,12 +176,17 @@ export default function ContactosPage() {
             companyFilterPlaceholder="Seleccione empresa"
           />
 
-          <CreateContactModal
-            isOpen={isCreateModalOpen}
-            onClose={handleCloseCreateModal}
+          <ContactFormDrawer
+            isOpen={isFormDrawerOpen}
+            onClose={() => {
+              setIsFormDrawerOpen(false);
+              setSelectedContact(null);
+            }}
             onSuccess={() => {
               refreshContacts();
             }}
+            contact={selectedContact}
+            mode={formMode}
           />
 
           {isDetailModalOpen && selectedContact && (
@@ -190,20 +195,6 @@ export default function ContactosPage() {
               onClose={() => {
                 setIsDetailModalOpen(false);
                 setSelectedContact(null);
-              }}
-            />
-          )}
-
-          {isEditModalOpen && selectedContact && (
-            <EditContactModal
-              isOpen={isEditModalOpen}
-              contact={selectedContact}
-              onClose={() => {
-                setIsEditModalOpen(false);
-                setSelectedContact(null);
-              }}
-              onSuccess={() => {
-                refreshContacts();
               }}
             />
           )}

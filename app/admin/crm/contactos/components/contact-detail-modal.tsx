@@ -4,6 +4,7 @@ import { Contact } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { DetailModal, Text } from "@/shared/components/citrica-ui";
 import { Button } from "@heroui/react";
+import { COUNTRIES } from "@/shared/data/countries";
 
 interface ContactDetailModalProps {
   contact: Contact;
@@ -22,6 +23,22 @@ export default function ContactDetailModal({
     return company?.name || "Empresa no encontrada";
   };
 
+  const getCountryWithFlag = (countryName: string | null) => {
+    if (!countryName) return "-";
+    const country = COUNTRIES.find(c => c.name === countryName);
+    return country ? `${country.flag} ${country.name}` : countryName;
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "-";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+    } catch {
+      return dateString;
+    }
+  };
+
   const sections = [
     {
       title: "Datos del contacto",
@@ -31,10 +48,10 @@ export default function ContactDetailModal({
           <div className="flex flex-col gap-[8px]">
             <div className="flex flex-col">
               <p>
-                <Text variant="label" color="#678CC5">Relación</Text>
+                <Text variant="label" color="#678CC5">Tipo de Contacto</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">.</Text>
+                <Text variant="body" color="#16305A">{contact.types_contact?.name || "-"}</Text>
               </p>
             </div>
             <div className="flex flex-col">
@@ -61,6 +78,14 @@ export default function ContactDetailModal({
                 <Text variant="body" color="#16305A">{contact.phone || "-"}</Text>
               </p>
             </div>
+            <div className="flex flex-col">
+              <p>
+                <Text variant="label" color="#678CC5">Fecha de Cumpleaños</Text>
+              </p>
+              <p>
+                <Text variant="body" color="#16305A">{formatDate(contact.birth_date)}</Text>
+              </p>
+            </div>
           </div>
 
           {/* Columna Derecha */}
@@ -70,20 +95,12 @@ export default function ContactDetailModal({
                 <Text variant="label" color="#678CC5">País</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">.</Text>
+                <Text variant="body" color="#16305A">{getCountryWithFlag(contact.country)}</Text>
               </p>
             </div>
             <div className="flex flex-col">
               <p>
-                <Text variant="label" color="#678CC5">Ciudad</Text>
-              </p>
-              <p>
-                <Text variant="body" color="#16305A">.</Text>
-              </p>
-            </div>
-            <div className="flex flex-col">
-              <p>
-                <Text variant="label" color="#678CC5">Dirección:</Text>
+                <Text variant="label" color="#678CC5">Dirección</Text>
               </p>
               <p>
                 <Text variant="body" color="#16305A">{contact.address || "-"}</Text>

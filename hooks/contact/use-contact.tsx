@@ -18,6 +18,8 @@ export interface Contact {
   code: string | null;
   email_access: string | null;
   last_name: string | null;
+  birth_date: string | null;
+  country: string | null;
   active_users?: boolean;
   types_contact?: {
     id: number;
