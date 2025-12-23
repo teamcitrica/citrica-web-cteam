@@ -24,7 +24,7 @@ interface ContactFormDrawerProps {
 }
 
 // Helper para validar y parsear fechas ISO
-const safeParseDateString = (dateString: string | null) => {
+const safeParseDateString = (dateString: string | null | undefined) => {
   if (!dateString) return null;
 
   // Validar formato ISO 8601 (YYYY-MM-DD)
@@ -294,10 +294,11 @@ export default function ContactFormDrawer({
         {/* Fecha de cumpleaños */}
         <DatePicker
           label="Fecha de cumpleaños"
-          value={safeParseDateString(formData.birth_date)}
+          value={safeParseDateString(formData.birth_date) as any}
           onChange={(date) => {
             if (date) {
-              handleInputChange("birth_date", `${date.year}-${String(date.month).padStart(2, "0")}-${String(date.day).padStart(2, "0")}`);
+              const formattedDate = `${date.year}-${String(date.month).padStart(2, "0")}-${String(date.day).padStart(2, "0")}`;
+              handleInputChange("birth_date", formattedDate);
             } else {
               handleInputChange("birth_date", null);
             }
