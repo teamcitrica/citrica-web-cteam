@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Select, SelectItem, Textarea } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
+import { useSupabase } from "@/shared/context/supabase-context";
 
 import { useCompanyCRUD, CompanyInput } from "@/hooks/companies/use-companies";
 
@@ -20,6 +21,8 @@ export default function CreateCompanyModal({
   onSuccess,
 }: CreateCompanyModalProps) {
   const { createCompany, isLoading } = useCompanyCRUD();
+  const { supabase } = useSupabase();
+  const [contactTypes, setContactTypes] = useState<Array<{ id: number; name: string }>>([]);
   const [formData, setFormData] = useState<CompanyInput>({
     name: null,
     description: null,
@@ -33,7 +36,32 @@ export default function CreateCompanyModal({
     street_or_avenue: null,
     address_number: null,
     contact_position: null,
+    type_id: null,
+    zip_code: null,
+    website: null,
   });
+
+  // Cargar tipos de contacto (Cliente y Proveedor)
+  useEffect(() => {
+    const fetchContactTypes = async () => {
+      const { data, error } = await supabase
+        .from("types_contact")
+        .select("id, name")
+        .in("id", [1, 5])
+        .order("id", { ascending: true });
+
+      if (error) {
+        console.error("Error al cargar tipos de contacto:", error);
+        return;
+      }
+
+      setContactTypes(data || []);
+    };
+
+    if (isOpen) {
+      fetchContactTypes();
+    }
+  }, [isOpen, supabase]);
 
   const handleInputChange = (field: keyof CompanyInput, value: string) => {
     setFormData((prev) => ({
@@ -68,6 +96,9 @@ export default function CreateCompanyModal({
           street_or_avenue: null,
           address_number: null,
           contact_position: null,
+          type_id: null,
+          zip_code: null,
+          website: null,
         });
         onSuccess?.();
         onClose();
@@ -153,13 +184,13 @@ export default function CreateCompanyModal({
         </Select>
         <Select
           label="Relación"
-          placeholder="Seleccione una empresa"
-          selectedKeys=""
+          placeholder="Seleccione una relación"
+          selectedKeys={formData.type_id ? [String(formData.type_id)] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];
             setFormData((prev) => ({
               ...prev,
-              company_id: selected ? Number(selected) : null,
+              type_id: selected ? Number(selected) : null,
             }));
           }}
           classNames={{
@@ -170,15 +201,17 @@ export default function CreateCompanyModal({
           }}
           isRequired
         >
-            <SelectItem className="text-[#265197]">
-              Relación: Cliente, Proveedor
+          {contactTypes.map((type) => (
+            <SelectItem key={type.id} className="text-[#265197]">
+              {type.name}
             </SelectItem>
+          ))}
         </Select>
         <InputCitricaAdmin
           label="Website"
-          placeholder="Website"
-          value="."
-          //onChange={(e) => handleInputChange("contact_phone", e.target.value)}
+          placeholder="https://ejemplo.com"
+          value={formData.website || ""}
+          onChange={(e) => handleInputChange("website", e.target.value)}
         />
         <InputCitricaAdmin
           label="Teléfono"
@@ -220,8 +253,8 @@ export default function CreateCompanyModal({
         <InputCitricaAdmin
           label="Código Postal"
           placeholder="123456"
-          value={formData.address_number || ""}
-          onChange={(e) => handleInputChange("address_number", e.target.value)}
+          value={formData.zip_code || ""}
+          onChange={(e) => handleInputChange("zip_code", e.target.value)}
         />
       </div>
       <Textarea
