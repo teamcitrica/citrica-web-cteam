@@ -11,6 +11,9 @@ import { useCompanyCRUD, Company } from "@/hooks/companies/use-companies";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { Text } from "@/shared/components/citrica-ui";
+import { createBuilding } from "@/public/icon-svg/icon-create-building";
+import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
+import { Divider } from "@heroui/react";
 
 export default function EmpresasPage() {
   const { companies, isLoading, refreshCompanies, deleteCompany } = useCompanyCRUD();
@@ -20,6 +23,21 @@ export default function EmpresasPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null);
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+
+  // IDs de tipos de contacto
+  const CLIENTE_TYPE_ID = 1;
+  const PROVEEDOR_TYPE_ID = 5;
+
+  // Filtrar empresas por tipo seleccionado
+  const filteredCompanies = useMemo(() => {
+    if (typeFilter === "cliente") {
+      return companies.filter((company) => company.type_id === CLIENTE_TYPE_ID);
+    } else if (typeFilter === "proveedor") {
+      return companies.filter((company) => company.type_id === PROVEEDOR_TYPE_ID);
+    }
+    return companies;
+  }, [companies, typeFilter]);
 
   const handleOpenCreateModal = () => setIsCreateModalOpen(true);
 
@@ -84,12 +102,13 @@ export default function EmpresasPage() {
           </h1>
 
           <DataTable<Company>
-            data={companies}
+            data={filteredCompanies}
             columns={columns}
             isLoading={isLoading}
             searchFields={[]}
             onAdd={handleOpenCreateModal}
             addButtonText="Agregar Empresa"
+            addButtonIcon={createBuilding()}
             emptyContent="No se encontraron empresas"
             headerColor="#265197"
             headerTextColor="#ffffff"
@@ -104,6 +123,30 @@ export default function EmpresasPage() {
             companies={companies}
             companyFilterField="id"
             companyFilterPlaceholder="Filtrar por empresa"
+            customFilters={
+              <div className="w-full flex flex-col">
+                <div style={{ width: "245px" }}>
+                  <FilterButtonGroup
+                    buttons={[
+                      { value: "all", label: "Todas" },
+                      { value: "cliente", label: "Clientes" },
+                      { value: "proveedor", label: "Proveedores" },
+                    ]}
+                    selectedValue={typeFilter}
+                    onValueChange={setTypeFilter}
+                    height="38px"
+                  />
+                </div>
+                <Divider
+                  className="bg-[#D4DEED]"
+                  style={{
+                    marginTop: "16px",
+                    marginBottom: "12px",
+                    height: "1px"
+                  }}
+                />
+              </div>
+            }
           />
 
           <CreateCompanyModal
