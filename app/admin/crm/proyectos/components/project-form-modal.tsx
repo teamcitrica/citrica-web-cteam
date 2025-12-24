@@ -11,7 +11,6 @@ import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-
 
 import { useProjectCRUD, ProjectInput, Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
-import { useContactCRUD } from "@/hooks/contact/use-contact";
 import { useProjectContacts } from "@/hooks/project-contacts/use-project-contacts";
 
 interface ProjectFormModalProps {
@@ -31,7 +30,6 @@ export default function ProjectFormModal({
 }: ProjectFormModalProps) {
   const { createProject, updateProject, isLoading } = useProjectCRUD();
   const { companies } = useCompanyCRUD();
-  const { contacts } = useContactCRUD();
   const { getProjectContacts, syncProjectContacts } = useProjectContacts();
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
 
@@ -60,67 +58,69 @@ export default function ProjectFormModal({
   });
 
   useEffect(() => {
-    if (mode === "edit" && project) {
-      const projectData = {
-        name: project.name,
-        company_id: project.company_id,
-        status: project.status,
-        nombre_responsable: project.nombre_responsable,
-        email_responsable: project.email_responsable,
-        phone_responsable: project.phone_responsable,
-        tabla: project.tabla,
-        supabase_url: project.supabase_url,
-        supabase_anon_key: project.supabase_anon_key,
-      };
-      setFormData(projectData);
-      setOriginalData(projectData);
+    if (isOpen) {
+      if (mode === "edit" && project) {
+        const projectData = {
+          name: project.name,
+          company_id: project.company_id,
+          status: project.status,
+          nombre_responsable: project.nombre_responsable,
+          email_responsable: project.email_responsable,
+          phone_responsable: project.phone_responsable,
+          tabla: project.tabla,
+          supabase_url: project.supabase_url,
+          supabase_anon_key: project.supabase_anon_key,
+        };
+        setFormData(projectData);
+        setOriginalData(projectData);
 
-      // Cargar contactos asociados al proyecto
-      const loadProjectContacts = async () => {
-        try {
-          const projectContacts = await getProjectContacts(project.id);
-          if (projectContacts && projectContacts.length > 0) {
-            const contactIds = new Set(projectContacts.map(c => c.id));
-            setSelectedContactIds(contactIds);
-          } else {
+        // Cargar contactos asociados al proyecto
+        const loadProjectContacts = async () => {
+          try {
+            const projectContacts = await getProjectContacts(project.id);
+            if (projectContacts && projectContacts.length > 0) {
+              const contactIds = new Set(projectContacts.map(c => c.id));
+              setSelectedContactIds(contactIds);
+            } else {
+              setSelectedContactIds(new Set());
+            }
+          } catch (error) {
+            console.log("No hay contactos asociados al proyecto");
             setSelectedContactIds(new Set());
           }
-        } catch (error) {
-          console.log("No hay contactos asociados al proyecto");
-          setSelectedContactIds(new Set());
-        }
-      };
+        };
 
-      loadProjectContacts();
-    } else {
-      // Limpiar todo el formulario cuando es modo crear
-      setFormData({
-        name: null,
-        company_id: null,
-        status: "abierto",
-        nombre_responsable: null,
-        email_responsable: null,
-        phone_responsable: null,
-        tabla: null,
-        supabase_url: null,
-        supabase_anon_key: null,
-      });
-      setOriginalData({
-        name: null,
-        company_id: null,
-        status: null,
-        nombre_responsable: null,
-        email_responsable: null,
-        phone_responsable: null,
-        tabla: null,
-        supabase_url: null,
-        supabase_anon_key: null,
-      });
-      setSelectedContactIds(new Set());
+        loadProjectContacts();
+      } else {
+        // Limpiar todo el formulario cuando es modo crear
+        setFormData({
+          name: null,
+          company_id: null,
+          status: "abierto",
+          nombre_responsable: null,
+          email_responsable: null,
+          phone_responsable: null,
+          tabla: null,
+          supabase_url: null,
+          supabase_anon_key: null,
+        });
+        setOriginalData({
+          name: null,
+          company_id: null,
+          status: null,
+          nombre_responsable: null,
+          email_responsable: null,
+          phone_responsable: null,
+          tabla: null,
+          supabase_url: null,
+          supabase_anon_key: null,
+        });
+        setSelectedContactIds(new Set());
+      }
     }
-  }, [project, mode, getProjectContacts]);
+  }, [isOpen, project, mode, getProjectContacts]);
 
-  const handleInputChange = (field: keyof ProjectInput, value: string | number) => {
+  const handleInputChange = (field: keyof ProjectInput, value: string | number | null) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value || null,
@@ -248,21 +248,46 @@ export default function ProjectFormModal({
               label="Empresa"
               placeholder="Seleccione una empresa"
               selectedKeys={formData.company_id ? [formData.company_id.toString()] : []}
-              onChange={(e) => {
-                handleInputChange("company_id", parseInt(e.target.value));
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0];
+                handleInputChange("company_id", selected ? parseInt(selected as string) : null);
               }}
               isRequired
               classNames={{
-                label: "text-gray-700",
-                value: "text-gray-800",
+                label: "!text-[#265197]",
+                value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
+                trigger: "bg-white !border-[#D4DEED]",
+                selectorIcon: "text-[#678CC5]",
               }}
             >
               {companies.map((company) => (
-                <SelectItem key={company.id.toString()}>
+                <SelectItem key={company.id.toString()} className="text-[#265197]">
                   {company.name || "Sin nombre"}
                 </SelectItem>
               ))}
             </Select>
+
+        {mode === "edit" && (
+          <Select
+            label="Estatus"
+            placeholder="Seleccione el estatus"
+            selectedKeys={formData.status ? [formData.status] : []}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0];
+              handleInputChange("status", selected ? selected as string : null);
+            }}
+            classNames={{
+              label: "!text-[#265197]",
+              value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
+              trigger: "bg-white !border-[#D4DEED]",
+              selectorIcon: "text-[#678CC5]",
+            }}
+          >
+            <SelectItem key="abierto" className="text-[#265197]">Abierto</SelectItem>
+            <SelectItem key="inactivo" className="text-[#265197]">Inactivo</SelectItem>
+            <SelectItem key="cerrado" className="text-[#265197]">Cerrado</SelectItem>
+          </Select>
+        )}
 
         <InputCitricaAdmin
           label="Nombre del Proyecto"

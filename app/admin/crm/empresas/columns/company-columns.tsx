@@ -88,10 +88,11 @@ export const getCompanyColumns = ({
       const location = [company.departament, company.country]
         .filter(Boolean)
         .join(", ") || "-";
+      const relation = company.types_contact?.name || "-";
       return (
         <div className="flex flex-col items-start">
-          <Text variant="body" weight="bold" color="#16305A">{location}</Text>
-          <Text variant="label" color="#678CC5">.</Text>
+          <Text variant="body" weight="bold" color="#16305A">{relation}</Text>
+          <Text variant="label" color="#678CC5">{location}</Text>
         </div>
       );
     },
@@ -132,14 +133,15 @@ export const getCompanyColumns = ({
     name: "ACCIONES",
     uid: "actions",
     sortable: false,
+    align: "end",
     render: (company) => (
-      <div className="relative flex justify-center items-center gap-2">
+      <div className="relative flex justify-end items-end gap-2">
         <Button
           isIconOnly
           size="sm"
           variant="light"
           onPress={() => onView(company)}
-          className="text-blue-500 hover:bg-blue-100"
+          className="text-[#265197] hover:bg-blue-100"
         >
           <Icon className="w-5 h-5" name="Eye" />
         </Button>
@@ -147,7 +149,7 @@ export const getCompanyColumns = ({
           <DropdownTrigger>
             <Button isIconOnly size="sm" variant="light">
               <Icon
-                className="text-default-400 w-5 h-5"
+                className="text-[#265197] w-5 h-5"
                 name="EllipsisVertical"
               />
             </Button>
@@ -166,6 +168,7 @@ export const getCompanyColumns = ({
             }}
           >
             <DropdownItem
+              className="text-[#265197]"
               key="edit"
             >
               Editar

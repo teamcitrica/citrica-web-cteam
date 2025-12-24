@@ -6,7 +6,6 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
-  Chip,
 } from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import { Text } from "@/shared/components/citrica-ui";
@@ -74,27 +73,44 @@ export const getProjectColumns = ({
     },
   },
   {
-    name: "ESTADO",
+    name: "ESTATUS",
     uid: "status",
     sortable: true,
     render: (project) => {
       const status = project.status || "abierto";
-      const statusConfig: Record<string, { color: "success" | "warning" | "danger" | "default"; variant: "flat" | "solid" }> = {
-        abierto: { color: "success", variant: "flat" },
-        inactivo: { color: "warning", variant: "flat" },
-        cerrado: { color: "danger", variant: "flat" },
+      const statusConfig: Record<string, { dotColor: string; label: string }> = {
+        abierto: { dotColor: "#10E5A4", label: "Abierto" },
+        inactivo: { dotColor: "#FF4D4F", label: "Inactivo" },
+        cerrado: { dotColor: "#6B7280", label: "Cerrado" },
       };
-      const config = statusConfig[status] || { color: "default" as const, variant: "flat" as const };
+      const config = statusConfig[status] || { dotColor: "#6B7280", label: status };
 
       return (
-        <Chip
-          color={config.color}
-          variant={config.variant}
-          size="sm"
-          className="capitalize"
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+            width: "91px",
+            height: "24px",
+            borderRadius: "16px",
+            border: "1.5px solid #A7BDE2",
+            backgroundColor: "#F9FAFB",
+          }}
         >
-          {status}
-        </Chip>
+          <div
+            style={{
+              width: "8px",
+              height: "8px",
+              borderRadius: "50%",
+              backgroundColor: config.dotColor,
+            }}
+          />
+          <span style={{ color: "#1F2937", fontSize: "14px", fontWeight: "500" }}>
+            {config.label}
+          </span>
+        </div>
       );
     },
   },
@@ -102,6 +118,7 @@ export const getProjectColumns = ({
     name: "ACCIONES",
     uid: "actions",
     sortable: false,
+    align: "end",
     render: (project) => (
       <div className="relative flex justify-end items-end gap-2">
         <Button
@@ -109,7 +126,7 @@ export const getProjectColumns = ({
           size="sm"
           variant="light"
           onPress={() => onView(project)}
-          className="text-blue-500 hover:bg-blue-100"
+          className="text-[#265197] hover:bg-blue-100"
         >
           <Icon className="w-5 h-5" name="Eye" />
         </Button>
@@ -117,7 +134,7 @@ export const getProjectColumns = ({
           <DropdownTrigger>
             <Button isIconOnly size="sm" variant="light">
               <Icon
-                className="text-default-400 w-5 h-5"
+                className="text-[#265197] w-5 h-5"
                 name="EllipsisVertical"
               />
             </Button>
@@ -139,11 +156,13 @@ export const getProjectColumns = ({
             }}
           >
             <DropdownItem
+              className="text-[#265197]"
               key="edit"
             >
               Editar
             </DropdownItem>
             <DropdownItem
+              className="text-[#265197]"
               key="manageUsers"
             >
               Gestionar Usuarios
