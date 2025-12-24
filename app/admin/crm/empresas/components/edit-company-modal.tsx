@@ -34,6 +34,9 @@ export default function EditCompanyModal({
     street_or_avenue: company.street_or_avenue,
     address_number: company.address_number,
     contact_position: company.contact_position,
+    type_id: company.type_id,
+    zip_code: company.zip_code,
+    website: company.website,
   });
 
   useEffect(() => {
@@ -50,6 +53,9 @@ export default function EditCompanyModal({
       street_or_avenue: company.street_or_avenue,
       address_number: company.address_number,
       contact_position: company.contact_position,
+      type_id: company.type_id,
+      zip_code: company.zip_code,
+      website: company.website,
     });
   }, [company]);
 
