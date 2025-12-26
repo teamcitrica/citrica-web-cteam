@@ -128,7 +128,7 @@ export default function ContactosPage() {
             data={filteredContacts}
             customFilters={
               <>
-              <div className="flex gap-4 pb-[18px]">
+              <div className="flex gap-3 pb-4">
                 <FilterButtonGroup
                   buttons={[
                     { value: "all", label: "Todos" },
@@ -150,7 +150,7 @@ export default function ContactosPage() {
                   onValueChange={setTypeFilter}
                 />
               </div>
-              <Divider/>
+              <Divider className="bg-[#D4DEED]"/>
               </>
               
             }

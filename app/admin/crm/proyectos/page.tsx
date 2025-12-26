@@ -148,7 +148,7 @@ export default function ProyectosPage() {
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="">
-          <h1 className="text-2xl font-bold text-[#265197] mb-5">
+          <h1 className="text-2xl font-bold text-[#265197] mb-4">
             <Text variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text variant="title" weight="bold" color="#265197">Proyectos</Text>
           </h1>
 
@@ -184,14 +184,7 @@ export default function ProyectosPage() {
                     height="38px"
                   />
                 </div>
-                <Divider
-                  className="bg-[#D4DEED]"
-                  style={{
-                    marginTop: "16px",
-                    marginBottom: "12px",
-                    height: "1px"
-                  }}
-                />
+                <Divider className="bg-[#D4DEED] mt-3"/>
               </div>
             }
           />

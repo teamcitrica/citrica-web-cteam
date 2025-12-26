@@ -128,7 +128,7 @@ export default function ContactDetailModal({
       title={
         <div className="flex items-center gap-3">
           <div className="rounded-full flex items-center justify-center overflow-hidden" style={{ width: '46px', height: '46px' }}>
-            <img src="/avatar-logueo-citrica.png" alt="Avatar" width="46" height="46" />
+            <img src="/avatar-login.png" alt="Avatar" width="46" height="46" />
           </div>
           <div className="flex flex-col">
             <Text variant="body" weight="bold" color="#265197">{`${contact.name || "Sin nombre"} ${contact.last_name || ""}`}</Text>

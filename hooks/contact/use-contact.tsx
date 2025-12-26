@@ -27,6 +27,12 @@ export interface Contact {
     name: string;
     description: string | null;
   };
+  user?: {
+    role?: {
+      id: number;
+      name: string;
+    };
+  };
 }
 
 export type ContactInput = Omit<Contact, "id" | "types_contact" | "tipo">;
@@ -50,7 +56,11 @@ export const useContactCRUD = () => {
             description
           ),
           users!user_id (
-            active_users
+            active_users,
+            role:role_id (
+              id,
+              name
+            )
           )
         `)
         .order("name", { ascending: true });
@@ -64,10 +74,13 @@ export const useContactCRUD = () => {
         });
         return;
       }
-      // Transformar los datos para incluir active_users del usuario relacionado
+      // Transformar los datos para incluir active_users y user con role del usuario relacionado
       const transformedData = (data || []).map((contact: any) => ({
         ...contact,
         active_users: contact.users?.active_users,
+        user: contact.users ? {
+          role: contact.users.role
+        } : undefined,
         users: undefined, // Remover el objeto users anidado
       }));
       setContacts(transformedData);
@@ -92,7 +105,11 @@ export const useContactCRUD = () => {
             description
           ),
           users!user_id (
-            active_users
+            active_users,
+            role:role_id (
+              id,
+              name
+            )
           )
         `)
         .eq("id", id)
@@ -103,10 +120,13 @@ export const useContactCRUD = () => {
         return null;
       }
 
-      // Transformar datos para incluir active_users
+      // Transformar datos para incluir active_users y user con role
       return {
         ...data,
         active_users: (data as any).users?.active_users,
+        user: (data as any).users ? {
+          role: (data as any).users.role
+        } : undefined,
         users: undefined,
       };
     } catch (err) {
