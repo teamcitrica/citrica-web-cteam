@@ -108,7 +108,7 @@ export default function EmpresasPage() {
             searchFields={[]}
             onAdd={handleOpenCreateModal}
             addButtonText="Agregar Empresa"
-            addButtonIcon={createBuilding()}
+            addButtonIcon={createBuilding()} 
             emptyContent="No se encontraron empresas"
             headerColor="#265197"
             headerTextColor="#ffffff"
@@ -125,7 +125,7 @@ export default function EmpresasPage() {
             companyFilterPlaceholder="Filtrar por empresa"
             customFilters={
               <div className="w-full flex flex-col">
-                <div style={{ width: "245px" }}>
+                <div className="pb-4" style={{ width: "280px" }}>
                   <FilterButtonGroup
                     buttons={[
                       { value: "all", label: "Todas" },
@@ -137,14 +137,7 @@ export default function EmpresasPage() {
                     height="38px"
                   />
                 </div>
-                <Divider
-                  className="bg-[#D4DEED]"
-                  style={{
-                    marginTop: "16px",
-                    marginBottom: "12px",
-                    height: "1px"
-                  }}
-                />
+                <Divider className="bg-[#D4DEED]"/>
               </div>
             }
           />

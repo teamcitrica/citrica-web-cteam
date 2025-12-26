@@ -16,6 +16,7 @@ import { UserAuth } from "@/shared/context/auth-context";
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
 import { Divider } from "@heroui/react";
 import { createUsers } from "@/public/icon-svg/create-users";
+import { Text } from "@/shared/components/citrica-ui";
 
 export default function UsersPage() {
   const { users, isLoading, refreshUsers, deleteUser, updateUserByRole } =
@@ -162,9 +163,9 @@ export default function UsersPage() {
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div>
-          <h1 className="text-2xl font-bold text-[#265197] mb-6">
-            <span className="text-[#678CC5]"></span>Usuarios
+        <div>         
+          <h1 className="mb-4">
+            <Text variant="title" weight="bold" color="#265197">Usuarios del sistema</Text>
           </h1>
 
           <DataTable<UserType>
@@ -211,14 +212,7 @@ export default function UsersPage() {
                     height="38px"
                   />
                 </div>
-                <Divider
-                  className="bg-[#D4DEED]"
-                  style={{
-                    marginTop: "16px",
-                    marginBottom: "12px",
-                    height: "1px"
-                  }}
-                />
+                <Divider className="bg-[#D4DEED] mt-4" />
               </div>
             }
           />
@@ -263,7 +257,7 @@ export default function UsersPage() {
               }}
             />
           )}
-        </div>
+        </div> 
       </Col>
     </Container>
   );

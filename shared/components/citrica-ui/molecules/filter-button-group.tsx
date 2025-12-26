@@ -23,8 +23,8 @@ export default function FilterButtonGroup({
   onValueChange,
   size = "sm",
   height,
-  containerClassName = "bg-[#D4DEED] p-2 rounded-md",
-  activeButtonClassName = "bg-white text-[#265197]",
+  containerClassName = "bg-[#D4DEED] p-1 rounded-md",
+  activeButtonClassName = "bg-white text-[#265197] !rounded-md",
   inactiveButtonClassName = "bg-[#D4DEED] text-[#265197] border border-[#D4DEED]",
 }: FilterButtonGroupProps) {
   return (
@@ -33,6 +33,7 @@ export default function FilterButtonGroup({
         {buttons.map((button) => (
           <Button
             key={button.value}
+            radius="md"
             className={`flex-1 h-full px-4 ${
               selectedValue === button.value
                 ? activeButtonClassName

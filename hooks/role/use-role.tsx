@@ -1,7 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
 import { addToast } from "@heroui/toast";
-
 import { useSupabase } from "@/shared/context/supabase-context";
 
 export interface RoleType {

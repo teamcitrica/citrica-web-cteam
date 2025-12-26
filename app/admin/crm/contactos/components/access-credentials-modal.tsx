@@ -11,7 +11,7 @@ import {
   Divider,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
-
+import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { Contact } from "@/hooks/contact/use-contact";
 import Text from "@/shared/components/citrica-ui/atoms/text";
 import Icon from "@/shared/components/citrica-ui/atoms/icon";
@@ -64,6 +64,13 @@ export default function AccessCredentialsModal({
   const isActive = contact.active_users === true;
   const isFirstTime = contact.user_id === null;
   const isReactivation = contact.user_id !== null && contact.active_users === false;
+  const { companies } = useCompanyCRUD();
+
+  const getCompanyName = (companyId: number | null) => {
+    if (!companyId) return "Sin empresa asignada";
+    const company = companies.find(c => c.id === companyId);
+    return company?.name || "Empresa no encontrada";
+  };
 
   const handleCopyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -210,7 +217,7 @@ export default function AccessCredentialsModal({
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center gap-3">
             <div className="rounded-full flex items-center justify-center overflow-hidden" style={{ width: '46px', height: '46px' }}>
-              <img src="/avatar-logueo-citrica.png" alt="Avatar" width="46" height="46" />
+              <img src="/avatar-login.png" alt="Avatar" width="46" height="46" />
             </div>
             <div className="flex flex-col">
               <Text variant="body" weight="bold" color="#265197">{`${contact.name || "Sin nombre"} ${contact.last_name || ""}`}</Text>
@@ -224,11 +231,11 @@ export default function AccessCredentialsModal({
             {/* Información del contacto */}
             <div className="flex flex-row gap-2">
               <Text variant="body" weight="bold" color="#265197">Empresa</Text>
-              <Text variant="body" weight="bold" color="#265197">.</Text>
+              <Text variant="body" weight="bold" color="#265197">{getCompanyName(contact.company_id)}</Text>
             </div>
             <div className="flex flex-col gap-1">
               <Text variant="label" color="#678CC5">Rol</Text>
-              <Text variant="body" color="#16305A">.</Text>
+              <Text variant="body" color="#16305A">{contact.user?.role?.name || "-"}</Text>
             </div>
 
             {hasUserAccess ? (

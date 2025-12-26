@@ -180,14 +180,14 @@ export function DataTable<T extends Record<string, any>>({
     <div className={`${customContainerClass} container-blue-principal2 h-full flex flex-col`}>
       {/* Custom Filters en su propia fila */}
       {customFilters && (
-        <div className="w-full pt-3 flex-shrink-0">
+        <div className="w-full flex-shrink-0">
           {customFilters}
         </div>
       )}
 
       {/* Barra de búsqueda y acciones */}
-      <div className="flex items-center justify-between w-full pb-3 pt-3 flex-shrink-0">
-        <div className="flex items-center gap-4 ">
+      <div className="flex items-center justify-between w-full py-3 flex-shrink-0">
+        <div className="flex items-center gap-2">
           {/* Autocomplete personalizado O Filtro de empresa */}
           {showCustomAutocomplete && customAutocompleteItems.length > 0 ? (
             <Autocomplete
@@ -198,7 +198,7 @@ export function DataTable<T extends Record<string, any>>({
               onSelectionChange={(key) => {
                 onCustomAutocompleteChange?.(key ? String(key) : "all");
               }}
-              className="w-64"
+              className="w-56"
               classNames={{
                 base: "!border-none",
                 listboxWrapper: "!border-none",
@@ -229,7 +229,7 @@ export function DataTable<T extends Record<string, any>>({
               onSelectionChange={(key) => {
                 tableFeatures.onCompanyFilterChange(key ? new Set([String(key)]) : new Set(["all"]));
               }}
-              className="w-64 [&_[data-slot='input-wrapper']]:bg-transparent [&_[data-slot='input-wrapper']]:!border-[#D4DEED] [&_[data-slot='input-wrapper']:hover]:!border-[#265197] [&_[data-slot='input-wrapper'][data-hover=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus-visible=true]]:!border-[#265197] [&_[data-slot='input-wrapper']:focus-within]:!border-[#265197] [&_input]:text-[#265197]"
+              className="w-56 [&_[data-slot='input-wrapper']]:bg-transparent [&_[data-slot='input-wrapper']]:!border-[#D4DEED] [&_[data-slot='input-wrapper']:hover]:!border-[#265197] [&_[data-slot='input-wrapper'][data-hover=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus-visible=true]]:!border-[#265197] [&_[data-slot='input-wrapper']:focus-within]:!border-[#265197] [&_input]:text-[#265197]"
               classNames={{
                 base: "bg-transparent",
                 listboxWrapper: "!border-none",
@@ -263,8 +263,8 @@ export function DataTable<T extends Record<string, any>>({
                   tableFeatures.setFilterValue(e.target.value);
                 }
               }}
-              startContent={<Icon className="w-4 h-4 text-[#265197]" name="Search" />}
-              className="w-64"
+              startContent={<Icon size={16} color="#265197" name="Search" />}
+              className="w-56"
             />
           )}
         </div>
@@ -276,8 +276,8 @@ export function DataTable<T extends Record<string, any>>({
                 <ButtonCitricaAdmin
                   variant="primary"
                   style={{ backgroundColor: headerColor }}
-                  startContent={exportButtonIcon || <Icon className="w-4 h-4" name="Download" />}
-                  className=" !w-[158px]"
+                  startContent={exportButtonIcon || <Icon size={16} name="Download" />}
+                  className=" !w-32"
                 >
                   <Text color="white" variant="label">
                     Descargar
@@ -300,19 +300,19 @@ export function DataTable<T extends Record<string, any>>({
               >
                 <DropdownItem
                   key="excel"
-                  startContent={<Icon className="w-4 h-4" name="FileSpreadsheet" />}
+                  startContent={<Icon size={16} name="FileSpreadsheet" />}
                 >
                   Excel (.xlsx)
                 </DropdownItem>
                 <DropdownItem
                   key="csv"
-                  startContent={<Icon className="w-4 h-4" name="FileText" />}
+                  startContent={<Icon size={16} name="FileText" />}
                 >
                   CSV (.csv)
                 </DropdownItem>
                 <DropdownItem
                   key="pdf"
-                  startContent={<Icon className="w-4 h-4" name="FileDown" />}
+                  startContent={<Icon size={16} name="FileDown" />}
                 >
                   PDF (.pdf)
                 </DropdownItem>
@@ -323,8 +323,8 @@ export function DataTable<T extends Record<string, any>>({
           {onAdd && (
             <ButtonCitricaAdmin
               variant="primary"
-              style={{ backgroundColor: headerColor, width: '205px' }}
-              startContent={addButtonIcon || <Icon className="w-4 h-4" name="Plus" />}
+              style={{ backgroundColor: headerColor, width: '172px' }}
+              startContent={addButtonIcon || <Icon size={16} name="UserPlus" />}
               onPress={onAdd}
             >
               <Text color="white" variant="label">
