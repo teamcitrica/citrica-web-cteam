@@ -128,7 +128,7 @@ export const DropCitrica: React.FC<DropCitricaProps> = ({
           style={defaultTriggerStyle}
         >
           <div className="rounded-full flex items-center justify-center overflow-hidden" style={{ width: '32px', height: '32px' }}>
-            <img src="/avatar-logueo-citrica.png" alt="Avatar" width="32" height="32" />
+            <img src="/avatar-login.png" alt="Avatar" width="32" height="32" />
           </div>
           <span className="flex-1" style={{ color: '#16305A' }}>
             <Text variant="label">{userName}</Text>
