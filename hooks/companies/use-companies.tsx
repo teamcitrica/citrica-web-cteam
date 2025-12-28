@@ -22,12 +22,15 @@ export interface Company {
   type_id: number | null;
   zip_code: string | null;
   website: string | null;
+  sector: string | null;
   types_contact?: {
     name: string;
   } | null;
 }
 
 export type CompanyInput = Omit<Company, "id" | "created_at">;
+
+
 
 export const useCompanyCRUD = () => {
   const { supabase } = useSupabase();

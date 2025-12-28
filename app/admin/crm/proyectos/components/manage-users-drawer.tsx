@@ -156,10 +156,10 @@ export default function ManageUsersDrawer({
     >
       <div className="space-y-4">
         {/* Información del proyecto */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <p className="text-sm text-gray-600">Proyecto</p>
+        <div className="bg-white border border-[#D4DEED] p-4 rounded-lg">
+          <p className="text-sm text-[#265197]">Proyecto</p>
           <p className="text-lg font-semibold text-[#16305A]">{project.name}</p>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-[#678CC5] mt-1">
             Empresa: {project.company?.name || "Sin empresa"}
           </p>
         </div>
@@ -180,14 +180,21 @@ export default function ManageUsersDrawer({
             onSelectionChange={handleAddUser}
             allowsCustomValue={false}
             menuTrigger="input"
-            classNames={{
-              base: "w-full",
+            style={{
+              width: "100%",
             }}
+            classNames={{
+              base: "w-full [&_label]:!text-[#265197] [&_input]:!text-[#265197] [&_input::placeholder]:!text-[#A7BDE2]",
+              selectorButton: "!text-[#678CC5]",
+              listboxWrapper: "!text-[#265197]",
+              popoverContent: "[&_li]:!text-[#265197]",
+            }}
+            className="[&>div>div]:bg-white [&>div>div]:!border-[#D4DEED]"
           >
             {clientUsers
               .filter(user => user.id && !selectedUserIds.includes(user.id))
               .map((user) => (
-                <AutocompleteItem key={user.id}>
+                <AutocompleteItem key={user.id} className="text-[#265197]">
                   {user.first_name && user.last_name
                     ? `${user.first_name} ${user.last_name}`
                     : user.email}
@@ -198,7 +205,7 @@ export default function ManageUsersDrawer({
           {/* Chips de usuarios seleccionados */}
           {selectedUsers.length > 0 && (
             <div className="mt-4">
-              <p className="text-sm text-gray-600 mb-2">
+              <p className="text-sm text-[#265197] mb-2">
                 Usuarios asignados ({selectedUsers.length}):
               </p>
               <div className="flex flex-wrap gap-2">
@@ -208,6 +215,11 @@ export default function ManageUsersDrawer({
                     onClose={() => handleRemoveUser(user.id!)}
                     variant="flat"
                     color="primary"
+                    classNames={{
+                      base: "bg-[#E8F0FE]",
+                      content: "text-[#265197]",
+                      closeButton: "text-[#265197]",
+                    }}
                   >
                     {user.first_name && user.last_name
                       ? `${user.first_name} ${user.last_name}`
@@ -219,13 +231,13 @@ export default function ManageUsersDrawer({
           )}
 
           {selectedUsers.length === 0 && (
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-[#678CC5] mt-2">
               No hay usuarios asignados a este proyecto
             </p>
           )}
 
           {clientUsers.length === 0 && (
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-[#678CC5] mt-2">
               No hay usuarios disponibles para esta empresa
             </p>
           )}

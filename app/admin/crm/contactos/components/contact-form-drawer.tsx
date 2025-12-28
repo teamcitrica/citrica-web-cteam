@@ -13,6 +13,7 @@ import { useContactCRUD, ContactInput, Contact } from "@/hooks/contact/use-conta
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { useTypeContactCRUD } from "@/hooks/types-contact/use-types-contact";
 import { COUNTRIES } from "@/shared/data/countries";
+import { PHONE_CODES } from "@/shared/archivos js/phone-codes";
 import { parseDate } from "@internationalized/date";
 
 interface ContactFormDrawerProps {
@@ -53,6 +54,7 @@ export default function ContactFormDrawer({
   const { companies } = useCompanyCRUD();
   const { typesContact } = useTypeContactCRUD();
 
+  const [phoneCode, setPhoneCode] = useState<string>("+51");
   const [formData, setFormData] = useState<Partial<ContactInput>>({
     name: null,
     cargo: null,
@@ -89,6 +91,16 @@ export default function ContactFormDrawer({
         country: contact.country,
         city: contact.city,
       });
+
+      // Extraer código de teléfono si existe
+      if (contact.phone) {
+        const matchedCode = PHONE_CODES.find(code =>
+          contact.phone?.startsWith(code.value)
+        );
+        if (matchedCode) {
+          setPhoneCode(matchedCode.value);
+        }
+      }
     } else {
       // Resetear formulario en modo crear
       setFormData({
@@ -284,12 +296,49 @@ export default function ContactFormDrawer({
         />
 
         {/* WhatsApp */}
-        <InputCitricaAdmin
-          label="WhatsApp"
-          placeholder="Número de teléfono"
-          value={formData.phone || ""}
-          onChange={(e) => handleInputChange("phone", e.target.value)}
-        />
+        <div className="grid grid-cols-[120px_1fr] gap-2">
+          <Select
+            label="Código"
+            placeholder="+51"
+            selectedKeys={[phoneCode]}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0] as string;
+              setPhoneCode(selected);
+            }}
+            classNames={{
+              label: "!text-[#265197]",
+              value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
+              trigger: "bg-white !border-[#D4DEED]",
+              selectorIcon: "text-[#678CC5]",
+            }}
+            renderValue={(items) => {
+              return items.map((item) => (
+                <div key={item.key} className="flex items-center gap-1">
+                  <span className="text-sm">{item.key}</span>
+                </div>
+              ));
+            }}
+          >
+            {PHONE_CODES.map((code) => (
+              <SelectItem
+                key={code.value}
+                className="text-[#265197]"
+                textValue={code.value}
+              >
+                {code.label}
+              </SelectItem>
+            ))}
+          </Select>
+          <InputCitricaAdmin
+            label="WhatsApp"
+            placeholder="Número de teléfono"
+            value={formData.phone?.replace(phoneCode, "").trim() || ""}
+            onChange={(e) => {
+              const phone = e.target.value ? `${phoneCode} ${e.target.value}` : "";
+              handleInputChange("phone", phone);
+            }}
+          />
+        </div>
 
         {/* Fecha de cumpleaños */}
         <DatePicker
