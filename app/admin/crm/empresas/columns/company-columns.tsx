@@ -75,7 +75,7 @@ export const getCompanyColumns = ({
         />
         <div className="flex flex-col">
           <Text variant="body" weight="bold" color="#16305A">{company.name || "-"}</Text>
-          <Text variant="label" color="#678CC5" className="truncate max-w-[200px]">.</Text>
+          <Text variant="label" color="#678CC5" className="truncate max-w-[200px]">{company.sector || "-"}</Text>
         </div>
       </div>
     ),
