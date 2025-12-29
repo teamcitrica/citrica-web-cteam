@@ -1,0 +1,23 @@
+// Sectores empresariales comunes
+export const COMPANY_SECTORS = [
+  "Tecnología y Software",
+  "Servicios Financieros",
+  "Educación",
+  "Salud y Medicina",
+  "Construcción e Inmobiliaria",
+  "Manufactura e Industria",
+  "Comercio y Retail",
+  "Alimentos y Bebidas",
+  "Turismo y Hospitalidad",
+  "Transporte y Logística",
+  "Energía y Recursos Naturales",
+  "Telecomunicaciones",
+  "Agricultura y Ganadería",
+  "Consultoría y Servicios Profesionales",
+  "Marketing y Publicidad",
+  "Medios y Entretenimiento",
+  "Seguros",
+  "Legal",
+  "Recursos Humanos",
+  "Otro",
+];
