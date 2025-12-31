@@ -48,7 +48,7 @@ export default function CompanyDetailModal({
                 <Text variant="label" color="#678CC5">Relación</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">.</Text>
+                <Text variant="body" color="#16305A">{company.types_contact?.name || "-"}</Text>
               </p>
             </div>
             <div className="flex flex-col pt-[8px]">
@@ -56,7 +56,7 @@ export default function CompanyDetailModal({
                 <Text variant="label" color="#678CC5">Website</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">.</Text>
+                <Text variant="body" color="#16305A">{company.website || "-"}</Text>
               </p>
             </div>
 
@@ -85,7 +85,7 @@ export default function CompanyDetailModal({
                 <Text variant="label" color="#678CC5">Sector:</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">.</Text>
+                <Text variant="body" color="#16305A">{company.sector || "-"}</Text>
               </p>
             </div>
             <div className="flex flex-col pt-[8px]">
