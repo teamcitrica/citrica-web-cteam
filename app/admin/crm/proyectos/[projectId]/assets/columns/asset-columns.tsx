@@ -5,7 +5,6 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  Avatar,
 } from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 
@@ -14,15 +13,6 @@ type AssetColumnsConfig = {
   onEdit: (asset: Asset) => void;
   onDelete: (asset: Asset) => void;
 };
-
-function stringToColor(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const hue = hash % 360;
-  return `hsl(${hue}, 65%, 50%)`;
-}
 
 export const getAssetColumns = ({
   onView,
@@ -35,27 +25,9 @@ export const getAssetColumns = ({
     sortable: true,
     render: (asset) => {
       const name = asset.name || "Sin nombre";
-      const color = stringToColor(name);
-      const initials = name
-        .split(" ")
-        .map((word) => word[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2);
 
       return (
-        <div className="flex items-center gap-3">
-          <Avatar
-            name={initials}
-            size="sm"
-            style={{ backgroundColor: color, color: "white" }}
-            classNames={{
-              base: "flex-shrink-0",
-              name: "text-xs font-semibold",
-            }}
-          />
-          <div className="text-[#16305A] font-medium">{name}</div>
-        </div>
+        <div className="text-[#16305A] font-medium">{name}</div>
       );
     },
   },
@@ -98,7 +70,6 @@ export const getAssetColumns = ({
           <DropdownMenu aria-label="Acciones del asset">
             <DropdownItem
               key="edit"
-              startContent={<Icon className="w-4 h-4 text-green-500" name="SquarePen" />}
               onPress={() => onEdit(asset)}
             >
               Editar
@@ -107,7 +78,6 @@ export const getAssetColumns = ({
               key="delete"
               className="text-danger"
               color="danger"
-              startContent={<Icon className="w-4 h-4" name="Trash2" />}
               onPress={() => onDelete(asset)}
             >
               Eliminar

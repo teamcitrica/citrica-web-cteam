@@ -95,12 +95,58 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
 
         if (data.user && data.session) {
           console.log(data.user.id);
+
+          // Validar si el usuario tiene acceso activo
+          const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('id, active_users')
+            .eq('id', data.user.id)
+            .single();
+
+          if (userError) {
+            console.error("Error al obtener datos del usuario:", userError);
+            respError = {
+              message: "Error al verificar los datos del usuario. Intenta nuevamente.",
+              name: "UserDataError",
+              status: 500,
+            } as AuthError;
+            await supabase.auth.signOut({ scope: 'local' });
+            return { respData: null, respError };
+          }
+
+          // Validar que active_users sea true
+          if (!userData || userData.active_users !== true) {
+            console.log("Acceso denegado: usuario sin acceso activo");
+
+            // Cerrar la sesión
+            await supabase.auth.signOut({ scope: 'local' });
+
+            // Crear error personalizado
+            respError = {
+              message: "Usuario sin acceso al sistema",
+              name: "AccessDenied",
+              status: 403,
+            } as AuthError;
+
+            return { respData: null, respError };
+          }
+
+          console.log("✅ Acceso validado correctamente");
+
           setUserSession(data.session);
           await getUserInfo(data.user.id);
         }
       }
     } catch (error) {
-      console.log(error);
+      console.error("Error inesperado en signInWithPassword:", error);
+      // Si hay una excepción, asegurarse de establecer respError
+      if (!respError) {
+        respError = {
+          message: "Intenta nuevamente más tarde.",
+          name: "UnexpectedError",
+          status: 500,
+        } as AuthError;
+      }
     }
 
     return { respData, respError };
@@ -259,15 +305,31 @@ export const AuthContextProvider = ({ children }: { children: any }) => {
           return;
         }
 
+        // Manejar TOKEN_REFRESHED
+        if (event === 'TOKEN_REFRESHED') {
+          if (session) {
+            setUserSession(session);
+            // Reset lastUserIdFetched para permitir que getUserInfo se ejecute en el próximo refresh
+            setLastUserIdFetched(null);
+          }
+          return;
+        }
+
+        // Manejar SIGNED_OUT
+        if (event === 'SIGNED_OUT') {
+          setUserSession(null);
+          setUserInfo(null);
+          setLastUserIdFetched(null);
+          return;
+        }
+
+        // Para otros eventos
         if (session !== null) {
           setUserSession(session);
-          // Solo llamar getUserInfo en eventos como TOKEN_REFRESHED
-          if (event === 'TOKEN_REFRESHED' && !userInfo) {
-            getUserInfo(session.user.id);
-          }
         } else {
           setUserSession(null);
           setUserInfo(null);
+          setLastUserIdFetched(null);
         }
       },
     );

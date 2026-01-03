@@ -14,17 +14,28 @@ export interface Contact {
   phone: string | null;
   name: string | null;
   user_id: string | null;
-  has_system_access: boolean | null;
   type_id: number | null;
-  active_users: boolean | null;
+  code: string | null;
+  email_access: string | null;
+  last_name: string | null;
+  birth_date: string | null;
+  country: string | null;
+  city: string | null;
+  active_users?: boolean;
   types_contact?: {
     id: number;
     name: string;
     description: string | null;
   };
+  user?: {
+    role?: {
+      id: number;
+      name: string;
+    };
+  };
 }
 
-export type ContactInput = Omit<Contact, "id" | "types_contact" | "active_users" | "tipo">;
+export type ContactInput = Omit<Contact, "id" | "types_contact" | "tipo">;
 
 export const useContactCRUD = () => {
   const { supabase } = useSupabase();
@@ -36,13 +47,20 @@ export const useContactCRUD = () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase
-        .from("contact_clients")
+        .from("contact")
         .select(`
           *,
           types_contact (
             id,
             name,
             description
+          ),
+          users!user_id (
+            active_users,
+            role:role_id (
+              id,
+              name
+            )
           )
         `)
         .order("name", { ascending: true });
@@ -56,7 +74,16 @@ export const useContactCRUD = () => {
         });
         return;
       }
-      setContacts(data || []);
+      // Transformar los datos para incluir active_users y user con role del usuario relacionado
+      const transformedData = (data || []).map((contact: any) => ({
+        ...contact,
+        active_users: contact.users?.active_users,
+        user: contact.users ? {
+          role: contact.users.role
+        } : undefined,
+        users: undefined, // Remover el objeto users anidado
+      }));
+      setContacts(transformedData);
     } catch (err) {
       console.error("Error en fetchContacts:", err);
     } finally {
@@ -69,13 +96,20 @@ export const useContactCRUD = () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase
-        .from("contact_clients")
+        .from("contact")
         .select(`
           *,
           types_contact (
             id,
             name,
             description
+          ),
+          users!user_id (
+            active_users,
+            role:role_id (
+              id,
+              name
+            )
           )
         `)
         .eq("id", id)
@@ -86,7 +120,15 @@ export const useContactCRUD = () => {
         return null;
       }
 
-      return data;
+      // Transformar datos para incluir active_users y user con role
+      return {
+        ...data,
+        active_users: (data as any).users?.active_users,
+        user: (data as any).users ? {
+          role: (data as any).users.role
+        } : undefined,
+        users: undefined,
+      };
     } catch (err) {
       console.error("Error en fetchContactById:", err);
       return null;
@@ -101,7 +143,7 @@ export const useContactCRUD = () => {
       setIsLoading(true);
 
       const { data, error } = await supabase
-        .from("contact_clients")
+        .from("contact")
         .insert([newContact])
         .select();
 
@@ -137,7 +179,7 @@ export const useContactCRUD = () => {
       setIsLoading(true);
 
       const { data, error } = await supabase
-        .from("contact_clients")
+        .from("contact")
         .update(updatedFields)
         .eq("id", id)
         .select();
@@ -179,7 +221,7 @@ export const useContactCRUD = () => {
       setIsLoading(true);
 
       const { error } = await supabase
-        .from("contact_clients")
+        .from("contact")
         .delete()
         .eq("id", id);
 

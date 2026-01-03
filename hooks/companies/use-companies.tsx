@@ -19,9 +19,18 @@ export interface Company {
   street_or_avenue: string | null;
   address_number: string | null;
   contact_position: string | null;
+  type_id: number | null;
+  zip_code: string | null;
+  website: string | null;
+  sector: string | null;
+  types_contact?: {
+    name: string;
+  } | null;
 }
 
 export type CompanyInput = Omit<Company, "id" | "created_at">;
+
+
 
 export const useCompanyCRUD = () => {
   const { supabase } = useSupabase();
@@ -34,7 +43,7 @@ export const useCompanyCRUD = () => {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("company")
-        .select("*")
+        .select("*, types_contact(name)")
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -60,7 +69,7 @@ export const useCompanyCRUD = () => {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("company")
-        .select("*")
+        .select("*, types_contact(name)")
         .eq("id", id)
         .single();
 

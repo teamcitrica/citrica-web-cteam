@@ -6,17 +6,20 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
+  Tooltip,
 } from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { ExportColumn } from "@/shared/hooks/useTableFeatures";
-import { Contact } from "@/hooks/contacts-clients/use-contacts-clients";
+import { Contact } from "@/hooks/contact/use-contact";
+import { Text } from "@/shared/components/citrica-ui";
 
 type ContactColumnsConfig = {
   getCompanyName: (companyId: number | null) => string;
   onView: (contact: Contact) => void;
   onEdit: (contact: Contact) => void;
   onDelete: (contact: Contact) => void;
+  onAccessCredentials: (contact: Contact) => void;
 };
 
 type ContactExportConfig = {
@@ -63,6 +66,7 @@ export const getContactColumns = ({
   onView,
   onEdit,
   onDelete,
+  onAccessCredentials,
 }: ContactColumnsConfig): Column<Contact>[] => [
   {
     name: "NOMBRE Y CARGO",
@@ -78,23 +82,43 @@ export const getContactColumns = ({
           name={getInitials(contact.name || "?")}
           size="sm"
         />
-        <div className="flex flex-col items-start gap-1">
-          <div className="text-[#16305A] font-medium">{contact.name || "-"}</div>
-          <div className="text-[#678CC5] text-sm">{contact.cargo || "-"}</div>
+        <div className="flex flex-col items-start">
+          <div className="flex items-center gap-2">
+            <Text variant="body" weight="bold" color="#16305A">{contact.name || "-"}</Text>
+            {contact.user_id !== null && (
+              <Tooltip
+                content={
+                  contact.active_users
+                    ? "Usuario con acceso activo"
+                    : "Usuario sin acceso activo"
+                }
+                delay={200}
+                closeDelay={0}
+              >
+                <div className="flex items-center">
+                  <Icon
+                    className={`w-4 h-4 ${contact.active_users ? "text-green-600" : "text-[#b5b5b5]"}`}
+                    name="ShieldCheck"
+                  />
+                </div>
+              </Tooltip>
+            )}
+          </div>
+          <Text variant="label" color="#678CC5">{contact.cargo || "-"}</Text>
         </div>
       </div>
     ),
   },
   {
-    name: "EMPRESA Y LOCACIÓN",
+    name: "EMPRESA",
     uid: "company",
     sortable: false,
     render: (contact) => (
-      <div className="flex flex-col gap-1 items-start">
+      <div className="flex flex-col items-start">
         <div className="text-[#16305A] font-medium">
-          {getCompanyName(contact.company_id)}
+          <Text variant="body" weight="bold" color="#16305A">{getCompanyName(contact.company_id)}</Text>
         </div>
-        <div className="text-[#678CC5] text-sm">{contact.address || "-"}</div>
+        <Text variant="label" color="#678CC5">{contact.types_contact?.name || "-"}</Text>
       </div>
     ),
   },
@@ -103,7 +127,7 @@ export const getContactColumns = ({
     uid: "contact_info",
     sortable: false,
     render: (contact) => (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col ">
         {contact.phone && (
           <a
             href={`https://wa.me/${contact.phone.replace(/\D/g, "")}`}
@@ -111,8 +135,8 @@ export const getContactColumns = ({
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-[#16305A] hover:text-green-700"
           >
-            <Icon className="w-4 h-4" name="Phone" />
-            <span className="text-sm">{contact.phone}</span>
+            <Icon size={12} name="Phone" />
+            <Text variant="body" weight="bold" color="#16305A">{contact.phone}</Text>
           </a>
         )}
         {contact.email && (
@@ -120,8 +144,8 @@ export const getContactColumns = ({
             href={`mailto:${contact.email}`}
             className="flex items-center gap-2 text-[#678CC5] hover:text-blue-700"
           >
-            <Icon className="w-4 h-4" name="Mail" />
-            <span className="text-sm">{contact.email}</span>
+            <Icon size={12} name="Mail" />
+            <Text variant="label" color="#678CC5">{contact.email}</Text>
           </a>
         )}
         {!contact.phone && !contact.email && (
@@ -134,23 +158,36 @@ export const getContactColumns = ({
     name: "ACCIONES",
     uid: "actions",
     sortable: false,
+    align: "end",
     render: (contact) => (
-      <div className="relative flex justify-center items-center">
+      <div
+        className="relative flex justify-end items-center gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Button
+          isIconOnly
+          size="sm"
+          variant="light"
+          onPress={() => onView(contact)}
+          className="text-[#265197] hover:bg-blue-100"
+        >
+          <Icon className="w-5 h-5" name="Eye" />
+        </Button>
         <Dropdown>
           <DropdownTrigger>
             <Button isIconOnly size="sm" variant="light">
-              <Icon className="text-default-400 w-5 h-5" name="EllipsisVertical" />
+              <Icon className="text-[#265197] w-5 h-5" name="EllipsisVertical" />
             </Button>
           </DropdownTrigger>
           <DropdownMenu
             aria-label="Acciones del contacto"
             onAction={(key) => {
               switch (key) {
-                case "view":
-                  onView(contact);
-                  break;
                 case "edit":
                   onEdit(contact);
+                  break;
+                case "access-credentials":
+                  onAccessCredentials(contact);
                   break;
                 case "delete":
                   onDelete(contact);
@@ -158,23 +195,18 @@ export const getContactColumns = ({
               }
             }}
           >
-            <DropdownItem
-              key="view"
-              startContent={<Icon className="w-4 h-4 text-blue-500" name="Eye" />}
-            >
-              Ver
-            </DropdownItem>
-            <DropdownItem
-              key="edit"
-              startContent={<Icon className="w-4 h-4 text-green-500" name="SquarePen" />}
-            >
+            <DropdownItem className="text-[#265197]" key="edit">
               Editar
+            </DropdownItem>
+            <DropdownItem className="text-[#265197]"
+              key="access-credentials"
+            >
+              Accesos
             </DropdownItem>
             <DropdownItem
               key="delete"
               className="text-danger"
               color="danger"
-              startContent={<Icon className="w-4 h-4" name="Trash2" />}
             >
               Eliminar
             </DropdownItem>

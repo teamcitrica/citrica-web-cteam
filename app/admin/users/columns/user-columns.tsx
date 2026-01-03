@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
+  Tooltip,
 } from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
@@ -16,6 +17,7 @@ type UserColumnsConfig = {
   onView: (user: UserType) => void;
   onEdit: (user: UserType) => void;
   onDelete: (user: UserType) => void;
+  onAccessCredentials: (user: UserType) => void;
 };
 
 type UserExportConfig = Record<string, never>;
@@ -57,13 +59,19 @@ export const getUserColumns = ({
   onView,
   onEdit,
   onDelete,
+  onAccessCredentials,
 }: UserColumnsConfig): Column<UserType>[] => [
   {
     name: "USUARIO",
     uid: "usuario",
     sortable: true,
     render: (user) => {
-      const userName = user.full_name || user.name || `${user.first_name || ""} ${user.last_name || ""}`.trim();
+      const userName =
+        user.full_name ||
+        user.name ||
+        `${user.first_name || ""} ${user.last_name || ""}`.trim();
+      const isActive = user.active_users === true;
+
       return (
         <div className="flex items-center gap-3">
           <Avatar
@@ -74,7 +82,30 @@ export const getUserColumns = ({
             name={getInitials(userName || "?")}
             size="sm"
           />
-          <div className="text-black font-medium">{userName || "-"}</div>
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2">
+              <span className="text-black font-medium">{userName || "-"}</span>
+              {user.active_users !== undefined && (
+                <Tooltip
+                  content={
+                    isActive
+                      ? "Usuario con acceso activo"
+                      : "Usuario sin acceso activo"
+                  }
+                  delay={200}
+                  closeDelay={0}
+                >
+                  <div className="flex items-center">
+                    <Icon
+                      className={`w-4 h-4 ${isActive ? "text-green-600" : "text-[#b5b5b5]"}`}
+                      name="ShieldCheck"
+                    />
+                  </div>
+                </Tooltip>
+              )}
+            </div>
+            <span className="text-[#678CC5] text-xs">{user.cargo || "-"}</span>
+          </div>
         </div>
       );
     },
@@ -84,29 +115,18 @@ export const getUserColumns = ({
     uid: "empresa",
     sortable: true,
     render: (user) => (
-      <div className="flex flex-col gap-1 text-left">
-        <div className="text-black font-medium">
-          {user.company?.name || "-"}
-        </div>
-        <div className="flex items-center gap-1 text-gray-500 text-xs">
-          <Icon className="w-3 h-3" name="Mail" />
-          <span>{user.email || "-"}</span>
-        </div>
+      <div className="text-black font-medium">
+        {user.company?.name || "-"}
       </div>
     ),
   },
   {
-    name: "ROL Y ACCESO",
+    name: "ROL",
     uid: "rol_acceso",
     sortable: true,
     render: (user) => (
-      <div className="flex flex-col gap-1 text-left">
-        <div className="text-black font-medium capitalize">
-          {user.role?.name || "-"}
-        </div>
-        <div className="text-gray-500 text-xs">
-          Accesos: {user.user_metadata?.project_access_count || 0}
-        </div>
+      <div className="text-black font-medium capitalize">
+        {user.role?.name || "-"}
       </div>
     ),
   },
@@ -114,14 +134,15 @@ export const getUserColumns = ({
     name: "ACCIONES",
     uid: "actions",
     sortable: false,
+    align: "end",
     render: (user) => (
-      <div className="relative flex justify-center items-center gap-2">
+      <div className="relative flex justify-end items-end gap-2">
         <Button
           isIconOnly
           size="sm"
           variant="light"
           onPress={() => onView(user)}
-          className="text-blue-500 hover:bg-blue-100"
+          className="text-[#265197] hover:bg-blue-100"
         >
           <Icon className="w-5 h-5" name="Eye" />
         </Button>
@@ -129,7 +150,7 @@ export const getUserColumns = ({
           <DropdownTrigger>
             <Button isIconOnly size="sm" variant="light">
               <Icon
-                className="text-default-400 w-5 h-5"
+                className="text-[#265197] w-5 h-5"
                 name="EllipsisVertical"
               />
             </Button>
@@ -141,26 +162,25 @@ export const getUserColumns = ({
                 case "edit":
                   onEdit(user);
                   break;
+                case "access-credentials":
+                  onAccessCredentials(user);
+                  break;
                 case "delete":
                   onDelete(user);
                   break;
               }
             }}
           >
-            <DropdownItem
-              key="edit"
-              startContent={
-                <Icon className="w-4 h-4 text-green-500" name="SquarePen" />
-              }
-            >
+            <DropdownItem className="text-[#265197]" key="edit">
               Editar
             </DropdownItem>
             <DropdownItem
-              key="delete"
-              className="text-danger"
-              color="danger"
-              startContent={<Icon className="w-4 h-4" name="Trash2" />}
+              className="text-[#265197]"
+              key="access-credentials"
             >
+              Accesos
+            </DropdownItem>
+            <DropdownItem key="delete" className="text-danger" color="danger">
               Eliminar
             </DropdownItem>
           </DropdownMenu>
@@ -172,7 +192,7 @@ export const getUserColumns = ({
 
 export const getUserExportColumns = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _config?: UserExportConfig
+  _config?: UserExportConfig,
 ): ExportColumn[] => [
   {
     header: "NOMBRE",

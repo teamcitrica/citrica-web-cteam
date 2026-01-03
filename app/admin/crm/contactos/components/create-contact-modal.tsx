@@ -1,30 +1,28 @@
 "use client";
 import { useState } from "react";
 import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Input,
   Select,
   SelectItem,
   Switch,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
+import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
+import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
+import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
 
-import { useContactCRUD, ContactInput } from "@/hooks/contacts-clients/use-contacts-clients";
+import { useContactCRUD, ContactInput } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 
 interface CreateContactModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 export default function CreateContactModal({
   isOpen,
   onClose,
+  onSuccess,
 }: CreateContactModalProps) {
   const { createContact, isLoading } = useContactCRUD();
   const { companies } = useCompanyCRUD();
@@ -36,8 +34,10 @@ export default function CreateContactModal({
     phone: null,
     company_id: null,
     user_id: null,
-    has_system_access: false,
     type_id: null,
+    code: null,
+    email_access: null,
+    last_name: null,
   });
 
   const handleInputChange = (field: keyof ContactInput, value: string | number) => {
@@ -48,10 +48,28 @@ export default function CreateContactModal({
   };
 
   const handleSubmit = async () => {
+    if (!formData.company_id) {
+      addToast({
+        title: "Error",
+        description: "La empresa es requerida",
+        color: "danger",
+      });
+      return;
+    }
+
     if (!formData.name) {
       addToast({
         title: "Error",
         description: "El nombre del contacto es requerido",
+        color: "danger",
+      });
+      return;
+    }
+
+    if (!formData.email) {
+      addToast({
+        title: "Error",
+        description: "El email del contacto es requerido",
         color: "danger",
       });
       return;
@@ -68,9 +86,12 @@ export default function CreateContactModal({
           phone: null,
           company_id: null,
           user_id: null,
-          has_system_access: false,
           type_id: null,
+          code: null,
+          email_access: null,
+          last_name: null,
         });
+        onSuccess?.();
         onClose();
       }
     } catch (error) {
@@ -79,124 +100,134 @@ export default function CreateContactModal({
   };
 
   return (
-    <Modal
+    <DrawerCitricaAdmin
       isOpen={isOpen}
       onClose={onClose}
-      size="3xl"
-      scrollBehavior="inside"
-    >
-      <ModalContent>
-        <ModalHeader className="flex flex-col gap-1">
-          <h3 className="text-lg font-semibold text-gray-800">
-            Agregar Nuevo Contacto
-          </h3>
-        </ModalHeader>
-        <ModalBody>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Nombre del Contacto"
-              placeholder="Ingrese el nombre completo"
-              value={formData.name || ""}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              isRequired
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
-            />
-            <Input
-              label="Cargo"
-              placeholder="Cargo o posición"
-              value={formData.cargo || ""}
-              onChange={(e) => handleInputChange("cargo", e.target.value)}
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
-            />
-            <Input
-              label="Email"
-              placeholder="correo@ejemplo.com"
-              type="email"
-              value={formData.email || ""}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
-            />
-            <Input
-              label="Teléfono"
-              placeholder="Número de teléfono"
-              value={formData.phone || ""}
-              onChange={(e) => handleInputChange("phone", e.target.value)}
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
-            />
-            <Input
-              label="Dirección"
-              placeholder="Dirección completa"
-              value={formData.address || ""}
-              onChange={(e) => handleInputChange("address", e.target.value)}
-              classNames={{
-                label: "text-gray-700",
-                input: "text-gray-800",
-              }}
-            />
-            <Select
-              label="Empresa"
-              placeholder="Seleccione una empresa"
-              selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
-              onSelectionChange={(keys) => {
-                const selected = Array.from(keys)[0];
-                setFormData((prev) => ({
-                  ...prev,
-                  company_id: selected ? Number(selected) : null,
-                  has_system_access: selected && Number(selected) === 1 ? false : prev.has_system_access,
-                }));
-              }}
-              classNames={{
-                label: "text-gray-700",
-                value: "text-gray-800",
-              }}
-            >
-              {companies.map((company) => (
-                <SelectItem key={String(company.id)}>
-                  {company.name || `Empresa ${company.id}`}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
-
-          {formData.company_id && formData.company_id !== 1 && (
-            <div className="mt-4">
-              <Switch
-                isSelected={formData.has_system_access || false}
-                onValueChange={(value) => handleInputChange("has_system_access", value as any)}
-                classNames={{
-                  label: "text-gray-700",
-                }}
-              >
-                Dar acceso al sistema
-              </Switch>
-            </div>
-          )}
-        </ModalBody>
-        <ModalFooter>
-          <Button color="danger" variant="light" onPress={onClose}>
-            Cancelar
-          </Button>
-          <Button
-            className="bg-[#42668A] text-white"
+      title="AGREGAR CONTACTO"
+      footer={
+        <>
+          <ButtonCitricaAdmin
+            variant="secondary"
+            onPress={onClose}
+            className="w-[162px]"
+          >
+           Cerrar
+          </ButtonCitricaAdmin>
+          <ButtonCitricaAdmin
+            variant="primary"
+            className="bg-[#42668A] w-[162px]"
             onPress={handleSubmit}
             isLoading={isLoading}
           >
-            Crear Contacto
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+            Agregar
+          </ButtonCitricaAdmin>
+        </>
+      }
+    >
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-4 ">
+        <Select
+          label="Empresa"
+          placeholder="Seleccione una empresa"
+          selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0];
+            setFormData((prev) => ({
+              ...prev,
+              company_id: selected ? Number(selected) : null,
+            }));
+          }}
+          classNames={{
+            label: "!text-[#265197]",
+            value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
+            trigger: "bg-white !border-[#D4DEED]",
+            selectorIcon: "text-[#678CC5]",
+          }}
+          isRequired
+        >
+          {companies.map((company) => (
+            <SelectItem key={String(company.id)} className="text-[#265197]">
+              {company.name || `Empresa ${company.id}`}
+            </SelectItem>
+          ))}
+        </Select>
+        <Select
+          label="Relación"
+          placeholder="Seleccione una empresa"
+          selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0];
+            setFormData((prev) => ({
+              ...prev,
+              company_id: selected ? Number(selected) : null,
+            }));
+          }}
+          classNames={{
+            label: "!text-[#265197]",
+            value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
+            trigger: "bg-white !border-[#D4DEED]",
+            selectorIcon: "text-[#678CC5]",
+          }}
+          isRequired
+        >
+          {companies.map((company) => (
+            <SelectItem key={String(company.id)} className="text-[#265197]">
+              Relación: Cliente, Proveedor, Interno
+            </SelectItem>
+          ))}
+        </Select>
+        <InputCitricaAdmin
+          label="Nombre del Contacto"
+          placeholder="Ingrese el nombre completo"
+          value={formData.name || ""}
+          onChange={(e) => handleInputChange("name", e.target.value)}
+          isRequired
+        />
+        <InputCitricaAdmin
+          label="Cargo"
+          placeholder="Cargo o posición"
+          value={formData.cargo || ""}
+          onChange={(e) => handleInputChange("cargo", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="Email"
+          placeholder="correo@ejemplo.com"
+          type="email"
+          value={formData.email || ""}
+          onChange={(e) => handleInputChange("email", e.target.value)}
+          isRequired
+        />
+        <InputCitricaAdmin
+          label="WhatsApp"
+          placeholder="Número de teléfono"
+          value={formData.phone || ""}
+          onChange={(e) => handleInputChange("phone", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="Fecha de cumpleaños"
+          placeholder="Fecha de cumpleaños"
+          value="."
+          //onChange={(e) => handleInputChange("phone", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="País"
+          placeholder="País"
+          value="."
+          //onChange={(e) => handleInputChange("country", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="Ciudad"
+          placeholder="Ciudad"
+          value="."
+          //onChange={(e) => handleInputChange("city", e.target.value)}
+        />
+        <InputCitricaAdmin
+          label="Dirección"
+          placeholder="Dirección completa"
+          value={formData.address || ""}
+          onChange={(e) => handleInputChange("address", e.target.value)}
+        />
+
+      </div>
+    </DrawerCitricaAdmin>
   );
 }

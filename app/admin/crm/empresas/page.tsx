@@ -10,6 +10,10 @@ import { getCompanyColumns, getCompanyExportColumns } from "./columns/company-co
 import { useCompanyCRUD, Company } from "@/hooks/companies/use-companies";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Col, Container } from "@/styles/07-objects/objects";
+import { Text } from "@/shared/components/citrica-ui";
+import { createBuilding } from "@/public/icon-svg/icon-create-building";
+import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
+import { Divider } from "@heroui/react";
 
 export default function EmpresasPage() {
   const { companies, isLoading, refreshCompanies, deleteCompany } = useCompanyCRUD();
@@ -19,11 +23,29 @@ export default function EmpresasPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null);
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+
+  // IDs de tipos de contacto
+  const CLIENTE_TYPE_ID = 1;
+  const PROVEEDOR_TYPE_ID = 5;
+
+  // Filtrar empresas por tipo seleccionado
+  const filteredCompanies = useMemo(() => {
+    if (typeFilter === "cliente") {
+      return companies.filter((company) => company.type_id === CLIENTE_TYPE_ID);
+    } else if (typeFilter === "proveedor") {
+      return companies.filter((company) => company.type_id === PROVEEDOR_TYPE_ID);
+    }
+    return companies;
+  }, [companies, typeFilter]);
 
   const handleOpenCreateModal = () => setIsCreateModalOpen(true);
 
   const handleCloseCreateModal = () => {
     setIsCreateModalOpen(false);
+  };
+
+  const handleCreateSuccess = () => {
     refreshCompanies();
   };
 
@@ -74,22 +96,23 @@ export default function EmpresasPage() {
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div className="p-4">
-          <h1 className="text-2xl font-bold text-[#265197] mb-6">
-            <span className="text-[#678CC5]">CRM</span> {'>'} Gestión de Empresas
+        <div className="">
+          <h1 className="text-2xl font-bold text-[#265197] mb-5">
+            <Text variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text variant="title" weight="bold" color="#265197">Empresas</Text>
           </h1>
 
           <DataTable<Company>
-            data={companies}
+            data={filteredCompanies}
             columns={columns}
             isLoading={isLoading}
             searchFields={[]}
             onAdd={handleOpenCreateModal}
             addButtonText="Agregar Empresa"
+            addButtonIcon={createBuilding()} 
             emptyContent="No se encontraron empresas"
-            headerColor="#42668A"
+            headerColor="#265197"
             headerTextColor="#ffffff"
-            paginationColor="#42668A"
+            paginationColor="#265197"
             getRowKey={(company) => company.id}
             enableExport={true}
             exportColumns={exportColumns}
@@ -100,11 +123,29 @@ export default function EmpresasPage() {
             companies={companies}
             companyFilterField="id"
             companyFilterPlaceholder="Filtrar por empresa"
+            customFilters={
+              <div className="w-full flex flex-col">
+                <div className="pb-4" style={{ width: "280px" }}>
+                  <FilterButtonGroup
+                    buttons={[
+                      { value: "all", label: "Todas" },
+                      { value: "cliente", label: "Clientes" },
+                      { value: "proveedor", label: "Proveedores" },
+                    ]}
+                    selectedValue={typeFilter}
+                    onValueChange={setTypeFilter}
+                    height="38px"
+                  />
+                </div>
+                <Divider className="bg-[#D4DEED]"/>
+              </div>
+            }
           />
 
           <CreateCompanyModal
             isOpen={isCreateModalOpen}
             onClose={handleCloseCreateModal}
+            onSuccess={handleCreateSuccess}
           />
 
           {isDetailModalOpen && selectedCompany && (
@@ -114,6 +155,7 @@ export default function EmpresasPage() {
                 setIsDetailModalOpen(false);
                 setSelectedCompany(null);
               }}
+            
             />
           )}
 
@@ -124,8 +166,8 @@ export default function EmpresasPage() {
               onClose={() => {
                 setIsEditModalOpen(false);
                 setSelectedCompany(null);
-                refreshCompanies();
               }}
+              onSuccess={handleCreateSuccess}
             />
           )}
 

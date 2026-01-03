@@ -8,6 +8,10 @@ export interface Project {
   id: string;
   name: string | null;
   company_id: number | null;
+  company?: {
+    id: number;
+    name: string | null;
+  };
   status: string | null;
   nombre_responsable: string | null;
   email_responsable: string | null;
@@ -15,22 +19,44 @@ export interface Project {
   tabla: string | null;
   supabase_url: string | null;
   supabase_anon_key: string | null;
+  access_count?: number;
+  asset_count?: number;
+  created_at?: string;
+  created_by?: string;
+  created_by_user?: {
+    id: string;
+    first_name: string | null;
+    last_name: string | null;
+    email: string;
+  };
 }
 
-export type ProjectInput = Omit<Project, "id">;
+export type ProjectInput = Omit<Project, "id" | "company">;
 
 export const useProjectCRUD = () => {
   const { supabase } = useSupabase();
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Leer: Traer todos los proyectos de la tabla
+  // Leer: Traer todos los proyectos de la tabla con información de la empresa
   const fetchProjects = useCallback(async () => {
     try {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("projects")
-        .select("*");
+        .select(`
+          *,
+          company:company_id (
+            id,
+            name
+          ),
+          created_by_user:users!created_by (
+            id,
+            first_name,
+            last_name,
+            email
+          )
+        `);
 
       if (error) {
         console.error("Error al obtener proyectos:", error);
@@ -41,7 +67,31 @@ export const useProjectCRUD = () => {
         });
         return;
       }
-      setProjects(data || []);
+
+      // Obtener conteos de accesos y assets para cada proyecto
+      const projectsWithCounts = await Promise.all(
+        (data || []).map(async (project) => {
+          // Conteo de accesos
+          const { count: accessCount } = await supabase
+            .from("proyect_acces")
+            .select("*", { count: "exact", head: true })
+            .eq("project_id", project.id);
+
+          // Conteo de assets
+          const { count: assetCount } = await supabase
+            .from("assets")
+            .select("*", { count: "exact", head: true })
+            .eq("project_id", project.id);
+
+          return {
+            ...project,
+            access_count: accessCount || 0,
+            asset_count: assetCount || 0,
+          };
+        })
+      );
+
+      setProjects(projectsWithCounts);
     } catch (err) {
       console.error("Error en fetchProjects:", err);
     } finally {
@@ -78,9 +128,19 @@ export const useProjectCRUD = () => {
     try {
       setIsLoading(true);
 
+      // Obtener el usuario actual
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData?.user?.id;
+
+      // Agregar created_by al proyecto
+      const projectWithCreator = {
+        ...newProject,
+        created_by: userId || null,
+      };
+
       const { data, error } = await supabase
         .from("projects")
-        .insert([newProject])
+        .insert([projectWithCreator])
         .select();
 
       if (error) {
@@ -194,6 +254,7 @@ export const useProjectCRUD = () => {
 
   useEffect(() => {
     fetchProjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

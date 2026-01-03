@@ -1,5 +1,5 @@
 export type SiteConfig = typeof siteConfig;
-import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck, Calendar, UserStar, Sparkles } from "lucide-react"
+import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck, Calendar, UserStar, Sparkles, Folder } from "lucide-react"
 
 const ROL_ADMIN = 1;
 const ROL_USER = 2;
@@ -45,7 +45,7 @@ export const siteConfig = {
 			href: "/admin/ia",
 			allowedRoles: [ROL_ADMIN],
 			subItems: [
-				{
+				{ 
 					title: "Databases RAG",
 					href: "/admin/ia/databases_rag",
 				},
@@ -63,8 +63,8 @@ export const siteConfig = {
 			allowedRoles: [ROL_ADMIN],
 			subItems: [
 				{
-					title: "Reservas",
-					href: "/admin/agenda/reservas",
+					title: "Calendario",
+					href: "/admin/agenda/calendario",
 				},
 				{
 					title: "Disponibilidad",
@@ -75,6 +75,41 @@ export const siteConfig = {
 					href: "/admin/agenda/configuracion",
 				},
 			],
+		},
+		{
+			title: "CRM",
+			icon: "UserStar",
+			href: "/admin/crm",
+			allowedRoles: [ROL_ADMIN],
+			subItems: [
+				{
+					title: "Contactos",
+					href: "/admin/crm/contactos",
+				},
+				{
+					title: "Empresas",
+					href: "/admin/crm/empresas",
+				},
+				// {
+				// 	title: "Reuniones",
+				// 	href: "/admin/crm/reuniones",
+				// },
+				{
+					title: "Proyectos",
+					href: "/admin/crm/proyectos",
+				},
+				// {
+				// 	title: "Configuración",
+				// 	href: "/admin/crm/configuracion",
+				// },
+			],
+		},
+		{
+			title: "PROYECTOS",
+			icon: "Folder",
+			href: "/admin/client/mis-datos",
+			allowedRoles: [ROL_CLIENTE],
+			subItems: [],
 		},
 		{
 			title: "CMS",
@@ -95,41 +130,6 @@ export const siteConfig = {
 					href: "/admin/CMS/configuracion",
 				},
 			],
-		},
-		{
-			title: "CRM",
-			icon: "UserStar",
-			href: "/admin/crm",
-			allowedRoles: [ROL_ADMIN],
-			subItems: [
-				{
-					title: "Contactos",
-					href: "/admin/crm/contactos",
-				},
-				{
-					title: "Empresas",
-					href: "/admin/crm/empresas",
-				},
-				{
-					title: "Reuniones",
-					href: "/admin/crm/reuniones",
-				},
-				{
-					title: "Proyectos",
-					href: "/admin/crm/proyectos",
-				},
-				{
-					title: "Configuración",
-					href: "/admin/crm/configuracion",
-				},
-			],
-		},
-		{
-			title: "MIS DATOS",
-			icon: "ClipboardCheck",
-			href: "/admin/client/mis-datos",
-			allowedRoles: [ROL_CLIENTE],
-			subItems: [],
 		},
 
 	],

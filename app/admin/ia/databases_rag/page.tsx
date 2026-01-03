@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { InputCitricaAdmin, ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
+import { Card, CardHeader, CardBody, CardFooter, Skeleton } from "@heroui/react";
+import { addToast } from "@heroui/toast";
 import {
   Database,
   Upload,
@@ -43,7 +45,7 @@ export default function DatabasesRAGPage() {
   const [newStorageName, setNewStorageName] = useState("");
   const [newStorageDescription, setNewStorageDescription] = useState("");
   const [selectedStorage, setSelectedStorage] = useState<DocumentStorage | null>(null);
-  const [uploadingFiles, setUploadingFiles] = useState(false);
+  const [uploadingFiles, setUploadingFiles] = useState<Record<string, boolean>>({});
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [storageToDelete, setStorageToDelete] = useState<DocumentStorage | null>(null);
 
@@ -113,7 +115,7 @@ export default function DatabasesRAGPage() {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    setUploadingFiles(true);
+    setUploadingFiles(prev => ({ ...prev, [storageId]: true }));
 
     try {
       // Procesar cada archivo
@@ -137,13 +139,21 @@ export default function DatabasesRAGPage() {
         console.log("Upload result:", result);
       }
 
-      alert(`✅ ${files.length} archivo(s) procesado(s) exitosamente`);
+      addToast({
+        title: "Éxito",
+        description: `${files.length} archivo(s) procesado(s) exitosamente`,
+        color: "success",
+      });
       await fetchStorages(); // Recargar lista
     } catch (error: any) {
       console.error("Error uploading files:", error);
-      alert(`❌ Error: ${error.message || "Error al procesar archivos"}`);
+      addToast({
+        title: "Error",
+        description: error.message || "Error al procesar archivos",
+        color: "danger",
+      });
     } finally {
-      setUploadingFiles(false);
+      setUploadingFiles(prev => ({ ...prev, [storageId]: false }));
     }
   };
 
@@ -198,7 +208,7 @@ export default function DatabasesRAGPage() {
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div className="p-4">
+        <div>
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-[#265197] mb-2">
@@ -237,99 +247,30 @@ export default function DatabasesRAGPage() {
 
           {/* Grid de Storage Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {storages.map((storage) => (
-              <div
-                key={storage.id}
-                className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden"
-              >
-                {/* Card Header */}
-                <div className="bg-gradient-to-r from-[#265197] to-[#42668A] p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                      <Database className="w-6 h-6 text-white" />
-                      <h3 className="text-white font-bold text-lg truncate">
-                        {storage.name}
-                      </h3>
-                    </div>
-                    <button
-                      onClick={() => openDeleteModal(storage)}
-                      className="text-white hover:text-red-300 transition-colors"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                  <p className="text-blue-100 text-sm mt-1">
-                    {storage.description}
-                  </p>
-                </div>
-
-                {/* Card Body */}
-                <div className="p-4">
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-xs text-gray-500 mb-1">Archivos</div>
-                      <div className="text-xl font-bold text-[#265197]">
-                        {storage.fileCount}
+            {/* Skeleton Loader */}
+            {isLoading ? (
+              <>
+                {[1, 2, 3].map((i) => (
+                  <Card key={i} className="w-full">
+                    <CardHeader className="bg-gradient-to-r from-[#265197] to-[#42668A] p-4">
+                      <Skeleton className="w-3/4 h-6 rounded-lg bg-white/20" />
+                    
+                    </CardHeader>
+                    <CardBody className="p-4">
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        <Skeleton className="w-full h-16 rounded-lg" />
+                        <Skeleton className="w-full h-16 rounded-lg" />
                       </div>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <div className="text-xs text-gray-500 mb-1">Tamaño</div>
-                      <div className="text-xl font-bold text-[#265197]">
-                        {formatFileSize(storage.totalSize)}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Estado */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Estado:</span>
-                      <div className="flex items-center gap-1">
-                        {getStatusIcon(storage.status)}
-                        <span className="text-xs font-medium">
-                          {getStatusText(storage.status)}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Creado: {new Date(storage.createdAt).toLocaleDateString("es-ES")}
-                    </div>
-                  </div>
-
-                  {/* Upload Button */}
-                  <label
-                    className={`w-full flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-[#265197] text-[#265197] rounded-lg hover:bg-blue-50 transition-colors cursor-pointer ${uploadingFiles ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
-                  >
-                    {uploadingFiles ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        <span className="text-sm font-medium">Subiendo...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-5 h-5" />
-                        <span className="text-sm font-medium">
-                          Subir Archivos
-                        </span>
-                      </>
-                    )}
-                    <input
-                      type="file"
-                      multiple
-                      accept=".pdf,.txt,.doc,.docx,.md"
-                      onChange={(e) => handleFileUpload(storage.id, e)}
-                      disabled={uploadingFiles}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-              </div>
-            ))}
-
-            {/* Empty State */}
-            {storages.length === 0 && (
+                      <Skeleton className="w-full h-4 rounded-lg mb-2" />
+                      <Skeleton className="w-2/3 h-4 rounded-lg mb-4" />
+                    </CardBody>
+                    <CardFooter className="p-4 pt-0">
+                      <Skeleton className="w-full h-10 rounded-lg" />
+                    </CardFooter>
+                  </Card>
+                ))}
+              </>
+            ) : storages.length === 0 ? (
               <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
                 <FolderOpen className="w-16 h-16 text-gray-300 mb-3" />
                 <h3 className="text-lg font-semibold text-gray-600 mb-1">
@@ -339,6 +280,110 @@ export default function DatabasesRAGPage() {
                   Crea tu primer storage para comenzar a subir documentos
                 </p>
               </div>
+            ) : (
+              storages.map((storage) => (
+                <Card
+                  key={storage.id}
+                  onPress={() => setSelectedStorage(storage)}
+                  className="w-full hover:scale-[1.02] transition-transform"
+                >
+                  <CardHeader className="bg-gradient-to-r from-[#265197] to-[#42668A] p-4 flex-col items-start">
+                    <div className="flex items-start justify-between w-full">
+                      <div className="flex items-center gap-2">
+                        <Database className="w-6 h-6 text-white" />
+                        <h3 className="text-white font-bold text-lg truncate">
+                          {storage.name}
+                        </h3>
+                      </div>
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDeleteModal(storage);
+                        }}
+                        className="text-white hover:text-red-300 transition-colors cursor-pointer"
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.stopPropagation();
+                            openDeleteModal(storage);
+                          }
+                        }}
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </div>
+                    </div>
+                    <p className="text-blue-100 text-sm mt-1">
+                      {storage.description}
+                    </p>
+                  </CardHeader>
+
+                  <CardBody className="p-4">
+                    {/* Stats */}
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-xs text-gray-500 mb-1">Archivos</div>
+                        <div className="text-xl font-bold text-[#265197]">
+                          {storage.fileCount}
+                        </div>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <div className="text-xs text-gray-500 mb-1">Tamaño</div>
+                        <div className="text-xl font-bold text-[#265197]">
+                          {formatFileSize(storage.totalSize)}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Estado */}
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Estado:</span>
+                        <div className="flex items-center gap-1">
+                          {getStatusIcon(storage.status)}
+                          <span className="text-xs font-medium">
+                            {getStatusText(storage.status)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Creado: {new Date(storage.createdAt).toLocaleDateString("es-ES")}
+                      </div>
+                    </div>
+                  </CardBody>
+
+                  <CardFooter className="p-4 pt-0">
+                    {/* Upload Button */}
+                    <label
+                      onClick={(e) => e.stopPropagation()}
+                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-[#265197] text-[#265197] rounded-lg hover:bg-blue-50 transition-colors cursor-pointer ${uploadingFiles[storage.id] ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                    >
+                      {uploadingFiles[storage.id] ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <span className="text-sm font-medium">Subiendo...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-5 h-5" />
+                          <span className="text-sm font-medium">
+                            Subir Archivos
+                          </span>
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        multiple
+                        accept=".pdf,.txt,.doc,.docx,.md"
+                        onChange={(e) => handleFileUpload(storage.id, e)}
+                        disabled={uploadingFiles[storage.id]}
+                        className="hidden"
+                      />
+                    </label>
+                  </CardFooter>
+                </Card>
+              ))
             )}
           </div>
         </div>

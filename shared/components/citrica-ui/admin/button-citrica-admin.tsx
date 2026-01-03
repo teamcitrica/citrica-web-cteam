@@ -2,9 +2,11 @@
 import React from "react";
 import { Button as HeroUIButton, ButtonProps as HeroUIButtonProps } from "@heroui/react";
 
-export interface ButtonCitricaAdminProps extends Omit<HeroUIButtonProps, 'className' | 'variant'> {
-  variant?: "primary" | "secondary" | "export";
+export interface ButtonCitricaAdminProps
+  extends Omit<HeroUIButtonProps, 'variant'> {
+  variant?: "primary" | "secondary" | "export" |"modal"|"modalv2";
   children?: React.ReactNode;
+  className?: string;
 }
 
 /**
@@ -19,6 +21,7 @@ export const ButtonCitricaAdmin: React.FC<ButtonCitricaAdminProps> = ({
   variant = "primary",
   children,
   style,
+  className = "",
   ...props
 }) => {
   const getVariantStyles = () => {
@@ -26,9 +29,13 @@ export const ButtonCitricaAdmin: React.FC<ButtonCitricaAdminProps> = ({
       case "primary":
         return "text-white py-[6px] px-[6px] rounded-lg border-2 border-white";
       case "secondary":
-        return "bg-transparent text-gray-700 py-4";
+        return "border-[#42668A] border-[2px] bg-transparent text-[#42668A] rounded-[8px]";
       case "export":
         return "bg-transparent border-2 border-[#D4DEED] text-gray-700 py-4";
+         case "modal":
+        return "bg-[#265197] text-white py-4 w-[142px]";
+         case "modalv2":
+        return "bg-transparent border-2 border-[#265197] text-[#265197] py-4 w-[142px]";
       default:
         return "";
     }
@@ -36,7 +43,7 @@ export const ButtonCitricaAdmin: React.FC<ButtonCitricaAdminProps> = ({
 
   return (
     <HeroUIButton
-      className={getVariantStyles()}
+      className={`${getVariantStyles()} ${className}`.trim()}
       style={style}
       {...props}
     >

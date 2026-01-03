@@ -11,6 +11,7 @@ import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { ExportColumn } from "@/shared/hooks/useTableFeatures";
 import { Company } from "@/hooks/companies/use-companies";
+import { Text } from "@/shared/components/citrica-ui";
 
 type CompanyColumnsConfig = {
   onView: (company: Company) => void;
@@ -59,7 +60,7 @@ export const getCompanyColumns = ({
   onDelete,
 }: CompanyColumnsConfig): Column<Company>[] => [
   {
-    name: "EMPRESA",
+    name: "EMPRESA Y SECTOR",
     uid: "name",
     sortable: true,
     render: (company) => (
@@ -72,24 +73,26 @@ export const getCompanyColumns = ({
           name={getInitials(company.name || "?")}
           size="sm"
         />
-        <div className="text-[#16305A] font-medium">{company.name || "-"}</div>
+        <div className="flex flex-col">
+          <Text variant="body" weight="bold" color="#16305A">{company.name || "-"}</Text>
+          <Text variant="label" color="#678CC5" className="truncate max-w-[200px]">{company.sector || "-"}</Text>
+        </div>
       </div>
     ),
   },
   {
-    name: "UBICACIÓN Y SECTOR",
+    name: "RELACIÓN Y UBICACIÓN",
     uid: "location",
     sortable: false,
     render: (company) => {
       const location = [company.departament, company.country]
         .filter(Boolean)
         .join(", ") || "-";
+      const relation = company.types_contact?.name || "-";
       return (
-        <div className="flex flex-col gap-1 items-start">
-          <div className="text-[#16305A] font-medium">{location}</div>
-          <div className="text-[#678CC5] text-sm truncate max-w-[200px]">
-            {company.description || "-"}
-          </div>
+        <div className="flex flex-col items-start">
+          <Text variant="body" weight="bold" color="#16305A">{relation}</Text>
+          <Text variant="label" color="#678CC5">{location}</Text>
         </div>
       );
     },
@@ -99,7 +102,7 @@ export const getCompanyColumns = ({
     uid: "contact_info",
     sortable: false,
     render: (company) => (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col">
         {company.contact_phone && (
           <a
             href={`https://wa.me/${company.contact_phone.replace(/\D/g, "")}`}
@@ -107,8 +110,8 @@ export const getCompanyColumns = ({
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-[#16305A] hover:text-green-700"
           >
-            <Icon className="w-4 h-4" name="Phone" />
-            <span className="text-sm">{company.contact_phone}</span>
+            <Icon size={12} name="Phone" />
+            <Text variant="body" weight="bold" color="#16305A">{company.contact_phone}</Text>
           </a>
         )}
         {company.contact_email && (
@@ -116,8 +119,8 @@ export const getCompanyColumns = ({
             href={`mailto:${company.contact_email}`}
             className="flex items-center gap-2 text-[#678CC5] hover:text-blue-700"
           >
-            <Icon className="w-4 h-4" name="Mail" />
-            <span className="text-sm">{company.contact_email}</span>
+            <Icon size={12} name="Mail" />
+            <Text variant="label" color="#678CC5">{company.contact_email}</Text>
           </a>
         )}
         {!company.contact_phone && !company.contact_email && (
@@ -130,14 +133,15 @@ export const getCompanyColumns = ({
     name: "ACCIONES",
     uid: "actions",
     sortable: false,
+    align: "end",
     render: (company) => (
-      <div className="relative flex justify-center items-center gap-2">
+      <div className="relative flex justify-end items-end gap-2">
         <Button
           isIconOnly
           size="sm"
           variant="light"
           onPress={() => onView(company)}
-          className="text-blue-500 hover:bg-blue-100"
+          className="text-[#265197] hover:bg-blue-100"
         >
           <Icon className="w-5 h-5" name="Eye" />
         </Button>
@@ -145,7 +149,7 @@ export const getCompanyColumns = ({
           <DropdownTrigger>
             <Button isIconOnly size="sm" variant="light">
               <Icon
-                className="text-default-400 w-5 h-5"
+                className="text-[#265197] w-5 h-5"
                 name="EllipsisVertical"
               />
             </Button>
@@ -164,10 +168,8 @@ export const getCompanyColumns = ({
             }}
           >
             <DropdownItem
+              className="text-[#265197]"
               key="edit"
-              startContent={
-                <Icon className="w-4 h-4 text-green-500" name="SquarePen" />
-              }
             >
               Editar
             </DropdownItem>
@@ -175,7 +177,6 @@ export const getCompanyColumns = ({
               key="delete"
               className="text-danger"
               color="danger"
-              startContent={<Icon className="w-4 h-4" name="Trash2" />}
             >
               Eliminar
             </DropdownItem>
