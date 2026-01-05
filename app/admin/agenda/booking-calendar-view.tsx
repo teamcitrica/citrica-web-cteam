@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Text from "@ui/atoms/text";
-import Button from "@ui/molecules/button";
+import { Button, Text } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
 import Icon from "@ui/atoms/icon";
 import { Chip } from "@heroui/react";
@@ -103,7 +102,7 @@ const BookingCalendarView = () => {
             <Button
               size="sm"
               variant="secondary"
-              onClick={goToPreviousMonth}
+              onPress={goToPreviousMonth}
               startContent={<Icon name="ChevronLeft" size={16} />}
             >
               Anterior
@@ -111,14 +110,14 @@ const BookingCalendarView = () => {
             <Button
               size="sm"
               variant="secondary"
-              onClick={goToToday}
+              onPress={goToToday}
             >
               Hoy
             </Button>
             <Button
               size="sm"
               variant="secondary"
-              onClick={goToNextMonth}
+              onPress={goToNextMonth}
               endContent={<Icon name="ChevronRight" size={16} />}
             >
               Siguiente

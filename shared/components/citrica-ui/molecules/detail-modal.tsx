@@ -8,7 +8,7 @@ import {
   ModalFooter,
   Divider,
 } from "@heroui/react";
-import { Text } from "@/shared/components/citrica-ui";
+import { Text } from "citrica-ui-toolkit";
 
 interface DetailModalSection {
   title: string;

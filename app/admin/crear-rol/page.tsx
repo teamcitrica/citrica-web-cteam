@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@heroui/react";
+import { Button } from "citrica-ui-toolkit";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useUserRole, RoleType } from "@/hooks/role/use-role";
 import CreateRoleModal from "./components/modal-create-role";

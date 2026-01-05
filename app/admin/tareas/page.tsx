@@ -1,5 +1,5 @@
 import React from 'react'
-import Text from '@/shared/components/citrica-ui/atoms/text'
+import { Text } from 'citrica-ui-toolkit';
 
 const TareasPage = () => {
   return (

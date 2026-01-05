@@ -7,13 +7,12 @@ import {
   ModalBody,
   ModalFooter,
   Tooltip,
-  Button,
   Divider,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { Contact } from "@/hooks/contact/use-contact";
-import Text from "@/shared/components/citrica-ui/atoms/text";
+import { Text, Button } from "citrica-ui-toolkit";
 import Icon from "@/shared/components/citrica-ui/atoms/icon";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";

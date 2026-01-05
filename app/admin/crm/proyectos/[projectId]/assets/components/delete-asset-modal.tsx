@@ -5,13 +5,13 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Button,
   Divider,
 } from "@heroui/react";
 
 import { Asset } from "@/hooks/assets/use-assets";
-import { Icon, Text } from "@/shared/components/citrica-ui";
+import { Icon } from "@/shared/components/citrica-ui";
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
+import { Text } from "citrica-ui-toolkit";
 
 interface DeleteAssetModalProps {
   asset: Asset;

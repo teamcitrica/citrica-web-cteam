@@ -8,7 +8,7 @@ import {
   DrawerFooter,
   DrawerProps,
 } from "@heroui/react";
-import Text from "../atoms/text";
+import { Text } from "citrica-ui-toolkit";
 
 export interface DrawerCitricaAdminProps extends Omit<DrawerProps, 'placement' | 'classNames'> {
   isOpen: boolean;

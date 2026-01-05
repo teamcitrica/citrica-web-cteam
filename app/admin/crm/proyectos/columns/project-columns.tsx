@@ -4,11 +4,10 @@ import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
-  DropdownItem,
-  Button,
+  DropdownItem
 } from "@heroui/react";
 import Icon from "@ui/atoms/icon";
-import { Text } from "@/shared/components/citrica-ui";
+import { Text, Button } from "citrica-ui-toolkit";
 
 type ProjectColumnsConfig = {
   getCompanyName: (companyId: number | null) => string;
@@ -122,9 +121,7 @@ export const getProjectColumns = ({
     render: (project) => (
       <div className="relative flex justify-end items-end gap-2">
         <Button
-          isIconOnly
           size="sm"
-          variant="light"
           onPress={() => onView(project)}
           className="text-[#265197] hover:bg-blue-100"
         >
@@ -132,7 +129,7 @@ export const getProjectColumns = ({
         </Button>
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light">
+            <Button size="sm">
               <Icon
                 className="text-[#265197] w-5 h-5"
                 name="EllipsisVertical"

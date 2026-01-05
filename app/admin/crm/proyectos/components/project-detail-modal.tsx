@@ -10,7 +10,8 @@ import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { useUserProjects } from "@/hooks/user-projects/use-user-projects";
 import { UserType } from "@/shared/types/types";
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
-import { DetailModal, Text } from "@/shared/components/citrica-ui";
+import { DetailModal } from "@/shared/components/citrica-ui";
+import { Text } from "citrica-ui-toolkit";
 
 interface ProjectDetailModalProps {
   project: Project;

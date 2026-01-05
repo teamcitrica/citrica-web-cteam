@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import Text from "@ui/atoms/text";
-import Button from "@ui/molecules/button";
+import { Text, Button } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
 import Icon from "@ui/atoms/icon";
 import Input from "@ui/atoms/input";
@@ -225,7 +224,7 @@ const QuickConfigManager = () => {
 
           <Button
             variant="primary"
-            onClick={handleBatchAction}
+            onPress={handleBatchAction}
             disabled={!batchConfig.startDate || !batchConfig.endDate || isLoading}
             startContent={<Icon name="Play" size={16} />}
           >
@@ -254,7 +253,7 @@ const QuickConfigManager = () => {
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={async () => {
+                onPress={async () => {
                   const today = new Date();
                   const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
                   const endOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
@@ -285,7 +284,7 @@ const QuickConfigManager = () => {
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={async () => {
+                onPress={async () => {
                   const today = new Date();
                   const next3Months = new Date(today.getFullYear(), today.getMonth() + 3, 0);
 
@@ -315,7 +314,7 @@ const QuickConfigManager = () => {
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={async () => {
+                onPress={async () => {
                   const today = new Date();
                   const nextYear = new Date(today.getFullYear() + 1, 0, 1);
                   const endOfNextYear = new Date(today.getFullYear() + 1, 11, 31);
@@ -364,7 +363,7 @@ const QuickConfigManager = () => {
               <Button
                 size="sm"
                 variant="warning"
-                onClick={async () => {
+                onPress={async () => {
                   if (confirm("⚠️ ¿Cerrar el estudio MAÑANA?\n\nEsto bloqueará todo el día siguiente.")) {
                     const tomorrow = new Date();
                     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -391,7 +390,7 @@ const QuickConfigManager = () => {
               <Button
                 size="sm"
                 variant="warning"
-                onClick={async () => {
+                onPress={async () => {
                   if (confirm("⚠️ ¿Cerrar el estudio esta SEMANA?\n\nEsto bloqueará los próximos 7 días.")) {
                     const today = new Date();
                     const nextWeek = new Date();
@@ -422,7 +421,7 @@ const QuickConfigManager = () => {
               <Button
                 size="sm"
                 variant="danger"
-                onClick={async () => {
+                onPress={async () => {
                   if (confirm("🚨 ¿CERRAR TODO?\n\nEsto desactivará TODOS los horarios de la semana.\n\n¡Esta acción no se puede deshacer fácilmente!")) {
                     try {
                       const result = await emergencyCloseAll();

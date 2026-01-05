@@ -5,10 +5,9 @@ import { useForm } from "react-hook-form";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import { Container } from "@/styles/07-objects/objects";
-import Text from "../atoms/text";
 import Input from "../atoms/input";
 import Icon from "../atoms/icon";
-import Button from "../molecules/button";
+import { Text, Button } from "citrica-ui-toolkit";
 import Modal from "../molecules/modal";
 import { Divider, Link } from "@heroui/react";
 
@@ -293,7 +292,7 @@ useEffect(() => {
             label="Ir al inicio de sesión"
             fullWidth
             className="mb-4"
-            onClick={handleGoToLogin}
+            onPress={handleGoToLogin}
           />
         </div>
       </Modal>

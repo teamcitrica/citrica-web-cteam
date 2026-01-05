@@ -22,7 +22,7 @@ import {
 import Image from "next/image";
 import { ButtonCitricaAdmin, SelectCitricaAdmin, InputCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import Icon from "@ui/atoms/icon";
-import Text from "@/shared/components/citrica-ui/atoms/text";
+import { Text, Button } from "citrica-ui-toolkit";
 import ExportModal from "./export-modal";
 import { useTableFeatures, ExportColumn } from "@/shared/hooks/useTableFeatures";
 import "./data-table.css";
@@ -273,16 +273,12 @@ export function DataTable<T extends Record<string, any>>({
           {enableExport && (
             <Dropdown>
               <DropdownTrigger>
-                <ButtonCitricaAdmin
+                <Button
+                  isAdmin
                   variant="primary"
-                  style={{ backgroundColor: headerColor }}
                   startContent={exportButtonIcon || <Icon size={16} name="Download" />}
-                  className=" !w-32"
-                >
-                  <Text color="white" variant="label">
-                    Descargar
-                  </Text>
-                </ButtonCitricaAdmin>
+                  label="Descargar"
+                />
               </DropdownTrigger>
               <DropdownMenu
                 aria-label="Opciones de exportación"

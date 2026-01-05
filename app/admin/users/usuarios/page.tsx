@@ -16,7 +16,7 @@ import { UserAuth } from "@/shared/context/auth-context";
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
 import { Divider } from "@heroui/react";
 import { createUsers } from "@/public/icon-svg/create-users";
-import { Text } from "@/shared/components/citrica-ui";
+import { Text } from "citrica-ui-toolkit";
 
 export default function UsersPage() {
   const { users, isLoading, refreshUsers, deleteUser, updateUserByRole } =

@@ -7,7 +7,7 @@ import {
   ModalBody,
   ModalFooter,
 } from "@heroui/react";
-import Text from "@/shared/components/citrica-ui/atoms/text";
+import { Text } from "citrica-ui-toolkit";
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
 import { Reserva, ReservaEstado } from "@/hooks/reservas/use-reservas";
 

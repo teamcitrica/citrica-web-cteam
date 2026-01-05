@@ -1,7 +1,8 @@
 "use client"
 import { Col, Container } from '@/styles/07-objects/objects'
 import React from 'react'
-import { Icon, Text } from '../citrica-ui'
+import { Icon } from '../citrica-ui'
+import { Text } from 'citrica-ui-toolkit'
 import { Divider, Link } from '@heroui/react'
 
 export const FooterCitrica = () => {

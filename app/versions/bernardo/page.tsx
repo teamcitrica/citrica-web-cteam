@@ -1,8 +1,7 @@
 "use client"
 import React from 'react';
 import { Container, Col } from '@/styles/07-objects/objects';
-import Text from "@/shared/components/citrica-ui/atoms/text";
-import Button from "@/shared/components/citrica-ui/molecules/button";
+import { Button } from 'citrica-ui-toolkit';
 import Icon from "@/shared/components/citrica-ui/atoms/icon";
 import Card from '@/shared/components/citrica-ui/atoms/card';
 
@@ -30,7 +29,7 @@ export default function CitricaLanding() {
               </div>
               <div className="hidden md:block">
                 <Button
-                  onClick={() => { }}
+                  onPress={() => { }}
                   label="Comenzar"
                   variant="primary"
                 />
@@ -95,12 +94,12 @@ export default function CitricaLanding() {
 
               <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
                 <Button
-                  onClick={() => { }}
+                  onPress={() => { }}
                   label="Comenzar Proyecto"
                   variant="primary"
                 />
                 <Button
-                  onClick={() => { }}
+                  onPress={() => { }}
                   label="Ver Portafolio"
                   variant="secondary"
                 />
@@ -371,12 +370,12 @@ export default function CitricaLanding() {
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center">
                 <Button
-                  onClick={() => { }}
+                  onPress={() => { }}
                   label="Comenzar Ahora"
                   variant="primary"
                 />
                 <Button
-                  onClick={() => { }}
+                  onPress={() => { }}
                   label="Agendar Consulta Gratuita"
                   variant="secondary"
                 />

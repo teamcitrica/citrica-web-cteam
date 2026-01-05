@@ -8,7 +8,6 @@ import {
   Send,
   Bot,
   User,
-  Database,
   Loader2,
   MessageSquare,
   Sparkles,

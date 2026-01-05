@@ -2,9 +2,8 @@
 import React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Container, Col } from "@citrica/objects";
-import Text from "@ui/atoms/text";
+import { Button, Text } from "citrica-ui-toolkit";
 import Icon from "@ui/atoms/icon";
-import Button from "@ui/molecules/button";
 
 import WeeklyScheduleManager from "./components/weekly-schedule-manager";
 import UnifiedAvailabilityManager from "./components/unified-availability-manager";
@@ -58,7 +57,7 @@ const DisponibilidadAdminPage = () => {
             <Button
               size="sm"
               variant={activeTab === "disponibilidad" ? "primary" : "secondary"}
-              onClick={() => router.push("/admin/reservas/disponibilidad?page=disponibilidad")}
+              onPress={() => router.push("/admin/reservas/disponibilidad?page=disponibilidad")}
               startContent={<Icon name="Calendar" size={16} />}
             >
               Gestión de Disponibilidad
@@ -66,7 +65,7 @@ const DisponibilidadAdminPage = () => {
             <Button
               size="sm"
               variant={activeTab === "semanal" ? "primary" : "secondary"}
-              onClick={() => router.push("/admin/reservas/disponibilidad?page=semanal")}
+              onPress={() => router.push("/admin/reservas/disponibilidad?page=semanal")}
               startContent={<Icon name="Clock" size={16} />}
             >
               Configuración Semanal

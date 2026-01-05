@@ -1,8 +1,7 @@
 "use client";
 import React from 'react';
 import { Container, Col } from '@citrica/objects';
-import Text from '@ui/atoms/text';
-import Button from '@ui/molecules/button';
+import { Text, Button } from 'citrica-ui-toolkit';
 import Icon from '@ui/atoms/icon';
 import Card from '@ui/atoms/card';
 
@@ -118,13 +117,13 @@ const CitricaLanding = () => {
                   <Button 
                     label="Comenzar Proyecto"
                     variant="primary"
-                    onClick={() => {}}
+                    onPress={() => {}}
                     className="bg-[#E1FF00] text-[#16141F] hover:bg-[#E1FF00]/90"
                   />
                   <Button 
                     label="Ver Proyectos"
                     variant="secondary"
-                    onClick={() => {}}
+                    onPress={() => {}}
                     className="border-[#00FFFF] text-[#00FFFF] hover:bg-[#00FFFF]/10"
                   />
                 </div>
@@ -400,13 +399,13 @@ const CitricaLanding = () => {
                 <Button 
                   label="Solicitar Cotización"
                   variant="primary"
-                  onClick={() => {}}
+                  onPress={() => {}}
                   className="bg-[#16141F] text-[#E1FF00] hover:bg-[#16141F]/90"
                 />
                 <Button 
                   label="Agendar Llamada"
                   variant="secondary"
-                  onClick={() => {}}
+                  onPress={() => {}}
                   className="border-[#16141F] text-[#16141F] hover:bg-[#16141F]/10"
                 />
               </div>

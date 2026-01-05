@@ -6,11 +6,11 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Button,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 
 import { Contact } from "@/hooks/contact/use-contact";
+import { Button } from "citrica-ui-toolkit";
 
 interface RevokeAccessModalProps {
   isOpen: boolean;
@@ -119,7 +119,7 @@ export default function RevokeAccessModal({
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button color="default" variant="light" onPress={onClose}>
+          <Button color="default" onPress={onClose}>
             Cancelar
           </Button>
           <Button

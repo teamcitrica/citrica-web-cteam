@@ -5,13 +5,13 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Button,
   Divider,
 } from "@heroui/react";
 
 import { Project } from "@/hooks/projects/use-projects";
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
-import { Icon, Text } from "@/shared/components/citrica-ui";
+import { Icon } from "@/shared/components/citrica-ui";
+import { Text } from "citrica-ui-toolkit";
 
 interface DeleteProjectModalProps {
   project: Project;

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Container, Col } from '@citrica/objects';
-import Text from '@ui/atoms/text';
-import Button from '@ui/molecules/button';
+import { Text } from 'citrica-ui-toolkit';
 
 const HeroSection = () => {
     return (

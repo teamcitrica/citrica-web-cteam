@@ -1,8 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { Container, Col } from '@/styles/07-objects/objects';
-import Text from '@/shared/components/citrica-ui/atoms/text';
-import Button from '@/shared/components/citrica-ui/molecules/button';
+import { Text, Button } from 'citrica-ui-toolkit';
 import Icon from '@/shared/components/citrica-ui/atoms/icon';
 import Card from '@/shared/components/citrica-ui/atoms/card';
 
@@ -101,7 +100,7 @@ const CitricaWireframe = () => {
               {/* CTA Button */}
               <div className="hidden md:block">
                 <Button
-                  onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
+                  onPress={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
                   label="Contáctanos"
                   variant="primary"
                   className="border-2 border-black bg-black text-white px-6 py-2 hover:bg-white hover:text-black transition-all"
@@ -147,13 +146,13 @@ const CitricaWireframe = () => {
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
-                  onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
+                  onPress={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
                   label="Comenzar Proyecto"
                   variant="primary"
                   className="border-2 border-black bg-black text-white px-8 py-3 hover:bg-white hover:text-black transition-all"
                 />
                 <Button
-                  onClick={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}
+                  onPress={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}
                   label="Ver Servicios"
                   variant="secondary"
                   className="border-2 border-black bg-white text-black px-8 py-3 hover:bg-black hover:text-white transition-all"
@@ -453,7 +452,7 @@ const CitricaWireframe = () => {
                 </div>
 
                 <Button
-                  onClick={() => {}}
+                  onPress={() => {}}
                   label="Enviar Mensaje"
                   variant="primary"
                   className="w-full border-2 border-black bg-black text-white py-4 hover:bg-white hover:text-black transition-all"

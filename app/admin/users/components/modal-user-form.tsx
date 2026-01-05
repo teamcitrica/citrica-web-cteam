@@ -10,7 +10,6 @@ import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { UserType } from "@/shared/types/types";
 import { InputCitricaAdmin, SelectCitricaAdmin, ButtonCitricaAdmin, DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import { SelectItem } from "@heroui/react";
-import Text from "@/shared/components/citrica-ui/atoms/text";
 
 type UserFormModalProps = {
   isOpen: boolean;

@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import Text from '@/shared/components/citrica-ui/atoms/text';
+import { Text } from 'citrica-ui-toolkit'
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation';
 import { siteConfig } from '@/config/site';

@@ -1,7 +1,7 @@
 // ModalDeleteUser.tsx
 import React from "react";
 import { UserType } from "@/shared/types/types";
-import Text from "@/shared/components/citrica-ui/atoms/text";
+import { Text } from "citrica-ui-toolkit";
 import Icon from "@ui/atoms/icon";
 import { Modal, ModalContent, Divider } from "@heroui/react";
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";

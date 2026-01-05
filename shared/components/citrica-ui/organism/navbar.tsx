@@ -9,10 +9,8 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerBody,
-  Button,
   useDisclosure,
 } from "@heroui/react";
-import Icon from "../atoms/icon";
 import { UserBox } from "@/hooks/user-box";
 import { type Session } from "@supabase/auth-helpers-nextjs";
 import { UserAuth } from "@/shared/context/auth-context";

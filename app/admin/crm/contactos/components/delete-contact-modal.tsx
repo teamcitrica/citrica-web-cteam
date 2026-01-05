@@ -9,7 +9,8 @@ import {
 } from "@heroui/react";
 import { Contact } from "@/hooks/contact/use-contact";
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
-import { Icon, Text } from "@/shared/components/citrica-ui";
+import { Icon } from "@/shared/components/citrica-ui";
+import { Text } from "citrica-ui-toolkit";
 
 interface DeleteContactModalProps {
   contact: Contact;

@@ -1,10 +1,9 @@
 'use client';
 import React, { useState } from 'react'
 import { Container } from '@/styles/07-objects/objects';
-import Text from '../atoms/text';
+import { Text, Button } from 'citrica-ui-toolkit';
 import Input from "../atoms/input";
 import { Divider, Link } from "@heroui/react";
-import Button from '../molecules/button';
 import Modal from '../molecules/modal';
 import Icon from '../atoms/icon';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -119,7 +118,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             variant="primary"
             label="Cerrar"
             fullWidth
-            onClick={() => setShowEmailSentModal(false)}
+            onPress={() => setShowEmailSentModal(false)}
             className="mb-4"
           />
 

@@ -1,9 +1,8 @@
 "use client"
 import React from 'react'
 import { Container, Col } from '@citrica/objects'
-import Text from '@ui/atoms/text'
+import { Text, Button } from 'citrica-ui-toolkit'
 import Icon from '@ui/atoms/icon'
-import Button from '@ui/molecules/button'
 import { addToast } from "@heroui/toast"
 import DotGrid from '../versions/yolanda/components/DotGrid'
 import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";
@@ -100,13 +99,13 @@ const CitricaLanding = () => {
 
                 <div className="flex justify-center space-x-4 mb-2">
                   <Button
-                    onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
+                    onPress={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
                     label="¡Quiero mi página!"
                     variant="primary"
                     className='px-8 bg-[#FF5B00] rounded-[80]'
                   />
                   <Button
-                    onClick={() => document.getElementById('proyectos')?.scrollIntoView({ behavior: 'smooth' })}
+                    onPress={() => document.getElementById('proyectos')?.scrollIntoView({ behavior: 'smooth' })}
                     label="Ver Proyectos"
                     variant="secondary"
                     className="hidden bg-[#E5FFFF] text-[#16141F] border border-[rgba(22,20,31,0.06)] px-8 rounded-[80]"
@@ -413,7 +412,7 @@ const CitricaLanding = () => {
                 </p>
 
                 <Button
-                  onClick={handleContactClick}
+                  onPress={handleContactClick}
                   label="Comenzar mi proyecto"
                   variant="primary"
                   textVariant="body"

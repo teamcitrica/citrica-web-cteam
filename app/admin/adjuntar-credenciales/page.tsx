@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button } from "@heroui/react";
+import { Button } from "citrica-ui-toolkit";
 import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
 import AttachCredentialsModal from "./components/modal-attach-credentials";
 import ViewCredentialModal from "./components/modal-view-credential";

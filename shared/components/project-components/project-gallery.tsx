@@ -1,8 +1,7 @@
 import { Container, Col } from "@citrica/objects";
 import Link from "next/link";
-import Text from "@ui/atoms/text";
+import { Text, Button } from "citrica-ui-toolkit";
 import Icon from "@ui/atoms/icon";
-import Button from "@ui/molecules/button";
 import { addToast } from "@heroui/toast";
 
 const ProjectsGallery = () => {
@@ -115,7 +114,7 @@ const ProjectsGallery = () => {
 
                   {/* Botón */}
                   <Button
-                    onClick={() => {
+                    onPress={() => {
                       addToast({
                         title: "Proyecto seleccionado",
                         description: `Viendo detalles de ${project.title}`,

@@ -13,7 +13,7 @@ import {
   SelectItem,
 } from "@heroui/react";
 import Icon from "@/shared/components/citrica-ui/atoms/icon";
-import Text from "@/shared/components/citrica-ui/atoms/text";
+import { Text } from "citrica-ui-toolkit";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { UserAuth } from "@/shared/context/auth-context";
 import { useExcelExport } from "@/hooks/use-excel-export";

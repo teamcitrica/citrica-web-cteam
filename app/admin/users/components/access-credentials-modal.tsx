@@ -12,7 +12,7 @@ import {
 import { addToast } from "@heroui/toast";
 
 import { UserType } from "@/shared/types/types";
-import Text from "@/shared/components/citrica-ui/atoms/text";
+import { Text } from "citrica-ui-toolkit";
 import Icon from "@/shared/components/citrica-ui/atoms/icon";
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import { useUserCRUD } from "@/hooks/users/use-users";

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Col } from '@citrica/objects';
-import Text from '@ui/atoms/text';
+import { Text } from 'citrica-ui-toolkit';
 
 const TeamSection = () => {
   const expertiseAreas = [

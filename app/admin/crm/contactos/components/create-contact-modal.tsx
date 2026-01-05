@@ -3,7 +3,6 @@ import { useState } from "react";
 import {
   Select,
   SelectItem,
-  Switch,
 } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";

@@ -3,7 +3,7 @@ import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
-import Text from "../atoms/text";
+import { Text } from "citrica-ui-toolkit";
 import { Divider } from "@heroui/react";
 
 type ExportModalProps = {

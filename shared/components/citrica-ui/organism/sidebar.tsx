@@ -1,10 +1,10 @@
 "use client"
 import React from "react"
 import { Suspense, useEffect, useState } from 'react';
-import { Button } from "@heroui/react"
+import { Button, Text } from "citrica-ui-toolkit"
 import { ChevronDown, Menu } from "lucide-react"
 import type { SidebarProps, MenuItem } from "../../../types/sidebar"
-import { Icon, Text } from "@citrica-ui"
+import { Icon } from "@citrica-ui"
 import { IconName } from "@/shared/components/citrica-ui/atoms/icon"
 import { usePathname, useRouter } from 'next/navigation';
 import { UserAuth } from "@/shared/context/auth-context";
@@ -18,7 +18,6 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
     <div>
       <Button
         className= {`w-full justify-between px-4 py-2 transition-colors hover:bg-gray-100`}
-        variant="light"
         onPress={onToggle}
       >
         <span className="flex items-center gap-2">
@@ -34,7 +33,6 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
             return (
               <Button
                 key={subItem.title}
-                variant="light"
                 className={`justify-start px-4 py-2 transition-colors hover:bg-[#EEF1F7] ${isActive ? "bg-[#EEF1F7]" : ""}`}
                 onPress={() => router.push(subItem.href)}
               >
@@ -135,7 +133,6 @@ export function Sidebar({ items }: SidebarProps) {
             </Suspense>
           ) : (
             <Button
-              variant="light"
               className= {`w-full justify-start gap-2 px-4 py-2 transition-colors hover:bg-gray-100 ${item.href === pathname ? "bg-gray-100" : ""}`}
               onPress={() => {
                 if (item.href && item.href !== "#") {
@@ -155,7 +152,7 @@ export function Sidebar({ items }: SidebarProps) {
   return (
     <>
       {/* Mobile Drawer */}
-      <Button className="md:hidden" isIconOnly variant="light" onPress={() => setIsOpen(true)}>
+      <Button className="md:hidden" onPress={() => setIsOpen(true)}>
         <Menu className="h-5 w-5" />
         <span className="sr-only">Toggle navigation menu</span>
       </Button>
@@ -168,7 +165,7 @@ export function Sidebar({ items }: SidebarProps) {
       >
         <div className="flex h-16 items-center justify-between px-4">
           <h2 className="text-lg font-semibold">Navegación</h2>
-          <Button isIconOnly variant="light" onPress={() => setIsOpen(false)}>
+          <Button onPress={() => setIsOpen(false)}>
             <ChevronDown className="h-6 w-6 rotate-90" />
           </Button>
         </div>

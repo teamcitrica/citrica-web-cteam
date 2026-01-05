@@ -4,14 +4,13 @@ import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
-  DropdownItem,
-  Button,
+  DropdownItem
 } from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { ExportColumn } from "@/shared/hooks/useTableFeatures";
 import { Company } from "@/hooks/companies/use-companies";
-import { Text } from "@/shared/components/citrica-ui";
+import { Text, Button } from 'citrica-ui-toolkit';
 
 type CompanyColumnsConfig = {
   onView: (company: Company) => void;
@@ -139,7 +138,6 @@ export const getCompanyColumns = ({
         <Button
           isIconOnly
           size="sm"
-          variant="light"
           onPress={() => onView(company)}
           className="text-[#265197] hover:bg-blue-100"
         >
@@ -147,7 +145,10 @@ export const getCompanyColumns = ({
         </Button>
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light">
+            <Button
+              isIconOnly
+              size="sm"
+              >
               <Icon
                 className="text-[#265197] w-5 h-5"
                 name="EllipsisVertical"
