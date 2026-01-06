@@ -165,16 +165,16 @@ export const getContactColumns = ({
       >
         <Button
           isIconOnly
-          isAdmin
-          size="sm"
+          variant="flat"
           onPress={() => onView(contact)}
-          className="text-[#265197] hover:bg-blue-100"
+          className=" hover:!bg-transparent !p-1 !min-w-0"
         >
-          <Icon className="w-5 h-5" name="Eye" />
+          <Icon className="w-5 h-5 text-[#265197]" name="Eye" />
         </Button>
+
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly isAdmin size="sm" >
+            <Button isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0">
               <Icon className="text-[#265197] w-5 h-5" name="EllipsisVertical" />
             </Button>
           </DropdownTrigger>
@@ -194,12 +194,10 @@ export const getContactColumns = ({
               }
             }}
           >
-            <DropdownItem className="text-[#265197]" key="edit">
+            <DropdownItem key="edit">
               Editar
             </DropdownItem>
-            <DropdownItem className="text-[#265197]"
-              key="access-credentials"
-            >
+            <DropdownItem key="access-credentials">
               Accesos
             </DropdownItem>
             <DropdownItem

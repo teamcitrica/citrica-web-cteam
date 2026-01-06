@@ -134,25 +134,23 @@ export const getCompanyColumns = ({
     sortable: false,
     align: "end",
     render: (company) => (
-      <div className="relative flex justify-end items-end gap-2">
+      <div
+        className="relative flex justify-end items-center gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
         <Button
           isIconOnly
-          size="sm"
+          variant="flat"
           onPress={() => onView(company)}
-          className="text-[#265197] hover:bg-blue-100"
+          className=" hover:!bg-transparent !p-1 !min-w-0"
         >
-          <Icon className="w-5 h-5" name="Eye" />
+          <Icon className="w-5 h-5 text-[#265197]" name="Eye" />
         </Button>
+
         <Dropdown>
           <DropdownTrigger>
-            <Button
-              isIconOnly
-              size="sm"
-              >
-              <Icon
-                className="text-[#265197] w-5 h-5"
-                name="EllipsisVertical"
-              />
+            <Button isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0">
+              <Icon className="text-[#265197] w-5 h-5" name="EllipsisVertical" />
             </Button>
           </DropdownTrigger>
           <DropdownMenu
@@ -168,10 +166,7 @@ export const getCompanyColumns = ({
               }
             }}
           >
-            <DropdownItem
-              className="text-[#265197]"
-              key="edit"
-            >
+            <DropdownItem key="edit">
               Editar
             </DropdownItem>
             <DropdownItem

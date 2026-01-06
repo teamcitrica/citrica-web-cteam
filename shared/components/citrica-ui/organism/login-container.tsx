@@ -113,7 +113,7 @@ const LoginPage = () => {
             }
           />
           <Button
-            type="submit"
+            onClick={handleSubmit(onSubmit)}
             variant="primary"
             label={isLoading ? 'Accediendo...' : 'Iniciar sesión'}
             disabled={isLoading}

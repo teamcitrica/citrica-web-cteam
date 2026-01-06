@@ -20,12 +20,12 @@ import {
   Divider,
 } from "@heroui/react";
 import Image from "next/image";
-import { ButtonCitricaAdmin, SelectCitricaAdmin, InputCitricaAdmin } from "@/shared/components/citrica-ui/admin";
+import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import Icon from "@ui/atoms/icon";
 import { Text, Button } from "citrica-ui-toolkit";
 import ExportModal from "./export-modal";
 import { useTableFeatures, ExportColumn } from "@/shared/hooks/useTableFeatures";
-import "./data-table.css";
+// import "./data-table.css";
 
 export interface Column<T extends Record<string, any>> {
   name: string;
@@ -317,16 +317,13 @@ export function DataTable<T extends Record<string, any>>({
           )}
 
           {onAdd && (
-            <ButtonCitricaAdmin
+            <Button
+              isAdmin
               variant="primary"
-              style={{ backgroundColor: headerColor, width: '172px' }}
               startContent={addButtonIcon || <Icon size={16} name="UserPlus" />}
-              onPress={onAdd}
-            >
-              <Text color="white" variant="label">
-                {addButtonText}
-              </Text>
-            </ButtonCitricaAdmin>
+              onClick={onAdd}
+              label={addButtonText}
+            />
           )}
         </div>
       </div>

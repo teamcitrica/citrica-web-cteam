@@ -216,6 +216,8 @@ export default function ContactFormDrawer({
         <Select
           label="Tipo de Contacto"
           placeholder="Seleccione el tipo"
+          labelPlacement="outside-top"
+          variant="bordered"
           selectedKeys={formData.type_id ? [String(formData.type_id)] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];
@@ -240,6 +242,8 @@ export default function ContactFormDrawer({
         <Select
           label="Empresa"
           placeholder="Seleccione una empresa"
+          labelPlacement="outside-top"
+          variant="bordered"
           selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];
@@ -300,6 +304,8 @@ export default function ContactFormDrawer({
           <Select
             label="Código"
             placeholder="+51"
+            labelPlacement="outside-top"
+            variant="bordered"
             selectedKeys={[phoneCode]}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0] as string;
@@ -364,6 +370,8 @@ export default function ContactFormDrawer({
         <Select
           label="País"
           placeholder="Seleccione un país"
+          labelPlacement="outside-top"
+          variant="bordered"
           selectedKeys={formData.country ? [formData.country] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];

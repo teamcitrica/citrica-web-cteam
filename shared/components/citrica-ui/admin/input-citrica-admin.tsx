@@ -40,6 +40,7 @@ export const InputCitricaAdmin: React.FC<InputCitricaAdminProps> = ({
           ...customClassNames,
         }}
         variant="bordered"
+        labelPlacement="outside"
         endContent={endContent}
         {...props}
       />

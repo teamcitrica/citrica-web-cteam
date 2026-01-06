@@ -1,6 +1,6 @@
 "use client";
-import { ButtonGroup } from "@heroui/react";
-import { Button } from "citrica-ui-toolkit";
+import { ButtonGroup, Button } from "@heroui/react";
+
 export interface FilterButton {
   value: string;
   label: string;
@@ -33,7 +33,6 @@ export default function FilterButtonGroup({
         {buttons.map((button) => (
           <Button
             key={button.value}
-            // radius="md"
             className={`flex-1 h-full px-4 ${
               selectedValue === button.value
                 ? activeButtonClassName

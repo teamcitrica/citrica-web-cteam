@@ -7,6 +7,7 @@ import {
   DropdownItem,
 } from "@heroui/react";
 import Icon from "@ui/atoms/icon";
+import { Button } from "citrica-ui-toolkit";
 
 type AssetColumnsConfig = {
   onView: (asset: Asset) => void;
@@ -53,32 +54,47 @@ export const getAssetColumns = ({
     name: "ACCIONES",
     uid: "actions",
     sortable: false,
+    align: "end",
     render: (asset) => (
-      <div className="relative flex justify-center items-center gap-2">
-        <button
-          onClick={() => onView(asset)}
-          className="text-blue-500 hover:bg-blue-100 p-1 rounded transition-colors"
+      <div
+        className="relative flex justify-end items-center gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Button
+          isIconOnly
+          variant="flat"
+          onPress={() => onView(asset)}
+          className=" hover:!bg-transparent !p-1 !min-w-0"
         >
-          <Icon className="w-5 h-5" name="Eye" />
-        </button>
+          <Icon className="w-5 h-5 text-[#265197]" name="Eye" />
+        </Button>
+
         <Dropdown>
           <DropdownTrigger>
-            <button className="text-[#678CC5] hover:text-[#16305A] transition-colors p-1">
-              <Icon className="w-5 h-5" name="EllipsisVertical" />
-            </button>
+            <Button isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0">
+              <Icon className="text-[#265197] w-5 h-5" name="EllipsisVertical" />
+            </Button>
           </DropdownTrigger>
-          <DropdownMenu aria-label="Acciones del asset">
-            <DropdownItem
-              key="edit"
-              onPress={() => onEdit(asset)}
-            >
+          <DropdownMenu
+            aria-label="Acciones del asset"
+            onAction={(key) => {
+              switch (key) {
+                case "edit":
+                  onEdit(asset);
+                  break;
+                case "delete":
+                  onDelete(asset);
+                  break;
+              }
+            }}
+          >
+            <DropdownItem key="edit">
               Editar
             </DropdownItem>
             <DropdownItem
               key="delete"
               className="text-danger"
               color="danger"
-              onPress={() => onDelete(asset)}
             >
               Eliminar
             </DropdownItem>
