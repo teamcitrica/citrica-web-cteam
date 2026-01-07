@@ -1,6 +1,7 @@
 "use client";
 
 import { useCredentials, CredentialType } from "@/hooks/use-credentials";
+import { Button } from "citrica-ui-toolkit";
 
 type DeleteCredentialModalProps = {
   isOpen: boolean;
@@ -33,12 +34,14 @@ const DeleteCredentialModal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-md p-6 w-full max-w-md relative">
         {/* Botón para cerrar el modal */}
-        <button
-          className="absolute top-2 right-2 text-black text-xl font-bold hover:text-gray-600"
-          onClick={onClose}
+        <Button
+          isAdmin
+          variant="flat"
+          className="absolute top-2 right-2 text-black text-xl font-bold hover:text-gray-600 min-w-0 w-auto h-auto p-1"
+          onPress={onClose}
         >
           X
-        </button>
+        </Button>
         <div className="flex flex-col gap-4">
           <h2 className="text-xl font-bold text-red-600">
             Eliminar Credencial
@@ -64,18 +67,22 @@ const DeleteCredentialModal = ({
           </p>
 
           <div className="flex gap-3 mt-4">
-            <button
-              className="flex-1 bg-gray-300 text-black p-2 rounded-md hover:bg-gray-400"
-              onClick={onClose}
+            <Button
+              isAdmin
+              variant="secondary"
+              className="flex-1"
+              onPress={onClose}
             >
               Cancelar
-            </button>
-            <button
-              className="flex-1 bg-red-600 text-white p-2 rounded-md hover:bg-red-700"
-              onClick={handleDelete}
+            </Button>
+            <Button
+              isAdmin
+              variant="primary"
+              className="flex-1 bg-red-600 hover:bg-red-700"
+              onPress={handleDelete}
             >
               Eliminar
-            </button>
+            </Button>
           </div>
         </div>
       </div>

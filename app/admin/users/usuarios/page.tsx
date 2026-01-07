@@ -199,21 +199,20 @@ export default function UsersPage() {
             customAutocompleteSelectedKey={selectedUserId || "all"}
             onCustomAutocompleteChange={(key) => setSelectedUserId(key)}
             customFilters={
-              <div className="w-full flex flex-col">
-                <div style={{ width: "245px" }}>
-                  <FilterButtonGroup
-                    buttons={[
-                      { value: "all", label: "Todos" },
-                      { value: "citrica", label: "Citrica" },
-                      { value: "cliente", label: "Clientes" },
-                    ]}
-                    selectedValue={roleFilter}
-                    onValueChange={setRoleFilter}
-                    height="38px"
-                  />
-                </div>
-                <Divider className="bg-[#D4DEED] mt-4" />
+              <>
+              <div className="flex gap-3 pb-4">
+                <FilterButtonGroup
+                  buttons={[
+                    { value: "all", label: "Todos" },
+                    { value: "citrica", label: "Citrica" },
+                    { value: "cliente", label: "Clientes" },
+                  ]}
+                  selectedValue={roleFilter}
+                  onValueChange={setRoleFilter}
+                />
               </div>
+              <Divider className="bg-[#D4DEED]"/>
+              </>
             }
           />
 

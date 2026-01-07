@@ -84,20 +84,24 @@ export default function CrearRolPage() {
                     </td>
                     <td className="p-3 text-black">
                       <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(role)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                        <Button
+                          isAdmin
+                          variant="flat"
+                          onPress={() => handleEdit(role)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded min-w-0"
                           title="Editar"
                         >
                           <Pencil size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(role)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded"
+                        </Button>
+                        <Button
+                          isAdmin
+                          variant="flat"
+                          onPress={() => handleDelete(role)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded min-w-0"
                           title="Eliminar"
                         >
                           <Trash2 size={18} />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>

@@ -124,21 +124,20 @@ export default function EmpresasPage() {
             companyFilterField="id"
             companyFilterPlaceholder="Filtrar por empresa"
             customFilters={
-              <div className="w-full flex flex-col">
-                <div className="pb-4" style={{ width: "280px" }}>
-                  <FilterButtonGroup
-                    buttons={[
-                      { value: "all", label: "Todas" },
-                      { value: "cliente", label: "Clientes" },
-                      { value: "proveedor", label: "Proveedores" },
-                    ]}
-                    selectedValue={typeFilter}
-                    onValueChange={setTypeFilter}
-                    height="38px"
-                  />
-                </div>
-                <Divider className="bg-[#D4DEED]"/>
+              <>
+              <div className="flex gap-3 pb-4">
+                <FilterButtonGroup
+                  buttons={[
+                    { value: "all", label: "Todas" },
+                    { value: "cliente", label: "Clientes" },
+                    { value: "proveedor", label: "Proveedores" },
+                  ]}
+                  selectedValue={typeFilter}
+                  onValueChange={setTypeFilter}
+                />
               </div>
+              <Divider className="bg-[#D4DEED]"/>
+              </>
             }
           />
 
