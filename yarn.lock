@@ -641,7 +641,7 @@
     "@heroui/react-rsc-utils" "2.1.9"
     "@heroui/shared-utils" "2.1.12"
 
-"@heroui/react@^2.6.14":
+"@heroui/react@^2.6.18":
   version "2.8.7"
   resolved "https://registry.yarnpkg.com/@heroui/react/-/react-2.8.7.tgz#f1898c1db0ba18d0a74629fb1d79ee766da4101f"
   integrity sha512-0PkjyvjXQpsjNz9P6q3YmJEWO7F+cyQjc2Ts7HqfvnOWPKAX3zAVnExq8d4Bdwnpp1F6TZpuC0woowVq6Fj4Fw==
@@ -749,11 +749,6 @@
   resolved "https://registry.yarnpkg.com/@heroui/shared-utils/-/shared-utils-2.1.12.tgz#2b0c654797985e8f66bfb7c00f5227ee05bf9ffb"
   integrity sha512-0iCnxVAkIPtrHQo26Qa5g0UTqMTpugTbClNOrEPsrQuyRAq7Syux998cPwGlneTfB5E5xcU3LiEdA9GUyeK2cQ==
 
-"@heroui/shared-utils@2.1.7":
-  version "2.1.7"
-  resolved "https://registry.yarnpkg.com/@heroui/shared-utils/-/shared-utils-2.1.7.tgz#7213ac10e9acb5b83ba7c9ad50f1a4aaa3df2e12"
-  integrity sha512-1nx7y41P+Bsca7nDC+QFajAoFhSRGvjKhdFeopMQNTvU95L42PD7B0ThjcOretvQD0Ye2TsAEQInwsSgZ6kK/g==
-
 "@heroui/skeleton@2.2.18":
   version "2.2.18"
   resolved "https://registry.yarnpkg.com/@heroui/skeleton/-/skeleton-2.2.18.tgz#c88f0200d08ca773f77425b6423477d18502a05c"
@@ -828,7 +823,7 @@
   dependencies:
     "@react-types/shared" "3.32.1"
 
-"@heroui/system@2.4.25":
+"@heroui/system@2.4.25", "@heroui/system@^2.4.18":
   version "2.4.25"
   resolved "https://registry.yarnpkg.com/@heroui/system/-/system-2.4.25.tgz#60d14f492b0a52677432d98d088668eb4d25e81d"
   integrity sha512-F6UUoGTQ+Qas5wYkCzLjXE7u74Z9ygO0u0+dkTW7zCaY7ds65CcmvZ/ahKz2ES3Tk6TNks1MJSyaQ9rFLs8AqA==
@@ -874,21 +869,7 @@
     "@react-types/shared" "3.32.1"
     scroll-into-view-if-needed "3.0.10"
 
-"@heroui/theme@2.4.13":
-  version "2.4.13"
-  resolved "https://registry.yarnpkg.com/@heroui/theme/-/theme-2.4.13.tgz#51c955fbd50ef080953a59c58b6e9aebd0b2818e"
-  integrity sha512-W1wm/x3dx9rZXNdyvjQRueK+9ieTpT2icyttGuVEn7NWgzMhpIbEKsAwtTLZGc5zMHJE2cxJQ/jpdCR8HBe0Dw==
-  dependencies:
-    "@heroui/shared-utils" "2.1.7"
-    clsx "^1.2.1"
-    color "^4.2.3"
-    color2k "^2.0.3"
-    deepmerge "4.3.1"
-    flat "^5.0.2"
-    tailwind-merge "2.5.4"
-    tailwind-variants "0.3.0"
-
-"@heroui/theme@2.4.25":
+"@heroui/theme@2.4.25", "@heroui/theme@^2.4.25":
   version "2.4.25"
   resolved "https://registry.yarnpkg.com/@heroui/theme/-/theme-2.4.25.tgz#5ef08b400fbab209cc1fe52aedbde231b1ca9d24"
   integrity sha512-nTptYhO1V9rMoh9SJDnMfaSmFuoXvbem1UuwgHcraRtqy/TIVBPqv26JEGzSoUCL194TDGOJpqrpMuab/PdXcw==
@@ -3465,11 +3446,6 @@ clsx@2.1.1, clsx@^2.0.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/clsx/-/clsx-2.1.1.tgz#eed397c9fd8bd882bfb18deab7102049a2f32999"
   integrity sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==
-
-clsx@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/clsx/-/clsx-1.2.1.tgz#0ddc4a20a549b59c93a4116bb26f5294ca17dc12"
-  integrity sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==
 
 codepage@~1.15.0:
   version "1.15.0"
@@ -6226,11 +6202,6 @@ synckit@^0.11.7:
   dependencies:
     "@pkgr/core" "^0.2.9"
 
-tailwind-merge@2.5.4:
-  version "2.5.4"
-  resolved "https://registry.yarnpkg.com/tailwind-merge/-/tailwind-merge-2.5.4.tgz#4bf574e81fa061adeceba099ae4df56edcee78d1"
-  integrity sha512-0q8cfZHMu9nuYP/b5Shb7Y7Sh1B7Nnl5GqNr1U+n2p6+mybvRtayrQ+0042Z5byvTA8ihjlP8Odo8/VnHbZu4Q==
-
 tailwind-merge@3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/tailwind-merge/-/tailwind-merge-3.4.0.tgz#5a264e131a096879965f1175d11f8c36e6b64eca"
@@ -6241,24 +6212,12 @@ tailwind-merge@^1.14.0:
   resolved "https://registry.yarnpkg.com/tailwind-merge/-/tailwind-merge-1.14.0.tgz#e677f55d864edc6794562c63f5001f45093cdb8b"
   integrity sha512-3mFKyCo/MBcgyOTlrY8T7odzZFx+w+qKSMAmdFzRvqBfLlSigU6TZnlFHK0lkMwj9Bj8OYU+9yW9lmGuS0QEnQ==
 
-tailwind-merge@^2.5.4:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/tailwind-merge/-/tailwind-merge-2.6.0.tgz#ac5fb7e227910c038d458f396b7400d93a3142d5"
-  integrity sha512-P+Vu1qXfzediirmHOC3xKGAYeZtPcV9g76X+xg2FD4tYgR71ewMA35Y3sCz3zhiN/dwefRpJX0yBcgwi1fXNQA==
-
 tailwind-variants@0.1.20:
   version "0.1.20"
   resolved "https://registry.yarnpkg.com/tailwind-variants/-/tailwind-variants-0.1.20.tgz#8aaed9094be0379a438641a42d588943e44c5fcd"
   integrity sha512-AMh7x313t/V+eTySKB0Dal08RHY7ggYK0MSn/ad8wKWOrDUIzyiWNayRUm2PIJ4VRkvRnfNuyRuKbLV3EN+ewQ==
   dependencies:
     tailwind-merge "^1.14.0"
-
-tailwind-variants@0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/tailwind-variants/-/tailwind-variants-0.3.0.tgz#481f53031cd4e91f92e0c078bbfd9fe453162e0b"
-  integrity sha512-ho2k5kn+LB1fT5XdNS3Clb96zieWxbStE9wNLK7D0AV64kdZMaYzAKo0fWl6fXLPY99ffF9oBJnIj5escEl/8A==
-  dependencies:
-    tailwind-merge "^2.5.4"
 
 tailwind-variants@3.2.2:
   version "3.2.2"
