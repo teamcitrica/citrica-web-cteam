@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { useUserAssets } from "@/hooks/user-assets/use-user-assets";
-import { Spinner, DateRangePicker, ButtonGroup, Divider } from "@heroui/react";
+import { Spinner, DateRangePicker, Divider } from "@heroui/react";
 import { Button } from "citrica-ui-toolkit";
 import Input from "@/shared/components/citrica-ui/atoms/input";
 import { Col, Container } from "@/styles/07-objects/objects";
@@ -837,8 +837,9 @@ export default function AssetDataPage() {
                               {/* Botones de operador numérico */}
                               {textSearchInput && !isNaN(Number(textSearchInput)) && (
                                 <div className="bg-[#D4DEED] p-2 rounded-md">
-                                  <ButtonGroup size="sm" className="w-full">
+                                  <div className="flex w-full gap-0">
                                     <Button
+                                      size="sm"
                                       className={`flex-1 ${numericSearchOperator === "eq"
                                         ? "bg-white text-[#265197]"
                                         : "bg-[#D4DEED] text-[#265197] border border-[#D4DEED]"
@@ -851,6 +852,7 @@ export default function AssetDataPage() {
                                       = Igual
                                     </Button>
                                     <Button
+                                      size="sm"
                                       className={`flex-1 ${numericSearchOperator === "gte"
                                         ? "bg-white text-[#265197]"
                                         : "bg-[#D4DEED] text-[#265197] border border-[#D4DEED]"
@@ -863,6 +865,7 @@ export default function AssetDataPage() {
                                       ≥ Mayor o igual
                                     </Button>
                                     <Button
+                                      size="sm"
                                       className={`flex-1 ${numericSearchOperator === "lte"
                                         ? "bg-white text-[#265197]"
                                         : "bg-[#D4DEED] text-[#265197] border border-[#D4DEED]"
@@ -874,7 +877,7 @@ export default function AssetDataPage() {
                                     >
                                       ≤ Menor o igual
                                     </Button>
-                                  </ButtonGroup>
+                                  </div>
                                 </div>
                               )}
                             </>
