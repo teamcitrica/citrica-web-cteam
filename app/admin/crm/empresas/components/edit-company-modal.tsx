@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Select, SelectItem, Textarea } from "@heroui/react";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
+import { Button } from "citrica-ui-toolkit";
 import { useSupabase } from "@/shared/context/supabase-context";
 
 import { Company, CompanyInput, useCompanyCRUD } from "@/hooks/companies/use-companies";
@@ -125,17 +125,18 @@ export default function EditCompanyModal({
       size="2xl"
       footer={
         <>
-          <ButtonCitricaAdmin variant="secondary" onPress={onClose}>
+          <Button isAdmin variant="secondary" onPress={onClose}>
             Cancelar
-          </ButtonCitricaAdmin>
-          <ButtonCitricaAdmin
+          </Button>
+          <Button
+            isAdmin
             variant="primary"
             className="bg-[#42668A]"
             onPress={handleSubmit}
             isLoading={isLoading}
           >
             Guardar Cambios
-          </ButtonCitricaAdmin>
+          </Button>
         </>
       }
     >

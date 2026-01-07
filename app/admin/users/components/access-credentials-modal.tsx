@@ -12,9 +12,8 @@ import {
 import { addToast } from "@heroui/toast";
 
 import { UserType } from "@/shared/types/types";
-import { Text } from "citrica-ui-toolkit";
+import { Text, Button } from "citrica-ui-toolkit";
 import Icon from "@/shared/components/citrica-ui/atoms/icon";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import { useUserCRUD } from "@/hooks/users/use-users";
 
 interface AccessCredentialsModalProps {
@@ -155,32 +154,35 @@ export default function AccessCredentialsModal({
         </ModalBody>
 
         <ModalFooter className="flex justify-between">
-          <ButtonCitricaAdmin
+          <Button
+            isAdmin
             variant="secondary"
             onPress={onClose}
             className="w-[162px]"
           >
             Cerrar
-          </ButtonCitricaAdmin>
+          </Button>
 
           {isActive ? (
-            <ButtonCitricaAdmin
+            <Button
+              isAdmin
               variant="primary"
               className="bg-[#F04242] w-[162px] !border-0"
               onPress={handleToggleAccess}
               isLoading={isLoading}
             >
               Inhabilitar
-            </ButtonCitricaAdmin>
+            </Button>
           ) : (
-            <ButtonCitricaAdmin
+            <Button
+              isAdmin
               variant="primary"
               className="bg-[#10E5A4] text-[#16305A] w-[162px] !border-0"
               onPress={handleToggleAccess}
               isLoading={isLoading}
             >
               Habilitar
-            </ButtonCitricaAdmin>
+            </Button>
           )}
         </ModalFooter>
       </ModalContent>

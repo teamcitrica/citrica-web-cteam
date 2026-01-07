@@ -7,7 +7,7 @@ import {
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
+import { Button } from "citrica-ui-toolkit";
 
 import { useProjectCRUD, ProjectInput, Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
@@ -228,10 +228,11 @@ export default function ProjectFormModal({
       size="2xl"
       footer={
         <>
-          <ButtonCitricaAdmin variant="secondary" onPress={onClose}>
+          <Button isAdmin variant="secondary" onPress={onClose}>
             Cancelar
-          </ButtonCitricaAdmin>
-          <ButtonCitricaAdmin
+          </Button>
+          <Button
+            isAdmin
             variant="primary"
             className="bg-[#42668A]"
             onPress={handleSubmit}
@@ -239,7 +240,7 @@ export default function ProjectFormModal({
             isDisabled={!isFormValid() || isLoading}
           >
             {mode === "create" ? "Crear Proyecto" : "Guardar Cambios"}
-          </ButtonCitricaAdmin>
+          </Button>
         </>
       }
     >

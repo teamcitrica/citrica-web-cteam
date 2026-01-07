@@ -7,7 +7,7 @@ import {
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
+import { Button } from "citrica-ui-toolkit";
 
 import { useContactCRUD, Contact, ContactInput } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
@@ -122,10 +122,11 @@ export default function EditContactModal({
       size="2xl"
       footer={
         <>
-          <ButtonCitricaAdmin variant="secondary" onPress={onClose}>
+          <Button isAdmin variant="secondary" onPress={onClose}>
             Cancelar
-          </ButtonCitricaAdmin>
-          <ButtonCitricaAdmin
+          </Button>
+          <Button
+            isAdmin
             variant="primary"
             className="bg-[#42668A]"
             onPress={handleSubmit}
@@ -133,7 +134,7 @@ export default function EditContactModal({
             isDisabled={!hasChanges()}
           >
             Actualizar Contacto
-          </ButtonCitricaAdmin>
+          </Button>
         </>
       }
     >

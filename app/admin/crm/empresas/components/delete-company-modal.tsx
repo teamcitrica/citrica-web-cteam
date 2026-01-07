@@ -5,13 +5,12 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Button,
   Divider,
 } from "@heroui/react";
 
 import { Company } from "@/hooks/companies/use-companies";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import { Icon, Text } from "@/shared/components/citrica-ui";
+import { Button } from "citrica-ui-toolkit";
 
 interface DeleteCompanyModalProps {
   company: Company;
@@ -47,20 +46,22 @@ export default function DeleteCompanyModal({
         </ModalBody>
         <ModalFooter>
         <div className="flex gap-3 justify-end">
-          <ButtonCitricaAdmin
-            variant="modalv2"
+          <Button
+            isAdmin
+            variant="secondary"
             className="w-[162px]"
             onPress={onCancel}
           >
             Cancelar
-          </ButtonCitricaAdmin>
-          <ButtonCitricaAdmin
+          </Button>
+          <Button
+            isAdmin
             variant="primary"
             className="bg-[#F04242] w-[162px] !border-0"
             onPress={onConfirm}
           >
             Eliminar
-          </ButtonCitricaAdmin>
+          </Button>
         </div>
         </ModalFooter>
       </ModalContent>

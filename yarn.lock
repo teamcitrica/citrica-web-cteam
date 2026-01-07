@@ -714,7 +714,7 @@
     "@heroui/shared-utils" "2.1.12"
     "@heroui/use-data-scroll-overflow" "2.2.13"
 
-"@heroui/select@2.4.30", "@heroui/select@^2.4.30":
+"@heroui/select@2.4.30":
   version "2.4.30"
   resolved "https://registry.yarnpkg.com/@heroui/select/-/select-2.4.30.tgz#e5ca371df2e8a0b243de2f1d5c90907e42cbcbfb"
   integrity sha512-laGM9ib4E/wxWu0T5/85yQZaKaT9HYP2hqy+xpD0HrKOZxBEINyTIbPJCq3cB9LiM6qqJJk/2A3rRjKNSj1Law==
@@ -3432,16 +3432,19 @@ chokidar@^4.0.0:
   dependencies:
     readdirp "^4.0.1"
 
-citrica-ui-toolkit@0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/citrica-ui-toolkit/-/citrica-ui-toolkit-0.0.8.tgz#64909305bd41c42fd963a9fdd683692b9e513735"
-  integrity sha512-JfUEtzYu/wwuKdrX9WZxJzULIYEIi2ySzaty+T6TK7WW7lnHGbJzAJJXpo+C0I4sbyz6N/nAcS1Ajul+rSwTrg==
+citrica-ui-toolkit@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/citrica-ui-toolkit/-/citrica-ui-toolkit-0.0.9.tgz#47217aa52090210326564d9f68453c4a0d4516e0"
+  integrity sha512-U8VjDnOXaCXlkRBnmxYnIgQc1UnhEk0JdhPEZx+J7rIuKP4pGWNedrfHfOFFSD14bYLheRSzXpxFtmYq6NbDKA==
   dependencies:
     "@heroui/button" "2.2.29"
+    "@heroui/card" "2.2.27"
     "@heroui/input" "2.4.30"
-    "@heroui/select" "^2.4.30"
+    "@heroui/modal" "2.2.26"
+    "@heroui/select" "2.4.30"
     clsx "2.1.1"
     lucide-react "0.562.0"
+    swiper "12.0.3"
 
 classlist-polyfill@^1.0.3:
   version "1.2.0"
@@ -6205,6 +6208,11 @@ svg-pathdata@^6.0.3:
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/svg-pathdata/-/svg-pathdata-6.0.3.tgz#80b0e0283b652ccbafb69ad4f8f73e8d3fbf2cac"
   integrity sha512-qsjeeq5YjBZ5eMdFuUa4ZosMLxgr5RZ+F+Y1OrDhuOCEInRMA3x74XdBtggJcj9kOeInz0WE+LgCPDkZFlBYJw==
+
+swiper@12.0.3:
+  version "12.0.3"
+  resolved "https://registry.yarnpkg.com/swiper/-/swiper-12.0.3.tgz#c7804fd39955189d3ec652d9832896bd3d04733e"
+  integrity sha512-BHd6U1VPEIksrXlyXjMmRWO0onmdNPaTAFduzqR3pgjvi7KfmUCAm/0cj49u2D7B0zNjMw02TSeXfinC1hDCXg==
 
 swiper@^10.3.1:
   version "10.3.1"

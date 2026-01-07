@@ -79,13 +79,14 @@ $btn-citrica-ui-admin: (
   }
 }
 .btn-secondary-admin{
-  background-color: var(--color-secondary-btn);
-  color: var(--color-secondary-btn-text);
-  border: none;
+  background-color: var(--color-admin-secondary-btn);
+  color: var(--color-admin-secondary-btn-text);
+  border: 1px solid var(--color-admin-secondary-btn-border);
   &:hover{
-    background-color: var(--color-secondary-btn-hover);
+    background-color: var(--color-admin-secondary-btn-hover);
+    border-color: var(--color-admin-secondary-btn-border-hover);
     .text-component {
-      color: var(--color-secondary-btn-text-hover) !important;
+      color: var(--color-admin-secondary-btn-text-hover) !important;
     }
   }
 }
