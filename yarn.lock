@@ -744,7 +744,7 @@
   resolved "https://registry.yarnpkg.com/@heroui/shared-icons/-/shared-icons-2.1.10.tgz#df53c7726d790320618530827627f71f8b8c759e"
   integrity sha512-ePo60GjEpM0SEyZBGOeySsLueNDCqLsVL79Fq+5BphzlrBAcaKY7kUp74964ImtkXvknTxAWzuuTr3kCRqj6jg==
 
-"@heroui/shared-utils@2.1.12":
+"@heroui/shared-utils@2.1.12", "@heroui/shared-utils@^2.1.1":
   version "2.1.12"
   resolved "https://registry.yarnpkg.com/@heroui/shared-utils/-/shared-utils-2.1.12.tgz#2b0c654797985e8f66bfb7c00f5227ee05bf9ffb"
   integrity sha512-0iCnxVAkIPtrHQo26Qa5g0UTqMTpugTbClNOrEPsrQuyRAq7Syux998cPwGlneTfB5E5xcU3LiEdA9GUyeK2cQ==
