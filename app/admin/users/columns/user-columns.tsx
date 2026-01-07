@@ -1,12 +1,7 @@
+import { Avatar } from "@heroui/avatar";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import { Tooltip } from "@heroui/tooltip";
 import React from "react";
-import {
-  Avatar,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Tooltip,
-} from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { ExportColumn } from "@/shared/hooks/useTableFeatures";

@@ -1,12 +1,6 @@
 "use client";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Divider,
-} from "@heroui/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { Divider } from "@heroui/divider";
 import { Contact } from "@/hooks/contact/use-contact";
 import { Icon } from "@/shared/components/citrica-ui";
 import { Text, Button } from "citrica-ui-toolkit";

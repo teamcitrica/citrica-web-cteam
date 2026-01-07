@@ -1,4 +1,5 @@
 "use client";
+import { Divider } from "@heroui/divider";
 import { useState, useCallback, useMemo } from "react";
 import ContactFormDrawer from "./components/contact-form-drawer";
 import ContactDetailModal from "./components/contact-detail-modal";
@@ -11,7 +12,6 @@ import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { Text } from 'citrica-ui-toolkit';
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
-import { Divider } from "@heroui/react";
 
 export default function ContactosPage() {
   const { contacts, isLoading, refreshContacts, deleteContact } = useContactCRUD();

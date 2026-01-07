@@ -1,24 +1,13 @@
 "use client";
+import { Skeleton } from "@heroui/skeleton";
+import { SelectItem } from "@heroui/select";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import { Chip } from "@heroui/chip";
+import { Divider } from "@heroui/divider";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
+import { Pagination } from "@heroui/pagination";
+import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 import React, { useCallback, useMemo, useState } from "react";
-import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Skeleton,
-  Pagination,
-  SelectItem,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Autocomplete,
-  AutocompleteItem,
-  Chip,
-  Divider,
-} from "@heroui/react";
 import Image from "next/image";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import Icon from "@ui/atoms/icon";

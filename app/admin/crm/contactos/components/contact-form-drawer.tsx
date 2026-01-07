@@ -1,10 +1,7 @@
 "use client";
+import { Select, SelectItem } from "@heroui/select";
+import { DatePicker } from "@heroui/date-picker";
 import { useState, useEffect } from "react";
-import {
-  Select,
-  SelectItem,
-  DatePicker,
-} from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
@@ -218,7 +215,7 @@ export default function ContactFormDrawer({
         <Select
           label="Tipo de Contacto"
           placeholder="Seleccione el tipo"
-          labelPlacement="outside-top"
+          labelPlacement="outside"
           variant="bordered"
           selectedKeys={formData.type_id ? [String(formData.type_id)] : []}
           onSelectionChange={(keys) => {
@@ -244,7 +241,7 @@ export default function ContactFormDrawer({
         <Select
           label="Empresa"
           placeholder="Seleccione una empresa"
-          labelPlacement="outside-top"
+          labelPlacement="outside"
           variant="bordered"
           selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
           onSelectionChange={(keys) => {
@@ -306,7 +303,7 @@ export default function ContactFormDrawer({
           <Select
             label="Código"
             placeholder="+51"
-            labelPlacement="outside-top"
+            labelPlacement="outside"
             variant="bordered"
             selectedKeys={[phoneCode]}
             onSelectionChange={(keys) => {
@@ -372,7 +369,7 @@ export default function ContactFormDrawer({
         <Select
           label="País"
           placeholder="Seleccione un país"
-          labelPlacement="outside-top"
+          labelPlacement="outside"
           variant="bordered"
           selectedKeys={formData.country ? [formData.country] : []}
           onSelectionChange={(keys) => {

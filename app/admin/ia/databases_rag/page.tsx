@@ -1,10 +1,11 @@
 "use client";
+import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
+import { Skeleton } from "@heroui/skeleton";
 import { useState, useEffect } from "react";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import { Button } from "citrica-ui-toolkit";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
-import { Card, CardHeader, CardBody, CardFooter, Skeleton } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import {
   Database,

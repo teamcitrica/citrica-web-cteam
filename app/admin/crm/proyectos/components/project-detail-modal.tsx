@@ -1,9 +1,7 @@
 "use client";
+import { Divider } from "@heroui/divider";
+import { Skeleton } from "@heroui/skeleton";
 import { useEffect, useState } from "react";
-import {
-  Divider,
-  Skeleton,
-} from "@heroui/react";
 
 import { Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";

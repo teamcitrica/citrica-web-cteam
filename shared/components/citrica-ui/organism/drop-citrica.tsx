@@ -1,6 +1,6 @@
+import { Avatar } from "@heroui/avatar";
 import React from 'react';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
-import { Avatar } from '@heroui/react';
 import Icon, { IconName } from "@/shared/components/citrica-ui/atoms/icon";
 import { useRouter } from 'next/navigation';
 import { Text } from "citrica-ui-toolkit";

@@ -1,14 +1,8 @@
 "use client";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { Tooltip } from "@heroui/tooltip";
+import { Divider } from "@heroui/divider";
 import { useState } from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Tooltip,
-  Divider,
-} from "@heroui/react";
 import { addToast } from "@heroui/toast";
 
 import { UserType } from "@/shared/types/types";

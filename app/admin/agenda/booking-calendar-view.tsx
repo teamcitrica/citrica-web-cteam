@@ -1,9 +1,9 @@
 "use client";
+import { Chip } from "@heroui/chip";
 import React, { useState, useEffect } from "react";
 import { Button, Text } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
 import Icon from "@ui/atoms/icon";
-import { Chip } from "@heroui/react";
 
 import { useReservas } from "@/hooks/reservas/use-reservas";
 

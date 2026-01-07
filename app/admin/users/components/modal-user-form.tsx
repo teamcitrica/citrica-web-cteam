@@ -1,5 +1,6 @@
 "use client";
 
+import { SelectItem } from "@heroui/select";
 import { useEffect, useState } from "react";
 import { addToast } from "@heroui/toast";
 import { Eye, EyeOff } from "lucide-react";
@@ -10,7 +11,6 @@ import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { UserType } from "@/shared/types/types";
 import { InputCitricaAdmin, SelectCitricaAdmin, DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import { Button } from "citrica-ui-toolkit";
-import { SelectItem } from "@heroui/react";
 
 type UserFormModalProps = {
   isOpen: boolean;
@@ -473,8 +473,6 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             name="user_email_modal"
           />
 
-
-
           {!isEditMode && (
             <InputCitricaAdmin
               label="Contraseña *"
@@ -503,9 +501,6 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
               }
             />
           )}
-
-
-
 
         </div>
       </form>

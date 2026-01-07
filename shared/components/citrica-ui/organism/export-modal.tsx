@@ -1,9 +1,9 @@
 "use client";
+import { Divider } from "@heroui/divider";
 import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { Text, Button } from "citrica-ui-toolkit";
-import { Divider } from "@heroui/react";
 
 type ExportModalProps = {
   isOpen: boolean;

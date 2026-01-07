@@ -1,9 +1,9 @@
 "use client";
+import { SelectItem } from "@heroui/select";
 import { useState, useRef, useEffect } from "react";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { SelectCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import { Button } from "citrica-ui-toolkit";
-import { SelectItem } from "@heroui/react";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
 import {
   Send,

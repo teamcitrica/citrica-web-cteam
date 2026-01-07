@@ -1,9 +1,10 @@
 // ModalDeleteUser.tsx
+import { Modal, ModalContent } from "@heroui/modal";
+import { Divider } from "@heroui/divider";
 import React from "react";
 import { UserType } from "@/shared/types/types";
 import { Text, Button } from "citrica-ui-toolkit";
 import Icon from "@ui/atoms/icon";
-import { Modal, ModalContent, Divider } from "@heroui/react";
 
 interface ModalDeleteUserProps {
   user: UserType | null;

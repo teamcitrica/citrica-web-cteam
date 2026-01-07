@@ -1,10 +1,10 @@
 "use client";
+import { Switch } from "@heroui/switch";
 import React, { useState, useEffect } from "react";
 import { Button, Text } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
 import Modal from "@ui/molecules/modal";
 import Icon from "@ui/atoms/icon";
-import { Switch } from "@heroui/react";
 
 import { useAdminBookings, WeeklyAvailability } from "@/hooks/disponibilidad/use-admin-bookings";
 

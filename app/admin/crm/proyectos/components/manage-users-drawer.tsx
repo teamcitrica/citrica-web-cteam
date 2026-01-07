@@ -1,6 +1,7 @@
 "use client";
+import { Chip } from "@heroui/chip";
+import { Divider } from "@heroui/divider";
 import { useState, useEffect } from "react";
-import { Chip, Divider } from "@heroui/react";
 import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 import { addToast } from "@heroui/toast";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";

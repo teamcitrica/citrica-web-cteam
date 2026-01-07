@@ -1,11 +1,6 @@
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { Project } from "@/hooks/projects/use-projects";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem
-} from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import { Text, Button } from "citrica-ui-toolkit";
 

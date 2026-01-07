@@ -1,10 +1,10 @@
 "use client";
+import { Select, SelectItem } from "@heroui/select";
 import React, { useState } from "react";
 import { Text, Button } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
 import Icon from "@ui/atoms/icon";
 import Input from "@ui/atoms/input";
-import { Select, SelectItem } from "@heroui/react";
 
 import { useAdminBookings } from "@/hooks/disponibilidad/use-admin-bookings";
 

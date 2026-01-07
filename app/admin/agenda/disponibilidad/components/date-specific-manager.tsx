@@ -1,8 +1,9 @@
 "use client";
+import { Calendar } from "@heroui/calendar";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import React, { useState, useEffect } from "react";
 import { Button, Text } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
-import { Calendar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/react";
 import { today, getLocalTimeZone } from "@internationalized/date";
 
 import { useAdminBookings } from "@/hooks/disponibilidad/use-admin-bookings";

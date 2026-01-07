@@ -1,9 +1,6 @@
 "use client";
+import { Select, SelectItem } from "@heroui/select";
 import { useState, useEffect } from "react";
-import {
-  Select,
-  SelectItem,
-} from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";

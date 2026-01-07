@@ -1,12 +1,6 @@
 "use client";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import React from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from "@heroui/react";
 import { Text, Button } from "citrica-ui-toolkit";
 import { Reserva, ReservaEstado } from "@/hooks/reservas/use-reservas";
 

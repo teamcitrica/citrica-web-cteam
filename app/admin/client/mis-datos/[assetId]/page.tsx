@@ -1,10 +1,12 @@
 "use client";
+import { Spinner } from "@heroui/spinner";
+import { DateRangePicker } from "@heroui/date-picker";
+import { Divider } from "@heroui/divider";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { useUserAssets } from "@/hooks/user-assets/use-user-assets";
-import { Spinner, DateRangePicker, Divider } from "@heroui/react";
 import { Button } from "citrica-ui-toolkit";
 import Input from "@/shared/components/citrica-ui/atoms/input";
 import { Col, Container } from "@/styles/07-objects/objects";

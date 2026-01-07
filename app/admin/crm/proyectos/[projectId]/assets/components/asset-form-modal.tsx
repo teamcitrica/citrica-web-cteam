@@ -1,19 +1,10 @@
 "use client";
+import { Select, SelectItem } from "@heroui/select";
+import { Chip } from "@heroui/chip";
+import { Input } from "@heroui/input";
+import { Checkbox, CheckboxGroup } from "@heroui/checkbox";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { useState, useEffect, useCallback } from "react";
-import {
-  Select,
-  SelectItem,
-  Checkbox,
-  CheckboxGroup,
-  Chip,
-  Input,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-} from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
@@ -85,7 +76,6 @@ export default function AssetFormModal({
       [field]: finalValue,
     }));
   };
-
 
   // Función para obtener columnas de una tabla específica
   const fetchTableColumns = useCallback(async (tableName: string, preservedColumns?: string[], showToast = true, supabaseUrl?: string, supabaseKey?: string) => {
@@ -351,7 +341,6 @@ export default function AssetFormModal({
     };
     handleInputChange("assets_options", options);
   };
-
 
   // Función para manejar la columna de búsqueda por fecha
   const handleDateSearchColumnChange = (column: string) => {
