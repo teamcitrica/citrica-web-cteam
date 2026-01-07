@@ -1,12 +1,13 @@
 "use client";
 
+import { Divider } from "@heroui/divider";
 import React from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
 import { UserType } from "@/shared/types/types";
-import { DetailModal, Text } from "@/shared/components/citrica-ui";
-import { Divider } from "@heroui/react";
+import { DetailModal } from "@/shared/components/citrica-ui";
+import { Text } from "citrica-ui-toolkit";
 
 interface UserDetailModalProps {
   user: UserType | null;

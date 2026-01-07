@@ -2,8 +2,8 @@
 import React from "react";
 import { Contact } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
-import { DetailModal, Text } from "@/shared/components/citrica-ui";
-import { Button } from "@heroui/react";
+import { DetailModal } from "@/shared/components/citrica-ui";
+import { Text } from "citrica-ui-toolkit";
 import { COUNTRIES } from "@/shared/data/countries";
 
 interface ContactDetailModalProps {

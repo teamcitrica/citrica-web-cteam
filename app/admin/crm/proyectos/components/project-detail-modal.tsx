@@ -1,16 +1,14 @@
 "use client";
+import { Divider } from "@heroui/divider";
+import { Skeleton } from "@heroui/skeleton";
 import { useEffect, useState } from "react";
-import {
-  Divider,
-  Skeleton,
-} from "@heroui/react";
 
 import { Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { useUserProjects } from "@/hooks/user-projects/use-user-projects";
 import { UserType } from "@/shared/types/types";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
-import { DetailModal, Text } from "@/shared/components/citrica-ui";
+import { DetailModal } from "@/shared/components/citrica-ui";
+import { Text, Button } from "citrica-ui-toolkit";
 
 interface ProjectDetailModalProps {
   project: Project;
@@ -130,9 +128,9 @@ export default function ProjectDetailModal({
       title="DETALLES DEL PROYECTO"
       sections={sections}
       footer={
-        <ButtonCitricaAdmin variant="modal" onPress={onClose}>
+        <Button isAdmin variant="secondary" onPress={onClose}>
           Cerrar
-        </ButtonCitricaAdmin>
+        </Button>
       }
     />
   );

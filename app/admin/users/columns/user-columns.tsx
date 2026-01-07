@@ -1,17 +1,12 @@
+import { Avatar } from "@heroui/avatar";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import { Tooltip } from "@heroui/tooltip";
 import React from "react";
-import {
-  Avatar,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Button,
-  Tooltip,
-} from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { ExportColumn } from "@/shared/hooks/useTableFeatures";
 import { UserType } from "@/shared/types/types";
+import { Button } from "citrica-ui-toolkit";
 
 type UserColumnsConfig = {
   onView: (user: UserType) => void;
@@ -136,23 +131,23 @@ export const getUserColumns = ({
     sortable: false,
     align: "end",
     render: (user) => (
-      <div className="relative flex justify-end items-end gap-2">
+      <div
+        className="relative flex justify-end items-center gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
         <Button
           isIconOnly
-          size="sm"
-          variant="light"
+          variant="flat"
           onPress={() => onView(user)}
-          className="text-[#265197] hover:bg-blue-100"
+          className=" hover:!bg-transparent !p-1 !min-w-0"
         >
-          <Icon className="w-5 h-5" name="Eye" />
+          <Icon className="w-5 h-5 text-[#265197]" name="Eye" />
         </Button>
+
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light">
-              <Icon
-                className="text-[#265197] w-5 h-5"
-                name="EllipsisVertical"
-              />
+            <Button isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0">
+              <Icon className="text-[#265197] w-5 h-5" name="EllipsisVertical" />
             </Button>
           </DropdownTrigger>
           <DropdownMenu
@@ -171,13 +166,10 @@ export const getUserColumns = ({
               }
             }}
           >
-            <DropdownItem className="text-[#265197]" key="edit">
+            <DropdownItem key="edit">
               Editar
             </DropdownItem>
-            <DropdownItem
-              className="text-[#265197]"
-              key="access-credentials"
-            >
+            <DropdownItem key="access-credentials">
               Accesos
             </DropdownItem>
             <DropdownItem key="delete" className="text-danger" color="danger">

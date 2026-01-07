@@ -2,7 +2,8 @@
 
 import { Col, Container } from '@/styles/07-objects/objects'
 import React from 'react'
-import { Button, Icon, Input, Select, Text, Textarea } from '../citrica-ui'
+import { Icon, Input, Textarea } from '../citrica-ui'
+import { Button, Text } from 'citrica-ui-toolkit'
 import { useContact } from '@/hooks/leads/use-leads'
 import AnimatedContent from './animated-content'
 import CalendarComponent from './calendar'
@@ -142,7 +143,7 @@ export const ContactSectionLanding = ({
           </Col>
 
           <Col cols={{ lg: 5, md: 3, sm: 4 }} className='mt-8 md:mt-0 lg:mt-0'>
-            <div className="bg-color-ct-white rounded-2xl shadow-xl border-3 border-[757575] p-4">
+            <div className="bg-color-ct-white rounded-2xl shadow-xl border-3 border-[1] p-4">
               <form
                 onSubmit={handleSubmit}
                 className="flex flex-col items-center gap-4"
@@ -289,7 +290,7 @@ export const ContactSectionLanding = ({
                         label="Anterior"
                         variant="secondary"
                         fullWidth
-                        onClick={prevStep}
+                        onPress={prevStep}
                       />
                       <Button
                         type="submit"
@@ -330,7 +331,7 @@ export const ContactSectionLanding = ({
                         label="Siguiente"
                         variant="primary"
                         fullWidth
-                        onClick={nextStep}
+                        onPress={nextStep}
                         disabled={!formData.date}
                       />
                     </div>
@@ -428,14 +429,14 @@ export const ContactSectionLanding = ({
                         label="Anterior"
                         variant="secondary"
                         fullWidth
-                        onClick={prevStep}
+                        onPress={prevStep}
                       />
                       <Button
                         type="button"
                         label="Siguiente"
                         variant="primary"
                         fullWidth
-                        onClick={nextStep}
+                        onPress={nextStep}
                         disabled={
                           studioConfig.allow_multiple_time_slots
                             ? selectedTimeSlots.length === 0

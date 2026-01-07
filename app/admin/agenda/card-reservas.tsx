@@ -1,23 +1,12 @@
 "use client";
+import { Spinner } from "@heroui/spinner";
+import { Input } from "@heroui/input";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
+import { Pagination } from "@heroui/pagination";
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Spinner,
-  Pagination,
-  Input,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Button,
-} from "@heroui/react";
 import Icon from "@ui/atoms/icon";
-import Text from "@/shared/components/citrica-ui/atoms/text";
+import { Button, Text } from "citrica-ui-toolkit";
 import { useReservas, Reserva, ReservaEstado } from "@/hooks/reservas/use-reservas";
 import ReservaDetailModal from "./components/modal-details-reserva";
 
@@ -280,9 +269,7 @@ export default function CardReservas({
               <Dropdown>
                 <DropdownTrigger>
                   <Button
-                    isIconOnly
                     size="sm"
-                    variant="light"
                     className="text-gray-600 hover:text-gray-800"
                   >
                     <Icon name="MoreVertical" className="w-5 h-5" />

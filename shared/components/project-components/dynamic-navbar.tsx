@@ -1,9 +1,10 @@
 "use client";
+import { Link } from "@heroui/link";
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Container, Col } from "@/styles/07-objects/objects";
-import { Text, Icon, Button } from "@citrica-ui";
-import { Link } from "@heroui/react";
+import { Icon } from "@citrica-ui";
+import { Button, Text } from "citrica-ui-toolkit";
 
 export const DynamicNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -132,7 +133,7 @@ export const DynamicNavbar = () => {
             {isProjectPage ? (
               <Link href="/">
                 <Button
-                  onClick={() => setIsMenuOpen(false)}
+                  onPress={() => setIsMenuOpen(false)}
                   label="Regresar"
                   variant="primary"
                   className="px-8 mt-[10px] bg-[#E1FF00] text-black rounded-[80]"
@@ -141,7 +142,7 @@ export const DynamicNavbar = () => {
             ) : (
               <a href="mailto:contacto@citrica.dev">
                 <Button
-                  onClick={() => setIsMenuOpen(false)}
+                  onPress={() => setIsMenuOpen(false)}
                   label="Hablemos"
                   variant="primary"
                 />

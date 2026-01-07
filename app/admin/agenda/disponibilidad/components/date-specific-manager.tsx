@@ -1,9 +1,9 @@
 "use client";
+import { Calendar } from "@heroui/calendar";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import React, { useState, useEffect } from "react";
-import Text from "@ui/atoms/text";
-import Button from "@ui/molecules/button";
+import { Button, Text } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
-import { Calendar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/react";
 import { today, getLocalTimeZone } from "@internationalized/date";
 
 import { useAdminBookings } from "@/hooks/disponibilidad/use-admin-bookings";
@@ -350,7 +350,7 @@ const DateSpecificManager = () => {
           {/* Botón de prueba para verificar el modal */}
           <Button
             variant="secondary"
-            onClick={() => {
+            onPress={() => {
               const testDate = today(getLocalTimeZone());
               handleDateSelect(testDate);
             }}
@@ -422,14 +422,14 @@ const DateSpecificManager = () => {
                 <div className="flex gap-2 mb-4">
                   <Button
                     size="sm"
-                    onClick={blockEntireDay}
+                    onPress={blockEntireDay}
                     className="bg-[#FF8C00] text-white hover:bg-green-500 transition-colors"
                   >
                     Bloquear Todo el Día
                   </Button>
                   <Button
                     size="sm"
-                    onClick={unblockEntireDay}
+                    onPress={unblockEntireDay}
                     className="bg-[#FF8C00] text-white hover:bg-green-500 transition-colors"
                   >
                     Desbloquear Todo el Día
@@ -455,7 +455,7 @@ const DateSpecificManager = () => {
                           isAvailableByDefault ? "success" :
                           "flat"
                         }
-                        onClick={() => toggleSlotBlock(timeSlot)}
+                        onPress={() => toggleSlotBlock(timeSlot)}
                         className={`
                           !min-w-0 text-xs transition-all
                           ${!isBusinessHour ? 'opacity-50' : ''}
@@ -503,7 +503,7 @@ const DateSpecificManager = () => {
           <ModalFooter>
             <Button
               variant="secondary"
-              onClick={() => setIsModalOpen(false)}
+              onPress={() => setIsModalOpen(false)}
             >
               Cerrar
             </Button>

@@ -1,6 +1,6 @@
 import { Col, Container } from '@/styles/07-objects/objects'
 import React from 'react'
-import { Button, Text } from '../citrica-ui'
+import { Button, Text } from 'citrica-ui-toolkit'
 
 export const CtaSection = () => {
   return (
@@ -29,7 +29,7 @@ export const CtaSection = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
-                onClick={() =>
+                onPress={() =>
                   window.open("mailto:contacto@citrica.dev", "_blank")
                 }
                 label="Solicitar Cotización"

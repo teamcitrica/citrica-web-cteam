@@ -1,18 +1,11 @@
 "use client";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { Tooltip } from "@heroui/tooltip";
 import { useState } from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Tooltip,
-} from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { Icon } from "@/shared/components/citrica-ui";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
-
+import { Button } from "citrica-ui-toolkit";
 import { Contact } from "@/hooks/contact/use-contact";
 
 // Función para generar contraseña segura aleatoria
@@ -353,7 +346,6 @@ export default function GrantAccessModal({
                         </div>
                         <Tooltip content="Generar contraseña">
                           <Button
-                            isIconOnly
                             className="bg-[#42668A] text-white"
                             onPress={handleGeneratePassword}
                           >
@@ -362,7 +354,6 @@ export default function GrantAccessModal({
                         </Tooltip>
                         <Tooltip content="Copiar al portapapeles">
                           <Button
-                            isIconOnly
                             className="bg-green-600 text-white"
                             onPress={handleCopyPassword}
                             isDisabled={!password}
@@ -382,7 +373,7 @@ export default function GrantAccessModal({
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button color="danger" variant="light" onPress={handleClose}>
+          <Button color="danger" onPress={handleClose}>
             Cancelar
           </Button>
           <Button

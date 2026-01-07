@@ -1,22 +1,19 @@
 'use client';
+import { Divider } from "@heroui/divider";
+import { Link } from "@heroui/link";
 import React, { useState } from 'react'
 import { Container } from '@/styles/07-objects/objects';
-import Text from '../atoms/text';
+import { Text, Button } from 'citrica-ui-toolkit';
 import Input from "../atoms/input";
-import { Divider, Link } from "@heroui/react";
-import Button from '../molecules/button';
 import Modal from '../molecules/modal';
 import Icon from '../atoms/icon';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-
 
 const ForgotPasswordPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailSentModal, setShowEmailSentModal] = useState(false);
   const [email, setEmail] = useState('');
   const supabase = createClientComponentClient();
-
-
 
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -41,7 +38,6 @@ const handleSubmit = async (e: React.FormEvent) => {
   if (typeof window !== 'undefined') {
     localStorage.setItem('password_reset_email', email);
   }
-
 
   setShowEmailSentModal(true);
 };
@@ -119,10 +115,9 @@ const handleSubmit = async (e: React.FormEvent) => {
             variant="primary"
             label="Cerrar"
             fullWidth
-            onClick={() => setShowEmailSentModal(false)}
+            onPress={() => setShowEmailSentModal(false)}
             className="mb-4"
           />
-
 
           <div className="text-center">
             <Text variant="label" textColor="color-on-secondary">

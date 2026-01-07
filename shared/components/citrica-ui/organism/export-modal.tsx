@@ -1,10 +1,9 @@
 "use client";
+import { Divider } from "@heroui/divider";
 import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
-import Text from "../atoms/text";
-import { Divider } from "@heroui/react";
+import { Text, Button } from "citrica-ui-toolkit";
 
 type ExportModalProps = {
   isOpen: boolean;
@@ -54,18 +53,19 @@ const ExportModal: React.FC<ExportModalProps> = ({
               </div>
             </ModalBody>
             <ModalFooter className="h-[72px] flex justify-center">
-              <ButtonCitricaAdmin variant="modalv2" onPress={onCloseModal} isDisabled={isLoading}>
+              <Button isAdmin variant="secondary" onPress={onCloseModal} isDisabled={isLoading}>
                 Cancelar
-              </ButtonCitricaAdmin>
-              <ButtonCitricaAdmin
-                variant="modal"
+              </Button>
+              <Button
+                isAdmin
+                variant="primary"
                 className="bg-[#265197]"
                 onPress={onConfirm}
                 isDisabled={!fileName.trim() || isLoading}
                 isLoading={isLoading}
               >
                 {isLoading ? "Exportando..." : "Exportar"}
-              </ButtonCitricaAdmin>
+              </Button>
             </ModalFooter>
           </>
         )}

@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Container, Col } from '@citrica/objects'
-import Text from '@ui/atoms/text'
-import Button from '@ui/molecules/button'
+import { Button, Text } from 'citrica-ui-toolkit'
 import { Input } from "@heroui/input"
 import { Card, CardBody } from "@heroui/card"
 import { addToast } from "@heroui/toast"
@@ -176,7 +175,7 @@ const SignupPage = () => {
                 />
 
                 <Button
-                  onClick={handleSignup}
+                  onPress={handleSignup}
                   label={isLoading ? "Registrando..." : "Crear Cuenta"}
                   variant="primary"
                   textVariant="body"

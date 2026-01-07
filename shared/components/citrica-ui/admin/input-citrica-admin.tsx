@@ -1,6 +1,6 @@
 "use client";
+import { Input as HeroUIInput, InputProps as HeroUIInputProps } from "@heroui/input";
 import React from "react";
-import { Input as HeroUIInput, InputProps as HeroUIInputProps } from "@heroui/react";
 
 export interface InputCitricaAdminProps extends Omit<HeroUIInputProps, 'variant'> {
   endContent?: React.ReactNode;
@@ -40,6 +40,7 @@ export const InputCitricaAdmin: React.FC<InputCitricaAdminProps> = ({
           ...customClassNames,
         }}
         variant="bordered"
+        labelPlacement="outside"
         endContent={endContent}
         {...props}
       />

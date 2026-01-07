@@ -7,7 +7,6 @@ export { default as Select } from './atoms/select';
 export { default as Card } from './atoms/card';
 export { default as Icon } from './atoms/icon';
 // Molecules
-export { default as Button } from './molecules/button';
 export { default as Carousel } from './molecules/carousel';
 export { default as Modal } from './molecules/modal';
 export { default as DetailModal } from './molecules/detail-modal';

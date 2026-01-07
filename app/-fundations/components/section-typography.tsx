@@ -1,7 +1,6 @@
 "use client"
 import React from 'react'
-import Card from '@ui/atoms/card';
-import Text  from '@ui/atoms/text'; 
+import { Text } from 'citrica-ui-toolkit';
 import { Container, Col } from '@/styles/07-objects/objects';
 import Icon from '@ui/atoms/icon';
 

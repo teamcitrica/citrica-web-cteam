@@ -1,11 +1,11 @@
 "use client";
+import { Spinner } from "@heroui/spinner";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { useUserAssets } from "@/hooks/user-assets/use-user-assets";
-import { Spinner } from "@heroui/react";
 import { Col, Container } from "@/styles/07-objects/objects";
-import { Text } from "@/shared/components/citrica-ui";
+import { Text } from "citrica-ui-toolkit";
 
 export default function MisDatosPage() {
   const router = useRouter();

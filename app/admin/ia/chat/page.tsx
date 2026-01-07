@@ -1,14 +1,14 @@
 "use client";
+import { SelectItem } from "@heroui/select";
 import { useState, useRef, useEffect } from "react";
 import { Col, Container } from "@/styles/07-objects/objects";
-import { SelectCitricaAdmin, ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
-import { SelectItem } from "@heroui/react";
+import { SelectCitricaAdmin } from "@/shared/components/citrica-ui/admin";
+import { Button } from "citrica-ui-toolkit";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
 import {
   Send,
   Bot,
   User,
-  Database,
   Loader2,
   MessageSquare,
   Sparkles,
@@ -303,13 +303,14 @@ export default function ChatPage() {
 
             {/* Botón de eliminar historial */}
             <div className="flex items-center justify-center">
-              <ButtonCitricaAdmin
+              <Button
+                isAdmin
                 onClick={() => setIsDeleteModalOpen(true)}
                 variant="secondary"
                 style={{ backgroundColor: "#dc2626", color: "white", minWidth: "auto" }}
               >
                 <Trash2 className="w-4 h-4" />
-              </ButtonCitricaAdmin>
+              </Button>
             </div>
           </div>
 
@@ -436,7 +437,8 @@ export default function ChatPage() {
               />
               <MessageSquare className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             </div>
-            <ButtonCitricaAdmin
+            <Button
+              isAdmin
               onClick={() => handleSendMessage()}
               disabled={!inputMessage.trim() || isLoading}
             >
@@ -448,7 +450,7 @@ export default function ChatPage() {
                   <span>Enviar</span>
                 </>
               )}
-            </ButtonCitricaAdmin>
+            </Button>
           </div>
 
           {/* Información adicional */}
@@ -467,18 +469,20 @@ export default function ChatPage() {
         size="sm"
         footer={
           <div className="flex gap-3 w-full">
-            <ButtonCitricaAdmin
+            <Button
+              isAdmin
               onClick={() => setIsDeleteModalOpen(false)}
               variant="secondary"
             >
               Cancelar
-            </ButtonCitricaAdmin>
-            <ButtonCitricaAdmin
+            </Button>
+            <Button
+              isAdmin
               onClick={handleClearHistory}
               style={{ backgroundColor: "#dc2626" }}
             >
               Eliminar
-            </ButtonCitricaAdmin>
+            </Button>
           </div>
         }
       >

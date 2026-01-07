@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Text from "@ui/atoms/text";
+import { Text } from "citrica-ui-toolkit";
 
 // Tipos para el componente TextType
 interface TextTypeProps {

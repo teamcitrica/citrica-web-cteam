@@ -1,4 +1,5 @@
 "use client";
+import { Divider } from "@heroui/divider";
 import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
@@ -12,9 +13,8 @@ import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { getProjectColumns } from "./columns/project-columns";
 import { Col, Container } from "@/styles/07-objects/objects";
-import { Text } from "@/shared/components/citrica-ui";
+import { Text } from "citrica-ui-toolkit";
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
-import { Divider } from "@heroui/react";
 import { createUsers } from "@/public/icon-svg/create-users";
 
 export default function ProyectosPage() {

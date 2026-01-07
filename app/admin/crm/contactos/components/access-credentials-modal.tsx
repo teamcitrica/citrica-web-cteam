@@ -1,22 +1,14 @@
 "use client";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { Tooltip } from "@heroui/tooltip";
+import { Divider } from "@heroui/divider";
 import { useState } from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Tooltip,
-  Button,
-  Divider,
-} from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { Contact } from "@/hooks/contact/use-contact";
-import Text from "@/shared/components/citrica-ui/atoms/text";
+import { Text, Button } from "citrica-ui-toolkit";
 import Icon from "@/shared/components/citrica-ui/atoms/icon";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 
 // Función para generar contraseña segura aleatoria
 const generateSecurePassword = (): string => {
@@ -351,6 +343,7 @@ export default function AccessCredentialsModal({
                     <div className="flex gap-2">
                       <Tooltip content="Generar contraseña">
                         <Button
+                          isAdmin
                           size="sm"
                           className="bg-[#42668A] text-white"
                           onPress={handleGeneratePassword}
@@ -361,6 +354,7 @@ export default function AccessCredentialsModal({
                       </Tooltip>
                       <Tooltip content="Copiar al portapapeles">
                         <Button
+                          isAdmin
                           size="sm"
                           className="bg-green-600 text-white"
                           onPress={() => handleCopyToClipboard(newPassword, "Contraseña")}
@@ -382,25 +376,28 @@ export default function AccessCredentialsModal({
         </ModalBody>
 
         <ModalFooter className="flex justify-between">
-          <ButtonCitricaAdmin
+          <Button
+            isAdmin
             variant="secondary"
             onPress={onClose}
             className="w-[162px]"
           >
             Cerrar
-          </ButtonCitricaAdmin>
+          </Button>
 
           {isActive ? (
-            <ButtonCitricaAdmin
+            <Button
+              isAdmin
               variant="primary"
               className="bg-[#F04242] w-[162px] !border-0"
               onPress={handleToggleAccess}
               isLoading={isLoading}
             >
               Inhabilitar
-            </ButtonCitricaAdmin>
+            </Button>
           ) : (
-            <ButtonCitricaAdmin
+            <Button
+              isAdmin
               variant="primary"
               className="bg-[#10E5A4] text-[#16305A] w-[162px] !border-0"
               onPress={() => {
@@ -414,7 +411,7 @@ export default function AccessCredentialsModal({
               isDisabled={isFirstTime && showNewPasswordInput && !newPassword}
             >
               {isReactivation ? "Habilitar" : "Habilitar"}
-            </ButtonCitricaAdmin>
+            </Button>
           )}
         </ModalFooter>
       </ModalContent>

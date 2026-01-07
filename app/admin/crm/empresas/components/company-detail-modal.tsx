@@ -2,8 +2,8 @@
 import { useMemo } from "react";
 import { Company } from "@/hooks/companies/use-companies";
 import { useUserCRUD } from "@/hooks/users/use-users";
-import { DetailModal, Text } from "@/shared/components/citrica-ui";
-import { Divider } from "@heroui/react";
+import { DetailModal } from "@/shared/components/citrica-ui";
+import { Text } from 'citrica-ui-toolkit';
 
 interface CompanyDetailModalProps {
   company: Company;

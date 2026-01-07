@@ -1,14 +1,11 @@
 "use client";
+import { Select, SelectItem } from "@heroui/select";
+import { DatePicker } from "@heroui/date-picker";
 import { useState, useEffect } from "react";
-import {
-  Select,
-  SelectItem,
-  DatePicker,
-} from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
+import { Button } from "citrica-ui-toolkit";
 import { useContactCRUD, ContactInput, Contact } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { useTypeContactCRUD } from "@/hooks/types-contact/use-types-contact";
@@ -193,21 +190,23 @@ export default function ContactFormDrawer({
       title={mode === "create" ? "AGREGAR CONTACTO" : "EDITAR CONTACTO"}
       footer={
         <>
-          <ButtonCitricaAdmin
+          <Button
+            isAdmin
             variant="secondary"
             onPress={onClose}
-            className="w-[162px]"
+            className=" bg-white w-[162px]"
           >
             Cerrar
-          </ButtonCitricaAdmin>
-          <ButtonCitricaAdmin
+          </Button>
+          <Button
+            isAdmin
             variant="primary"
-            className="bg-[#42668A] w-[162px]"
+            className="w-[162px]"
             onPress={handleSubmit}
             isLoading={isLoading}
           >
             {mode === "create" ? "Agregar" : "Guardar"}
-          </ButtonCitricaAdmin>
+          </Button>
         </>
       }
     >
@@ -216,6 +215,8 @@ export default function ContactFormDrawer({
         <Select
           label="Tipo de Contacto"
           placeholder="Seleccione el tipo"
+          labelPlacement="outside"
+          variant="bordered"
           selectedKeys={formData.type_id ? [String(formData.type_id)] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];
@@ -240,6 +241,8 @@ export default function ContactFormDrawer({
         <Select
           label="Empresa"
           placeholder="Seleccione una empresa"
+          labelPlacement="outside"
+          variant="bordered"
           selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];
@@ -300,6 +303,8 @@ export default function ContactFormDrawer({
           <Select
             label="Código"
             placeholder="+51"
+            labelPlacement="outside"
+            variant="bordered"
             selectedKeys={[phoneCode]}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0] as string;
@@ -364,6 +369,8 @@ export default function ContactFormDrawer({
         <Select
           label="País"
           placeholder="Seleccione un país"
+          labelPlacement="outside"
+          variant="bordered"
           selectedKeys={formData.country ? [formData.country] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];

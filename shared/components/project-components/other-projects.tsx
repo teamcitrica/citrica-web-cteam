@@ -1,8 +1,8 @@
+import { Link } from "@heroui/link";
 import { Col, Container } from '@/styles/07-objects/objects'
 import React from 'react'
-import { Button, Text } from '../citrica-ui'
+import { Button, Text } from 'citrica-ui-toolkit'
 import { otherProjects } from "@/shared/archivos js/citrica-data";
-import { Link } from '@heroui/react';
 
 interface CompletedProjectsProps {
   currentProjectSlug?: string;
@@ -73,7 +73,7 @@ export const CompletedProjects = ({ currentProjectSlug }: CompletedProjectsProps
                   {/* Botón */}
                   <Link href={otherProjects.link} className="w-full">
                     <Button
-                      onClick={() => { }}
+                      onPress={() => { }}
                       label="Ver Detalles"
                       variant="secondary"
                       fullWidth

@@ -1,5 +1,6 @@
 "use client";
 
+import { SelectItem } from "@heroui/select";
 import { useEffect, useState } from "react";
 import { addToast } from "@heroui/toast";
 import { Eye, EyeOff } from "lucide-react";
@@ -8,9 +9,8 @@ import { useUserRole } from "@/hooks/role/use-role";
 import { useUserCRUD } from "@/hooks/users/use-users";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { UserType } from "@/shared/types/types";
-import { InputCitricaAdmin, SelectCitricaAdmin, ButtonCitricaAdmin, DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin";
-import { SelectItem } from "@heroui/react";
-import Text from "@/shared/components/citrica-ui/atoms/text";
+import { InputCitricaAdmin, SelectCitricaAdmin, DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin";
+import { Button } from "citrica-ui-toolkit";
 
 type UserFormModalProps = {
   isOpen: boolean;
@@ -303,14 +303,16 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
       title={isEditMode ? "EDITAR USUARIO" : "AGREGAR USUARIO"}
       footer={
         <>
-          <ButtonCitricaAdmin
+          <Button
+            isAdmin
             variant="secondary"
             onPress={onClose}
             className="border-[#42668A] text-[#42668A] rounded-[8px] w-[162px]"
           >
             Cerrar
-          </ButtonCitricaAdmin>
-          <ButtonCitricaAdmin
+          </Button>
+          <Button
+            isAdmin
             variant="primary"
             style={{ backgroundColor: "#42668A" }}
             onPress={handleSubmit}
@@ -319,7 +321,7 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             className="bg-[#265197] text-white w-[162px] rounded-[8px]"
           >
             {isEditMode ? "Guardar" : "Agregar"}
-          </ButtonCitricaAdmin>
+          </Button>
         </>
       }
     >
@@ -471,8 +473,6 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             name="user_email_modal"
           />
 
-
-
           {!isEditMode && (
             <InputCitricaAdmin
               label="Contraseña *"
@@ -501,9 +501,6 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
               }
             />
           )}
-
-
-
 
         </div>
       </form>

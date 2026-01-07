@@ -1,14 +1,7 @@
 "use client";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import React from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from "@heroui/react";
-import Text from "@/shared/components/citrica-ui/atoms/text";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
+import { Text, Button } from "citrica-ui-toolkit";
 import { Reserva, ReservaEstado } from "@/hooks/reservas/use-reservas";
 
 interface ReservaDetailModalProps {
@@ -170,12 +163,13 @@ export default function ReservaDetailModal({
           </div>
         </ModalBody>
         <ModalFooter className="border-t border-gray-200">
-          <ButtonCitricaAdmin
+          <Button
+            isAdmin
             variant="secondary"
             onPress={onClose}
           >
             Cerrar
-          </ButtonCitricaAdmin>
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

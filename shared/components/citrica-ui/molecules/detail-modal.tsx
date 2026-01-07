@@ -1,14 +1,8 @@
 "use client";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { Divider } from "@heroui/divider";
 import { ReactNode } from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Divider,
-} from "@heroui/react";
-import { Text } from "@/shared/components/citrica-ui";
+import { Text } from "citrica-ui-toolkit";
 
 interface DetailModalSection {
   title: string;

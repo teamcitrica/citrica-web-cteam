@@ -1,9 +1,9 @@
 "use client";
+import { Calendar } from "@heroui/calendar";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
 import React, { useState, useEffect } from "react";
-import Text from "@ui/atoms/text";
-import Button from "@ui/molecules/button";
+import { Button, Text } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
-import { Calendar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/react";
 import { today, getLocalTimeZone } from "@internationalized/date";
 
 import { useAdminBookings } from "@/hooks/disponibilidad/use-admin-bookings";
@@ -735,7 +735,6 @@ const UnifiedAvailabilityManager = () => {
               />
             </div>
 
-
             {/* Controles de horario */}
             <div className="space-y-3">
               <div className="flex gap-2 items-center flex-wrap">
@@ -764,10 +763,10 @@ const UnifiedAvailabilityManager = () => {
               </div>
 
               <div className="flex gap-2 flex-wrap">
-                <Button size="sm" variant="flat" onClick={applyOfficeHours} className="bg-[#ff6b35] text-white hover:bg-[#e55a24]">
+                <Button size="sm" variant="flat" onPress={applyOfficeHours} className="bg-[#ff6b35] text-white hover:bg-[#e55a24]">
                   🕘 Aplicar Horario de Oficina
                 </Button>
-                <Button size="sm" variant="flat" onClick={activateAllSlots} className="bg-[#ff6b35] text-white hover:bg-[#e55a24]">
+                <Button size="sm" variant="flat" onPress={activateAllSlots} className="bg-[#ff6b35] text-white hover:bg-[#e55a24]">
                   🌐 Activar Todos los Slots
                 </Button>
               </div>
@@ -784,14 +783,14 @@ const UnifiedAvailabilityManager = () => {
                   <Button
                     size="sm"
                     variant={userDisplayMode === '30min' ? 'primary' : 'flat'}
-                    onClick={() => updateDisplayModeConfiguration('30min')}
+                    onPress={() => updateDisplayModeConfiguration('30min')}
                   >
                     Slots de 30min
                   </Button>
                   <Button
                     size="sm"
                     variant={userDisplayMode === '1hour' ? 'primary' : 'flat'}
-                    onClick={() => updateDisplayModeConfiguration('1hour')}
+                    onPress={() => updateDisplayModeConfiguration('1hour')}
                   >
                     Horas completas
                   </Button>
@@ -812,14 +811,14 @@ const UnifiedAvailabilityManager = () => {
                     <Button
                       size="sm"
                       variant={allowMultipleTimeSlots ? 'primary' : 'flat'}
-                      onClick={() => updateMultipleTimeSlotsConfiguration(true)}
+                      onPress={() => updateMultipleTimeSlotsConfiguration(true)}
                     >
                       Múltiples horarios
                     </Button>
                     <Button
                       size="sm"
                       variant={!allowMultipleTimeSlots ? 'primary' : 'flat'}
-                      onClick={() => updateMultipleTimeSlotsConfiguration(false)}
+                      onPress={() => updateMultipleTimeSlotsConfiguration(false)}
                     >
                       Un solo horario
                     </Button>
@@ -883,7 +882,7 @@ const UnifiedAvailabilityManager = () => {
                 <Button
                   size="sm"
                   variant="flat"
-                  onClick={blockEntireDay}
+                  onPress={blockEntireDay}
                   disabled={isLoading}
                   className="bg-[#ff6b35] text-white hover:bg-[#e55a24]"
                 >
@@ -892,7 +891,7 @@ const UnifiedAvailabilityManager = () => {
                 <Button
                   size="sm"
                   variant="flat"
-                  onClick={unblockEntireDay}
+                  onPress={unblockEntireDay}
                   disabled={isLoading}
                   className="bg-[#ff6b35] text-white hover:bg-[#e55a24]"
                 >
@@ -1130,7 +1129,7 @@ const UnifiedAvailabilityManager = () => {
           <ModalFooter>
             <Button
               variant="flat"
-              onClick={onClose}
+              onPress={onClose}
               size="sm"
               fullWidth
             >

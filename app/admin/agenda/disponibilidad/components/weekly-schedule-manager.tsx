@@ -1,11 +1,10 @@
 "use client";
+import { Switch } from "@heroui/switch";
 import React, { useState, useEffect } from "react";
-import Text from "@ui/atoms/text";
-import Button from "@ui/molecules/button";
+import { Button, Text } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
 import Modal from "@ui/molecules/modal";
 import Icon from "@ui/atoms/icon";
-import { Switch } from "@heroui/react";
 
 import { useAdminBookings, WeeklyAvailability } from "@/hooks/disponibilidad/use-admin-bookings";
 
@@ -185,7 +184,7 @@ const WeeklyScheduleManager = () => {
           <div className="flex gap-2">
             <Button
               size="sm"
-              onClick={() => setShowStandardHoursModal(true)}
+              onPress={() => setShowStandardHoursModal(true)}
               className="bg-[#FF8C00] text-white hover:bg-green-500 transition-colors"
             >
               Horario Estándar
@@ -193,7 +192,7 @@ const WeeklyScheduleManager = () => {
 
             <Button
               size="sm"
-              onClick={handleOpenToggleAllModal}
+              onPress={handleOpenToggleAllModal}
               className="bg-[#FF8C00] text-white hover:bg-green-500 transition-colors"
             >
               {areAllDaysClosed() ? "Abrir Todo" : "Cerrar Todo"}
@@ -324,14 +323,14 @@ const WeeklyScheduleManager = () => {
           <div className="flex justify-end gap-2 w-full">
             <Button
               variant="primary"
-              onClick={handleApplyStandardHours}
+              onPress={handleApplyStandardHours}
               startContent={<Icon name="Check" size={20} />}
             >
               Sí, aplicar horario estándar
             </Button>
             <Button
               variant="secondary"
-              onClick={() => setShowStandardHoursModal(false)}
+              onPress={() => setShowStandardHoursModal(false)}
             >
               Cancelar
             </Button>
@@ -389,13 +388,13 @@ const WeeklyScheduleManager = () => {
             <Button
               startContent={<Icon name={isOpeningAll ? "Check" : "X"} size={20} />}
               variant={isOpeningAll ? "primary" : "danger"}
-              onClick={handleToggleAllDays}
+              onPress={handleToggleAllDays}
             >
               {isOpeningAll ? "Sí, abrir todos los días" : "Sí, cerrar todos los días"}
             </Button>
             <Button
               variant="secondary"
-              onClick={() => setShowCloseAllModal(false)}
+              onPress={() => setShowCloseAllModal(false)}
             >
               Cancelar
             </Button>

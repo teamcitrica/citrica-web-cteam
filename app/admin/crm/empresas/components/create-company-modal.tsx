@@ -1,10 +1,11 @@
 "use client";
+import { Select, SelectItem } from "@heroui/select";
+import { Textarea } from "@heroui/input";
 import { useState, useEffect } from "react";
-import { Select, SelectItem, Textarea } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
+import { Button } from "citrica-ui-toolkit";
 import { useSupabase } from "@/shared/context/supabase-context";
 
 import { useCompanyCRUD, CompanyInput } from "@/hooks/companies/use-companies";
@@ -121,21 +122,23 @@ export default function CreateCompanyModal({
       title="AGREGAR EMPRESA"
       footer={
         <>
-          <ButtonCitricaAdmin
+          <Button
+            isAdmin
             variant="secondary"
             onPress={onClose}
             className="w-[162px]"
           >
             Cerrar
-          </ButtonCitricaAdmin>
-          <ButtonCitricaAdmin
+          </Button>
+          <Button
+            isAdmin
             variant="primary"
             className="bg-[#42668A] w-[162px]"
             onPress={handleSubmit}
             isLoading={isLoading}
           >
             Agregar
-          </ButtonCitricaAdmin>
+          </Button>
         </>
       }
     >

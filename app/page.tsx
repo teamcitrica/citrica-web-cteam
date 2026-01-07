@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Container, Col } from "@/styles/07-objects/objects";
-import { Text, Icon, Button, Header, Input, Textarea } from "@citrica-ui";
+import { Icon, Header } from "@citrica-ui";
+import { Text, Button } from "citrica-ui-toolkit";
 import CurvedLoop from "./versions/yolanda/components/CurvedLoop";
 import DotGrid from "./versions/yolanda/components/DotGrid";
 import AnimatedHeadlines from "./home/components/animatedheadlines";

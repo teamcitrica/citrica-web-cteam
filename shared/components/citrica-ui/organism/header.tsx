@@ -1,7 +1,8 @@
 "use client";
 import React from 'react'
 import { Col, Container } from '@citrica/objects';
-import { Text, Button, Icon } from '@citrica-ui';
+import { Icon } from '@citrica-ui';
+import { Button, Text } from 'citrica-ui-toolkit';
 import { siteConfig } from '@/config/site';
 
 interface NavLink {
@@ -112,7 +113,7 @@ const Header = ({
             {showButton && (
               <div className="hidden lg:block">
                 <Button
-                  onClick={onButtonClick || (() => scrollToSection('#contact'))}
+                  onPress={onButtonClick || (() => scrollToSection('#contact'))}
                   variant="primary"
                   size="md"
                   label={buttonText}
@@ -126,7 +127,7 @@ const Header = ({
               <Button 
                 size="sm" 
                 variant="flat" 
-                onClick={() => setIsOpen(!isOpen)}
+                onPress={() => setIsOpen(!isOpen)}
                 className="p-2"
               >
                 <Icon 
@@ -160,7 +161,7 @@ const Header = ({
                   {showButton && (
                     <div className="pt-2">
                       <Button
-                        onClick={onButtonClick || (() => scrollToSection('#contact'))}
+                        onPress={onButtonClick || (() => scrollToSection('#contact'))}
                         variant="primary"
                         fullWidth
                         size="md"
@@ -256,7 +257,7 @@ const Header = ({
               {/* CTA Button */}
               {showButton && (
                 <Button
-                  onClick={onButtonClick || (() => scrollToSection('#contact'))}
+                  onPress={onButtonClick || (() => scrollToSection('#contact'))}
                   variant="primary"
                   size="md"
                   label={buttonText === 'GET STARTED' ? 'Get started' : buttonText}
@@ -269,7 +270,7 @@ const Header = ({
                 <Button 
                   size="sm" 
                   variant="flat" 
-                  onClick={() => setIsOpen(!isOpen)}
+                  onPress={() => setIsOpen(!isOpen)}
                   className="p-2"
                 >
                   <Icon 
@@ -304,7 +305,7 @@ const Header = ({
                   {showButton && (
                     <div className="pt-2">
                       <Button
-                        onClick={onButtonClick || (() => scrollToSection('#contact'))}
+                        onPress={onButtonClick || (() => scrollToSection('#contact'))}
                         variant="primary"
                         fullWidth
                         size="md"
@@ -364,7 +365,7 @@ const Header = ({
 
               {showButton && (
                 <Button
-                  onClick={onButtonClick || (() => scrollToSection('#contact'))}
+                  onPress={onButtonClick || (() => scrollToSection('#contact'))}
                   variant="primary"
                   size="md"
                   label={buttonText === 'GET STARTED' ? 'Reservar' : buttonText}
@@ -378,7 +379,7 @@ const Header = ({
               <Button
                 size="sm"
                 variant="flat"
-                onClick={() => setIsOpen(!isOpen)}
+                onPress={() => setIsOpen(!isOpen)}
                 className="p-2 !min-w-0"
               >
                 <Icon
@@ -412,7 +413,7 @@ const Header = ({
                   {showButton && (
                     <div className="pt-2">
                       <Button
-                        onClick={onButtonClick || (() => scrollToSection('#contact'))}
+                        onPress={onButtonClick || (() => scrollToSection('#contact'))}
                         variant="primary"
                         fullWidth
                         size="md"
@@ -482,7 +483,7 @@ const Header = ({
             
             {showButton && (
               <Button
-                onClick={onButtonClick || (() => scrollToSection('#contact'))}
+                onPress={onButtonClick || (() => scrollToSection('#contact'))}
                 variant="primary"
                 size="md"
                 label={buttonText === 'GET STARTED' ? 'Reservar' : buttonText}
@@ -496,7 +497,7 @@ const Header = ({
             <Button 
               size="sm" 
               variant="flat" 
-              onClick={() => setIsOpen(!isOpen)}
+              onPress={() => setIsOpen(!isOpen)}
               className="p-2"
             >
               <Icon 
@@ -530,7 +531,7 @@ const Header = ({
                 {showButton && (
                   <div className="pt-2">
                     <Button
-                      onClick={onButtonClick || (() => scrollToSection('#contact'))}
+                      onPress={onButtonClick || (() => scrollToSection('#contact'))}
                       variant="primary"
                       fullWidth
                       size="md"
