@@ -1,11 +1,13 @@
 'use client'
+import { Divider } from "@heroui/divider";
+import { Link } from "@heroui/link";
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 import { addToast } from "@heroui/toast"
 import { UserAuth } from '@/shared/context/auth-context'
 import { useForm } from "react-hook-form"
-import { Divider, Link } from "@heroui/react"
+
 import { Button, Text } from 'citrica-ui-toolkit'
 import { Icon } from '@/shared/components/citrica-ui'
 import { Container } from '@/styles/07-objects/objects'
@@ -113,7 +115,7 @@ const LoginPage = () => {
             }
           />
           <Button
-            type="submit"
+            onClick={handleSubmit(onSubmit)}
             variant="primary"
             label={isLoading ? 'Accediendo...' : 'Iniciar sesión'}
             disabled={isLoading}

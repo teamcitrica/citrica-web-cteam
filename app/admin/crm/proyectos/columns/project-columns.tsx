@@ -1,11 +1,6 @@
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { Project } from "@/hooks/projects/use-projects";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem
-} from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import { Text, Button } from "citrica-ui-toolkit";
 
@@ -119,21 +114,23 @@ export const getProjectColumns = ({
     sortable: false,
     align: "end",
     render: (project) => (
-      <div className="relative flex justify-end items-end gap-2">
+      <div
+        className="relative flex justify-end items-center gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
         <Button
-          size="sm"
+          isIconOnly
+          variant="flat"
           onPress={() => onView(project)}
-          className="text-[#265197] hover:bg-blue-100"
+          className=" hover:!bg-transparent !p-1 !min-w-0"
         >
-          <Icon className="w-5 h-5" name="Eye" />
+          <Icon className="w-5 h-5 text-[#265197]" name="Eye" />
         </Button>
+
         <Dropdown>
           <DropdownTrigger>
-            <Button size="sm">
-              <Icon
-                className="text-[#265197] w-5 h-5"
-                name="EllipsisVertical"
-              />
+            <Button isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0 hover:!bg-transparent">
+              <Icon className="text-[#265197] w-5 h-5" name="EllipsisVertical" />
             </Button>
           </DropdownTrigger>
           <DropdownMenu
@@ -152,16 +149,10 @@ export const getProjectColumns = ({
               }
             }}
           >
-            <DropdownItem
-              className="text-[#265197]"
-              key="edit"
-            >
+            <DropdownItem key="edit">
               Editar
             </DropdownItem>
-            <DropdownItem
-              className="text-[#265197]"
-              key="manageUsers"
-            >
+            <DropdownItem key="manageUsers">
               Gestionar Usuarios
             </DropdownItem>
             <DropdownItem

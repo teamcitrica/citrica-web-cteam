@@ -1,4 +1,5 @@
 "use client";
+import { Divider } from "@heroui/divider";
 import { useState, useCallback, useMemo } from "react";
 
 import UserFormModal from "../components/modal-user-form";
@@ -14,7 +15,6 @@ import { Col, Container } from "@/styles/07-objects/objects";
 import { addToast } from "@heroui/toast";
 import { UserAuth } from "@/shared/context/auth-context";
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
-import { Divider } from "@heroui/react";
 import { createUsers } from "@/public/icon-svg/create-users";
 import { Text } from "citrica-ui-toolkit";
 

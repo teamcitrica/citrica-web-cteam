@@ -1,6 +1,6 @@
 "use client";
+import { Input as HeroInput } from "@heroui/input";
 import React, { forwardRef } from "react";
-import { Input as HeroInput } from "@heroui/react";
 import clsx from "clsx";
 
 import Icon, { IconName } from "./icon";

@@ -1,13 +1,7 @@
 "use client";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { Tooltip } from "@heroui/tooltip";
 import { useState } from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Tooltip,
-} from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { Icon } from "@/shared/components/citrica-ui";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";

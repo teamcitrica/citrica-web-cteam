@@ -1,13 +1,7 @@
 "use client";
+
 import React from "react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-  DrawerFooter,
-  DrawerProps,
-} from "@heroui/react";
+import { Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, DrawerProps } from "@heroui/drawer";
 import { Text } from "citrica-ui-toolkit";
 
 export interface DrawerCitricaAdminProps extends Omit<DrawerProps, 'placement' | 'classNames'> {

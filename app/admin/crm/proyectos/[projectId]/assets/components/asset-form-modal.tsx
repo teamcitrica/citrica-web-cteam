@@ -1,23 +1,13 @@
 "use client";
+import { Select, SelectItem } from "@heroui/select";
+import { Chip } from "@heroui/chip";
+import { Input } from "@heroui/input";
+import { Checkbox, CheckboxGroup } from "@heroui/checkbox";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { useState, useEffect, useCallback } from "react";
-import {
-  Select,
-  SelectItem,
-  Checkbox,
-  CheckboxGroup,
-  Chip,
-  Input,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-} from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
 import { Button } from "citrica-ui-toolkit";
 
 import { useAssetCRUD, AssetInput, Asset } from "@/hooks/assets/use-assets";
@@ -86,7 +76,6 @@ export default function AssetFormModal({
       [field]: finalValue,
     }));
   };
-
 
   // Función para obtener columnas de una tabla específica
   const fetchTableColumns = useCallback(async (tableName: string, preservedColumns?: string[], showToast = true, supabaseUrl?: string, supabaseKey?: string) => {
@@ -352,7 +341,6 @@ export default function AssetFormModal({
     };
     handleInputChange("assets_options", options);
   };
-
 
   // Función para manejar la columna de búsqueda por fecha
   const handleDateSearchColumnChange = (column: string) => {
@@ -661,14 +649,16 @@ export default function AssetFormModal({
       customWidth="700px"
       footer={
         <>
-          <ButtonCitricaAdmin
+          <Button
+            isAdmin
             variant="secondary"
             onPress={onClose}
             className="w-[162px]"
           >
             Cerrar
-          </ButtonCitricaAdmin>
-          <ButtonCitricaAdmin
+          </Button>
+          <Button
+            isAdmin
             variant="primary"
             className="bg-[#42668A] w-[162px]"
             onPress={handleSubmit}
@@ -676,7 +666,7 @@ export default function AssetFormModal({
             isDisabled={!isFormValid() || isLoading}
           >
             {mode === "create" ? "Agregar" : "Guardar"}
-          </ButtonCitricaAdmin>
+          </Button>
         </>
       }
     >
@@ -710,6 +700,7 @@ export default function AssetFormModal({
             {mode === "create" && (
               <div>
                 <Button
+                  isAdmin
                   className="bg-[#42668A] text-white w-full"
                   onPress={() => handleConsultTables()}
                   isLoading={isLoadingTables}
@@ -785,6 +776,7 @@ export default function AssetFormModal({
                           Selecciona las columnas que serán visibles para el usuario
                         </p>
                         <Button
+                          isAdmin
                           size="sm"
                           color="primary"
                           variant="flat"
@@ -1019,6 +1011,7 @@ export default function AssetFormModal({
                             Selecciona las columnas para búsqueda
                           </p>
                           <Button
+                            isAdmin
                             size="sm"
                             color="primary"
                             variant="flat"
@@ -1145,6 +1138,7 @@ export default function AssetFormModal({
 
                       {/* Botón para configurar filtro */}
                       <Button
+                        isAdmin
                         className="bg-[#42668A] text-white w-full mb-4"
                         onClick={handleSetFilter}
                         isDisabled={!selectedFilterColumn || !filterValue.trim()}
@@ -1163,6 +1157,7 @@ export default function AssetFormModal({
                               <strong>{filter.column}</strong> = {filter.value}
                             </span>
                             <Button
+                              isAdmin
                               size="sm"
                               color="danger"
                               onPress={() => handleRemoveFilter()}

@@ -1,10 +1,11 @@
 "use client";
+import { Chip } from "@heroui/chip";
+import { Divider } from "@heroui/divider";
 import { useState, useEffect } from "react";
-import { Chip, Divider } from "@heroui/react";
 import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 import { addToast } from "@heroui/toast";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin/button-citrica-admin";
+import { Button } from "citrica-ui-toolkit";
 
 import { Project } from "@/hooks/projects/use-projects";
 import { useUserCRUD } from "@/hooks/users/use-users";
@@ -139,10 +140,11 @@ export default function ManageUsersDrawer({
       size="lg"
       footer={
         <>
-          <ButtonCitricaAdmin variant="secondary" onPress={onClose}>
+          <Button isAdmin variant="secondary" onPress={onClose}>
             Cancelar
-          </ButtonCitricaAdmin>
-          <ButtonCitricaAdmin
+          </Button>
+          <Button
+            isAdmin
             variant="primary"
             className="bg-[#42668A]"
             onPress={handleSubmit}
@@ -150,7 +152,7 @@ export default function ManageUsersDrawer({
             isDisabled={!hasChanges() || isLoading}
           >
             Guardar Cambios
-          </ButtonCitricaAdmin>
+          </Button>
         </>
       }
     >

@@ -1,20 +1,10 @@
 "use client";
+import { Spinner } from "@heroui/spinner";
+import { Input } from "@heroui/input";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
+import { Pagination } from "@heroui/pagination";
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Spinner,
-  Pagination,
-  Input,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import { Button, Text } from "citrica-ui-toolkit";
 import { useReservas, Reserva, ReservaEstado } from "@/hooks/reservas/use-reservas";

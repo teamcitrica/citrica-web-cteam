@@ -1,4 +1,4 @@
-import { Calendar } from "@heroui/react";
+import { Calendar } from "@heroui/calendar";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { useLocale } from "@react-aria/i18n";
 

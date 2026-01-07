@@ -1,4 +1,6 @@
 "use client";
+import { Divider } from "@heroui/divider";
+import { Link } from "@heroui/link";
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from "react-hook-form";
@@ -9,7 +11,6 @@ import Input from "../atoms/input";
 import Icon from "../atoms/icon";
 import { Text, Button } from "citrica-ui-toolkit";
 import Modal from "../molecules/modal";
-import { Divider, Link } from "@heroui/react";
 
 type FormValues = {
   password: string;
@@ -65,10 +66,8 @@ useEffect(() => {
       if (accessToken && type === "recovery") {
         console.log("✅ Token de recovery encontrado, verificando OTP...");
 
-
         if (/^\d{6}$/.test(accessToken)) {
           console.log("Token es un OTP de 6 dígitos, usando verifyOtp");
-
 
           const savedEmail = typeof window !== 'undefined'
             ? localStorage.getItem('password_reset_email')
@@ -174,7 +173,6 @@ useEffect(() => {
   init();
 }, [params, supabase]);
 
-
   const onSubmit = async (data: FormValues) => {
     if (!isValidRecovery) {
       alert("Link inválido o expirado.");
@@ -201,7 +199,6 @@ useEffect(() => {
     setShowSuccessModal(false);
     router.push('/login');
   };
-
 
   if (!checked) return null;
 

@@ -1,4 +1,5 @@
 "use client";
+import { Divider } from "@heroui/divider";
 import { useState, useCallback, useMemo } from "react";
 
 import CreateCompanyModal from "./components/create-company-modal";
@@ -13,7 +14,6 @@ import { Col, Container } from "@/styles/07-objects/objects";
 import { Text } from 'citrica-ui-toolkit';
 import { createBuilding } from "@/public/icon-svg/icon-create-building";
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
-import { Divider } from "@heroui/react";
 
 export default function EmpresasPage() {
   const { companies, isLoading, refreshCompanies, deleteCompany } = useCompanyCRUD();

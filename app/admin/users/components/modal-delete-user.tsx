@@ -1,10 +1,10 @@
 // ModalDeleteUser.tsx
+import { Modal, ModalContent } from "@heroui/modal";
+import { Divider } from "@heroui/divider";
 import React from "react";
 import { UserType } from "@/shared/types/types";
-import { Text } from "citrica-ui-toolkit";
+import { Text, Button } from "citrica-ui-toolkit";
 import Icon from "@ui/atoms/icon";
-import { Modal, ModalContent, Divider } from "@heroui/react";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 
 interface ModalDeleteUserProps {
   user: UserType | null;
@@ -62,20 +62,22 @@ const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
           <Divider className="bg-[#A7BDE2] mb-4" />
 
           <div className="flex gap-3 justify-end">
-            <ButtonCitricaAdmin
-              variant="modalv2"
+            <Button
+              isAdmin
+              variant="secondary"
               className="w-[162px]"
               onPress={onCancel}
             >
               Cancelar
-            </ButtonCitricaAdmin>
-            <ButtonCitricaAdmin
+            </Button>
+            <Button
+              isAdmin
               variant="primary"
               className="bg-[#F04242] w-[162px] !border-0"
               onPress={onConfirm}
             >
               Eliminar
-            </ButtonCitricaAdmin>
+            </Button>
           </div>
         </div>
       </ModalContent>

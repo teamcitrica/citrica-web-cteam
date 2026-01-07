@@ -1,6 +1,6 @@
 'use client';
+import { Textarea as HeroTextarea } from "@heroui/input";
 import React from 'react';
-import { Textarea as HeroTextarea } from '@heroui/react';
 import clsx from 'clsx';
 
 interface TextareaProps {

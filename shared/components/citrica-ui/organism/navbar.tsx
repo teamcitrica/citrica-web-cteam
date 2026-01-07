@@ -1,16 +1,11 @@
 'use client'
+import { useDisclosure } from "@heroui/modal";
+import { Drawer, DrawerContent, DrawerHeader, DrawerBody } from "@heroui/drawer";
 import React, { useEffect, useRef, useState } from "react";
 import { Col, Container } from '@citrica/objects';
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { siteConfig } from "@/config/site";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-  useDisclosure,
-} from "@heroui/react";
 import { UserBox } from "@/hooks/user-box";
 import { type Session } from "@supabase/auth-helpers-nextjs";
 import { UserAuth } from "@/shared/context/auth-context";

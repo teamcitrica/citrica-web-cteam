@@ -1,10 +1,10 @@
 "use client";
+import { Link } from "@heroui/link";
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Container, Col } from "@/styles/07-objects/objects";
 import { Icon } from "@citrica-ui";
 import { Button, Text } from "citrica-ui-toolkit";
-import { Link } from "@heroui/react";
 
 export const DynamicNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

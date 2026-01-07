@@ -1,19 +1,11 @@
 "use client";
 
+import { Input } from "@heroui/input";
+import { Select, SelectItem } from "@heroui/select";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
+import { Pagination } from "@heroui/pagination";
 import { useEffect, useState, useMemo } from "react";
 import { useParams } from "next/navigation";
-import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Pagination,
-  Input,
-  Select,
-  SelectItem,
-} from "@heroui/react";
 import Icon from "@ui/atoms/icon";
 import { UserAuth } from "@/shared/context/auth-context";
 import { useRoleData } from "@/hooks/role/use-role-data";

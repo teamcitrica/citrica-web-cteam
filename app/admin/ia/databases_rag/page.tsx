@@ -1,9 +1,11 @@
 "use client";
+import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
+import { Skeleton } from "@heroui/skeleton";
 import { useState, useEffect } from "react";
 import { Col, Container } from "@/styles/07-objects/objects";
-import { InputCitricaAdmin, ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
+import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin";
+import { Button } from "citrica-ui-toolkit";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
-import { Card, CardHeader, CardBody, CardFooter, Skeleton } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import {
   Database,
@@ -238,11 +240,11 @@ export default function DatabasesRAGPage() {
 
           {/* Botón Crear Storage */}
           <div className="mb-6">
-            <ButtonCitricaAdmin variant="primary"
+            <Button isAdmin variant="primary"
               style={{ backgroundColor: "#42668A" }} onClick={() => setIsCreateModalOpen(true)}>
               <FolderOpen className="w-5 h-5" />
               Nuevo Storage
-            </ButtonCitricaAdmin>
+            </Button>
           </div>
 
           {/* Grid de Storage Cards */}
@@ -397,18 +399,20 @@ export default function DatabasesRAGPage() {
         size="md"
         footer={
           <div className="flex gap-3 w-full">
-            <ButtonCitricaAdmin
+            <Button
+              isAdmin
               onClick={() => setIsCreateModalOpen(false)}
               variant="secondary"
             >
               Cancelar
-            </ButtonCitricaAdmin>
-            <ButtonCitricaAdmin
+            </Button>
+            <Button
+              isAdmin
               onClick={handleCreateStorage}
               disabled={!newStorageName.trim()}
             >
               Crear Storage
-            </ButtonCitricaAdmin>
+            </Button>
           </div>
         }
       >
@@ -447,7 +451,8 @@ export default function DatabasesRAGPage() {
         size="sm"
         footer={
           <div className="flex gap-3 w-full">
-            <ButtonCitricaAdmin
+            <Button
+              isAdmin
               onClick={() => {
                 setIsDeleteModalOpen(false);
                 setStorageToDelete(null);
@@ -455,13 +460,14 @@ export default function DatabasesRAGPage() {
               variant="secondary"
             >
               Cancelar
-            </ButtonCitricaAdmin>
-            <ButtonCitricaAdmin
+            </Button>
+            <Button
+              isAdmin
               onClick={handleDeleteStorage}
               style={{ backgroundColor: "#dc2626" }}
             >
               Eliminar
-            </ButtonCitricaAdmin>
+            </Button>
           </div>
         }
       >

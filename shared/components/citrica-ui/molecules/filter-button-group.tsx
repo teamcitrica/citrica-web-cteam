@@ -1,6 +1,6 @@
 "use client";
-import { ButtonGroup } from "@heroui/react";
 import { Button } from "citrica-ui-toolkit";
+
 export interface FilterButton {
   value: string;
   label: string;
@@ -23,17 +23,18 @@ export default function FilterButtonGroup({
   onValueChange,
   size = "sm",
   height,
-  containerClassName = "bg-[#D4DEED] p-1 rounded-md",
-  activeButtonClassName = "bg-white text-[#265197] !rounded-md",
-  inactiveButtonClassName = "bg-[#D4DEED] text-[#265197] border border-[#D4DEED]",
+  containerClassName = "!bg-[#D4DEED] !p-1 !rounded-md",
+  activeButtonClassName = "!bg-white !text-[#265197] !rounded-md",
+  inactiveButtonClassName = "!bg-[#D4DEED] !text-[#265197] !border border-[#D4DEED]",
 }: FilterButtonGroupProps) {
   return (
     <div className={containerClassName} style={height ? { height } : undefined}>
-      <ButtonGroup size={size} className="w-full h-full">
+      <div className="flex w-full h-full gap-0">
         {buttons.map((button) => (
           <Button
+          isAdmin
             key={button.value}
-            // radius="md"
+            size={size}
             className={`flex-1 h-full px-4 ${
               selectedValue === button.value
                 ? activeButtonClassName
@@ -44,7 +45,7 @@ export default function FilterButtonGroup({
             {button.label}
           </Button>
         ))}
-      </ButtonGroup>
+      </div>
     </div>
   );
 }

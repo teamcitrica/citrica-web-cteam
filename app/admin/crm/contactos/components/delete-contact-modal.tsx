@@ -1,16 +1,9 @@
 "use client";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Divider,
-} from "@heroui/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { Divider } from "@heroui/divider";
 import { Contact } from "@/hooks/contact/use-contact";
-import { ButtonCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import { Icon } from "@/shared/components/citrica-ui";
-import { Text } from "citrica-ui-toolkit";
+import { Text, Button } from "citrica-ui-toolkit";
 
 interface DeleteContactModalProps {
   contact: Contact;
@@ -46,20 +39,22 @@ export default function DeleteContactModal({
         </ModalBody>
         <ModalFooter>
         <div className="flex gap-3 justify-end">
-          <ButtonCitricaAdmin
-            variant="modalv2"
+          <Button
+            isAdmin
+            variant="secondary"
             className="w-[162px]"
             onPress={onCancel}
           >
             Cancelar
-          </ButtonCitricaAdmin>
-          <ButtonCitricaAdmin
+          </Button>
+          <Button
+            isAdmin
             variant="primary"
             className="bg-[#F04242] w-[162px] !border-0"
             onPress={onConfirm}
           >
             Eliminar
-          </ButtonCitricaAdmin>
+          </Button>
         </div>
         </ModalFooter>
       </ModalContent>

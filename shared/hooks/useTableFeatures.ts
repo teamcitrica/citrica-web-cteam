@@ -1,6 +1,6 @@
 "use client";
+import type { SortDescriptor } from "@heroui/table";
 import { useState, useCallback, useMemo } from "react";
-import { SortDescriptor } from "@heroui/react";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
