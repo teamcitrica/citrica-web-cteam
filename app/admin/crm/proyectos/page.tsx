@@ -171,21 +171,20 @@ export default function ProyectosPage() {
             companyFilterField="company_id"
             companyFilterPlaceholder="Filtrar por empresa"
             customFilters={
-              <div className="w-full flex flex-col">
-                <div style={{ width: "245px" }}>
-                  <FilterButtonGroup
-                    buttons={[
-                      { value: "abiertos", label: "Abiertos" },
-                      { value: "inactivos", label: "Inactivos" },
-                      { value: "cerrados", label: "Cerrados" },
-                    ]}
-                    selectedValue={statusFilter}
-                    onValueChange={setStatusFilter}
-                    height="38px"
-                  />
-                </div>
-                <Divider className="bg-[#D4DEED] mt-3"/>
+              <>
+              <div className="flex gap-3 pb-4">
+                <FilterButtonGroup
+                  buttons={[
+                    { value: "abiertos", label: "Abiertos" },
+                    { value: "inactivos", label: "Inactivos" },
+                    { value: "cerrados", label: "Cerrados" },
+                  ]}
+                  selectedValue={statusFilter}
+                  onValueChange={setStatusFilter}
+                />
               </div>
+              <Divider className="bg-[#D4DEED]"/>
+              </>
             }
           />
 

@@ -5,6 +5,7 @@ import { addToast } from "@heroui/toast";
 import { Input } from "@/shared/components/citrica-ui";
 import { useUserRole } from "@/hooks/role/use-role";
 import { useSupabase } from "@/shared/context/supabase-context";
+import { Button } from "citrica-ui-toolkit";
 
 type AttachCredentialsModalProps = {
   isOpen: boolean;
@@ -237,9 +238,9 @@ const AttachCredentialsModal = ({ isOpen, onClose }: AttachCredentialsModalProps
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-md p-6 w-full max-w-md relative max-h-[90vh] overflow-y-auto">
         {/* Botón para cerrar el modal */}
-        <button className="absolute top-2 right-2 text-black text-xl" onClick={onClose}>
+        <Button isAdmin variant="flat" className="absolute top-2 right-2 text-black text-xl min-w-0 w-auto h-auto p-1" onPress={onClose}>
           X
-        </button>
+        </Button>
         <div className="flex flex-col gap-4">
           <h2 className="text-xl font-bold text-black">Adjuntar Credenciales</h2>
 
@@ -259,13 +260,15 @@ const AttachCredentialsModal = ({ isOpen, onClose }: AttachCredentialsModalProps
             onChange={handleChange}
           />
 
-          <button
-            className="mt-2 bg-green-600 text-white p-2 rounded-md hover:bg-green-700 disabled:bg-gray-400"
-            onClick={handleConsultTables}
-            disabled={isLoadingTables}
+          <Button
+            isAdmin
+            variant="primary"
+            className="mt-2 bg-green-600 hover:bg-green-700"
+            onPress={handleConsultTables}
+            isDisabled={isLoadingTables}
           >
             {isLoadingTables ? "Consultando..." : "Consultar Tablas"}
-          </button>
+          </Button>
 
           {tables.length > 0 && (
             <>
@@ -309,13 +312,15 @@ const AttachCredentialsModal = ({ isOpen, onClose }: AttachCredentialsModalProps
             </>
           )}
 
-          <button
-            className="mt-4 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-            onClick={handleSubmit}
-            disabled={isSaving || tables.length === 0}
+          <Button
+            isAdmin
+            variant="primary"
+            className="mt-4 bg-blue-600 hover:bg-blue-700"
+            onPress={handleSubmit}
+            isDisabled={isSaving || tables.length === 0}
           >
             {isSaving ? "Guardando..." : "Guardar Credenciales"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
