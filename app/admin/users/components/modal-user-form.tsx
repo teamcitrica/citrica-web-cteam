@@ -1,22 +1,20 @@
 "use client";
 
-import { SelectItem } from "@heroui/select";
 import { useEffect, useState } from "react";
 import { addToast } from "@heroui/toast";
 import { Eye, EyeOff } from "lucide-react";
-
 import { useUserRole } from "@/hooks/role/use-role";
 import { useUserCRUD } from "@/hooks/users/use-users";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { UserType } from "@/shared/types/types";
-import { InputCitricaAdmin, SelectCitricaAdmin, DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin";
-import { Button } from "citrica-ui-toolkit";
+import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin";
+import { Button, Select, Input } from "citrica-ui-toolkit";
 
 type UserFormModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-  user?: UserType | null; // Si existe user, es modo editar; si es null/undefined, es modo crear
+  user?: UserType | null;
 };
 
 const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps) => {
@@ -331,11 +329,11 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
         <input type="password" name="fake_password" style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} tabIndex={-1} />
 
         <div className="flex flex-col gap-4">
-          <SelectCitricaAdmin
+          <Select
             label="Rol *"
             placeholder="Seleccione un rol"
             selectedKeys={formData.role_id && roles.some(r => String(r.id) === formData.role_id) ? [formData.role_id] : []}
-            onSelectionChange={(keys) => {
+            onSelectionChange={(keys: any) => {
               const selected = Array.from(keys)[0] as string;
               handleChange("role_id", selected);
 
@@ -349,74 +347,51 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             }}
             isInvalid={errors.role_id}
             errorMessage={errors.role_id ? "El rol es obligatorio" : ""}
-          >
-            {roles.map((role) => (
-              <SelectItem
-                key={String(role.id)}
-                classNames={{
-                  base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
-                  wrapper: "!border-none",
-                }}
-                style={{
-                  border: 'none',
-                  borderColor: 'transparent',
-                  borderWidth: '0',
-                } as React.CSSProperties}
-              >
-                {role.name}
-              </SelectItem>
-            ))}
-          </SelectCitricaAdmin>
+            variant="faded"
+            classNames={{
+              trigger: "bg-white !border-[#D4DEED] !rounded-[12px]",
+              label: "!text-[#265197]",
+              value: "!text-[#265197]",
+              selectorIcon: "text-[#678CC5]",
+            }}
+            options={roles.map((role) => ({
+              value: String(role.id),
+              label: role.name,
+            }))}
+          />
 
-          <SelectCitricaAdmin
+          <Select
             label="Empresa *"
             placeholder="Seleccione una empresa"
             selectedKeys={formData.company_id && companies.some(c => String(c.id) === formData.company_id) ? [formData.company_id] : []}
-            onSelectionChange={(keys) => {
+            onSelectionChange={(keys: any) => {
               const selected = Array.from(keys)[0] as string;
               handleChange("company_id", selected);
             }}
             isInvalid={errors.company_id}
             errorMessage={errors.company_id ? "La empresa es obligatoria" : ""}
-            isDisabled={Number(formData.role_id) === 1}
-          >
-            {Number(formData.role_id) === 1
-              ? companies.filter(c => c.name?.toLowerCase() === 'citrica').map((company) => (
-                <SelectItem
-                  key={String(company.id)}
-                  classNames={{
-                    base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
-                    wrapper: "!border-none",
-                  }}
-                  style={{
-                    border: 'none',
-                    borderColor: 'transparent',
-                    borderWidth: '0',
-                  } as React.CSSProperties}
-                >
-                  {company.name || "Sin nombre"}
-                </SelectItem>
-              ))
-              : companies.map((company) => (
-                <SelectItem
-                  key={String(company.id)}
-                  classNames={{
-                    base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
-                    wrapper: "!border-none",
-                  }}
-                  style={{
-                    border: 'none',
-                    borderColor: 'transparent',
-                    borderWidth: '0',
-                  } as React.CSSProperties}
-                >
-                  {company.name || "Sin nombre"}
-                </SelectItem>
-              ))
+            disabled={Number(formData.role_id) === 1}
+            variant="faded"
+            classNames={{
+              trigger: "bg-white !border-[#D4DEED] !rounded-[12px]",
+              label: "!text-[#265197]",
+              value: "!text-[#265197]",
+              selectorIcon: "text-[#678CC5]",
+            }}
+            options={
+              Number(formData.role_id) === 1
+                ? companies.filter(c => c.name?.toLowerCase() === 'citrica').map((company) => ({
+                    value: String(company.id),
+                    label: company.name || "Sin nombre",
+                  }))
+                : companies.map((company) => ({
+                    value: String(company.id),
+                    label: company.name || "Sin nombre",
+                  }))
             }
-          </SelectCitricaAdmin>
+          />
 
-          <InputCitricaAdmin
+          <Input
             label="Nombre *"
             placeholder="Ingrese el nombre"
             value={formData.first_name}
@@ -425,9 +400,15 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             errorMessage={errors.first_name ? "El nombre es obligatorio" : ""}
             autoComplete="off"
             name="user_first_name_modal"
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
-          <InputCitricaAdmin
+          <Input
             label="Apellido *"
             placeholder="Ingrese el apellido"
             value={formData.last_name}
@@ -436,9 +417,15 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             errorMessage={errors.last_name ? "El apellido es obligatorio" : ""}
             autoComplete="off"
             name="user_last_name_modal"
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
-          <InputCitricaAdmin
+          <Input
             label="Cargo *"
             placeholder="Ingrese el cargo"
             value={formData.cargo}
@@ -447,9 +434,15 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             errorMessage={errors.cargo ? "El cargo es obligatorio" : ""}
             autoComplete="off"
             name="user_cargo_modal"
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
-          <InputCitricaAdmin
+          <Input
             label="WhatsApp *"
             placeholder="Ingrese el número de WhatsApp"
             value={formData.phone}
@@ -458,23 +451,35 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             errorMessage={errors.phone ? "El WhatsApp es obligatorio" : ""}
             autoComplete="off"
             name="user_phone_modal"
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
-          <InputCitricaAdmin
+          <Input
             label="Email *"
             type="email"
             placeholder="Ingrese el email"
             value={formData.email}
             onChange={(e) => handleChange("email", e.target.value)}
-            isDisabled={isEditMode}
+            disabled={isEditMode}
             isInvalid={errors.email}
             errorMessage={errors.email ? "El email es obligatorio" : ""}
             autoComplete="off"
             name="user_email_modal"
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
           {!isEditMode && (
-            <InputCitricaAdmin
+            <Input
               label="Contraseña *"
               type={showPassword ? "text" : "password"}
               placeholder="Ingrese la contraseña"
@@ -484,6 +489,12 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
               errorMessage={errors.password ? "La contraseña es obligatoria" : ""}
               autoComplete="new-password"
               name="user_password_modal"
+              variant="faded"
+              classNames={{
+                inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                label: "!text-[#265197]",
+                input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+              }}
               endContent={
                 <button
                   type="button"

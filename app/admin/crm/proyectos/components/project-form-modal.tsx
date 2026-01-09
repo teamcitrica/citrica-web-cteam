@@ -1,10 +1,9 @@
 "use client";
-import { Select, SelectItem } from "@heroui/select";
+import { Select } from "citrica-ui-toolkit";
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
-import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { Button } from "citrica-ui-toolkit";
+import { Button, Input } from "citrica-ui-toolkit";
 
 import { useProjectCRUD, ProjectInput, Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
@@ -245,25 +244,21 @@ export default function ProjectFormModal({
             <Select
               label="Empresa"
               placeholder="Seleccione una empresa"
-              selectedKeys={formData.company_id ? [formData.company_id.toString()] : []}
+              selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
               onSelectionChange={(keys) => {
-                const selected = Array.from(keys)[0];
-                handleInputChange("company_id", selected ? parseInt(selected as string) : null);
+                const selected = Array.from(keys)[0] as string;
+                handleInputChange("company_id", selected ? parseInt(selected) : null);
               }}
-              isRequired
+              options={companies.map((company) => ({ value: String(company.id), label: company.name || "Sin nombre" }))}
+              variant="faded"
+              required
               classNames={{
                 label: "!text-[#265197]",
                 value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
                 trigger: "bg-white !border-[#D4DEED]",
                 selectorIcon: "text-[#678CC5]",
               }}
-            >
-              {companies.map((company) => (
-                <SelectItem key={company.id.toString()} className="text-[#265197]">
-                  {company.name || "Sin nombre"}
-                </SelectItem>
-              ))}
-            </Select>
+            />
 
         {mode === "edit" && (
           <Select
@@ -271,50 +266,76 @@ export default function ProjectFormModal({
             placeholder="Seleccione el estatus"
             selectedKeys={formData.status ? [formData.status] : []}
             onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0];
-              handleInputChange("status", selected ? selected as string : null);
+              const selected = Array.from(keys)[0] as string;
+              handleInputChange("status", selected || null);
             }}
+            options={[
+              { value: "abierto", label: "Abierto" },
+              { value: "inactivo", label: "Inactivo" },
+              { value: "cerrado", label: "Cerrado" }
+            ]}
+            variant="faded"
             classNames={{
               label: "!text-[#265197]",
               value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
               trigger: "bg-white !border-[#D4DEED]",
               selectorIcon: "text-[#678CC5]",
             }}
-          >
-            <SelectItem key="abierto" className="text-[#265197]">Abierto</SelectItem>
-            <SelectItem key="inactivo" className="text-[#265197]">Inactivo</SelectItem>
-            <SelectItem key="cerrado" className="text-[#265197]">Cerrado</SelectItem>
-          </Select>
+          />
         )}
 
-        <InputCitricaAdmin
+        <Input
           label="Nombre del Proyecto"
           placeholder="Ingrese el nombre"
           value={formData.name || ""}
           onChange={(e) => handleInputChange("name", e.target.value)}
-          isRequired
+          required
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
 
-        <InputCitricaAdmin
+        <Input
               label="Nombre del Responsable"
               placeholder="Ingrese el nombre del responsable"
               value={formData.nombre_responsable || ""}
               onChange={(e) => handleInputChange("nombre_responsable", e.target.value)}
+              variant="faded"
+              classNames={{
+                inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                label: "!text-[#265197]",
+                input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+              }}
             />
 
-            <InputCitricaAdmin
+            <Input
               label="Email del Responsable"
               placeholder="email@ejemplo.com"
               type="email"
               value={formData.email_responsable || ""}
               onChange={(e) => handleInputChange("email_responsable", e.target.value)}
+              variant="faded"
+              classNames={{
+                inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                label: "!text-[#265197]",
+                input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+              }}
             />
 
-            <InputCitricaAdmin
+            <Input
               label="Teléfono del Responsable"
               placeholder="Ingrese el teléfono"
               value={formData.phone_responsable || ""}
               onChange={(e) => handleInputChange("phone_responsable", e.target.value)}
+              variant="faded"
+              classNames={{
+                inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                label: "!text-[#265197]",
+                input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+              }}
             />
           </div>
     </DrawerCitricaAdmin>

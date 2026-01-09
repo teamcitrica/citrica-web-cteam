@@ -4,8 +4,7 @@ import { Tooltip } from "@heroui/tooltip";
 import { useState } from "react";
 import { addToast } from "@heroui/toast";
 import { Icon } from "@/shared/components/citrica-ui";
-import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
-import { Button } from "citrica-ui-toolkit";
+import { Button, Input } from "citrica-ui-toolkit";
 import { Contact } from "@/hooks/contact/use-contact";
 
 // Función para generar contraseña segura aleatoria
@@ -319,14 +318,20 @@ export default function GrantAccessModal({
                       <label className="text-xs font-medium text-gray-600">Contraseña *</label>
                       <div className="flex gap-2 mt-1">
                         <div className="flex-1">
-                          <InputCitricaAdmin
+                          <Input
                             name="new-password"
                             autoComplete="new-password"
                             placeholder="Ingrese o genere una contraseña"
                             type={showPassword ? "text" : "password"}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            isRequired
+                            required
+                            variant="faded"
+                            classNames={{
+                              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                              label: "!text-[#265197]",
+                              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+                            }}
                             endContent={
                               <div className="flex items-center gap-1">
                                 <Tooltip content="Mostrar/Ocultar contraseña">

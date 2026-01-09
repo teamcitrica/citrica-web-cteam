@@ -1,11 +1,9 @@
 "use client";
-import { Select, SelectItem } from "@heroui/select";
 import { DatePicker } from "@heroui/date-picker";
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
-import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { Button } from "citrica-ui-toolkit";
+import { Button, Select, Input } from "citrica-ui-toolkit";
 import { useContactCRUD, ContactInput, Contact } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { useTypeContactCRUD } from "@/hooks/types-contact/use-types-contact";
@@ -215,87 +213,105 @@ export default function ContactFormDrawer({
         <Select
           label="Tipo de Contacto"
           placeholder="Seleccione el tipo"
-          labelPlacement="outside"
-          variant="bordered"
+          variant="faded"
           selectedKeys={formData.type_id ? [String(formData.type_id)] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];
             handleInputChange("type_id", selected ? Number(selected) : null);
           }}
-          classNames={{
+          required
+          options={typesContact.map((type) => ({
+            value: String(type.id),
+            label: type.name,
+          }))}
+           classNames={{
             label: "!text-[#265197]",
             value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
             trigger: "bg-white !border-[#D4DEED]",
             selectorIcon: "text-[#678CC5]",
           }}
-          isRequired
-        >
-          {typesContact.map((type) => (
-            <SelectItem key={String(type.id)} className="text-[#265197]">
-              {type.name}
-            </SelectItem>
-          ))}
-        </Select>
+        />
 
         {/* Select Empresa */}
         <Select
           label="Empresa"
           placeholder="Seleccione una empresa"
-          labelPlacement="outside"
-          variant="bordered"
+          variant="faded"
           selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];
             handleInputChange("company_id", selected ? Number(selected) : null);
           }}
+          required
+          options={companies.map((company) => ({
+            value: String(company.id),
+            label: company.name || `Empresa ${company.id}`,
+          }))}
           classNames={{
             label: "!text-[#265197]",
             value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
             trigger: "bg-white !border-[#D4DEED]",
             selectorIcon: "text-[#678CC5]",
           }}
-          isRequired
-        >
-          {companies.map((company) => (
-            <SelectItem key={String(company.id)} className="text-[#265197]">
-              {company.name || `Empresa ${company.id}`}
-            </SelectItem>
-          ))}
-        </Select>
+        />
 
         {/* Nombre */}
-        <InputCitricaAdmin
+        <Input
           label="Nombre del Contacto"
           placeholder="Ingrese el nombre"
           value={formData.name || ""}
           onChange={(e) => handleInputChange("name", e.target.value)}
-          isRequired
+          required
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
 
         {/* Apellido */}
-        <InputCitricaAdmin
+        <Input
           label="Apellido"
           placeholder="Ingrese el apellido"
           value={formData.last_name || ""}
           onChange={(e) => handleInputChange("last_name", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
 
         {/* Cargo */}
-        <InputCitricaAdmin
+        <Input
           label="Cargo"
           placeholder="Cargo o posición"
           value={formData.cargo || ""}
           onChange={(e) => handleInputChange("cargo", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
 
         {/* Email */}
-        <InputCitricaAdmin
+        <Input
           label="Email"
           placeholder="correo@ejemplo.com"
           type="email"
           value={formData.email || ""}
           onChange={(e) => handleInputChange("email", e.target.value)}
-          isRequired
+          required
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
 
         {/* WhatsApp */}
@@ -303,44 +319,36 @@ export default function ContactFormDrawer({
           <Select
             label="Código"
             placeholder="+51"
-            labelPlacement="outside"
-            variant="bordered"
+            variant="faded"
             selectedKeys={[phoneCode]}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0] as string;
               setPhoneCode(selected);
             }}
+            options={PHONE_CODES.map((code) => ({
+              value: code.value,
+              label: code.value,
+            }))}
             classNames={{
               label: "!text-[#265197]",
               value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
               trigger: "bg-white !border-[#D4DEED]",
               selectorIcon: "text-[#678CC5]",
             }}
-            renderValue={(items) => {
-              return items.map((item) => (
-                <div key={item.key} className="flex items-center gap-1">
-                  <span className="text-sm">{item.key}</span>
-                </div>
-              ));
-            }}
-          >
-            {PHONE_CODES.map((code) => (
-              <SelectItem
-                key={code.value}
-                className="text-[#265197]"
-                textValue={code.value}
-              >
-                {code.label}
-              </SelectItem>
-            ))}
-          </Select>
-          <InputCitricaAdmin
+          />
+          <Input
             label="WhatsApp"
             placeholder="Número de teléfono"
             value={formData.phone?.replace(phoneCode, "").trim() || ""}
             onChange={(e) => {
               const phone = e.target.value ? `${phoneCode} ${e.target.value}` : "";
               handleInputChange("phone", phone);
+            }}
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
             }}
           />
         </div>
@@ -369,56 +377,50 @@ export default function ContactFormDrawer({
         <Select
           label="País"
           placeholder="Seleccione un país"
-          labelPlacement="outside"
-          variant="bordered"
+          variant="faded"
           selectedKeys={formData.country ? [formData.country] : []}
           onSelectionChange={(keys) => {
             const selected = Array.from(keys)[0];
             handleInputChange("country", selected ? String(selected) : null);
           }}
+          options={COUNTRIES.map((country) => ({
+            value: country.name,
+            label: `${country.flag} ${country.name}`,
+          }))}
           classNames={{
             label: "!text-[#265197]",
             value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
             trigger: "bg-white !border-[#D4DEED]",
             selectorIcon: "text-[#678CC5]",
           }}
-          renderValue={(items) => {
-            return items.map((item) => {
-              const country = COUNTRIES.find(c => c.name === item.key);
-              return (
-                <div key={item.key} className="flex items-center gap-2">
-                  <span>{country?.flag}</span>
-                  <span>{country?.name}</span>
-                </div>
-              );
-            });
-          }}
-        >
-          {COUNTRIES.map((country) => (
-            <SelectItem
-              key={country.name}
-              className="text-[#265197]"
-              startContent={<span className="text-lg">{country.flag}</span>}
-            >
-              {country.name}
-            </SelectItem>
-          ))}
-        </Select>
+        />
 
         {/* Ciudad */}
-        <InputCitricaAdmin
+        <Input
           label="Ciudad"
           placeholder="Ingrese la ciudad"
           value={formData.city || ""}
           onChange={(e) => handleInputChange("city", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
 
         {/* Dirección */}
-        <InputCitricaAdmin
+        <Input
           label="Dirección"
           placeholder="Dirección completa"
           value={formData.address || ""}
           onChange={(e) => handleInputChange("address", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
       </div>
     </DrawerCitricaAdmin>

@@ -2,8 +2,7 @@
 import { Divider } from "@heroui/divider";
 import React from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
-import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
-import { Text, Button } from "citrica-ui-toolkit";
+import { Text, Button, Input } from "citrica-ui-toolkit";
 
 type ExportModalProps = {
   isOpen: boolean;
@@ -40,11 +39,17 @@ const ExportModal: React.FC<ExportModalProps> = ({
                 </p>
                 <Divider className="bg-[#A7BDE2]"/>
                 <div className="mb-4">
-                  <InputCitricaAdmin
+                  <Input
                     label="Nombre del archivo"
                     placeholder="Ingrese el nombre del archivo"
                     value={fileName}
                     onChange={(e) => onFileNameChange(e.target.value)}
+                    variant="faded"
+                    classNames={{
+                      inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                      label: "!text-[#265197]",
+                      input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+                    }}
                   />
                   <span className="bg-[#EDF1F7] block">
                     <Text variant="label" color="#678CC5">El nombre por defecto incluye la fecha actual.</Text>
