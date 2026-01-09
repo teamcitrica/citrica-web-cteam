@@ -1,6 +1,5 @@
 "use client";
 
-import { SelectItem } from "@heroui/select";
 import { useEffect, useState } from "react";
 import { addToast } from "@heroui/toast";
 import { Eye, EyeOff } from "lucide-react";
@@ -349,24 +348,11 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             }}
             isInvalid={errors.role_id}
             errorMessage={errors.role_id ? "El rol es obligatorio" : ""}
-          >
-            {roles.map((role) => (
-              <SelectItem
-                key={String(role.id)}
-                classNames={{
-                  base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
-                  wrapper: "!border-none",
-                }}
-                style={{
-                  border: 'none',
-                  borderColor: 'transparent',
-                  borderWidth: '0',
-                } as React.CSSProperties}
-              >
-                {role.name}
-              </SelectItem>
-            ))}
-          </SelectCitricaAdmin>
+            options={roles.map((role) => ({
+              value: String(role.id),
+              label: role.name,
+            }))}
+          />
 
           <SelectCitricaAdmin
             label="Empresa *"
@@ -378,43 +364,19 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             }}
             isInvalid={errors.company_id}
             errorMessage={errors.company_id ? "La empresa es obligatoria" : ""}
-            isDisabled={Number(formData.role_id) === 1}
-          >
-            {Number(formData.role_id) === 1
-              ? companies.filter(c => c.name?.toLowerCase() === 'citrica').map((company) => (
-                <SelectItem
-                  key={String(company.id)}
-                  classNames={{
-                    base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
-                    wrapper: "!border-none",
-                  }}
-                  style={{
-                    border: 'none',
-                    borderColor: 'transparent',
-                    borderWidth: '0',
-                  } as React.CSSProperties}
-                >
-                  {company.name || "Sin nombre"}
-                </SelectItem>
-              ))
-              : companies.map((company) => (
-                <SelectItem
-                  key={String(company.id)}
-                  classNames={{
-                    base: "!border-none data-[hover=true]:bg-gray-100 data-[hover=true]:!border-none data-[selectable=true]:focus:bg-gray-200 data-[selectable=true]:focus:!border-none !outline-none",
-                    wrapper: "!border-none",
-                  }}
-                  style={{
-                    border: 'none',
-                    borderColor: 'transparent',
-                    borderWidth: '0',
-                  } as React.CSSProperties}
-                >
-                  {company.name || "Sin nombre"}
-                </SelectItem>
-              ))
+            disabled={Number(formData.role_id) === 1}
+            options={
+              Number(formData.role_id) === 1
+                ? companies.filter(c => c.name?.toLowerCase() === 'citrica').map((company) => ({
+                    value: String(company.id),
+                    label: company.name || "Sin nombre",
+                  }))
+                : companies.map((company) => ({
+                    value: String(company.id),
+                    label: company.name || "Sin nombre",
+                  }))
             }
-          </SelectCitricaAdmin>
+          />
 
           <InputCitricaAdmin
             label="Nombre *"

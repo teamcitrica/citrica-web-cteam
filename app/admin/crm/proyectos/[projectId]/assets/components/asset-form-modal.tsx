@@ -1,5 +1,5 @@
 "use client";
-import { Select, SelectItem } from "@heroui/select";
+import { Select } from "citrica-ui-toolkit";
 import { Chip } from "@heroui/chip";
 import { Input } from "@heroui/input";
 import { Checkbox, CheckboxGroup } from "@heroui/checkbox";
@@ -716,7 +716,7 @@ export default function AssetFormModal({
                 <Select
                   label="Tabla"
                   placeholder="Selecciona una tabla"
-                  selectedKeys={formData.tabla ? [formData.tabla] : []}
+                  value={formData.tabla || ""}
                   onChange={(e) => {
                     const tableName = e.target.value;
                     handleInputChange("tabla", tableName);
@@ -724,29 +724,16 @@ export default function AssetFormModal({
                       fetchTableColumns(tableName);
                     }
                   }}
-                  isRequired={mode === "create"}
+                  options={tables.map((table) => ({ value: table, label: table }))}
+                  variant="faded"
+                  required={mode === "create"}
                   classNames={{
                     label: "!text-[#265197]",
                     value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2] truncate",
                     trigger: "bg-white !border-[#D4DEED]",
                     selectorIcon: "text-[#678CC5]",
                   }}
-                >
-                  {tables.map((table) => (
-                    <SelectItem
-                      key={table}
-                      classNames={{
-                        base: "max-w-full",
-                        title: "truncate",
-                      }}
-                      title={table}
-                    >
-                      <span className="truncate block" title={table}>
-                        {table}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </Select>
+                />
               </div>
             )}
 
@@ -974,21 +961,17 @@ export default function AssetFormModal({
                         <Select
                           label="Columna de fecha"
                           placeholder="Selecciona una columna"
-                          selectedKeys={dateSearchColumn ? [dateSearchColumn] : []}
+                          value={dateSearchColumn || ""}
                           onChange={(e) => handleDateSearchColumnChange(e.target.value)}
+                          options={["", ...selectedColumns].map((column) => ({ value: column, label: column === "" ? "Ninguna" : column }))}
+                          variant="faded"
                           classNames={{
                             label: "!text-[#265197]",
                             value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
                             trigger: "bg-white !border-[#D4DEED]",
                             selectorIcon: "text-[#678CC5]",
                           }}
-                        >
-                          {["", ...selectedColumns].map((column) => (
-                            <SelectItem key={column}>
-                              {column === "" ? "Ninguna" : column}
-                            </SelectItem>
-                          ))}
-                        </Select>
+                        />
                         {dateSearchColumn && (
                           <div className="mt-2">
                             <Chip color="primary" variant="flat" size="sm">
@@ -1107,24 +1090,20 @@ export default function AssetFormModal({
                         <Select
                           label="Columna"
                           placeholder="Selecciona una columna"
-                          selectedKeys={selectedFilterColumn ? [selectedFilterColumn] : []}
+                          value={selectedFilterColumn || ""}
                           onChange={(e) => {
                             const column = e.target.value;
                             setSelectedFilterColumn(column);
                           }}
+                          options={selectedColumns.map((column) => ({ value: column, label: column }))}
+                          variant="faded"
                           classNames={{
                             label: "!text-[#265197]",
                             value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
                             trigger: "bg-white !border-[#D4DEED]",
                             selectorIcon: "text-[#678CC5]",
                           }}
-                        >
-                          {selectedColumns.map((column) => (
-                            <SelectItem key={column}>
-                              {column}
-                            </SelectItem>
-                          ))}
-                        </Select>
+                        />
 
                         {/* Input de valor */}
                         <InputCitricaAdmin

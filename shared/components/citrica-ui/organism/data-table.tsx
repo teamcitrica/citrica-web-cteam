@@ -1,6 +1,5 @@
 "use client";
 import { Skeleton } from "@heroui/skeleton";
-import { SelectItem } from "@heroui/select";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { Chip } from "@heroui/chip";
 import { Divider } from "@heroui/divider";

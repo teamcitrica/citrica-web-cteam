@@ -1,5 +1,5 @@
 "use client";
-import { Select, SelectItem } from "@heroui/select";
+import { Select } from "citrica-ui-toolkit";
 import { Textarea } from "@heroui/input";
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
@@ -171,53 +171,43 @@ export default function CreateCompanyModal({
         <Select
           label="Sector"
           placeholder="Seleccione un sector"
-          selectedKeys={formData.sector ? [formData.sector] : []}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
+          value={formData.sector || ""}
+          onChange={(e) => {
             setFormData((prev) => ({
               ...prev,
-              sector: selected ? String(selected) : null,
+              sector: e.target.value || null,
             }));
           }}
+          options={COMPANY_SECTORS.map((sector) => ({ value: sector, label: sector }))}
+          variant="faded"
           classNames={{
             label: "!text-[#265197]",
             value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
             trigger: "bg-white !border-[#D4DEED]",
             selectorIcon: "text-[#678CC5]",
           }}
-          isRequired
-        >
-          {COMPANY_SECTORS.map((sector) => (
-            <SelectItem key={sector} className="text-[#265197]">
-              {sector}
-            </SelectItem>
-          ))}
-        </Select>
+          required
+        />
         <Select
           label="Relación"
           placeholder="Seleccione una relación"
-          selectedKeys={formData.type_id ? [String(formData.type_id)] : []}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
+          value={formData.type_id ? String(formData.type_id) : ""}
+          onChange={(e) => {
             setFormData((prev) => ({
               ...prev,
-              type_id: selected ? Number(selected) : null,
+              type_id: e.target.value ? Number(e.target.value) : null,
             }));
           }}
+          options={contactTypes.map((type) => ({ value: String(type.id), label: type.name }))}
+          variant="faded"
           classNames={{
             label: "!text-[#265197]",
             value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
             trigger: "bg-white !border-[#D4DEED]",
             selectorIcon: "text-[#678CC5]",
           }}
-          isRequired
-        >
-          {contactTypes.map((type) => (
-            <SelectItem key={type.id} className="text-[#265197]">
-              {type.name}
-            </SelectItem>
-          ))}
-        </Select>
+          required
+        />
         <InputCitricaAdmin
           label="Website"
           placeholder="https://ejemplo.com"
@@ -228,35 +218,19 @@ export default function CreateCompanyModal({
           <Select
             label="Código"
             placeholder="+51"
-            selectedKeys={[phoneCode]}
-            onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0] as string;
-              setPhoneCode(selected);
+            value={phoneCode}
+            onChange={(e) => {
+              setPhoneCode(e.target.value);
             }}
+            options={PHONE_CODES.map((code) => ({ value: code.value, label: code.label }))}
+            variant="faded"
             classNames={{
               label: "!text-[#265197]",
               value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
               trigger: "bg-white !border-[#D4DEED]",
               selectorIcon: "text-[#678CC5]",
             }}
-            renderValue={(items) => {
-              return items.map((item) => (
-                <div key={item.key} className="flex items-center gap-1">
-                  <span className="text-sm">{item.key}</span>
-                </div>
-              ));
-            }}
-          >
-            {PHONE_CODES.map((code) => (
-              <SelectItem
-                key={code.value}
-                className="text-[#265197]"
-                textValue={code.value}
-              >
-                {code.label}
-              </SelectItem>
-            ))}
-          </Select>
+          />
           <InputCitricaAdmin
             label="Teléfono"
             placeholder="Número de teléfono"
@@ -277,42 +251,22 @@ export default function CreateCompanyModal({
         <Select
           label="País"
           placeholder="Seleccione un país"
-          selectedKeys={formData.country ? [formData.country] : []}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
+          value={formData.country || ""}
+          onChange={(e) => {
             setFormData((prev) => ({
               ...prev,
-              country: selected ? String(selected) : null,
+              country: e.target.value || null,
             }));
           }}
+          options={COUNTRIES.map((country) => ({ value: country.name, label: `${country.flag} ${country.name}` }))}
+          variant="faded"
           classNames={{
             label: "!text-[#265197]",
             value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
             trigger: "bg-white !border-[#D4DEED]",
             selectorIcon: "text-[#678CC5]",
           }}
-          renderValue={(items) => {
-            return items.map((item) => {
-              const country = COUNTRIES.find(c => c.name === item.key);
-              return (
-                <div key={item.key} className="flex items-center gap-2">
-                  <span>{country?.flag}</span>
-                  <span>{country?.name}</span>
-                </div>
-              );
-            });
-          }}
-        >
-          {COUNTRIES.map((country) => (
-            <SelectItem
-              key={country.name}
-              className="text-[#265197]"
-              startContent={<span className="text-lg">{country.flag}</span>}
-            >
-              {country.name}
-            </SelectItem>
-          ))}
-        </Select>
+        />
         <InputCitricaAdmin
           label="Ciudad o localidad"
           placeholder="Lima"

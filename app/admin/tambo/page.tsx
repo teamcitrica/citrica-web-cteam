@@ -1,6 +1,6 @@
 "use client";
 import { Input } from "@heroui/input";
-import { Select, SelectItem } from "@heroui/select";
+import { Select } from "citrica-ui-toolkit";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { useState, useCallback, useMemo } from "react";
@@ -507,19 +507,13 @@ export default function TamboPage() {
                         trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                         value: "!text-[#3E688E]",
                       }}
-                      selectedKeys={[filter.column]}
+                      value={filter.column}
                       variant="faded"
-                      onSelectionChange={(keys) => {
-                        const value = Array.from(keys)[0] as string;
+                      options={columns.map((col) => ({ value: col.uid, label: col.name }))}
+                      onChange={(value) => {
                         updateFilter(filter.id, "column", value);
                       }}
-                    >
-                      {columns.map((col) => (
-                        <SelectItem key={col.uid}>
-                          {col.name}
-                        </SelectItem>
-                      ))}
-                    </Select>
+                    />
 
                     {/* Selector de operador */}
                     <Select
@@ -528,19 +522,13 @@ export default function TamboPage() {
                         trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                         value: "!text-[#3E688E]",
                       }}
-                      selectedKeys={[filter.operator]}
+                      value={filter.operator}
                       variant="faded"
-                      onSelectionChange={(keys) => {
-                        const value = Array.from(keys)[0] as string;
+                      options={getOperatorsForColumn(filter.column).map((op) => ({ value: op.key, label: op.label }))}
+                      onChange={(value) => {
                         updateFilter(filter.id, "operator", value);
                       }}
-                    >
-                      {getOperatorsForColumn(filter.column).map((op) => (
-                        <SelectItem key={op.key}>
-                          {op.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
+                    />
 
                     {/* Input de valor (solo si no es is_null o is_not_null) */}
                     {filter.operator !== "is_null" && filter.operator !== "is_not_null" && (

@@ -1,5 +1,5 @@
 "use client";
-import { Select, SelectItem } from "@heroui/select";
+import { Select } from "citrica-ui-toolkit";
 import React, { useState } from "react";
 import { Text, Button } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
@@ -193,22 +193,17 @@ const QuickConfigManager = () => {
               </label>
               <Select
                 placeholder="Selecciona una acción"
-                selectedKeys={[batchConfig.action]}
-                onSelectionChange={(keys) => {
-                  const selectedKey = Array.from(keys)[0] as string;
-                  setBatchConfig({ ...batchConfig, action: selectedKey });
+                value={batchConfig.action}
+                onChange={(e) => {
+                  setBatchConfig({ ...batchConfig, action: e.target.value });
                 }}
-              >
-                <SelectItem key="generate">
-                  Generar Slots
-                </SelectItem>
-                <SelectItem key="activate">
-                  Activar Período
-                </SelectItem>
-                <SelectItem key="deactivate">
-                  Desactivar Período
-                </SelectItem>
-              </Select>
+                options={[
+                  { value: "generate", label: "Generar Slots" },
+                  { value: "activate", label: "Activar Período" },
+                  { value: "deactivate", label: "Desactivar Período" }
+                ]}
+                variant="faded"
+              />
             </div>
           </div>
 

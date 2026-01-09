@@ -2,7 +2,7 @@
 import { Calendar } from "@heroui/calendar";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
 import React, { useState, useEffect } from "react";
-import { Button, Text } from "citrica-ui-toolkit";
+import { Button, Text, Select } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
 import { today, getLocalTimeZone } from "@internationalized/date";
 
@@ -741,25 +741,33 @@ const UnifiedAvailabilityManager = () => {
                 <Text variant="body" color="#ff6b35" className="font-semibold">
                   Horario de Oficina:
                 </Text>
-                <select
-                  value={officeStartHour}
-                  onChange={(e) => setOfficeStartHour(parseInt(e.target.value))}
+                <Select
+                  variant="faded"
+                  selectedKeys={[officeStartHour.toString()]}
+                  onSelectionChange={(keys) => {
+                    const value = Array.from(keys)[0] as string;
+                    setOfficeStartHour(parseInt(value));
+                  }}
+                  options={Array.from({ length: 24 }, (_, i) => ({
+                    value: i.toString(),
+                    label: `${String(i).padStart(2, '0')}:00`
+                  }))}
                   className="border rounded px-2 py-1 text-sm"
-                >
-                  {Array.from({ length: 24 }, (_, i) => (
-                    <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
-                  ))}
-                </select>
+                />
                 <Text variant="body" color="color-on-surface">-</Text>
-                <select
-                  value={officeEndHour}
-                  onChange={(e) => setOfficeEndHour(parseInt(e.target.value))}
+                <Select
+                  variant="faded"
+                  selectedKeys={[officeEndHour.toString()]}
+                  onSelectionChange={(keys) => {
+                    const value = Array.from(keys)[0] as string;
+                    setOfficeEndHour(parseInt(value));
+                  }}
+                  options={Array.from({ length: 24 }, (_, i) => ({
+                    value: i.toString(),
+                    label: `${String(i).padStart(2, '0')}:00`
+                  }))}
                   className="border rounded px-2 py-1 text-sm"
-                >
-                  {Array.from({ length: 24 }, (_, i) => (
-                    <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div className="flex gap-2 flex-wrap">

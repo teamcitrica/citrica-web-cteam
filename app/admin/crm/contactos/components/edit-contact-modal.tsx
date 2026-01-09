@@ -1,5 +1,5 @@
 "use client";
-import { Select, SelectItem } from "@heroui/select";
+import { Select } from "citrica-ui-toolkit";
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
@@ -144,54 +144,44 @@ export default function EditContactModal({
               Este contacto ya se convirtió en usuario del sistema. La empresa se edita desde Usuarios.
             </p>
           )}
-          selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
-            const newCompanyId = selected ? Number(selected) : null;
+          value={formData.company_id ? String(formData.company_id) : ""}
+          onChange={(e) => {
+            const newCompanyId = e.target.value ? Number(e.target.value) : null;
 
             setFormData((prev) => ({
               ...prev,
               company_id: newCompanyId,
             }));
           }}
-          isDisabled={!!contact.user_id}
+          options={companies.map((company) => ({ value: String(company.id), label: company.name || `Empresa ${company.id}` }))}
+          variant="faded"
+          disabled={!!contact.user_id}
           classNames={{
             label: "text-gray-700",
             value: "text-gray-800",
             trigger: "bg-white !border-[#D4DEED]",
           }}
-        >
-          {companies.map((company) => (
-            <SelectItem key={String(company.id)}>
-              {company.name || `Empresa ${company.id}`}
-            </SelectItem>
-          ))}
-        </Select>
+        />
         <Select
           label="Relación"
           placeholder="Seleccione una empresa"
-          selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
+          value={formData.company_id ? String(formData.company_id) : ""}
+          onChange={(e) => {
             setFormData((prev) => ({
               ...prev,
-              company_id: selected ? Number(selected) : null,
+              company_id: e.target.value ? Number(e.target.value) : null,
             }));
           }}
+          options={companies.map((company) => ({ value: String(company.id), label: "Relación: Cliente, Proveedor, Interno" }))}
+          variant="faded"
           classNames={{
             label: "!text-[#265197]",
             value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
             trigger: "bg-white !border-[#D4DEED]",
             selectorIcon: "text-[#678CC5]",
           }}
-          isRequired
-        >
-          {companies.map((company) => (
-            <SelectItem key={String(company.id)} className="text-[#265197]">
-              Relación: Cliente, Proveedor, Interno
-            </SelectItem>
-          ))}
-        </Select>
+          required
+        />
         <InputCitricaAdmin
           label="Nombre del Contacto"
           placeholder="Ingrese el nombre completo"

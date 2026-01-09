@@ -1,5 +1,5 @@
 "use client";
-import { Select, SelectItem } from "@heroui/select";
+import { Select } from "citrica-ui-toolkit";
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
 import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
@@ -245,46 +245,42 @@ export default function ProjectFormModal({
             <Select
               label="Empresa"
               placeholder="Seleccione una empresa"
-              selectedKeys={formData.company_id ? [formData.company_id.toString()] : []}
-              onSelectionChange={(keys) => {
-                const selected = Array.from(keys)[0];
-                handleInputChange("company_id", selected ? parseInt(selected as string) : null);
+              value={formData.company_id ? String(formData.company_id) : ""}
+              onChange={(e) => {
+                handleInputChange("company_id", e.target.value ? parseInt(e.target.value) : null);
               }}
-              isRequired
+              options={companies.map((company) => ({ value: String(company.id), label: company.name || "Sin nombre" }))}
+              variant="faded"
+              required
               classNames={{
                 label: "!text-[#265197]",
                 value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
                 trigger: "bg-white !border-[#D4DEED]",
                 selectorIcon: "text-[#678CC5]",
               }}
-            >
-              {companies.map((company) => (
-                <SelectItem key={company.id.toString()} className="text-[#265197]">
-                  {company.name || "Sin nombre"}
-                </SelectItem>
-              ))}
-            </Select>
+            />
 
         {mode === "edit" && (
           <Select
             label="Estatus"
             placeholder="Seleccione el estatus"
-            selectedKeys={formData.status ? [formData.status] : []}
-            onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0];
-              handleInputChange("status", selected ? selected as string : null);
+            value={formData.status || ""}
+            onChange={(e) => {
+              handleInputChange("status", e.target.value || null);
             }}
+            options={[
+              { value: "abierto", label: "Abierto" },
+              { value: "inactivo", label: "Inactivo" },
+              { value: "cerrado", label: "Cerrado" }
+            ]}
+            variant="faded"
             classNames={{
               label: "!text-[#265197]",
               value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
               trigger: "bg-white !border-[#D4DEED]",
               selectorIcon: "text-[#678CC5]",
             }}
-          >
-            <SelectItem key="abierto" className="text-[#265197]">Abierto</SelectItem>
-            <SelectItem key="inactivo" className="text-[#265197]">Inactivo</SelectItem>
-            <SelectItem key="cerrado" className="text-[#265197]">Cerrado</SelectItem>
-          </Select>
+          />
         )}
 
         <InputCitricaAdmin
