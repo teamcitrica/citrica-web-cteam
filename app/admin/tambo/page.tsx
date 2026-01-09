@@ -507,11 +507,12 @@ export default function TamboPage() {
                         trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                         value: "!text-[#3E688E]",
                       }}
-                      value={filter.column}
+                      selectedKeys={filter.column ? [filter.column] : []}
                       variant="faded"
                       options={columns.map((col) => ({ value: col.uid, label: col.name }))}
-                      onChange={(value) => {
-                        updateFilter(filter.id, "column", value);
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+                        updateFilter(filter.id, "column", selected);
                       }}
                     />
 
@@ -522,11 +523,12 @@ export default function TamboPage() {
                         trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                         value: "!text-[#3E688E]",
                       }}
-                      value={filter.operator}
+                      selectedKeys={filter.operator ? [filter.operator] : []}
                       variant="faded"
                       options={getOperatorsForColumn(filter.column).map((op) => ({ value: op.key, label: op.label }))}
-                      onChange={(value) => {
-                        updateFilter(filter.id, "operator", value);
+                      onSelectionChange={(keys) => {
+                        const selected = Array.from(keys)[0] as string;
+                        updateFilter(filter.id, "operator", selected);
                       }}
                     />
 

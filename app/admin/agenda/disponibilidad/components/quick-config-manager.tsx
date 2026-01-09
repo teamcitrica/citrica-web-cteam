@@ -193,9 +193,10 @@ const QuickConfigManager = () => {
               </label>
               <Select
                 placeholder="Selecciona una acción"
-                value={batchConfig.action}
-                onChange={(e) => {
-                  setBatchConfig({ ...batchConfig, action: e.target.value });
+                selectedKeys={[batchConfig.action]}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string;
+                  setBatchConfig({ ...batchConfig, action: selected });
                 }}
                 options={[
                   { value: "generate", label: "Generar Slots" },

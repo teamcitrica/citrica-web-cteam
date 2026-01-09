@@ -139,14 +139,11 @@ export default function EditContactModal({
         <Select
           label="Empresa"
           placeholder="Seleccione una empresa"
-          description={contact.user_id && (
-            <p className="text-xs text-gray-500 mt-1">
-              Este contacto ya se convirtió en usuario del sistema. La empresa se edita desde Usuarios.
-            </p>
-          )}
-          value={formData.company_id ? String(formData.company_id) : ""}
-          onChange={(e) => {
-            const newCompanyId = e.target.value ? Number(e.target.value) : null;
+          description={contact.user_id ? "Este contacto ya se convirtió en usuario del sistema. La empresa se edita desde Usuarios." : undefined}
+          selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0] as string;
+            const newCompanyId = selected ? Number(selected) : null;
 
             setFormData((prev) => ({
               ...prev,
@@ -165,11 +162,12 @@ export default function EditContactModal({
         <Select
           label="Relación"
           placeholder="Seleccione una empresa"
-          value={formData.company_id ? String(formData.company_id) : ""}
-          onChange={(e) => {
+          selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0] as string;
             setFormData((prev) => ({
               ...prev,
-              company_id: e.target.value ? Number(e.target.value) : null,
+              company_id: selected ? Number(selected) : null,
             }));
           }}
           options={companies.map((company) => ({ value: String(company.id), label: "Relación: Cliente, Proveedor, Interno" }))}

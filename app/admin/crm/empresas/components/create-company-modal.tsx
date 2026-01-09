@@ -171,11 +171,12 @@ export default function CreateCompanyModal({
         <Select
           label="Sector"
           placeholder="Seleccione un sector"
-          value={formData.sector || ""}
-          onChange={(e) => {
+          selectedKeys={formData.sector ? [formData.sector] : []}
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0] as string;
             setFormData((prev) => ({
               ...prev,
-              sector: e.target.value || null,
+              sector: selected || null,
             }));
           }}
           options={COMPANY_SECTORS.map((sector) => ({ value: sector, label: sector }))}
@@ -191,11 +192,12 @@ export default function CreateCompanyModal({
         <Select
           label="Relación"
           placeholder="Seleccione una relación"
-          value={formData.type_id ? String(formData.type_id) : ""}
-          onChange={(e) => {
+          selectedKeys={formData.type_id ? [String(formData.type_id)] : []}
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0] as string;
             setFormData((prev) => ({
               ...prev,
-              type_id: e.target.value ? Number(e.target.value) : null,
+              type_id: selected ? Number(selected) : null,
             }));
           }}
           options={contactTypes.map((type) => ({ value: String(type.id), label: type.name }))}
@@ -218,9 +220,10 @@ export default function CreateCompanyModal({
           <Select
             label="Código"
             placeholder="+51"
-            value={phoneCode}
-            onChange={(e) => {
-              setPhoneCode(e.target.value);
+            selectedKeys={phoneCode ? [phoneCode] : []}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0] as string;
+              setPhoneCode(selected);
             }}
             options={PHONE_CODES.map((code) => ({ value: code.value, label: code.label }))}
             variant="faded"
@@ -251,11 +254,12 @@ export default function CreateCompanyModal({
         <Select
           label="País"
           placeholder="Seleccione un país"
-          value={formData.country || ""}
-          onChange={(e) => {
+          selectedKeys={formData.country ? [formData.country] : []}
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0] as string;
             setFormData((prev) => ({
               ...prev,
-              country: e.target.value || null,
+              country: selected || null,
             }));
           }}
           options={COUNTRIES.map((country) => ({ value: country.name, label: `${country.flag} ${country.name}` }))}

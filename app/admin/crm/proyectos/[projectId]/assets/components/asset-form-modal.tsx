@@ -716,12 +716,12 @@ export default function AssetFormModal({
                 <Select
                   label="Tabla"
                   placeholder="Selecciona una tabla"
-                  value={formData.tabla || ""}
-                  onChange={(e) => {
-                    const tableName = e.target.value;
-                    handleInputChange("tabla", tableName);
-                    if (tableName) {
-                      fetchTableColumns(tableName);
+                  selectedKeys={formData.tabla ? [formData.tabla] : []}
+                  onSelectionChange={(keys) => {
+                    const selected = Array.from(keys)[0] as string;
+                    handleInputChange("tabla", selected);
+                    if (selected) {
+                      fetchTableColumns(selected);
                     }
                   }}
                   options={tables.map((table) => ({ value: table, label: table }))}
@@ -961,8 +961,11 @@ export default function AssetFormModal({
                         <Select
                           label="Columna de fecha"
                           placeholder="Selecciona una columna"
-                          value={dateSearchColumn || ""}
-                          onChange={(e) => handleDateSearchColumnChange(e.target.value)}
+                          selectedKeys={dateSearchColumn ? [dateSearchColumn] : []}
+                          onSelectionChange={(keys) => {
+                            const selected = Array.from(keys)[0] as string;
+                            handleDateSearchColumnChange(selected);
+                          }}
                           options={["", ...selectedColumns].map((column) => ({ value: column, label: column === "" ? "Ninguna" : column }))}
                           variant="faded"
                           classNames={{
@@ -1090,10 +1093,10 @@ export default function AssetFormModal({
                         <Select
                           label="Columna"
                           placeholder="Selecciona una columna"
-                          value={selectedFilterColumn || ""}
-                          onChange={(e) => {
-                            const column = e.target.value;
-                            setSelectedFilterColumn(column);
+                          selectedKeys={selectedFilterColumn ? [selectedFilterColumn] : []}
+                          onSelectionChange={(keys) => {
+                            const selected = Array.from(keys)[0] as string;
+                            setSelectedFilterColumn(selected);
                           }}
                           options={selectedColumns.map((column) => ({ value: column, label: column }))}
                           variant="faded"

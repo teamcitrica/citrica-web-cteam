@@ -289,14 +289,15 @@ export default function RoleDataPage() {
                       trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                       value: "!text-[#3E688E]",
                     }}
-                    value={filter.column}
+                    selectedKeys={filter.column ? [filter.column] : []}
                     variant="faded"
                     options={availableColumns.map((col) => ({
                       value: col,
                       label: col === "campaign" ? "CAMPAÑA" : col === "id" ? "ID" : "FECHA"
                     }))}
-                    onChange={(value) => {
-                      updateFilter(filter.id, "column", value);
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+                      updateFilter(filter.id, "column", selected);
                     }}
                   />
 
@@ -308,14 +309,15 @@ export default function RoleDataPage() {
                       trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                       value: "!text-[#3E688E]",
                     }}
-                    value={filter.operator}
+                    selectedKeys={filter.operator ? [filter.operator] : []}
                     variant="faded"
                     options={getOperatorsForColumn(isNumericColumn).map((op) => ({
                       value: op.key,
                       label: op.label
                     }))}
-                    onChange={(value) => {
-                      updateFilter(filter.id, "operator", value);
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+                      updateFilter(filter.id, "operator", selected);
                     }}
                   />
 

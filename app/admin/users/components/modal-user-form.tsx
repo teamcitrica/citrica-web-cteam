@@ -8,8 +8,8 @@ import { useUserRole } from "@/hooks/role/use-role";
 import { useUserCRUD } from "@/hooks/users/use-users";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { UserType } from "@/shared/types/types";
-import { InputCitricaAdmin, SelectCitricaAdmin, DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin";
-import { Button } from "citrica-ui-toolkit";
+import { InputCitricaAdmin, DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin";
+import { Button, Select } from "citrica-ui-toolkit";
 
 type UserFormModalProps = {
   isOpen: boolean;
@@ -330,11 +330,11 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
         <input type="password" name="fake_password" style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} tabIndex={-1} />
 
         <div className="flex flex-col gap-4">
-          <SelectCitricaAdmin
+          <Select
             label="Rol *"
             placeholder="Seleccione un rol"
             selectedKeys={formData.role_id && roles.some(r => String(r.id) === formData.role_id) ? [formData.role_id] : []}
-            onSelectionChange={(keys) => {
+            onSelectionChange={(keys: any) => {
               const selected = Array.from(keys)[0] as string;
               handleChange("role_id", selected);
 
@@ -348,23 +348,37 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             }}
             isInvalid={errors.role_id}
             errorMessage={errors.role_id ? "El rol es obligatorio" : ""}
+            variant="faded"
+            classNames={{
+              trigger: "bg-white !border-[#D4DEED] !rounded-[12px]",
+              label: "!text-[#265197]",
+              value: "!text-[#265197]",
+              selectorIcon: "text-[#678CC5]",
+            }}
             options={roles.map((role) => ({
               value: String(role.id),
               label: role.name,
             }))}
           />
 
-          <SelectCitricaAdmin
+          <Select
             label="Empresa *"
             placeholder="Seleccione una empresa"
             selectedKeys={formData.company_id && companies.some(c => String(c.id) === formData.company_id) ? [formData.company_id] : []}
-            onSelectionChange={(keys) => {
+            onSelectionChange={(keys: any) => {
               const selected = Array.from(keys)[0] as string;
               handleChange("company_id", selected);
             }}
             isInvalid={errors.company_id}
             errorMessage={errors.company_id ? "La empresa es obligatoria" : ""}
             disabled={Number(formData.role_id) === 1}
+            variant="faded"
+            classNames={{
+              trigger: "bg-white !border-[#D4DEED] !rounded-[12px]",
+              label: "!text-[#265197]",
+              value: "!text-[#265197]",
+              selectorIcon: "text-[#678CC5]",
+            }}
             options={
               Number(formData.role_id) === 1
                 ? companies.filter(c => c.name?.toLowerCase() === 'citrica').map((company) => ({

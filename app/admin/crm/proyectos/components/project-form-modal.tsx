@@ -245,9 +245,10 @@ export default function ProjectFormModal({
             <Select
               label="Empresa"
               placeholder="Seleccione una empresa"
-              value={formData.company_id ? String(formData.company_id) : ""}
-              onChange={(e) => {
-                handleInputChange("company_id", e.target.value ? parseInt(e.target.value) : null);
+              selectedKeys={formData.company_id ? [String(formData.company_id)] : []}
+              onSelectionChange={(keys) => {
+                const selected = Array.from(keys)[0] as string;
+                handleInputChange("company_id", selected ? parseInt(selected) : null);
               }}
               options={companies.map((company) => ({ value: String(company.id), label: company.name || "Sin nombre" }))}
               variant="faded"
@@ -264,9 +265,10 @@ export default function ProjectFormModal({
           <Select
             label="Estatus"
             placeholder="Seleccione el estatus"
-            value={formData.status || ""}
-            onChange={(e) => {
-              handleInputChange("status", e.target.value || null);
+            selectedKeys={formData.status ? [formData.status] : []}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0] as string;
+              handleInputChange("status", selected || null);
             }}
             options={[
               { value: "abierto", label: "Abierto" },

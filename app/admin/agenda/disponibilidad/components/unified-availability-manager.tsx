@@ -5,7 +5,6 @@ import React, { useState, useEffect } from "react";
 import { Button, Text, Select } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
 import { today, getLocalTimeZone } from "@internationalized/date";
-
 import { useAdminBookings } from "@/hooks/disponibilidad/use-admin-bookings";
 import { useStudioConfig } from "@/hooks/disponibilidad/use-studio-config";
 import { useAvailability } from "@/app/contexts/AvailabilityContext";
