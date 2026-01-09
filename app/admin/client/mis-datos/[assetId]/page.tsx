@@ -7,8 +7,7 @@ import { useParams } from "next/navigation";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { useUserAssets } from "@/hooks/user-assets/use-user-assets";
-import { Button } from "citrica-ui-toolkit";
-import Input from "@/shared/components/citrica-ui/atoms/input";
+import { Button, Input } from "citrica-ui-toolkit";
 import { Col, Container } from "@/styles/07-objects/objects";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
@@ -813,7 +812,7 @@ export default function AssetDataPage() {
                                   value={textSearchInput}
                                   onValueChange={setTextSearchInput}
                                   clearable
-                                  variant="primary"
+                                  variant="faded"
                                   startContent={
                                     <svg
                                       className="w-4 h-4 text-gray-400"
@@ -832,7 +831,8 @@ export default function AssetDataPage() {
                                   classNames={{
                                     base: "w-full max-w-[348px]",
                                     label: "!text-[#265197] font-medium mb-1",
-                                    inputWrapper: "bg-white !border-[#D4DEED] border-[2px]",
+                                    inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                                    input: "placeholder:text-[#A7BDE2] !text-[#265197]",
                                   }}
                                 />
                               </div>

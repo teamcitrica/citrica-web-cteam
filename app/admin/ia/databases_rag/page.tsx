@@ -3,8 +3,7 @@ import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
 import { Skeleton } from "@heroui/skeleton";
 import { useState, useEffect } from "react";
 import { Col, Container } from "@/styles/07-objects/objects";
-import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin";
-import { Button } from "citrica-ui-toolkit";
+import { Button, Input } from "citrica-ui-toolkit";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
 import { addToast } from "@heroui/toast";
 import {
@@ -417,12 +416,18 @@ export default function DatabasesRAGPage() {
         }
       >
         <div className="space-y-4">
-          <InputCitricaAdmin
+          <Input
             label="Nombre del Storage"
             type="text"
             value={newStorageName}
             onChange={(e) => setNewStorageName(e.target.value)}
             placeholder="Ej: Documentación de Ventas"
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
           <div>

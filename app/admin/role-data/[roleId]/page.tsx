@@ -1,7 +1,6 @@
 "use client";
 
-import { Input } from "@heroui/input";
-import { Select, SelectItem } from "@heroui/select";
+import { Select,Input } from "citrica-ui-toolkit";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { useEffect, useState, useMemo } from "react";
@@ -289,19 +288,17 @@ export default function RoleDataPage() {
                       trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                       value: "!text-[#3E688E]",
                     }}
-                    selectedKeys={[filter.column]}
+                    selectedKeys={filter.column ? [filter.column] : []}
                     variant="faded"
+                    options={availableColumns.map((col) => ({
+                      value: col,
+                      label: col === "campaign" ? "CAMPAÑA" : col === "id" ? "ID" : "FECHA"
+                    }))}
                     onSelectionChange={(keys) => {
-                      const value = Array.from(keys)[0] as string;
-                      updateFilter(filter.id, "column", value);
+                      const selected = Array.from(keys)[0] as string;
+                      updateFilter(filter.id, "column", selected);
                     }}
-                  >
-                    {availableColumns.map((col) => (
-                      <SelectItem key={col} textValue={col}>
-                        {col === "campaign" ? "CAMPAÑA" : col === "id" ? "ID" : "FECHA"}
-                      </SelectItem>
-                    ))}
-                  </Select>
+                  />
 
                   {/* Selector de operador */}
                   <Select
@@ -311,19 +308,17 @@ export default function RoleDataPage() {
                       trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                       value: "!text-[#3E688E]",
                     }}
-                    selectedKeys={[filter.operator]}
+                    selectedKeys={filter.operator ? [filter.operator] : []}
                     variant="faded"
+                    options={getOperatorsForColumn(isNumericColumn).map((op) => ({
+                      value: op.key,
+                      label: op.label
+                    }))}
                     onSelectionChange={(keys) => {
-                      const value = Array.from(keys)[0] as string;
-                      updateFilter(filter.id, "operator", value);
+                      const selected = Array.from(keys)[0] as string;
+                      updateFilter(filter.id, "operator", selected);
                     }}
-                  >
-                    {getOperatorsForColumn(isNumericColumn).map((op) => (
-                      <SelectItem key={op.key} textValue={op.label}>
-                        {op.label}
-                      </SelectItem>
-                    ))}
-                  </Select>
+                  />
 
                   {/* Input de valor (solo si no es is_null o is_not_null) */}
                   {filter.operator !== "is_null" && filter.operator !== "is_not_null" && (

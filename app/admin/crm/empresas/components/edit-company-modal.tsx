@@ -1,10 +1,9 @@
 "use client";
-import { Select, SelectItem } from "@heroui/select";
+import { Select } from "citrica-ui-toolkit";
 import { Textarea } from "@heroui/input";
 import { useState, useEffect } from "react";
-import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { Button } from "citrica-ui-toolkit";
+import { Button, Input } from "citrica-ui-toolkit";
 import { useSupabase } from "@/shared/context/supabase-context";
 
 import { Company, CompanyInput, useCompanyCRUD } from "@/hooks/companies/use-companies";
@@ -142,63 +141,61 @@ export default function EditCompanyModal({
       }
     >
       <div className="grid grid-cols-1 gap-4">
-        <InputCitricaAdmin
+        <Input
           label="Nombre de la Empresa"
           placeholder="Ingrese el nombre"
           value={formData.name || ""}
           onChange={(e) => handleInputChange("name", e.target.value)}
-          isRequired
+          required
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
         <Select
           label="Sector"
           placeholder="Seleccione un sector"
           selectedKeys={formData.sector ? [formData.sector] : []}
           onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
+            const selected = Array.from(keys)[0] as string;
             setFormData((prev) => ({
               ...prev,
-              sector: selected ? String(selected) : null,
+              sector: selected || null,
             }));
           }}
+          options={COMPANY_SECTORS.map((sector) => ({ value: sector, label: sector }))}
+          variant="faded"
           classNames={{
             label: "!text-[#265197]",
             value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
             trigger: "bg-white !border-[#D4DEED]",
             selectorIcon: "text-[#678CC5]",
           }}
-          isRequired
-        >
-          {COMPANY_SECTORS.map((sector) => (
-            <SelectItem key={sector} className="text-[#265197]">
-              {sector}
-            </SelectItem>
-          ))}
-        </Select>
+          required
+        />
         <Select
           label="Relación"
           placeholder="Seleccione una relación"
           selectedKeys={formData.type_id ? [String(formData.type_id)] : []}
           onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
+            const selected = Array.from(keys)[0] as string;
             setFormData((prev) => ({
               ...prev,
               type_id: selected ? Number(selected) : null,
             }));
           }}
+          options={contactTypes.map((type) => ({ value: String(type.id), label: type.name }))}
+          variant="faded"
           classNames={{
             label: "!text-[#265197]",
             value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
             trigger: "bg-white !border-[#D4DEED]",
             selectorIcon: "text-[#678CC5]",
           }}
-          isRequired
-        >
-          {contactTypes.map((type) => (
-            <SelectItem key={type.id} className="text-[#265197]">
-              {type.name}
-            </SelectItem>
-          ))}
-        </Select>
+          required
+        />
         {/* <InputCitricaAdmin
           label="RUC"
           placeholder="Ingrese el RUC"
@@ -217,46 +214,37 @@ export default function EditCompanyModal({
           value={formData.contact_position || ""}
           onChange={(e) => handleInputChange("contact_position", e.target.value)}
         /> */}
-        <InputCitricaAdmin
+        <Input
           label="Website"
           placeholder="Website"
           value="."
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
           //onChange={(e) => handleInputChange("contact_phone", e.target.value)}
         />
         <div className="grid grid-cols-[100px_1fr] gap-2">
           <Select
             label="Código"
             placeholder="+51"
-            selectedKeys={[phoneCode]}
+            selectedKeys={phoneCode ? [phoneCode] : []}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0] as string;
               setPhoneCode(selected);
             }}
+            options={PHONE_CODES.map((code) => ({ value: code.value, label: code.label }))}
+            variant="faded"
             classNames={{
               label: "!text-[#265197]",
               value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
               trigger: "bg-white !border-[#D4DEED]",
               selectorIcon: "text-[#678CC5]",
             }}
-            renderValue={(items) => {
-              return items.map((item) => (
-                <div key={item.key} className="flex items-center gap-1">
-                  <span className="text-sm">{item.key}</span>
-                </div>
-              ));
-            }}
-          >
-            {PHONE_CODES.map((code) => (
-              <SelectItem
-                key={code.value}
-                className="text-[#265197]"
-                textValue={code.value}
-              >
-                {code.label}
-              </SelectItem>
-            ))}
-          </Select>
-          <InputCitricaAdmin
+          />
+          <Input
             label="Teléfono"
             placeholder="Número de teléfono"
             value={formData.contact_phone?.replace(phoneCode, "").trim() || ""}
@@ -264,77 +252,94 @@ export default function EditCompanyModal({
               const phone = e.target.value ? `${phoneCode} ${e.target.value}` : "";
               handleInputChange("contact_phone", phone);
             }}
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
         </div>
-        <InputCitricaAdmin
+        <Input
           label="Email"
           placeholder="correo@ejemplo.com"
           type="email"
           value={formData.contact_email || ""}
           onChange={(e) => handleInputChange("contact_email", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
         <Select
           label="País"
           placeholder="Seleccione un país"
           selectedKeys={formData.country ? [formData.country] : []}
           onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
+            const selected = Array.from(keys)[0] as string;
             setFormData((prev) => ({
               ...prev,
-              country: selected ? String(selected) : null,
+              country: selected || null,
             }));
           }}
+          options={COUNTRIES.map((country) => ({ value: country.name, label: `${country.flag} ${country.name}` }))}
+          variant="faded"
           classNames={{
             label: "!text-[#265197]",
             value: "!text-[#265197] data-[placeholder=true]:!text-[#A7BDE2]",
             trigger: "bg-white !border-[#D4DEED]",
             selectorIcon: "text-[#678CC5]",
           }}
-          renderValue={(items) => {
-            return items.map((item) => {
-              const country = COUNTRIES.find(c => c.name === item.key);
-              return (
-                <div key={item.key} className="flex items-center gap-2">
-                  <span>{country?.flag}</span>
-                  <span>{country?.name}</span>
-                </div>
-              );
-            });
-          }}
-        >
-          {COUNTRIES.map((country) => (
-            <SelectItem
-              key={country.name}
-              className="text-[#265197]"
-              startContent={<span className="text-lg">{country.flag}</span>}
-            >
-              {country.name}
-            </SelectItem>
-          ))}
-        </Select>
-        <InputCitricaAdmin
+        />
+        <Input
           label="Ciudad o localidad"
           placeholder="Lima"
           value={formData.departament || ""}
           onChange={(e) => handleInputChange("departament", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
-        <InputCitricaAdmin
+        <Input
           label="Calle y Número"
           placeholder="Nombre de la calle"
           value={formData.street_or_avenue || ""}
           onChange={(e) => handleInputChange("street_or_avenue", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
-        <InputCitricaAdmin
+        <Input
           label="Distrito o Barrio"
           placeholder="Distrito"
           value={formData.district || ""}
           onChange={(e) => handleInputChange("district", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
-        <InputCitricaAdmin
+        <Input
           label="Código Postal"
           placeholder="123456"
           value={formData.address_number || ""}
           onChange={(e) => handleInputChange("address_number", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
       </div>
       <Textarea

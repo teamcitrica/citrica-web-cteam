@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
-import { Input } from "@/shared/components/citrica-ui";
 import { useUserRole } from "@/hooks/role/use-role";
 import { useCredentials, CredentialType } from "@/hooks/use-credentials";
+import { Select, Input } from "citrica-ui-toolkit";
 
 type EditCredentialModalProps = {
   isOpen: boolean;
@@ -46,7 +46,7 @@ const EditCredentialModal = ({
   }, [isOpen, credential, fetchRoles]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -204,6 +204,12 @@ const EditCredentialModal = ({
             type="url"
             value={formData.supabase_url}
             onChange={handleChange}
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
           <Input
@@ -212,6 +218,12 @@ const EditCredentialModal = ({
             type="text"
             value={formData.supabase_anon_key}
             onChange={handleChange}
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
           <button
@@ -228,38 +240,41 @@ const EditCredentialModal = ({
                 <label className="text-sm font-medium text-black">
                   Seleccionar Tabla
                 </label>
-                <select
-                  name="table_name"
-                  value={formData.table_name}
-                  onChange={handleChange}
+                <Select
+                  variant="faded"
+                  selectedKeys={formData.table_name ? [formData.table_name] : []}
+                  onSelectionChange={(keys) => {
+                    const value = Array.from(keys)[0] as string;
+                    setFormData((prev) => ({ ...prev, table_name: value }));
+                  }}
+                  options={[
+                    { value: "", label: "Selecciona una tabla" },
+                    ...tables.map((table) => ({ value: table, label: table }))
+                  ]}
                   className="border rounded-md p-2 text-black"
-                >
-                  <option value="">Selecciona una tabla</option>
-                  {tables.map((table) => (
-                    <option key={table} value={table}>
-                      {table}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium text-black">
                   Seleccionar Rol
                 </label>
-                <select
-                  name="role_id"
-                  value={formData.role_id}
-                  onChange={handleChange}
+                <Select
+                  variant="faded"
+                  selectedKeys={formData.role_id ? [formData.role_id] : []}
+                  onSelectionChange={(keys) => {
+                    const value = Array.from(keys)[0] as string;
+                    setFormData((prev) => ({ ...prev, role_id: value }));
+                  }}
+                  options={[
+                    { value: "", label: "Selecciona un rol" },
+                    ...availableRoles.map((role) => ({
+                      value: role.id.toString(),
+                      label: `${role.name} (ID: ${role.id})`
+                    }))
+                  ]}
                   className="border rounded-md p-2 text-black"
-                >
-                  <option value="">Selecciona un rol</option>
-                  {availableRoles.map((role) => (
-                    <option key={role.id} value={role.id}>
-                      {role.name} (ID: {role.id})
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
             </>
           )}

@@ -8,10 +8,9 @@ import { addToast } from "@heroui/toast"
 import { UserAuth } from '@/shared/context/auth-context'
 import { useForm } from "react-hook-form"
 
-import { Button, Text } from 'citrica-ui-toolkit'
+import { Button, Text, Input } from 'citrica-ui-toolkit'
 import { Icon } from '@/shared/components/citrica-ui'
 import { Container } from '@/styles/07-objects/objects'
-import { InputCitricaAdmin } from '../admin'
 
 type FormValues = {
   password: string;
@@ -86,26 +85,32 @@ const LoginPage = () => {
           </Text>
         </span>
         <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center gap-5 mt-7'>
-          <InputCitricaAdmin
+          <Input
             label="Email"
             type="email"
             placeholder="Correo electónico"
             {...register("email")}
             disabled={isLoading}
             required
+            variant="faded"
             classNames={{
-              label: "!text-[#FF5B00]"
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#FF5B00]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
             }}
           />
-          <InputCitricaAdmin
+          <Input
             label="Clave"
             type={showPassword ? "text" : "password"}
             placeholder="Contraseña"
             {...register("password")}
             disabled={isLoading}
             required
+            variant="faded"
             classNames={{
-              label: "!text-[#FF5B00]"
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#FF5B00]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
             }}
             endContent={
               <Icon name="Eye"

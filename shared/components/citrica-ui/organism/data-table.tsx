@@ -1,6 +1,5 @@
 "use client";
 import { Skeleton } from "@heroui/skeleton";
-import { SelectItem } from "@heroui/select";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { Chip } from "@heroui/chip";
 import { Divider } from "@heroui/divider";
@@ -9,9 +8,8 @@ import { Pagination } from "@heroui/pagination";
 import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 import React, { useCallback, useMemo, useState } from "react";
 import Image from "next/image";
-import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin";
 import Icon from "@ui/atoms/icon";
-import { Text, Button } from "citrica-ui-toolkit";
+import { Text, Button, Input } from "citrica-ui-toolkit";
 import ExportModal from "./export-modal";
 import { useTableFeatures, ExportColumn } from "@/shared/hooks/useTableFeatures";
 // import "./data-table.css";
@@ -241,7 +239,7 @@ export function DataTable<T extends Record<string, any>>({
 
           {/* Input de búsqueda */}
           {searchFields.length > 0 && (
-            <InputCitricaAdmin
+            <Input
               type="text"
               placeholder={searchPlaceholder || "Buscar..."}
               value={serverSidePagination ? (searchValueServer || "") : tableFeatures.filterValue}
@@ -254,6 +252,12 @@ export function DataTable<T extends Record<string, any>>({
               }}
               startContent={<Icon size={16} color="#265197" name="Search" />}
               className="w-56"
+              variant="faded"
+              classNames={{
+                inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                label: "!text-[#265197]",
+                input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+              }}
             />
           )}
         </div>

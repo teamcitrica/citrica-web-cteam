@@ -1,9 +1,7 @@
 "use client";
-import { SelectItem } from "@heroui/select";
 import { useState, useRef, useEffect } from "react";
 import { Col, Container } from "@/styles/07-objects/objects";
-import { SelectCitricaAdmin } from "@/shared/components/citrica-ui/admin";
-import { Button } from "citrica-ui-toolkit";
+import { Button, Select } from "citrica-ui-toolkit";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
 import {
   Send,
@@ -254,51 +252,55 @@ export default function ChatPage() {
           <div className="mb-4 flex flex-col md:flex-row gap-3">
             {/* Selector de Base de Datos */}
             <div className="flex-1">
-              <SelectCitricaAdmin
+              <Select
                 label="Base de Datos"
-                value={selectedDatabase}
-                onChange={(e) => handleDatabaseChange(e.target.value)}
+                selectedKeys={[selectedDatabase]}
+                onSelectionChange={(keys: any) => {
+                  const selected = Array.from(keys)[0] as string;
+                  handleDatabaseChange(selected);
+                }}
                 className="w-full"
-              >
-                <>
-                  <SelectItem key="all">
-                    Todas las bases de datos
-                  </SelectItem>
-                  {storages.map((storage) => (
-                    <SelectItem key={storage.id}>
-                      {storage.name}
-                    </SelectItem>
-                  ))}
-                </>
-              </SelectCitricaAdmin>
+                variant="faded"
+                classNames={{
+                  trigger: "bg-white !border-[#D4DEED] !rounded-[12px]",
+                  label: "!text-[#265197]",
+                  value: "!text-[#265197]",
+                  selectorIcon: "text-[#678CC5]",
+                }}
+                options={[
+                  { value: "all", label: "Todas las bases de datos" },
+                  ...storages.map((storage) => ({
+                    value: storage.id,
+                    label: storage.name,
+                  }))
+                ]}
+              />
             </div>
 
             {/* Selector de Perfil de Respuesta */}
             <div className="flex-1">
-              <SelectCitricaAdmin
+              <Select
                 label="Calidad de Respuesta"
                 selectedKeys={[responseProfile]}
-                onSelectionChange={(keys) => {
+                onSelectionChange={(keys: any) => {
                   const selected = Array.from(keys)[0] as string;
                   setResponseProfile(selected);
                 }}
                 className="w-full"
-              >
-                <>
-                  <SelectItem key="concise">
-                    Concisa (~400 palabras)
-                  </SelectItem>
-                  <SelectItem key="balanced">
-                    Balanceada (~1600 palabras)
-                  </SelectItem>
-                  <SelectItem key="detailed">
-                    Detallada (~3200 palabras)
-                  </SelectItem>
-                  <SelectItem key="comprehensive">
-                    Completa (~6400 palabras)
-                  </SelectItem>
-                </>
-              </SelectCitricaAdmin>
+                variant="faded"
+                classNames={{
+                  trigger: "bg-white !border-[#D4DEED] !rounded-[12px]",
+                  label: "!text-[#265197]",
+                  value: "!text-[#265197]",
+                  selectorIcon: "text-[#678CC5]",
+                }}
+                options={[
+                  { value: "concise", label: "Concisa (~400 palabras)" },
+                  { value: "balanced", label: "Balanceada (~1600 palabras)" },
+                  { value: "detailed", label: "Detallada (~3200 palabras)" },
+                  { value: "comprehensive", label: "Completa (~6400 palabras)" }
+                ]}
+              />
             </div>
 
             {/* Botón de eliminar historial */}
