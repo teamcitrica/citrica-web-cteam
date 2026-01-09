@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { addToast } from "@heroui/toast";
 import { useUserRole } from "@/hooks/role/use-role";
-import { Input } from "@/shared/components/citrica-ui";
+import { Input } from "citrica-ui-toolkit";
 
 type CreateRoleModalProps = {
   isOpen: boolean;
@@ -79,6 +79,12 @@ const CreateRoleModal = ({ isOpen, onClose }: CreateRoleModalProps) => {
             type="text"
             value={formData.name}
             onChange={handleChange}
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
           <div className="flex flex-col gap-2">

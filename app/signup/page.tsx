@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Container, Col } from '@citrica/objects'
-import { Button, Text } from 'citrica-ui-toolkit'
-import { Input } from "@heroui/input"
+import { Button, Text, Input } from 'citrica-ui-toolkit'
 import { Card, CardBody } from "@heroui/card"
 import { addToast } from "@heroui/toast"
 import { UserAuth } from '@/shared/context/auth-context'
@@ -125,9 +124,14 @@ const SignupPage = () => {
                     placeholder="Tu nombre"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    variant="bordered"
-                    isRequired
-                    isDisabled={isLoading}
+                    variant="faded"
+                    required
+                    disabled={isLoading}
+                    classNames={{
+                      inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                      label: "!text-[#265197]",
+                      input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+                    }}
                   />
                   <Input
                     type="text"
@@ -135,9 +139,14 @@ const SignupPage = () => {
                     placeholder="Tu apellido"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    variant="bordered"
-                    isRequired
-                    isDisabled={isLoading}
+                    variant="faded"
+                    required
+                    disabled={isLoading}
+                    classNames={{
+                      inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                      label: "!text-[#265197]",
+                      input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+                    }}
                   />
                 </div>
 
@@ -147,9 +156,14 @@ const SignupPage = () => {
                   placeholder="tu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  variant="bordered"
-                  isRequired
-                  isDisabled={isLoading}
+                  variant="faded"
+                  required
+                  disabled={isLoading}
+                  classNames={{
+                    inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                    label: "!text-[#265197]",
+                    input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+                  }}
                 />
 
                 <Input
@@ -158,9 +172,14 @@ const SignupPage = () => {
                   placeholder="Mínimo 6 caracteres"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  variant="bordered"
-                  isRequired
-                  isDisabled={isLoading}
+                  variant="faded"
+                  required
+                  disabled={isLoading}
+                  classNames={{
+                    inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                    label: "!text-[#265197]",
+                    input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+                  }}
                 />
 
                 <Input
@@ -169,9 +188,14 @@ const SignupPage = () => {
                   placeholder="Repite tu contraseña"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  variant="bordered"
-                  isRequired
-                  isDisabled={isLoading}
+                  variant="faded"
+                  required
+                  disabled={isLoading}
+                  classNames={{
+                    inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                    label: "!text-[#265197]",
+                    input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+                  }}
                 />
 
                 <Button

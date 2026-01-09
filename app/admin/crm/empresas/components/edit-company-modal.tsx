@@ -2,9 +2,8 @@
 import { Select } from "citrica-ui-toolkit";
 import { Textarea } from "@heroui/input";
 import { useState, useEffect } from "react";
-import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { Button } from "citrica-ui-toolkit";
+import { Button, Input } from "citrica-ui-toolkit";
 import { useSupabase } from "@/shared/context/supabase-context";
 
 import { Company, CompanyInput, useCompanyCRUD } from "@/hooks/companies/use-companies";
@@ -142,12 +141,18 @@ export default function EditCompanyModal({
       }
     >
       <div className="grid grid-cols-1 gap-4">
-        <InputCitricaAdmin
+        <Input
           label="Nombre de la Empresa"
           placeholder="Ingrese el nombre"
           value={formData.name || ""}
           onChange={(e) => handleInputChange("name", e.target.value)}
-          isRequired
+          required
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
         <Select
           label="Sector"
@@ -209,10 +214,16 @@ export default function EditCompanyModal({
           value={formData.contact_position || ""}
           onChange={(e) => handleInputChange("contact_position", e.target.value)}
         /> */}
-        <InputCitricaAdmin
+        <Input
           label="Website"
           placeholder="Website"
           value="."
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
           //onChange={(e) => handleInputChange("contact_phone", e.target.value)}
         />
         <div className="grid grid-cols-[100px_1fr] gap-2">
@@ -233,7 +244,7 @@ export default function EditCompanyModal({
               selectorIcon: "text-[#678CC5]",
             }}
           />
-          <InputCitricaAdmin
+          <Input
             label="Teléfono"
             placeholder="Número de teléfono"
             value={formData.contact_phone?.replace(phoneCode, "").trim() || ""}
@@ -241,14 +252,26 @@ export default function EditCompanyModal({
               const phone = e.target.value ? `${phoneCode} ${e.target.value}` : "";
               handleInputChange("contact_phone", phone);
             }}
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
         </div>
-        <InputCitricaAdmin
+        <Input
           label="Email"
           placeholder="correo@ejemplo.com"
           type="email"
           value={formData.contact_email || ""}
           onChange={(e) => handleInputChange("contact_email", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
         <Select
           label="País"
@@ -270,29 +293,53 @@ export default function EditCompanyModal({
             selectorIcon: "text-[#678CC5]",
           }}
         />
-        <InputCitricaAdmin
+        <Input
           label="Ciudad o localidad"
           placeholder="Lima"
           value={formData.departament || ""}
           onChange={(e) => handleInputChange("departament", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
-        <InputCitricaAdmin
+        <Input
           label="Calle y Número"
           placeholder="Nombre de la calle"
           value={formData.street_or_avenue || ""}
           onChange={(e) => handleInputChange("street_or_avenue", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
-        <InputCitricaAdmin
+        <Input
           label="Distrito o Barrio"
           placeholder="Distrito"
           value={formData.district || ""}
           onChange={(e) => handleInputChange("district", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
-        <InputCitricaAdmin
+        <Input
           label="Código Postal"
           placeholder="123456"
           value={formData.address_number || ""}
           onChange={(e) => handleInputChange("address_number", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
       </div>
       <Textarea

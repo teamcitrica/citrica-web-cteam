@@ -3,19 +3,18 @@
 import { useEffect, useState } from "react";
 import { addToast } from "@heroui/toast";
 import { Eye, EyeOff } from "lucide-react";
-
 import { useUserRole } from "@/hooks/role/use-role";
 import { useUserCRUD } from "@/hooks/users/use-users";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { UserType } from "@/shared/types/types";
-import { InputCitricaAdmin, DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin";
-import { Button, Select } from "citrica-ui-toolkit";
+import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin";
+import { Button, Select, Input } from "citrica-ui-toolkit";
 
 type UserFormModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-  user?: UserType | null; // Si existe user, es modo editar; si es null/undefined, es modo crear
+  user?: UserType | null;
 };
 
 const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps) => {
@@ -392,7 +391,7 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             }
           />
 
-          <InputCitricaAdmin
+          <Input
             label="Nombre *"
             placeholder="Ingrese el nombre"
             value={formData.first_name}
@@ -401,9 +400,15 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             errorMessage={errors.first_name ? "El nombre es obligatorio" : ""}
             autoComplete="off"
             name="user_first_name_modal"
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
-          <InputCitricaAdmin
+          <Input
             label="Apellido *"
             placeholder="Ingrese el apellido"
             value={formData.last_name}
@@ -412,9 +417,15 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             errorMessage={errors.last_name ? "El apellido es obligatorio" : ""}
             autoComplete="off"
             name="user_last_name_modal"
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
-          <InputCitricaAdmin
+          <Input
             label="Cargo *"
             placeholder="Ingrese el cargo"
             value={formData.cargo}
@@ -423,9 +434,15 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             errorMessage={errors.cargo ? "El cargo es obligatorio" : ""}
             autoComplete="off"
             name="user_cargo_modal"
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
-          <InputCitricaAdmin
+          <Input
             label="WhatsApp *"
             placeholder="Ingrese el número de WhatsApp"
             value={formData.phone}
@@ -434,23 +451,35 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             errorMessage={errors.phone ? "El WhatsApp es obligatorio" : ""}
             autoComplete="off"
             name="user_phone_modal"
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
-          <InputCitricaAdmin
+          <Input
             label="Email *"
             type="email"
             placeholder="Ingrese el email"
             value={formData.email}
             onChange={(e) => handleChange("email", e.target.value)}
-            isDisabled={isEditMode}
+            disabled={isEditMode}
             isInvalid={errors.email}
             errorMessage={errors.email ? "El email es obligatorio" : ""}
             autoComplete="off"
             name="user_email_modal"
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
           {!isEditMode && (
-            <InputCitricaAdmin
+            <Input
               label="Contraseña *"
               type={showPassword ? "text" : "password"}
               placeholder="Ingrese la contraseña"
@@ -460,6 +489,12 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
               errorMessage={errors.password ? "La contraseña es obligatoria" : ""}
               autoComplete="new-password"
               name="user_password_modal"
+              variant="faded"
+              classNames={{
+                inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                label: "!text-[#265197]",
+                input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+              }}
               endContent={
                 <button
                   type="button"

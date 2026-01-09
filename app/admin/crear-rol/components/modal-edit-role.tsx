@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
 import { useUserRole, RoleType } from "@/hooks/role/use-role";
-import { Input } from "@/shared/components/citrica-ui";
+import { Input } from "citrica-ui-toolkit";
 
 type EditRoleModalProps = {
   isOpen: boolean;
@@ -86,6 +86,12 @@ const EditRoleModal = ({ isOpen, onClose, role }: EditRoleModalProps) => {
             type="text"
             value={formData.name}
             onChange={handleChange}
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
           <div className="flex flex-col gap-2">

@@ -1,6 +1,5 @@
 "use client";
-import { Input } from "@heroui/input";
-import { Select } from "citrica-ui-toolkit";
+import { Select, Input } from "citrica-ui-toolkit";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { useState, useCallback, useMemo } from "react";
@@ -537,9 +536,8 @@ export default function TamboPage() {
                       <Input
                         className="text-[#3E688E] flex-1"
                         classNames={{
-                          inputWrapper:
-                            "!bg-[#F4F4F5] !text-[#3E688E] !placeholder-[#719BC1]",
-                          input: "!text-[#3E688E]",
+                          inputWrapper: "!bg-[#F4F4F5] !border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                          input: "!text-[#3E688E] placeholder:!text-[#719BC1]",
                         }}
                         placeholder="Valor..."
                         value={filter.value}

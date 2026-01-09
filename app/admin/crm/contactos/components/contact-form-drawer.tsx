@@ -2,9 +2,8 @@
 import { DatePicker } from "@heroui/date-picker";
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
-import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { Button, Select } from "citrica-ui-toolkit";
+import { Button, Select, Input } from "citrica-ui-toolkit";
 import { useContactCRUD, ContactInput, Contact } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { useTypeContactCRUD } from "@/hooks/types-contact/use-types-contact";
@@ -257,38 +256,62 @@ export default function ContactFormDrawer({
         />
 
         {/* Nombre */}
-        <InputCitricaAdmin
+        <Input
           label="Nombre del Contacto"
           placeholder="Ingrese el nombre"
           value={formData.name || ""}
           onChange={(e) => handleInputChange("name", e.target.value)}
-          isRequired
+          required
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
 
         {/* Apellido */}
-        <InputCitricaAdmin
+        <Input
           label="Apellido"
           placeholder="Ingrese el apellido"
           value={formData.last_name || ""}
           onChange={(e) => handleInputChange("last_name", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
 
         {/* Cargo */}
-        <InputCitricaAdmin
+        <Input
           label="Cargo"
           placeholder="Cargo o posición"
           value={formData.cargo || ""}
           onChange={(e) => handleInputChange("cargo", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
 
         {/* Email */}
-        <InputCitricaAdmin
+        <Input
           label="Email"
           placeholder="correo@ejemplo.com"
           type="email"
           value={formData.email || ""}
           onChange={(e) => handleInputChange("email", e.target.value)}
-          isRequired
+          required
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
 
         {/* WhatsApp */}
@@ -313,13 +336,19 @@ export default function ContactFormDrawer({
               selectorIcon: "text-[#678CC5]",
             }}
           />
-          <InputCitricaAdmin
+          <Input
             label="WhatsApp"
             placeholder="Número de teléfono"
             value={formData.phone?.replace(phoneCode, "").trim() || ""}
             onChange={(e) => {
               const phone = e.target.value ? `${phoneCode} ${e.target.value}` : "";
               handleInputChange("phone", phone);
+            }}
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
             }}
           />
         </div>
@@ -367,19 +396,31 @@ export default function ContactFormDrawer({
         />
 
         {/* Ciudad */}
-        <InputCitricaAdmin
+        <Input
           label="Ciudad"
           placeholder="Ingrese la ciudad"
           value={formData.city || ""}
           onChange={(e) => handleInputChange("city", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
 
         {/* Dirección */}
-        <InputCitricaAdmin
+        <Input
           label="Dirección"
           placeholder="Dirección completa"
           value={formData.address || ""}
           onChange={(e) => handleInputChange("address", e.target.value)}
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
       </div>
     </DrawerCitricaAdmin>

@@ -1,7 +1,6 @@
 "use client";
 
-import { Input } from "@heroui/input";
-import { Select } from "citrica-ui-toolkit";
+import { Select,Input } from "citrica-ui-toolkit";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { useEffect, useState, useMemo } from "react";

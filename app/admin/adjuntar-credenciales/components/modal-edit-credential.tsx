@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
-import { Input } from "@/shared/components/citrica-ui";
 import { useUserRole } from "@/hooks/role/use-role";
 import { useCredentials, CredentialType } from "@/hooks/use-credentials";
-import { Select } from "citrica-ui-toolkit";
+import { Select, Input } from "citrica-ui-toolkit";
 
 type EditCredentialModalProps = {
   isOpen: boolean;
@@ -205,6 +204,12 @@ const EditCredentialModal = ({
             type="url"
             value={formData.supabase_url}
             onChange={handleChange}
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
           <Input
@@ -213,6 +218,12 @@ const EditCredentialModal = ({
             type="text"
             value={formData.supabase_anon_key}
             onChange={handleChange}
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
           <button

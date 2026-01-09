@@ -2,9 +2,8 @@
 import { Select } from "citrica-ui-toolkit";
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
-import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { Button } from "citrica-ui-toolkit";
+import { Button, Input } from "citrica-ui-toolkit";
 
 import { useProjectCRUD, ProjectInput, Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
@@ -285,34 +284,58 @@ export default function ProjectFormModal({
           />
         )}
 
-        <InputCitricaAdmin
+        <Input
           label="Nombre del Proyecto"
           placeholder="Ingrese el nombre"
           value={formData.name || ""}
           onChange={(e) => handleInputChange("name", e.target.value)}
-          isRequired
+          required
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
 
-        <InputCitricaAdmin
+        <Input
               label="Nombre del Responsable"
               placeholder="Ingrese el nombre del responsable"
               value={formData.nombre_responsable || ""}
               onChange={(e) => handleInputChange("nombre_responsable", e.target.value)}
+              variant="faded"
+              classNames={{
+                inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                label: "!text-[#265197]",
+                input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+              }}
             />
 
-            <InputCitricaAdmin
+            <Input
               label="Email del Responsable"
               placeholder="email@ejemplo.com"
               type="email"
               value={formData.email_responsable || ""}
               onChange={(e) => handleInputChange("email_responsable", e.target.value)}
+              variant="faded"
+              classNames={{
+                inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                label: "!text-[#265197]",
+                input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+              }}
             />
 
-            <InputCitricaAdmin
+            <Input
               label="Teléfono del Responsable"
               placeholder="Ingrese el teléfono"
               value={formData.phone_responsable || ""}
               onChange={(e) => handleInputChange("phone_responsable", e.target.value)}
+              variant="faded"
+              classNames={{
+                inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                label: "!text-[#265197]",
+                input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+              }}
             />
           </div>
     </DrawerCitricaAdmin>

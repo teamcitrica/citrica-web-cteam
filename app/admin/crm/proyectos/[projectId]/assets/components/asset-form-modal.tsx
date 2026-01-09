@@ -1,14 +1,12 @@
 "use client";
 import { Select } from "citrica-ui-toolkit";
 import { Chip } from "@heroui/chip";
-import { Input } from "@heroui/input";
 import { Checkbox, CheckboxGroup } from "@heroui/checkbox";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { useState, useEffect, useCallback } from "react";
 import { addToast } from "@heroui/toast";
-import { InputCitricaAdmin } from "@/shared/components/citrica-ui/admin/input-citrica-admin";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { Button } from "citrica-ui-toolkit";
+import { Button, Input } from "citrica-ui-toolkit";
 
 import { useAssetCRUD, AssetInput, Asset } from "@/hooks/assets/use-assets";
 
@@ -671,30 +669,48 @@ export default function AssetFormModal({
       }
     >
       <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
-        <InputCitricaAdmin
+        <Input
           label="Nombre del Asset"
           placeholder="Ingrese el nombre"
           value={formData.name || ""}
           onChange={(e) => handleInputChange("name", e.target.value)}
-          isRequired
+          required
+          variant="faded"
+          classNames={{
+            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+            label: "!text-[#265197]",
+            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+          }}
         />
 
-            <InputCitricaAdmin
+            <Input
               label="Supabase URL"
               placeholder="https://xxx.supabase.co"
               value={formData.supabase_url || ""}
               onChange={(e) => handleInputChange("supabase_url", e.target.value)}
-              isDisabled={mode === "edit"}
-              isRequired={mode === "create"}
+              disabled={mode === "edit"}
+              required={mode === "create"}
+              variant="faded"
+              classNames={{
+                inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                label: "!text-[#265197]",
+                input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+              }}
             />
 
-            <InputCitricaAdmin
+            <Input
               label="Supabase Anon Key"
               placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
               value={formData.supabase_anon_key || ""}
               onChange={(e) => handleInputChange("supabase_anon_key", e.target.value)}
-              isDisabled={mode === "edit"}
-              isRequired={mode === "create"}
+              disabled={mode === "edit"}
+              required={mode === "create"}
+              variant="faded"
+              classNames={{
+                inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                label: "!text-[#265197]",
+                input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+              }}
             />
 
             {mode === "create" && (
@@ -1109,12 +1125,18 @@ export default function AssetFormModal({
                         />
 
                         {/* Input de valor */}
-                        <InputCitricaAdmin
+                        <Input
                           label="Valor"
                           placeholder="Ingresa el valor del filtro"
                           value={filterValue}
                           onChange={(e) => setFilterValue(e.target.value)}
-                          isDisabled={!selectedFilterColumn}
+                          disabled={!selectedFilterColumn}
+                          variant="faded"
+                          classNames={{
+                            inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                            label: "!text-[#265197]",
+                            input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+                          }}
                         />
                       </div>
 

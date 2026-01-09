@@ -1,12 +1,11 @@
 "use client";
 import { Spinner } from "@heroui/spinner";
-import { Input } from "@heroui/input";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 import Icon from "@ui/atoms/icon";
-import { Button, Text } from "citrica-ui-toolkit";
+import { Button, Text, Input } from "citrica-ui-toolkit";
 import { useReservas, Reserva, ReservaEstado } from "@/hooks/reservas/use-reservas";
 import ReservaDetailModal from "./components/modal-details-reserva";
 
@@ -310,9 +309,8 @@ export default function CardReservas({
           <Input
             className="text-[#3E688E] min-w-[268px]"
             classNames={{
-              inputWrapper:
-                "!bg-[#F4F4F5] !text-[#3E688E] !placeholder-[#719BC1] input-ui-pro input-ui-pro",
-              mainWrapper: "",
+              inputWrapper: "!bg-[#F4F4F5] !border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              input: "!text-[#3E688E] placeholder:!text-[#719BC1]",
             }}
             placeholder="Buscar por nombre o email"
             startContent={

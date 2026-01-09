@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
-import { Input } from "@/shared/components/citrica-ui";
 import { useUserRole } from "@/hooks/role/use-role";
 import { useSupabase } from "@/shared/context/supabase-context";
-import { Button, Select } from "citrica-ui-toolkit";
+import { Button, Select, Input } from "citrica-ui-toolkit";
 
 type AttachCredentialsModalProps = {
   isOpen: boolean;
@@ -250,6 +249,12 @@ const AttachCredentialsModal = ({ isOpen, onClose }: AttachCredentialsModalProps
             type="url"
             value={formData.supabase_url}
             onChange={handleChange}
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
           <Input
@@ -258,6 +263,12 @@ const AttachCredentialsModal = ({ isOpen, onClose }: AttachCredentialsModalProps
             type="text"
             value={formData.supabase_anon_key}
             onChange={handleChange}
+            variant="faded"
+            classNames={{
+              inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+              label: "!text-[#265197]",
+              input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+            }}
           />
 
           <Button
