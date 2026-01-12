@@ -6,23 +6,18 @@ import { useRouter } from 'next/navigation'
 
 import { addToast } from "@heroui/toast"
 import { UserAuth } from '@/shared/context/auth-context'
-import { useForm } from "react-hook-form"
 
 import { Button, Text, Input } from 'citrica-ui-toolkit'
 import { Icon } from '@/shared/components/citrica-ui'
 import { Container } from '@/styles/07-objects/objects'
 
-type FormValues = {
-  password: string;
-  email: string;
-};
-
 const LoginPage = () => {
-  const { register, handleSubmit } = useForm<FormValues>();
   const { signInWithPassword, userSession, isInitializing } = UserAuth();
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   // Redirigir a admin si ya está autenticado (solo una vez)
   useEffect(() => {
@@ -36,8 +31,10 @@ const LoginPage = () => {
     return null;
   }
 
-  const onSubmit = async (data: FormValues) => {
-    if (!data.email || !data.password) {
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !password) {
       addToast({
         title: "Error",
         description: "Por favor ingresa tu correo y contraseña.",
@@ -49,7 +46,7 @@ const LoginPage = () => {
     setIsLoading(true)
 
     try {
-      const { respData, respError } = await signInWithPassword(data.email, data.password)
+      const { respData, respError } = await signInWithPassword(email, password)
 
       if (respError) {
         addToast({
@@ -84,14 +81,14 @@ const LoginPage = () => {
             Ingresa tu correo electrónico y tu clave
           </Text>
         </span>
-        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center gap-5 mt-7'>
+        <form onSubmit={onSubmit} className='flex flex-col justify-center gap-5 mt-7'>
           <Input
             label="Email"
             type="email"
             placeholder="Correo electónico"
-            {...register("email")}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             disabled={isLoading}
-            required
             variant="faded"
             classNames={{
               inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
@@ -103,9 +100,9 @@ const LoginPage = () => {
             label="Clave"
             type={showPassword ? "text" : "password"}
             placeholder="Contraseña"
-            {...register("password")}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             disabled={isLoading}
-            required
             variant="faded"
             classNames={{
               inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
@@ -120,7 +117,7 @@ const LoginPage = () => {
             }
           />
           <Button
-            onClick={handleSubmit(onSubmit)}
+            onClick={onSubmit}
             variant="primary"
             label={isLoading ? 'Accediendo...' : 'Iniciar sesión'}
             disabled={isLoading}
