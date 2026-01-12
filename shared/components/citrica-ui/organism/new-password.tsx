@@ -3,7 +3,6 @@ import { Divider } from "@heroui/divider";
 import { Link } from "@heroui/link";
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useForm } from "react-hook-form";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import { Container } from "@/styles/07-objects/objects";
@@ -12,13 +11,8 @@ import Icon from "../atoms/icon";
 import { Text, Button } from "citrica-ui-toolkit";
 import Modal from "../molecules/modal";
 
-type FormValues = {
-  password: string;
-};
-
 const NewPasswordPage = () => {
   const supabase = createClientComponentClient();
-  const { register, handleSubmit } = useForm<FormValues>();
   const router = useRouter();
   const params = useSearchParams();
 
@@ -173,16 +167,26 @@ useEffect(() => {
   init();
 }, [params, supabase]);
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
     if (!isValidRecovery) {
       alert("Link inválido o expirado.");
+      return;
+    }
+
+    const passwordInput = document.querySelector<HTMLInputElement>('input[type="password"]');
+    const password = passwordInput?.value;
+
+    if (!password) {
+      alert("Por favor ingresa una contraseña.");
       return;
     }
 
     setIsLoading(true);
 
     const { error } = await supabase.auth.updateUser({
-      password: data.password,
+      password: password,
     });
 
     if (error) {
@@ -220,11 +224,10 @@ useEffect(() => {
         )}
 
         {isValidRecovery && (
-          <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col justify-center gap-4'>
+          <form onSubmit={onSubmit} className='flex flex-col justify-center gap-4'>
             <Input
               type={showPassword ? "text" : "password"}
               placeholder="Nueva contraseña"
-              {...register("password")}
               disabled={isLoading}
               required
               endContent={
@@ -238,7 +241,7 @@ useEffect(() => {
             />
 
             <Button
-              type="submit"
+              onClick={onSubmit}
               variant="primary"
               label={isLoading ? "Guardando..." : "Guardar contraseña"}
               disabled={isLoading}
