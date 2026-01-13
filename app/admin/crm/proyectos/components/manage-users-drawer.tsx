@@ -2,10 +2,9 @@
 import { Chip } from "@heroui/chip";
 import { Divider } from "@heroui/divider";
 import { useState, useEffect } from "react";
-import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 import { addToast } from "@heroui/toast";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { Button } from "citrica-ui-toolkit";
+import { Button, Autocomplete } from "citrica-ui-toolkit";
 
 import { Project } from "@/hooks/projects/use-projects";
 import { useUserCRUD } from "@/hooks/users/use-users";
@@ -28,7 +27,8 @@ export default function ManageUsersDrawer({
   const { getProjectUsers, syncProjectUsers } = useUserProjects();
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [originalUserIds, setOriginalUserIds] = useState<string[]>([]);
-  const [searchValue, setSearchValue] = useState('');
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -78,22 +78,24 @@ export default function ManageUsersDrawer({
   const selectedUsers = clientUsers.filter(u => u.id && selectedUserIds.includes(u.id));
 
   // Agregar usuario a la selección
-  const handleAddUser = (key: React.Key | null) => {
-    const userId = key?.toString() || null;
-    if (!userId) return;
+  const handleAddUser = (key: string | null) => {
+    if (!key) return;
 
     // No agregar si ya está seleccionado
-    if (selectedUserIds.includes(userId)) {
+    if (selectedUserIds.includes(key)) {
       addToast({
         title: "Usuario ya seleccionado",
         description: "Este usuario ya está asignado al proyecto",
         color: "warning",
       });
+      setSelectedKey(null);
+      setInputValue('');
       return;
     }
 
-    setSelectedUserIds(prev => [...prev, userId]);
-    setSearchValue(''); // Limpiar búsqueda
+    setSelectedUserIds(prev => [...prev, key]);
+    setSelectedKey(null);
+    setInputValue('');
   };
 
   // Remover usuario de la selección
@@ -171,20 +173,26 @@ export default function ManageUsersDrawer({
         {/* Autocomplete para agregar usuarios */}
         <div>
           <Autocomplete
-            aria-label='Seleccione usuarios'
             label="Agregar Usuarios al Proyecto"
-            listboxProps={{
-              emptyContent: "No hay coincidencias",
-            }}
-            inputValue={searchValue}
-            onInputChange={setSearchValue}
             placeholder="Buscar y seleccionar usuarios"
+            selectedKey={selectedKey}
+            inputValue={inputValue}
             onSelectionChange={handleAddUser}
+            onInputChange={setInputValue}
             allowsCustomValue={false}
             menuTrigger="input"
-            style={{
-              width: "100%",
-            }}
+            isClearable
+            fullWidth
+            variant="bordered"
+            color="primary"
+            options={clientUsers
+              .filter(user => user.id && !selectedUserIds.includes(user.id))
+              .map((user) => ({
+                value: user.id!,
+                label: user.first_name && user.last_name
+                  ? `${user.first_name} ${user.last_name}`
+                  : user.email || '',
+              }))}
             classNames={{
               base: "w-full [&_label]:!text-[#265197] [&_input]:!text-[#265197] [&_input::placeholder]:!text-[#A7BDE2]",
               selectorButton: "!text-[#678CC5]",
@@ -192,17 +200,7 @@ export default function ManageUsersDrawer({
               popoverContent: "[&_li]:!text-[#265197]",
             }}
             className="[&>div>div]:bg-white [&>div>div]:!border-[#D4DEED]"
-          >
-            {clientUsers
-              .filter(user => user.id && !selectedUserIds.includes(user.id))
-              .map((user) => (
-                <AutocompleteItem key={user.id} className="text-[#265197]">
-                  {user.first_name && user.last_name
-                    ? `${user.first_name} ${user.last_name}`
-                    : user.email}
-                </AutocompleteItem>
-              ))}
-          </Autocomplete>
+          />
 
           {/* Chips de usuarios seleccionados */}
           {selectedUsers.length > 0 && (
