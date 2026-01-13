@@ -5,11 +5,10 @@ import { Chip } from "@heroui/chip";
 import { Divider } from "@heroui/divider";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
-import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 import React, { useCallback, useMemo, useState } from "react";
 import Image from "next/image";
 import Icon from "@ui/atoms/icon";
-import { Text, Button, Input } from "citrica-ui-toolkit";
+import { Text, Button, Input, Autocomplete } from "citrica-ui-toolkit";
 import ExportModal from "./export-modal";
 import { useTableFeatures, ExportColumn } from "@/shared/hooks/useTableFeatures";
 // import "./data-table.css";
@@ -178,63 +177,45 @@ export function DataTable<T extends Record<string, any>>({
           {/* Autocomplete personalizado O Filtro de empresa */}
           {showCustomAutocomplete && customAutocompleteItems.length > 0 ? (
             <Autocomplete
-              aria-label={customAutocompletePlaceholder}
               placeholder={customAutocompletePlaceholder}
-              defaultItems={customAutocompleteItems}
               selectedKey={customAutocompleteSelectedKey || "all"}
               onSelectionChange={(key) => {
-                onCustomAutocompleteChange?.(key ? String(key) : "all");
+                onCustomAutocompleteChange?.(key || "all");
               }}
+              options={customAutocompleteItems.map(item => ({
+                value: item.id,
+                label: item.name,
+              }))}
+              variant="bordered"
+              fullWidth={false}
               className="w-56"
               classNames={{
                 base: "!border-none",
                 listboxWrapper: "!border-none",
                 popoverContent: "!border-none",
               }}
-            >
-              {(item) => (
-                <AutocompleteItem
-                  key={item.id}
-                  classNames={{
-                    base: "!border-none data-[hover=true]:bg-gray-100 data-[focus=true]:bg-gray-200 !outline-none",
-                  }}
-                >
-                  {item.name}
-                </AutocompleteItem>
-              )}
-            </Autocomplete>
+            />
           ) : showCompanyFilter && companies.length > 0 ? (
             <Autocomplete
               variant="bordered"
-              aria-label="Filtrar por empresa"
               placeholder={companyFilterPlaceholder}
-              defaultItems={[
-                { id: 'all', name: 'Todas las empresas' },
-                ...companies.map(c => ({ id: String(c.id), name: c.name || 'Sin nombre' }))
+              options={[
+                { value: 'all', label: 'Todas las empresas' },
+                ...companies.map(c => ({ value: String(c.id), label: c.name || 'Sin nombre' }))
               ]}
               selectedKey={tableFeatures.companyFilter && tableFeatures.companyFilter !== "" && tableFeatures.companyFilter !== "all" ? tableFeatures.companyFilter : null}
               onSelectionChange={(key) => {
                 tableFeatures.onCompanyFilterChange(key ? new Set([String(key)]) : new Set(["all"]));
               }}
+              isClearable={false}
+              fullWidth={false}
               className="w-56 [&_[data-slot='input-wrapper']]:bg-transparent [&_[data-slot='input-wrapper']]:!border-[#D4DEED] [&_[data-slot='input-wrapper']:hover]:!border-[#265197] [&_[data-slot='input-wrapper'][data-hover=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus-visible=true]]:!border-[#265197] [&_[data-slot='input-wrapper']:focus-within]:!border-[#265197] [&_input]:text-[#265197]"
               classNames={{
                 base: "bg-transparent",
                 listboxWrapper: "!border-none",
                 popoverContent: "!border-none",
               }}
-              isClearable={false}
-            >
-              {(item) => (
-                <AutocompleteItem
-                  key={item.id}
-                  classNames={{
-                    base: "!border-none data-[hover=true]:bg-gray-100 data-[focus=true]:bg-gray-200 !outline-none",
-                  }}
-                >
-                  {item.name}
-                </AutocompleteItem>
-              )}
-            </Autocomplete>
+            />
           ) : null}
 
           {/* Input de búsqueda */}
