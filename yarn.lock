@@ -3223,16 +3223,21 @@ chokidar@^4.0.0:
   dependencies:
     readdirp "^4.0.1"
 
-citrica-ui-toolkit@^0.0.9:
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/citrica-ui-toolkit/-/citrica-ui-toolkit-0.0.9.tgz#47217aa52090210326564d9f68453c4a0d4516e0"
-  integrity sha512-U8VjDnOXaCXlkRBnmxYnIgQc1UnhEk0JdhPEZx+J7rIuKP4pGWNedrfHfOFFSD14bYLheRSzXpxFtmYq6NbDKA==
+citrica-ui-toolkit@^0.0.11:
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/citrica-ui-toolkit/-/citrica-ui-toolkit-0.0.11.tgz#0ce526d77b91bbc2f08a0a89e6802d9583ded54d"
+  integrity sha512-t0CC6Ob5mfdJ08nHANimxe0nPs38wQR6HMq9sWwsr+IyhfHQYfPuhRY0VM8WbETIgY5VVOFadFwGCIpscThirA==
   dependencies:
+    "@heroui/autocomplete" "2.3.31"
     "@heroui/button" "2.2.29"
     "@heroui/card" "2.2.27"
     "@heroui/input" "2.4.30"
+    "@heroui/listbox" "2.3.28"
     "@heroui/modal" "2.2.26"
+    "@heroui/popover" "2.3.29"
+    "@heroui/scroll-shadow" "2.3.19"
     "@heroui/select" "2.4.30"
+    classnames "2.5.1"
     clsx "2.1.1"
     lucide-react "0.562.0"
     swiper "12.0.3"
@@ -3242,7 +3247,7 @@ classlist-polyfill@^1.0.3:
   resolved "https://registry.yarnpkg.com/classlist-polyfill/-/classlist-polyfill-1.2.0.tgz#935bc2dfd9458a876b279617514638bcaa964a2e"
   integrity sha512-GzIjNdcEtH4ieA2S8NmrSxv7DfEV5fmixQeyTmqmRmRJPGpRBaSnA2a0VrCjyT8iW8JjEdMbKzDotAJf+ajgaQ==
 
-classnames@^2.3.2:
+classnames@2.5.1, classnames@^2.3.2:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.5.1.tgz#ba774c614be0f016da105c858e7159eae8e7687b"
   integrity sha512-saHYOzhIQs6wy2sVxTM6bUDsQO4F50V9RQ22qBpEdCW+I+/Wmke2HOl6lS6dTpdxVhb88/I6+Hs+438c3lfUow==
