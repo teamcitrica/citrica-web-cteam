@@ -128,27 +128,31 @@ export default function ContactosPage() {
             data={filteredContacts}
             customFilters={
               <>
-              <div className="flex gap-3 pb-4">
-                <FilterButtonGroup
-                  buttons={[
-                    { value: "all", label: "Todos" },
-                    { value: "con-acceso", label: "Con acceso" },
-                    { value: "sin-acceso", label: "Sin acceso" },
-                  ]}
-                  selectedValue={accessFilter}
-                  onValueChange={setAccessFilter}
-                />
-                <Divider className="h-[36px]" orientation="vertical"/>
-                <FilterButtonGroup
-                  buttons={[
-                    { value: "all", label: "Todos" },
-                    { value: "4", label: "Internos" },
-                    { value: "1", label: "Cliente" },
-                    { value: "5", label: "Proveedores" },
-                  ]}
-                  selectedValue={typeFilter}
-                  onValueChange={setTypeFilter}
-                />
+              <div className="flex flex-col md:flex-row gap-3 pb-4 w-full">
+                <div className="w-full md:w-auto">
+                  <FilterButtonGroup
+                    buttons={[
+                      { value: "all", label: "Todos" },
+                      { value: "con-acceso", label: "Con acceso" },
+                      { value: "sin-acceso", label: "Sin acceso" },
+                    ]}
+                    selectedValue={accessFilter}
+                    onValueChange={setAccessFilter}
+                  />
+                </div>
+                <Divider className="h-[36px] hidden md:block" orientation="vertical"/>
+                <div className="w-full md:w-auto">
+                  <FilterButtonGroup
+                    buttons={[
+                      { value: "all", label: "Todos" },
+                      { value: "4", label: "Internos" },
+                      { value: "1", label: "Cliente" },
+                      { value: "5", label: "Proveedores" },
+                    ]}
+                    selectedValue={typeFilter}
+                    onValueChange={setTypeFilter}
+                  />
+                </div>
               </div>
               <Divider className="bg-[#D4DEED]"/>
               </>
