@@ -172,8 +172,8 @@ export function DataTable<T extends Record<string, any>>({
       )}
 
       {/* Barra de búsqueda y acciones */}
-      <div className="flex items-center justify-between w-full py-3 flex-shrink-0">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full py-3 flex-shrink-0 gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1 min-w-0">
           {/* Autocomplete personalizado O Filtro de empresa */}
           {showCustomAutocomplete && customAutocompleteItems.length > 0 ? (
             <Autocomplete
@@ -188,7 +188,7 @@ export function DataTable<T extends Record<string, any>>({
               }))}
               variant="bordered"
               fullWidth={false}
-              className="w-56"
+              className="w-full sm:w-56"
               classNames={{
                 base: "!border-none",
                 listboxWrapper: "!border-none",
@@ -209,7 +209,7 @@ export function DataTable<T extends Record<string, any>>({
               }}
               isClearable={false}
               fullWidth={false}
-              className="w-56 [&_[data-slot='input-wrapper']]:bg-transparent [&_[data-slot='input-wrapper']]:!border-[#D4DEED] [&_[data-slot='input-wrapper']:hover]:!border-[#265197] [&_[data-slot='input-wrapper'][data-hover=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus-visible=true]]:!border-[#265197] [&_[data-slot='input-wrapper']:focus-within]:!border-[#265197] [&_input]:text-[#265197]"
+              className="w-full sm:w-56 [&_[data-slot='input-wrapper']]:bg-transparent [&_[data-slot='input-wrapper']]:!border-[#D4DEED] [&_[data-slot='input-wrapper']:hover]:!border-[#265197] [&_[data-slot='input-wrapper'][data-hover=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus-visible=true]]:!border-[#265197] [&_[data-slot='input-wrapper']:focus-within]:!border-[#265197] [&_input]:text-[#265197]"
               classNames={{
                 base: "bg-transparent",
                 listboxWrapper: "!border-none",
@@ -232,7 +232,7 @@ export function DataTable<T extends Record<string, any>>({
                 }
               }}
               startContent={<Icon size={16} color="#265197" name="Search" />}
-              className="w-56"
+              className="w-full sm:w-56"
               variant="faded"
               classNames={{
                 inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
@@ -243,7 +243,7 @@ export function DataTable<T extends Record<string, any>>({
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           {enableExport && (
             <Dropdown>
               <DropdownTrigger>
@@ -252,6 +252,7 @@ export function DataTable<T extends Record<string, any>>({
                   variant="primary"
                   startContent={exportButtonIcon || <Icon size={16} name="Download" />}
                   label="Descargar"
+                  className="w-full sm:w-auto"
                 />
               </DropdownTrigger>
               <DropdownMenu
@@ -297,6 +298,7 @@ export function DataTable<T extends Record<string, any>>({
               startContent={addButtonIcon || <Icon size={16} name="UserPlus" />}
               onClick={onAdd}
               label={addButtonText}
+              className="w-full sm:w-auto"
             />
           )}
         </div>
