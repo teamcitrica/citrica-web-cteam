@@ -1,5 +1,4 @@
 "use client";
-import { Divider } from "@heroui/divider";
 import { useState, useCallback, useMemo } from "react";
 
 import LandingProjectFormModal from "./components/landing-project-form-modal";
@@ -11,7 +10,7 @@ import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { getLandingProjectColumns } from "./columns/landing-project-columns";
 import { Col, Container } from "@/styles/07-objects/objects";
 import { Text } from "citrica-ui-toolkit";
-import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
+import FilterDropdown from "@/shared/components/citrica-ui/molecules/filter-dropdown";
 
 export default function CMSProyectosPage() {
   const { projects, isLoading, refreshProjects, deleteProject } = useLandingProjects();
@@ -113,22 +112,18 @@ export default function CMSProyectosPage() {
             headerTextColor="#ffffff"
             paginationColor="#265197"
             getRowKey={(project) => project.id}
-            customFilters={
-              <>
-                <div className="flex gap-3 pb-4">
-                  <FilterButtonGroup
-                    buttons={[
-                      { value: "todos", label: "Todos" },
-                      { value: "activos", label: "Activos" },
-                      { value: "inactivos", label: "Inactivos" },
-                      { value: "destacados", label: "Destacados" },
-                    ]}
-                    selectedValue={statusFilter}
-                    onValueChange={setStatusFilter}
-                  />
-                </div>
-                <Divider className="bg-[#D4DEED]" />
-              </>
+            headerActions={
+              <FilterDropdown
+                options={[
+                  { value: "todos", label: "Todos" },
+                  { value: "activos", label: "Activos" },
+                  { value: "inactivos", label: "Inactivos" },
+                  { value: "destacados", label: "Destacados" },
+                ]}
+                selectedValue={statusFilter}
+                onValueChange={setStatusFilter}
+                defaultValue="todos"
+              />
             }
           />
 

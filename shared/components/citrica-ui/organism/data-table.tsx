@@ -65,6 +65,7 @@ export interface DataTableProps<T extends Record<string, any>> {
   removeWrapper?: boolean;
   customContainerClass?: string;
   customFilters?: React.ReactNode;
+  headerActions?: React.ReactNode;
   showFilterIndicators?: boolean;
   totalRecordsLabel?: string;
   activeFilters?: Array<{
@@ -119,6 +120,7 @@ export function DataTable<T extends Record<string, any>>({
   removeWrapper = false,
   customContainerClass = "container-blue-principal",
   customFilters,
+  headerActions,
   showFilterIndicators = false,
   totalRecordsLabel,
   activeFilters = [],
@@ -263,6 +265,7 @@ export function DataTable<T extends Record<string, any>>({
         </div>
 
         <div className="flex items-center gap-2">
+          {headerActions}
           {enableExport && (
             <Dropdown>
               <DropdownTrigger>

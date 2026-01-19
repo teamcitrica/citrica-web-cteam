@@ -101,7 +101,7 @@ export const useLandingProjects = () => {
         .from("landing_projects")
         .select("*")
         .eq("is_active", true)
-        .order("sort_order", { ascending: true })
+        .order("featured", { ascending: false })
         .order("created_at", { ascending: false });
 
       if (error) {

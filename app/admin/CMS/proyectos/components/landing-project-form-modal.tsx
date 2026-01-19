@@ -391,6 +391,7 @@ export default function LandingProjectFormModal({
             />
             <Text variant="label" color="#265197">Destacado</Text>
           </div>
+          {/* Campo de orden comentado - usando "destacado" para priorizar proyectos
           <Input
             label="Orden"
             type="number"
@@ -400,6 +401,7 @@ export default function LandingProjectFormModal({
             classNames={inputClasses}
             className="w-24"
           />
+          */}
         </div>
 
         <Divider className="bg-[#D4DEED]" />
