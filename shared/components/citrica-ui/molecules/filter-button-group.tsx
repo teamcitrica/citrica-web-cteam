@@ -29,13 +29,13 @@ export default function FilterButtonGroup({
 }: FilterButtonGroupProps) {
   return (
     <div className={containerClassName} style={height ? { height } : undefined}>
-      <div className="flex w-full h-full gap-0">
+      <div className="flex flex-wrap h-full gap-0">
         {buttons.map((button) => (
           <Button
           isAdmin
             key={button.value}
             size={size}
-            className={`flex-1 h-full px-4 ${
+            className={`flex-1 min-w-0 h-full px-2 md:px-4 text-xs md:text-sm whitespace-nowrap ${
               selectedValue === button.value
                 ? activeButtonClassName
                 : inactiveButtonClassName

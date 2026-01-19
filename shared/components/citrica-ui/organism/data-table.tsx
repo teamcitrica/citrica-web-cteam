@@ -5,11 +5,10 @@ import { Chip } from "@heroui/chip";
 import { Divider } from "@heroui/divider";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
-import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 import React, { useCallback, useMemo, useState } from "react";
 import Image from "next/image";
 import Icon from "@ui/atoms/icon";
-import { Text, Button, Input } from "citrica-ui-toolkit";
+import { Text, Button, Input, Autocomplete } from "citrica-ui-toolkit";
 import ExportModal from "./export-modal";
 import { useTableFeatures, ExportColumn } from "@/shared/hooks/useTableFeatures";
 // import "./data-table.css";
@@ -175,68 +174,50 @@ export function DataTable<T extends Record<string, any>>({
       )}
 
       {/* Barra de búsqueda y acciones */}
-      <div className="flex items-center justify-between w-full py-3 flex-shrink-0">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full py-3 flex-shrink-0 gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1 min-w-0">
           {/* Autocomplete personalizado O Filtro de empresa */}
           {showCustomAutocomplete && customAutocompleteItems.length > 0 ? (
             <Autocomplete
-              aria-label={customAutocompletePlaceholder}
               placeholder={customAutocompletePlaceholder}
-              defaultItems={customAutocompleteItems}
               selectedKey={customAutocompleteSelectedKey || "all"}
               onSelectionChange={(key) => {
-                onCustomAutocompleteChange?.(key ? String(key) : "all");
+                onCustomAutocompleteChange?.(key || "all");
               }}
-              className="w-56"
+              options={customAutocompleteItems.map(item => ({
+                value: item.id,
+                label: item.name,
+              }))}
+              variant="bordered"
+              fullWidth={false}
+              className="w-full sm:w-56"
               classNames={{
                 base: "!border-none",
                 listboxWrapper: "!border-none",
                 popoverContent: "!border-none",
               }}
-            >
-              {(item) => (
-                <AutocompleteItem
-                  key={item.id}
-                  classNames={{
-                    base: "!border-none data-[hover=true]:bg-gray-100 data-[focus=true]:bg-gray-200 !outline-none",
-                  }}
-                >
-                  {item.name}
-                </AutocompleteItem>
-              )}
-            </Autocomplete>
+            />
           ) : showCompanyFilter && companies.length > 0 ? (
             <Autocomplete
               variant="bordered"
-              aria-label="Filtrar por empresa"
               placeholder={companyFilterPlaceholder}
-              defaultItems={[
-                { id: 'all', name: 'Todas las empresas' },
-                ...companies.map(c => ({ id: String(c.id), name: c.name || 'Sin nombre' }))
+              options={[
+                { value: 'all', label: 'Todas las empresas' },
+                ...companies.map(c => ({ value: String(c.id), label: c.name || 'Sin nombre' }))
               ]}
               selectedKey={tableFeatures.companyFilter && tableFeatures.companyFilter !== "" && tableFeatures.companyFilter !== "all" ? tableFeatures.companyFilter : null}
               onSelectionChange={(key) => {
                 tableFeatures.onCompanyFilterChange(key ? new Set([String(key)]) : new Set(["all"]));
               }}
-              className="w-56 [&_[data-slot='input-wrapper']]:bg-transparent [&_[data-slot='input-wrapper']]:!border-[#D4DEED] [&_[data-slot='input-wrapper']:hover]:!border-[#265197] [&_[data-slot='input-wrapper'][data-hover=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus-visible=true]]:!border-[#265197] [&_[data-slot='input-wrapper']:focus-within]:!border-[#265197] [&_input]:text-[#265197]"
+              isClearable={false}
+              fullWidth={false}
+              className="w-full sm:w-56 [&_[data-slot='input-wrapper']]:bg-transparent [&_[data-slot='input-wrapper']]:!border-[#D4DEED] [&_[data-slot='input-wrapper']:hover]:!border-[#265197] [&_[data-slot='input-wrapper'][data-hover=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus-visible=true]]:!border-[#265197] [&_[data-slot='input-wrapper']:focus-within]:!border-[#265197] [&_input]:text-[#265197]"
               classNames={{
                 base: "bg-transparent",
                 listboxWrapper: "!border-none",
                 popoverContent: "!border-none",
               }}
-              isClearable={false}
-            >
-              {(item) => (
-                <AutocompleteItem
-                  key={item.id}
-                  classNames={{
-                    base: "!border-none data-[hover=true]:bg-gray-100 data-[focus=true]:bg-gray-200 !outline-none",
-                  }}
-                >
-                  {item.name}
-                </AutocompleteItem>
-              )}
-            </Autocomplete>
+            />
           ) : null}
 
           {/* Input de búsqueda */}
@@ -253,7 +234,7 @@ export function DataTable<T extends Record<string, any>>({
                 }
               }}
               startContent={<Icon size={16} color="#265197" name="Search" />}
-              className="w-56"
+              className="w-full sm:w-56"
               variant="faded"
               classNames={{
                 inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
@@ -264,8 +245,12 @@ export function DataTable<T extends Record<string, any>>({
           )}
         </div>
 
+<<<<<<< HEAD
         <div className="flex items-center gap-2">
           {headerActions}
+=======
+        <div className="flex items-center gap-2 flex-shrink-0">
+>>>>>>> 5a5ea2848b7d8189d6014cf80a48ceca81ef9195
           {enableExport && (
             <Dropdown>
               <DropdownTrigger>
@@ -274,6 +259,7 @@ export function DataTable<T extends Record<string, any>>({
                   variant="primary"
                   startContent={exportButtonIcon || <Icon size={16} name="Download" />}
                   label="Descargar"
+                  className="w-full sm:w-auto"
                 />
               </DropdownTrigger>
               <DropdownMenu
@@ -319,6 +305,7 @@ export function DataTable<T extends Record<string, any>>({
               startContent={addButtonIcon || <Icon size={16} name="UserPlus" />}
               onClick={onAdd}
               label={addButtonText}
+              className="w-full sm:w-auto"
             />
           )}
         </div>
