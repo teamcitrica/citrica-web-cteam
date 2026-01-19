@@ -245,12 +245,8 @@ export function DataTable<T extends Record<string, any>>({
           )}
         </div>
 
-<<<<<<< HEAD
-        <div className="flex items-center gap-2">
-          {headerActions}
-=======
         <div className="flex items-center gap-2 flex-shrink-0">
->>>>>>> 5a5ea2848b7d8189d6014cf80a48ceca81ef9195
+          {headerActions}
           {enableExport && (
             <Dropdown>
               <DropdownTrigger>
