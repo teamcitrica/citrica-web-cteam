@@ -3223,10 +3223,10 @@ chokidar@^4.0.0:
   dependencies:
     readdirp "^4.0.1"
 
-citrica-ui-toolkit@^0.0.11:
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/citrica-ui-toolkit/-/citrica-ui-toolkit-0.0.11.tgz#0ce526d77b91bbc2f08a0a89e6802d9583ded54d"
-  integrity sha512-t0CC6Ob5mfdJ08nHANimxe0nPs38wQR6HMq9sWwsr+IyhfHQYfPuhRY0VM8WbETIgY5VVOFadFwGCIpscThirA==
+citrica-ui-toolkit@^0.0.12:
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/citrica-ui-toolkit/-/citrica-ui-toolkit-0.0.12.tgz#4696d6cd5070f47d0aab61a45eeddf1ae58d210b"
+  integrity sha512-bik4ERblEvkn/teiV80uOVdNv6EJr7rTiuK4ApyqDgs6s6T8GXVL5H8WrqMivoSzsWam/XISEufvCEYSbkJ3+A==
   dependencies:
     "@heroui/autocomplete" "2.3.31"
     "@heroui/button" "2.2.29"
@@ -5430,6 +5430,11 @@ react-hot-toast@2.4.1:
   integrity sha512-j8z+cQbWIM5LY37pR6uZR6D4LfseplqnuAO4co4u8917hBUvXlEqyP1ZzqVLcqoyUesZZv/ImreoCeHVDpE5pQ==
   dependencies:
     goober "^2.1.10"
+
+react-icons@^5.5.0:
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-5.5.0.tgz#8aa25d3543ff84231685d3331164c00299cdfaf2"
+  integrity sha512-MEFcXdkP3dLo8uumGI5xN3lDFNsRtrjbOEKDLD7yv76v4wpnEq2Lt2qeHaQOr34I/wPN3s3+N08WkQ+CW37Xiw==
 
 react-is@^16.13.1:
   version "16.13.1"
