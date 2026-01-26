@@ -35,7 +35,7 @@ export default function FilterButtonGroup({
           isAdmin
             key={button.value}
             size={size}
-            className={`flex-1 min-w-0 h-full px-2 md:px-4 text-xs md:text-sm whitespace-nowrap ${
+            className={`!py-1 !px-4 !min-w-0 h-full text-xs md:text-sm whitespace-nowrap ${
               selectedValue === button.value
                 ? activeButtonClassName
                 : inactiveButtonClassName
