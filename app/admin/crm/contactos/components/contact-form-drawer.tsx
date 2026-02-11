@@ -208,7 +208,7 @@ export default function ContactFormDrawer({
         </>
       }
     >
-      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-1">
         {/* Select Tipo de Contacto */}
         <Select
           label="Tipo de Contacto"

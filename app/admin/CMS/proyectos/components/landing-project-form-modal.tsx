@@ -373,7 +373,7 @@ export default function LandingProjectFormModal({
         </>
       }
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col">
         <div className="flex items-center gap-6 pb-2">
           <div className="flex items-center gap-2">
             <Switch
@@ -406,7 +406,7 @@ export default function LandingProjectFormModal({
 
         <Divider className="bg-[#D4DEED]" />
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col">
           <Section title="Hero Section" defaultOpen={true}>
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -528,7 +528,7 @@ export default function LandingProjectFormModal({
           </Section>
 
           <Section title="Descripción del Proyecto">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col">
               <Input
                 label="Título Principal"
                 placeholder="Descripción principal del proyecto"
@@ -547,7 +547,7 @@ export default function LandingProjectFormModal({
           </Section>
 
           <Section title="El Desafío">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col">
               <div className="flex flex-col gap-2">
                 <Text variant="label" color="#265197">Imagen del Desafío</Text>
                 {formData.challenge_image ? (
@@ -625,7 +625,7 @@ export default function LandingProjectFormModal({
           </Section>
 
           <Section title="La Solución">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col">
               <div className="flex flex-col gap-2">
                 <Text variant="label" color="#265197">Imagen de la Solución</Text>
                 {formData.solution_image ? (
@@ -703,7 +703,7 @@ export default function LandingProjectFormModal({
           </Section>
 
           <Section title="Servicios" badge={formData.services.length}>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col">
               {formData.services.map((service, index) => (
                 <div key={index} className="border border-[#D4DEED] rounded-lg p-4">
                   <div className="flex justify-between items-center mb-3">
@@ -718,7 +718,7 @@ export default function LandingProjectFormModal({
                       <Icon name="Trash2" className="w-4 h-4 text-red-500" />
                     </Button>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4">
                     <Input
                       label="Título"
                       placeholder="Nombre del servicio"
@@ -769,7 +769,7 @@ export default function LandingProjectFormModal({
           </Section>
 
           <Section title="Tecnologías" badge={formData.technologies.length}>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col">
               {formData.technologies.map((tech, index) => (
                 <div key={index} className="border border-[#D4DEED] rounded-lg p-4">
                   <div className="flex justify-between items-center mb-3">
@@ -784,7 +784,7 @@ export default function LandingProjectFormModal({
                       <Icon name="Trash2" className="w-4 h-4 text-red-500" />
                     </Button>
                   </div>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-4">
                     <Input
                       label="Nombre"
                       placeholder="React JS"

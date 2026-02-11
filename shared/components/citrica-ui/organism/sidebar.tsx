@@ -25,7 +25,7 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
           <Icon name={item.icon as IconName} size={20} color="#265197" />
           <Text variant="label" color="#8099B2">{item.title}</Text>
         </span>
-        <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-4 w-4 text-[#8099B2] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
       </Button>
       {isOpen && item.subItems && (
         <div className="ml-6 mt-2 flex flex-col gap-2">
