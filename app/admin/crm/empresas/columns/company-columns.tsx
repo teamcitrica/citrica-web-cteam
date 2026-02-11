@@ -1,4 +1,3 @@
-import { Avatar } from "@heroui/avatar";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import React from "react";
 import Icon from "@ui/atoms/icon";
@@ -6,6 +5,8 @@ import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { ExportColumn } from "@/shared/hooks/useTableFeatures";
 import { Company } from "@/hooks/companies/use-companies";
 import { Text, Button } from 'citrica-ui-toolkit';
+import { AvatarTables } from "@/public/icon-svg/avatar-tables";
+import { getAvatarColor } from "@/shared/utils/avatar-colors";
 
 type CompanyColumnsConfig = {
   onView: (company: Company) => void;
@@ -14,39 +15,6 @@ type CompanyColumnsConfig = {
 };
 
 type CompanyExportConfig = Record<string, never>;
-
-// Función para generar un color único basado en el nombre
-const getAvatarColor = (name: string): string => {
-  const colors = [
-    "from-[#FFB457] to-[#FF705B]", // Naranja a rojo
-    "from-[#5EA67D] to-[#3E8A5E]", // Verde claro a verde oscuro
-    "from-[#5B9FED] to-[#3B7DBD]", // Azul claro a azul oscuro
-    "from-[#A78BFA] to-[#7C5CC8]", // Púrpura claro a púrpura oscuro
-    "from-[#F472B6] to-[#DB2777]", // Rosa claro a rosa oscuro
-    "from-[#FBBF24] to-[#D97706]", // Amarillo a naranja
-    "from-[#34D399] to-[#059669]", // Verde esmeralda claro a oscuro
-    "from-[#60A5FA] to-[#2563EB]", // Azul cielo a azul
-    "from-[#C084FC] to-[#9333EA]", // Lavanda a púrpura
-    "from-[#FB923C] to-[#EA580C]", // Naranja melocotón
-  ];
-
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  const index = Math.abs(hash) % colors.length;
-  return colors[index];
-};
-
-// Función para obtener las iniciales
-const getInitials = (name: string): string => {
-  const names = name.trim().split(" ");
-  if (names.length >= 2) {
-    return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
-  }
-  return name.substring(0, 2).toUpperCase();
-};
 
 export const getCompanyColumns = ({
   onView,
@@ -59,14 +27,7 @@ export const getCompanyColumns = ({
     sortable: true,
     render: (company) => (
       <div className="flex items-center gap-3">
-        <Avatar
-          classNames={{
-            base: `bg-gradient-to-br ${getAvatarColor(company.name || "Company")}`,
-            icon: "text-white",
-          }}
-          name={getInitials(company.name || "?")}
-          size="sm"
-        />
+        <AvatarTables color={getAvatarColor(company.name || "Company")} size={32} />
         <div className="flex flex-col">
           <Text variant="body" weight="bold" color="#16305A">{company.name || "-"}</Text>
           <Text variant="label" color="#678CC5" className="truncate max-w-[200px]">{company.sector || "-"}</Text>

@@ -41,7 +41,7 @@ export const DrawerCitricaAdmin: React.FC<DrawerCitricaAdminProps> = ({
       size={customWidth ? undefined : size}
       style={customWidth ? { width: customWidth, maxWidth: customWidth } : { width: '450px', maxWidth: '450px' }}
       classNames={{
-        closeButton: "w-8 h-8 min-w-8 text-[#265197] border-2 border-[#265197] rounded-full hover:bg-[#265197] hover:text-white transition-colors flex items-center justify-center items-center my-auto",
+        closeButton: "w-8 h-8 min-w-8 text-[#265197] border-2 border-[#265197] rounded-full hover:bg-[#265197] hover:text-white transition-colors flex items-center justify-center my-auto mr-2",
       }}
       {...props}
     >

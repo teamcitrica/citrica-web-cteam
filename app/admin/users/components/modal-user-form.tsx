@@ -29,7 +29,7 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
     email: "",
     cargo: "",
     phone: "",
-    password: "contraseña",
+    password: "",
     role_id: "",
     company_id: "",
   });
@@ -124,7 +124,7 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
         email: "",
         cargo: "",
         phone: "",
-        password: "contraseña",
+        password: "",
         role_id: "",
         company_id: "",
       });
@@ -264,7 +264,7 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
           email: "",
           cargo: "",
           phone: "",
-          password: "contraseña",
+          password: "",
           role_id: "",
           company_id: "",
         });
@@ -328,7 +328,7 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
         <input type="text" name="fake_username" style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} tabIndex={-1} />
         <input type="password" name="fake_password" style={{ position: 'absolute', top: '-9999px', left: '-9999px' }} tabIndex={-1} />
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col">
           <Select
             label="Rol *"
             placeholder="Seleccione un rol"
@@ -504,9 +504,9 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
                   aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
                   {showPassword ? (
-                    <EyeOff className="text-2xl text-default-400 pointer-events-none" size={20} />
+                    <EyeOff className="text-2xl text-[#A7BDE2] pointer-events-none" size={20} />
                   ) : (
-                    <Eye className="text-2xl text-default-400 pointer-events-none" size={20} />
+                    <Eye className="text-2xl text-[#A7BDE2] pointer-events-none" size={20} />
                   )}
                 </button>
               }

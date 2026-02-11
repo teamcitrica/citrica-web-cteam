@@ -319,26 +319,25 @@ const ProjectTemplate = ({ project, slug }: ProjectTemplateProps) => {
                 </Text>
               </p>
             </Col>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
-              {technologies.map((tech, index) => (
-                <div key={index} className="text-center group">
-                  <div
-                    className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110 border-2"
-                    style={{
-                      backgroundColor: `${tech.color}20`,
-                      borderColor: `${tech.color}40`,
-                    }}
-                  >
-                    <Icon name={tech.icon as any} size={32} color={tech.color} />
-                  </div>
-                  <Text variant="body" color="#16141F" className="font-medium">
-                    {tech.name}
-                  </Text>
-                </div>
-              ))}
-            </div>
           </Container>
+          <div className="max-w-7xl mx-auto px-4 flex flex-wrap !justify-center gap-8">
+            {technologies.map((tech, index) => (
+              <div key={index} className="text-center group">
+                <div
+                  className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110 border-2"
+                  style={{
+                    backgroundColor: `${tech.color}20`,
+                    borderColor: `${tech.color}40`,
+                  }}
+                >
+                  <Icon name={tech.icon as any} size={32} color={tech.color} />
+                </div>
+                <Text variant="body" color="#16141F" className="font-medium">
+                  {tech.name}
+                </Text>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* Otros Proyectos */}
