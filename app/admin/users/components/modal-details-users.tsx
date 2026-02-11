@@ -8,6 +8,8 @@ import { es } from "date-fns/locale";
 import { UserType } from "@/shared/types/types";
 import { DetailModal } from "@/shared/components/citrica-ui";
 import { Text } from "citrica-ui-toolkit";
+import { AvatarTables } from "@/public/icon-svg/avatar-tables";
+import { getAvatarColor } from "@/shared/utils/avatar-colors";
 
 interface UserDetailModalProps {
   user: UserType | null;
@@ -107,9 +109,7 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose }) => {
       width="512px"
       title={
         <div className="flex items-center gap-3">
-          <div className="rounded-full flex items-center justify-center overflow-hidden" style={{ width: '46px', height: '46px' }}>
-            <img src="/avatar-login.png" alt="Avatar" width="46" height="46" />
-          </div>
+          <AvatarTables color={getAvatarColor(userName || "User")} size={46} />
           <div className="flex flex-col">
             <Text variant="body" weight="bold" color="#265197">{userName || "Sin nombre"}</Text>
             <Text variant="label" weight="bold" color="#678CC5">{user.role?.name || "-"}</Text>

@@ -15,6 +15,10 @@ $select-citrica-ui: (
   // min-width: 140px !important;
   // max-width: 380px !important;
   @include a-set($select-citrica-ui);
+
+  [data-slot="trigger"] {
+    background-color: #ffffff;
+  }
 }
 .select-item-citrica-ui{
   border-radius: var(--form-radius-select); // border radius
