@@ -18,6 +18,8 @@ export interface Reserva {
   created_at: string
   notified?: boolean
   notification_email?: string
+  recurring?: string
+  last_notified_year?: number | null
 }
 
 export const useReservas = () => {
@@ -113,7 +115,7 @@ export const useReservas = () => {
   )
 
   const createReminder = useCallback(
-    async (data: { name: string; booking_date: string; time_slots: string[]; message?: string; description?: string }) => {
+    async (data: { name: string; booking_date: string; time_slots: string[]; message?: string; description?: string; recurring?: string }) => {
       try {
         setIsLoading(true)
         const { error } = await supabase
@@ -127,6 +129,7 @@ export const useReservas = () => {
             email: '',
             status: 'reminder' as ReservaEstado,
             type_id: 1,
+            recurring: data.recurring || 'none',
           }])
 
         if (error) {

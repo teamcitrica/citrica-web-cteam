@@ -14,6 +14,7 @@ interface CreateReminderModalProps {
     time_slots: string[];
     message?: string;
     description?: string;
+    recurring?: string;
   }) => Promise<{ error: unknown }>;
   defaultDate?: string;
 }
@@ -43,6 +44,7 @@ const CreateReminderModal: React.FC<CreateReminderModalProps> = ({
   const [timeEnd, setTimeEnd] = useState("09:00");
   const [description, setDescription] = useState("");
   const [message, setMessage] = useState("");
+  const [recurring, setRecurring] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // Actualizar fecha cuando cambia defaultDate
@@ -57,6 +59,7 @@ const CreateReminderModal: React.FC<CreateReminderModalProps> = ({
     setTimeEnd("09:00");
     setDescription("");
     setMessage("");
+    setRecurring(false);
   };
 
   const handleSubmit = async () => {
@@ -69,6 +72,7 @@ const CreateReminderModal: React.FC<CreateReminderModalProps> = ({
       time_slots: [`${timeStart}-${timeEnd}`],
       description,
       message,
+      recurring: recurring ? 'yearly' : 'none',
     });
 
     setIsLoading(false);
@@ -163,6 +167,15 @@ const CreateReminderModal: React.FC<CreateReminderModalProps> = ({
         classNames={TEXTAREA_CLASSNAMES}
         className="mt-4"
       />
+      <label className="flex items-center gap-2 mt-4 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={recurring}
+          onChange={(e) => setRecurring(e.target.checked)}
+          className="w-4 h-4 rounded border-[#D4DEED] accent-[#265197]"
+        />
+        <span className="text-sm text-[#265197]">Repetir cada año</span>
+      </label>
     </DrawerCitricaAdmin>
   );
 };

@@ -19,9 +19,10 @@ const resend = new Resend(resendApiKey)
 /**
  * GET /api/cron/send-reminders
  *
- * Busca recordatorios del día siguiente (mañana) que no hayan sido notificados
- * y envía un email por cada uno usando Resend.
- * Esto permite notificar un día antes del evento.
+ * Busca recordatorios para notificar un día antes del evento:
+ * - Recordatorios únicos (recurring='none'): fecha exacta de mañana, no notificados.
+ * - Recordatorios anuales (recurring='yearly'): mismo mes-día que mañana,
+ *   no notificados este año (usa last_notified_year).
  *
  * Protegido por CRON_SECRET para evitar llamadas no autorizadas.
  */
@@ -39,28 +40,52 @@ export async function GET(request: Request) {
     const now = new Date()
     const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
     const tomorrowStr = tomorrow.toLocaleDateString('en-CA', { timeZone: TIMEZONE })
+    const tomorrowMonthDay = tomorrowStr.slice(5) // 'MM-DD'
+    const currentYear = parseInt(tomorrowStr.slice(0, 4))
 
-    // Buscar recordatorios de mañana que no han sido notificados (notifica un día antes)
-    const { data: reminders, error: fetchError } = await supabase
+    // 1. Recordatorios únicos: fecha exacta de mañana, no notificados
+    const { data: oneTimeReminders, error: oneTimeError } = await supabase
       .from('bookings')
       .select('*')
       .eq('status', 'reminder')
       .eq('booking_date', tomorrowStr)
+      .or('recurring.is.null,recurring.eq.none')
       .eq('notified', false)
 
-    if (fetchError) {
-      console.error('Error al consultar recordatorios:', fetchError)
-      return NextResponse.json({ error: fetchError.message }, { status: 500 })
+    if (oneTimeError) {
+      console.error('Error al consultar recordatorios únicos:', oneTimeError)
+      return NextResponse.json({ error: oneTimeError.message }, { status: 500 })
     }
 
-    if (!reminders || reminders.length === 0) {
+    // 2. Recordatorios anuales: traer todos los yearly y filtrar por mes-día en JS
+    const { data: yearlyReminders, error: yearlyError } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('status', 'reminder')
+      .eq('recurring', 'yearly')
+
+    if (yearlyError) {
+      console.error('Error al consultar recordatorios anuales:', yearlyError)
+      return NextResponse.json({ error: yearlyError.message }, { status: 500 })
+    }
+
+    // Filtrar anuales: mismo mes-día que mañana Y no notificados este año
+    const yearlyToSend = (yearlyReminders || []).filter((r) => {
+      if (!r.booking_date) return false
+      const monthDay = r.booking_date.slice(5) // 'MM-DD'
+      return monthDay === tomorrowMonthDay && r.last_notified_year !== currentYear
+    })
+
+    const allReminders = [...(oneTimeReminders || []), ...yearlyToSend]
+
+    if (allReminders.length === 0) {
       return NextResponse.json({ message: 'No hay recordatorios pendientes para mañana', sent: 0 })
     }
 
     let sentCount = 0
     const errors: string[] = []
 
-    for (const reminder of reminders) {
+    for (const reminder of allReminders) {
       const toEmail = reminder.notification_email || DEFAULT_ADMIN_EMAIL
 
       // Formatear el horario
@@ -100,10 +125,19 @@ export async function GET(request: Request) {
         })
 
         // Marcar como notificado
-        await supabase
-          .from('bookings')
-          .update({ notified: true })
-          .eq('id', reminder.id)
+        if (reminder.recurring === 'yearly') {
+          // Anuales: guardar el año en que fue notificado
+          await supabase
+            .from('bookings')
+            .update({ last_notified_year: currentYear })
+            .eq('id', reminder.id)
+        } else {
+          // Únicos: marcar como notificado permanentemente
+          await supabase
+            .from('bookings')
+            .update({ notified: true })
+            .eq('id', reminder.id)
+        }
 
         sentCount++
       } catch (emailError) {
@@ -115,7 +149,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       message: `Recordatorios procesados`,
-      total: reminders.length,
+      total: allReminders.length,
       sent: sentCount,
       errors: errors.length > 0 ? errors : undefined,
     })
