@@ -13,7 +13,7 @@ interface EditBookingModalProps {
   booking: Reserva | null;
   onSubmit: (
     id: string,
-    data: Partial<Pick<Reserva, "name" | "email" | "message" | "description" | "booking_date" | "time_slots" | "status">>
+    data: Partial<Pick<Reserva, "name" | "email" | "message" | "description" | "booking_date" | "time_slots" | "status" | "recurring">>
   ) => Promise<{ error: unknown }>;
 }
 
@@ -75,6 +75,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<ReservaEstado>("pending");
+  const [recurring, setRecurring] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -85,6 +86,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
       setEmail(booking.email || "");
       setMessage(booking.message || "");
       setStatus(booking.status);
+      setRecurring(booking.recurring === "yearly");
       const { start, end } = parseTimeSlots(booking.time_slots);
       setTimeStart(start);
       setTimeEnd(end);
@@ -104,6 +106,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
         email,
         message,
         status,
+        recurring: recurring ? "yearly" : "none",
       });
 
       if (!error) {
@@ -223,6 +226,17 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
         classNames={TEXTAREA_CLASSNAMES}
         className="mt-4"
       />
+      {status === "reminder" && (
+        <label className="flex items-center gap-2 mt-4 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={recurring}
+            onChange={(e) => setRecurring(e.target.checked)}
+            className="w-4 h-4 rounded border-[#D4DEED] accent-[#265197]"
+          />
+          <span className="text-sm text-[#265197]">Repetir cada año</span>
+        </label>
+      )}
     </DrawerCitricaAdmin>
   );
 };
