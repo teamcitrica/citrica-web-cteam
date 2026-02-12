@@ -16,6 +16,8 @@ export interface Reserva {
   status: ReservaEstado
   type_id: number
   created_at: string
+  notified?: boolean
+  notification_email?: string
 }
 
 export const useReservas = () => {
