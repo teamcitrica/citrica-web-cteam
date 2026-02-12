@@ -296,7 +296,7 @@ export const useContact = () => {
             booking_date: dateStr,
             time_slots: slotsToSend,
             type_id: 1, // type_id 1 = reserva de cliente
-            status: 'confirmed',
+            status: 'pending',
             name: formData.name,
             email: formData.email,
             message: formData.message,
