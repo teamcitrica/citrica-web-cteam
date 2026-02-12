@@ -293,11 +293,12 @@ export const ContactSectionLanding = ({
                         onPress={prevStep}
                       />
                       <Button
-                        type="submit"
+                        type="button"
                         label={isLoading ? "Enviando..." : "Agendar cita"}
                         variant="primary"
                         fullWidth
-                        disabled={isLoading || !formData.message}
+                        isDisabled={isLoading || !formData.message}
+                        onPress={() => handleSubmit({ preventDefault: () => {} } as React.FormEvent)}
                       />
                     </div>
                   </AnimatedContent>

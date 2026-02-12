@@ -1,66 +1,71 @@
 "use client";
-import { Chip } from "@heroui/chip";
-import React, { useState, useEffect } from "react";
-import { Button, Text } from "citrica-ui-toolkit";
-import Card from "@ui/atoms/card";
-import Icon from "@ui/atoms/icon";
 
-import { useReservas } from "@/hooks/reservas/use-reservas";
+import React, { useState, useEffect, useMemo } from "react";
+import { Button, Text } from "citrica-ui-toolkit";
+import Icon from "@ui/atoms/icon";
+import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
+import { useReservas, Reserva } from "@/hooks/reservas/use-reservas";
+import CalendarGrid from "./components/calendar-grid";
+import DayDetailPanel from "./components/day-detail-panel";
+import CreateReminderModal from "./components/create-reminder-modal";
+import EditBookingModal from "./components/edit-booking-modal";
+
+/** Tipos de estado para los filtros del calendario */
+export type BookingStatusFilter = "all" | "confirmed" | "pending" | "cancelled" | "reminder";
+
+/** Configuración de colores y etiquetas por estado */
+export const STATUS_CONFIG: Record<string, { color: string; label: string }> = {
+  confirmed: { color: "#10E5A4", label: "Confirmada" },
+  pending: { color: "#F9E124", label: "Sin confirmar" },
+  cancelled: { color: "#F04242", label: "Cancelada" },
+  reminder: { color: "#8D0AF5", label: "Recordatorio" },
+};
+
+/** Botones de filtro para el grupo de filtros */
+const FILTER_BUTTONS = [
+  { value: "all", label: "Todas" },
+  { value: "confirmed", label: "Confirmadas" },
+  { value: "pending", label: "Sin confirmar" },
+  { value: "cancelled", label: "Canceladas" },
+  { value: "reminder", label: "Recordatorios" },
+];
+
+/** Capitaliza la primera letra de un string */
+const capitalize = (str: string) => str.replace(/^\w/, (c) => c.toUpperCase());
 
 const BookingCalendarView = () => {
-  const { isLoading, reservas: bookings, refreshReservas } = useReservas();
+  const { reservas: bookings, refreshReservas, createReminder, updateReservaStatus, deleteReserva, updateReserva } = useReservas();
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<BookingStatusFilter>("all");
+  const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingBooking, setEditingBooking] = useState<Reserva | null>(null);
 
   useEffect(() => {
     refreshReservas();
   }, [refreshReservas]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending": return "warning";
-      case "confirmed": return "success";
-      case "cancelled": return "danger";
-      default: return "default";
-    }
-  };
+  // Seleccionar hoy por defecto al cargar
+  useEffect(() => {
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+    setSelectedDate(todayStr);
+  }, []);
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "pending": return "Pendiente";
-      case "confirmed": return "Confirmada";
-      case "cancelled": return "Cancelada";
-      default: return status;
-    }
-  };
+  // Filtrar reservas según el estado seleccionado
+  const filteredBookings = useMemo(() => {
+    if (statusFilter === "all") return bookings;
+    return bookings.filter((b) => b.status === statusFilter);
+  }, [bookings, statusFilter]);
 
-  // Obtener primer día del mes y configuración del calendario
-  const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-  const firstDayWeekday = firstDayOfMonth.getDay();
-  const daysInMonth = lastDayOfMonth.getDate();
+  // Formatear mes y año para el selector: "Noviembre 2025"
+  const monthYearLabel = capitalize(
+    currentDate.toLocaleDateString("es-ES", { month: "long", year: "numeric" })
+  );
 
-  // Generar días del calendario
-  const calendarDays = [];
-
-  // Días vacíos al inicio
-  for (let i = 0; i < firstDayWeekday; i++) {
-    calendarDays.push(null);
-  }
-
-  // Días del mes
-  for (let day = 1; day <= daysInMonth; day++) {
-    calendarDays.push(day);
-  }
-
-  // Obtener reservas de una fecha específica
-  const getBookingsForDate = (day: number) => {
-    const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return bookings.filter(booking => booking.booking_date === dateStr);
-  };
-
-  // Navegar entre meses
+  // Navegación entre meses
   const goToPreviousMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
   };
@@ -69,240 +74,132 @@ const BookingCalendarView = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
   };
 
-  const goToToday = () => {
-    setCurrentDate(new Date());
-  };
+  // Reservas del día seleccionado
+  const selectedDayBookings = useMemo(() => {
+    if (!selectedDate) return [];
+    return filteredBookings.filter((b) => b.booking_date === selectedDate);
+  }, [filteredBookings, selectedDate]);
 
-  // Formatear mes y año - capitalizar solo la primera letra
-  const monthYear = currentDate.toLocaleDateString('es-ES', {
-    month: 'long',
-    year: 'numeric'
-  }).replace(/^\w/, c => c.toUpperCase());
-
-  // Obtener reservas del día seleccionado
-  const selectedDateBookings = selectedDate ? bookings.filter(b => b.booking_date === selectedDate) : [];
+  // Formatear la fecha seleccionada: "Viernes 14 Noviembre de 2025"
+  const selectedDateLabel = useMemo(() => {
+    if (!selectedDate) return "";
+    const date = new Date(selectedDate + "T00:00:00");
+    const weekday = capitalize(date.toLocaleDateString("es-ES", { weekday: "long" }));
+    const day = date.getDate();
+    const month = capitalize(date.toLocaleDateString("es-ES", { month: "long" }));
+    const year = date.getFullYear();
+    return `${weekday} ${day} ${month} de ${year}`;
+  }, [selectedDate]);
 
   return (
-    <div className="space-y-2">
-      {/* Controles del calendario */}
-      <Card className="p-4">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div>
-            <Text variant="title" color="#964f20">
-              {monthYear}
+    <div className="flex flex-col gap-3 h-full">
+      {/* Barra superior: navegación de mes + filtros, envuelta en contenedor blanco */}
+      <div className="flex flex-col md:flex-row items-start md:items-center gap-3 bg-white border border-[#D4DEED] rounded-xl px-4 py-2 overflow-hidden shadow-md">
+        {/* Navegación de mes: < Noviembre 2025 > */}
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            isIconOnly
+            variant="flat"
+            size="sm"
+            onPress={goToPreviousMonth}
+            className="!min-w-8 !w-8 !h-[34px] !p-0 !border-solid !border !border-[#16305A] !rounded-md !bg-transparent"
+          >
+            <Icon name="ChevronLeft" size={16} className="text-[#16305A]" />
+          </Button>
+
+          <div className="px-4 h-[34px] border border-[#16305A] rounded-md flex items-center">
+            <Text variant="body" weight="bold" color="#16305A">
+              {monthYearLabel}
             </Text>
-            <p>
-              <Text variant="body" color="color-on-surface">
-                Vista de calendario de reservas
-              </Text>
-            </p>
           </div>
 
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="secondary"
-              onPress={goToPreviousMonth}
-              startContent={<Icon name="ChevronLeft" size={16} />}
-            >
-              Anterior
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              onPress={goToToday}
-            >
-              Hoy
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              onPress={goToNextMonth}
-              endContent={<Icon name="ChevronRight" size={16} />}
-            >
-              Siguiente
-            </Button>
-          </div>
-        </div>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Calendario */}
-        <div className="lg:col-span-2 order-2 lg:order-1">
-          <Card className="p-2">
-            {/* Días de la semana */}
-            <div className="grid grid-cols-7 gap-2 mb-4">
-              {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
-                <div key={day} className="text-center p-2">
-                  <Text variant="label" color="color-on-surface">
-                    {day}
-                  </Text>
-                </div>
-              ))}
-            </div>
-
-            {/* Días del calendario */}
-            <div className="grid grid-cols-7 gap-2">
-              {calendarDays.map((day, index) => {
-                if (day === null) {
-                  return <div key={`empty-${index}`} className="h-20" />;
-                }
-
-                const dayBookings = getBookingsForDate(day);
-                const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const isSelected = selectedDate === dateStr;
-                const isToday = new Date().toDateString() === new Date(currentDate.getFullYear(), currentDate.getMonth(), day).toDateString();
-
-                return (
-                  <div
-                    key={`day-${dateStr}`}
-                    className={`
-                      h-20 border rounded-lg p-2 cursor-pointer transition-colors
-                      ${isSelected ? 'border-[#964f20] bg-[#964f20]/10' : 'border-gray-200 hover:border-gray-300'}
-                      ${isToday ? 'ring-2 ring-[#964f20]/30' : ''}
-                    `}
-                    onClick={() => setSelectedDate(selectedDate === dateStr ? null : dateStr)}
-                  >
-                    <div className="flex flex-col h-full">
-                      <span className={`text-sm ${isToday ? 'font-bold text-[#964f20]' : 'text-gray-700'}`}>
-                        {day}
-                      </span>
-
-                      <div className="flex-1 flex flex-col gap-1 mt-1">
-                        {dayBookings.slice(0, 2).map((booking, i) => (
-                          <div
-                            key={booking.id}
-                            className={`
-                              text-xs px-1 py-0.5 rounded-full text-white text-center
-                              ${booking.status === 'confirmed' ? 'bg-green-500' :
-                                booking.status === 'pending' ? 'bg-yellow-500' : 'bg-red-500'}
-                            `}
-                          >
-                            {/* {booking.time_slots[0]} */}
-                          </div>
-                        ))}
-                        {dayBookings.length > 2 && (
-                          <div className="text-xs text-gray-500 text-center">
-                            +{dayBookings.length - 2}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
+          <Button
+            isIconOnly
+            variant="flat"
+            size="sm"
+            onPress={goToNextMonth}
+            className="!min-w-8 !w-8 !h-[34px] !p-0 !border-solid !border !border-[#16305A] !rounded-md !bg-transparent"
+          >
+            <Icon name="ChevronRight" size={16} className="text-[#16305A]" />
+          </Button>
         </div>
 
-        {/* Panel lateral con detalles */}
-        <div className="order-1 lg:order-  ">
-          <Card className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Icon name="Info" size={20} className="text-[#964f20]" />
-                <Text variant="subtitle" color="#964f20">
-                  {selectedDate ? 'Detalles del día' : 'Información'}
-                </Text>
-              </div>
+        {/* Filtros de estado */}
+        <div className="w-full md:w-auto overflow-x-auto">
+          <FilterButtonGroup
+            buttons={FILTER_BUTTONS}
+            selectedValue={statusFilter}
+            onValueChange={(val) => setStatusFilter(val as BookingStatusFilter)}
+            size="sm"
+          />
+        </div>
 
-              {selectedDate ? (
-                <div className="space-y-4">
-                  <div>
-                    <p>
-                      <Text variant="body" color="color-on-surface">
-                        <strong>Fecha seleccionada:</strong>
-                      </Text>
-                    </p>
-                    <p>
-                      <Text variant="body" color="color-on-surface">
-                        {new Date(selectedDate + 'T00:00:00').toLocaleDateString('es-ES', {
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </Text>
-                    </p>
-                  </div>
+        {/* Botón crear recordatorio */}
+        <Button
+          isAdmin
+          size="sm"
+          variant="primary"
+          onPress={() => setIsReminderModalOpen(true)}
+          startContent={<Icon name="Plus" size={16} />}
+          className="!ml-auto shrink-0"
+        >
+          Recordatorio
+        </Button>
+      </div>
 
-                  <div>
-                    <Text variant="body" color="color-on-surface">
-                      <strong>Reservas ({selectedDateBookings.length}):</strong>
-                    </Text>
+      {/* Contenido principal: calendario + panel lateral, separados 12px */}
+      <div className="flex flex-col xl:flex-row gap-3 flex-1">
+        {/* Grilla del calendario */}
+        <div className="flex-1 min-w-0 border border-[#D4DEED] rounded-xl overflow-hidden bg-white shadow-md">
+          <CalendarGrid
+            currentDate={currentDate}
+            selectedDate={selectedDate}
+            onSelectDate={setSelectedDate}
+            bookings={filteredBookings}
+          />
+        </div>
 
-                    {selectedDateBookings.length === 0 ? (
-                      <Text variant="body" color="color-on-surface" className="text-gray-500">
-                        No hay reservas para este día
-                      </Text>
-                    ) : (
-                      <div className="space-y-2 mt-2">
-                        {selectedDateBookings.map((booking) => (
-                          <div
-                            key={booking.id}
-                            className="p-3 border rounded-lg border-gray-200"
-                          >
-                            <div className="flex justify-between items-start mb-1">
-                              <Text variant="label" color="color-on-surface">
-                                {booking.name || 'Sin nombre'}
-                              </Text>
-                              <Chip
-                                size="sm"
-                                color={getStatusColor(booking.status)}
-                                variant="flat"
-                              >
-                                {getStatusLabel(booking.status)}
-                              </Chip>
-                            </div>
-                            <p>
-                              <Text variant="body" color="color-on-surface" className="text-sm">
-                                {booking.time_slots?.join(', ') || 'Sin horario'}
-                              </Text>
-                            </p>
-                            <p>
-                              <Text variant="body" color="color-on-surface" className="text-sm text-gray-500">
-                                {booking.type_id === 1 ? "Reserva de Cliente" : "Bloqueo Administrativo"}
-                              </Text>
-                            </p>
-
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Text variant="body" color="color-on-surface">
-                    Haz clic en cualquier día del calendario para ver los detalles de las reservas.
-                  </Text>
-
-                  <div className="space-y-2 mt-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-                      <Text variant="body" color="color-on-surface" className="text-sm">
-                        Pendiente
-                      </Text>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-green-500 rounded"></div>
-                      <Text variant="body" color="color-on-surface" className="text-sm">
-                        Confirmada
-                      </Text>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-red-500 rounded"></div>
-                      <Text variant="body" color="color-on-surface" className="text-sm">
-                        Cancelada
-                      </Text>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </Card>
+        {/* Panel lateral de detalles del día */}
+        <div className="xl:w-[320px] xl:min-w-[320px] border border-[#D4DEED] rounded-xl overflow-hidden bg-white shadow-md max-h-[400px] xl:max-h-none">
+          <DayDetailPanel
+            dateLabel={selectedDateLabel}
+            bookings={selectedDayBookings}
+            onStatusChange={async (id, status) => {
+              await updateReservaStatus(id, status);
+              refreshReservas();
+            }}
+            onDelete={async (booking) => {
+              if (window.confirm(`¿Estás seguro de eliminar la reserva de ${booking.name}?`)) {
+                await deleteReserva(booking.id);
+                refreshReservas();
+              }
+            }}
+            onEdit={(booking) => {
+              setEditingBooking(booking);
+              setIsEditModalOpen(true);
+            }}
+          />
         </div>
       </div>
+
+      {/* Modal para crear recordatorio */}
+      <CreateReminderModal
+        isOpen={isReminderModalOpen}
+        onClose={() => setIsReminderModalOpen(false)}
+        onSubmit={createReminder}
+        defaultDate={selectedDate || undefined}
+      />
+
+      {/* Drawer para editar reserva/recordatorio */}
+      <EditBookingModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingBooking(null);
+        }}
+        booking={editingBooking}
+        onSubmit={updateReserva}
+      />
     </div>
   );
 };
