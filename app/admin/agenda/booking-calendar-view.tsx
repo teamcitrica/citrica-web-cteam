@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Button, Text } from "citrica-ui-toolkit";
 import Icon from "@ui/atoms/icon";
-import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
+import FilterDropdown from "@/shared/components/citrica-ui/molecules/filter-dropdown";
 import { useReservas, Reserva } from "@/hooks/reservas/use-reservas";
 import CalendarGrid from "./components/calendar-grid";
 import DayDetailPanel from "./components/day-detail-panel";
@@ -21,8 +21,8 @@ export const STATUS_CONFIG: Record<string, { color: string; label: string }> = {
   reminder: { color: "#8D0AF5", label: "Recordatorio" },
 };
 
-/** Botones de filtro para el grupo de filtros */
-const FILTER_BUTTONS = [
+/** Opciones de filtro para el dropdown */
+const FILTER_OPTIONS = [
   { value: "all", label: "Todas" },
   { value: "confirmed", label: "Confirmadas" },
   { value: "pending", label: "Sin confirmar" },
@@ -125,14 +125,11 @@ const BookingCalendarView = () => {
         </div>
 
         {/* Filtros de estado */}
-        <div className="w-full md:w-auto overflow-x-auto">
-          <FilterButtonGroup
-            buttons={FILTER_BUTTONS}
-            selectedValue={statusFilter}
-            onValueChange={(val) => setStatusFilter(val as BookingStatusFilter)}
-            size="sm"
-          />
-        </div>
+        <FilterDropdown
+          options={FILTER_OPTIONS}
+          selectedValue={statusFilter}
+          onValueChange={(val) => setStatusFilter(val as BookingStatusFilter)}
+        />
 
         {/* Botón crear recordatorio */}
         <Button
