@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 import { Button, Input } from "citrica-ui-toolkit";
-
 import { useContactCRUD, Contact, ContactInput } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 
@@ -118,11 +117,11 @@ export default function EditContactModal({
       size="2xl"
       footer={
         <>
-          <Button isAdmin variant="secondary" onPress={onClose}>
+          <Button isAdmin={true} variant="secondary" onPress={onClose}>
             Cancelar
           </Button>
           <Button
-            isAdmin
+            isAdmin={true}
             variant="primary"
             className="bg-[#42668A]"
             onPress={handleSubmit}

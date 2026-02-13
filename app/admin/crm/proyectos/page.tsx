@@ -2,18 +2,15 @@
 import { Divider } from "@heroui/divider";
 import { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
-
 import ProjectFormModal from "./components/project-form-modal";
 import ProjectDetailModal from "./components/project-detail-modal";
 import DeleteProjectModal from "./components/delete-project-modal";
 import ManageUsersDrawer from "./components/manage-users-drawer";
-
 import { useProjectCRUD, Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { getProjectColumns } from "./columns/project-columns";
-import { Col, Container } from "@/styles/07-objects/objects";
-import { Text } from "citrica-ui-toolkit";
+import { Text, Col, Container } from "citrica-ui-toolkit";
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
 import { createUsers } from "@/public/icon-svg/create-users";
 
@@ -146,10 +143,10 @@ export default function ProyectosPage() {
 
   return (
     <Container>
-      <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+      <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="">
           <h1 className="text-2xl font-bold text-[#265197] mb-4">
-            <Text variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text variant="title" weight="bold" color="#265197">Proyectos</Text>
+            <Text isAdmin={true} variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text isAdmin={true} variant="title"  weight="bold" color="#16305A">Proyectos</Text>
           </h1>
 
           <DataTable<Project>

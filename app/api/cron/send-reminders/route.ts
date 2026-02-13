@@ -14,8 +14,6 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 })
 
-const resend = new Resend(resendApiKey)
-
 /**
  * GET /api/cron/send-reminders
  *
@@ -27,6 +25,7 @@ const resend = new Resend(resendApiKey)
  * Protegido por CRON_SECRET para evitar llamadas no autorizadas.
  */
 export async function GET(request: Request) {
+  const resend = new Resend(resendApiKey)
   // Verificar autenticación del cron (opcional pero recomendado)
   const authHeader = request.headers.get('authorization')
   const cronSecret = process.env.CRON_SECRET

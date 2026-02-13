@@ -1,15 +1,12 @@
 "use client";
 import { useState, useCallback, useMemo } from "react";
-
 import LandingProjectFormModal from "./components/landing-project-form-modal";
 import LandingProjectDetailModal from "./components/landing-project-detail-modal";
 import DeleteLandingProjectModal from "./components/delete-landing-project-modal";
-
 import { useLandingProjects, LandingProject } from "@/hooks/landing-projects/use-landing-projects";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { getLandingProjectColumns } from "./columns/landing-project-columns";
-import { Col, Container } from "@/styles/07-objects/objects";
-import { Text } from "citrica-ui-toolkit";
+import { Text, Col, Container } from "citrica-ui-toolkit";
 import FilterDropdown from "@/shared/components/citrica-ui/molecules/filter-dropdown";
 
 export default function CMSProyectosPage() {

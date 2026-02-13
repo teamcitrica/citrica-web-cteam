@@ -3,8 +3,7 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@herou
 import { Tooltip } from "@heroui/tooltip";
 import { useState } from "react";
 import { addToast } from "@heroui/toast";
-import { Icon } from "@/shared/components/citrica-ui";
-import { Button, Input } from "citrica-ui-toolkit";
+import { Button, Input, Icon } from "citrica-ui-toolkit";
 import { Contact } from "@/hooks/contact/use-contact";
 
 // Función para generar contraseña segura aleatoria

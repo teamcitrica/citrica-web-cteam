@@ -2,7 +2,6 @@
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { useState } from "react";
 import { addToast } from "@heroui/toast";
-
 import { Contact } from "@/hooks/contact/use-contact";
 import { Button } from "citrica-ui-toolkit";
 

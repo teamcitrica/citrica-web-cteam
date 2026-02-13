@@ -9,8 +9,7 @@ import { getContactColumns, getContactExportColumns } from "./columns/contact-co
 import { useContactCRUD, Contact } from "@/hooks/contact/use-contact";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
-import { Col, Container } from "@/styles/07-objects/objects";
-import { Text } from 'citrica-ui-toolkit';
+import { Text, Col, Container } from 'citrica-ui-toolkit';
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
 
 export default function ContactosPage() {
@@ -118,10 +117,10 @@ export default function ContactosPage() {
 
   return (
     <Container>
-      <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+      <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }}>
         <div>
           <h1 className="text-2xl font-bold text-[#265197] mb-5">
-            <Text variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text variant="title" weight="bold" color="#265197">Contactos</Text>
+            <Text isAdmin={true} variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text isAdmin={true} variant="title" weight="bold" color="#265197">Contactos</Text>
           </h1>
 
           <DataTable<Contact>

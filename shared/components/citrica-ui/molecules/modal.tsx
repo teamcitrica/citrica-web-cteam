@@ -1,10 +1,7 @@
 "use client";
-
 import { Modal as HeroModal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
-import { Container, Col } from "@citrica/objects";
 import React, { useRef, useEffect } from "react";
-import Icon from "../atoms/icon";
-import { Text } from "citrica-ui-toolkit";
+import { Text, Icon, Container, Col } from "citrica-ui-toolkit";
 
 interface ModalProps {
   isOpen: boolean;

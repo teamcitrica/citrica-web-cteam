@@ -1,9 +1,8 @@
 "use client";
-
 import { CredentialType } from "@/hooks/use-credentials";
 import { useState } from "react";
-import { Eye, EyeOff, Copy } from "lucide-react";
 import { addToast } from "@heroui/toast";
+import { Icon } from "citrica-ui-toolkit";
 
 type ViewCredentialModalProps = {
   isOpen: boolean;
@@ -94,7 +93,7 @@ const ViewCredentialModal = ({
                 className="p-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 title="Copiar URL"
               >
-                <Copy size={18} />
+                <Icon name="Copy" size={18} />
               </button>
             </div>
           </div>
@@ -115,14 +114,14 @@ const ViewCredentialModal = ({
                 className="p-3 bg-gray-600 text-white rounded-md hover:bg-gray-700"
                 title={showKey ? "Ocultar clave" : "Mostrar clave"}
               >
-                {showKey ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showKey ? <Icon name="EyeOff" size={18} /> : <Icon name="Eye" size={18} />}
               </button>
               <button
                 onClick={handleCopyKey}
                 className="p-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 title="Copiar clave"
               >
-                <Copy size={18} />
+                <Icon name="Copy" size={18} />
               </button>
             </div>
           </div>

@@ -1,7 +1,6 @@
 "use client";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
-import { Button } from "@heroui/button";
-import Icon from "../atoms/icon";
+import { Button, Icon, Text } from "citrica-ui-toolkit";
 
 export interface FilterOption {
   value: string;
@@ -34,10 +33,11 @@ export default function FilterDropdown({
     >
       <DropdownTrigger>
         <Button
-          variant="flat"
+          isAdmin={true}
+          variant="secondary"
           className={`
             ${isFiltered ? "bg-[#00226c] text-white" : "bg-[#D4DEED] text-[#00226c]"}
-            rounded-lg
+            !rounded-lg
             px-4
             min-w-unit-10
             hover:opacity-90
@@ -45,11 +45,11 @@ export default function FilterDropdown({
             ${className}
           `}
         >
-          <Icon name="SlidersHorizontal" size={16} />
+          <Icon name="SlidersHorizontal" size={16} color="#00226c"/>
           {isFiltered && selectedOption && (
-            <span className="text-sm font-medium">{selectedOption.label}</span>
+            <Text variant="label" className="}1rounded-lg">{selectedOption.label}</Text>
           )}
-          <Icon name="ChevronDown" size={14} />
+          <Icon name="ChevronDown" size={14} color="#00226c"/>
         </Button>
       </DropdownTrigger>
       <DropdownMenu

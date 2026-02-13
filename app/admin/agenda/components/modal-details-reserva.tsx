@@ -84,7 +84,7 @@ export default function ReservaDetailModal({
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1 border-b border-gray-200">
-          <Text variant="title" weight="bold" textColor="color-primary">
+          <Text isAdmin={true} variant="title" weight="bold" textColor="color-primary">
             Detalles de la Reserva
           </Text>
         </ModalHeader>
@@ -92,18 +92,18 @@ export default function ReservaDetailModal({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Text variant="label" weight="bold" textColor="color-on-surface">
+                <Text isAdmin={true} variant="label" weight="bold" textColor="color-on-surface">
                   Nombre
                 </Text>
-                <Text variant="body" textColor="color-on-surface-var">
+                <Text isAdmin={true} variant="body" textColor="color-on-surface-var">
                   {reserva.name}
                 </Text>
               </div>
               <div>
-                <Text variant="label" weight="bold" textColor="color-on-surface">
+                <Text isAdmin={true} variant="label" weight="bold" textColor="color-on-surface">
                   Email
                 </Text>
-                <Text variant="body" textColor="color-on-surface-var">
+                <Text isAdmin={true} variant="body" textColor="color-on-surface-var">
                   {reserva.email}
                 </Text>
               </div>
@@ -111,18 +111,18 @@ export default function ReservaDetailModal({
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Text variant="label" weight="bold" textColor="color-on-surface">
+                <Text isAdmin={true} variant="label" weight="bold" textColor="color-on-surface">
                   Fecha de Reunión
                 </Text>
-                <Text variant="body" textColor="color-on-surface-var">
+                <Text isAdmin={true} variant="body" textColor="color-on-surface-var">
                   {formatDate(reserva.booking_date)}
                 </Text>
               </div>
               <div>
-                <Text variant="label" weight="bold" textColor="color-on-surface">
+                <Text isAdmin={true} variant="label" weight="bold" textColor="color-on-surface">
                   Horario
                 </Text>
-                <Text variant="body" textColor="color-on-surface-var">
+                <Text isAdmin={true} variant="body" textColor="color-on-surface-var">
                   {reserva.time_slots && reserva.time_slots.length > 0
                     ? reserva.time_slots.join(', ')
                     : "Sin horario"}
@@ -131,7 +131,7 @@ export default function ReservaDetailModal({
             </div>
 
             <div>
-              <Text variant="label" weight="bold" textColor="color-on-surface">
+              <Text isAdmin={true} variant="label" weight="bold" textColor="color-on-surface">
                 Estado
               </Text>
               <div className="mt-2">
@@ -146,17 +146,17 @@ export default function ReservaDetailModal({
                 Mensaje
               </Text>
               <div className="mt-2 p-4 bg-gray-50 rounded-lg">
-                <Text variant="body" textColor="color-on-surface-var">
+                <Text isAdmin={true} variant="body" textColor="color-on-surface-var">
                   {reserva.message || "Sin mensaje"}
                 </Text>
               </div>
             </div>
 
             <div>
-              <Text variant="label" weight="bold" textColor="color-on-surface">
+              <Text isAdmin={true} variant="label" weight="bold" textColor="color-on-surface">
                 Fecha de Creación
               </Text>
-              <Text variant="body" textColor="color-on-surface-var">
+              <Text isAdmin={true} variant="body" textColor="color-on-surface-var">
                 {formatDateTime(reserva.created_at)}
               </Text>
             </div>

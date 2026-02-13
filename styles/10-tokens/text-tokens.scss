@@ -241,7 +241,7 @@ $display-responsive-admin: (
   )
 );
 .text-display-admin {
-  font-family: var(--font-family-d);
+  font-family: var(--font-family-d-admin);
   font-weight: 400;
   letter-spacing: 0;
   text-decoration: none;
@@ -272,7 +272,7 @@ $headline-responsive-admin: (
   )
 );
 .text-headline-admin {
-  font-family: var(--font-family-d);
+  font-family: var(--font-family-d-admin);
   font-weight: 400;
   letter-spacing: 0;
   text-decoration: none;
@@ -303,7 +303,7 @@ $body-big-responsive-admin: (
   )
 );
 .text-body-big-admin {
-  font-family: var(--font-family-d);
+  font-family: var(--font-family-d-admin);
   font-weight: 400;
   letter-spacing: 0;
   text-decoration: none;
@@ -324,23 +324,23 @@ $title-responsive-admin: (
     line-height: 28px
   ),
   md: (
-    font-size: 25px,
+    font-size: 24px,
     line-height: 32px
   ),
   lg: (
-    font-size: 25px,
+    font-size: 24px,
     line-height: 32px
   )
 );
 .text-title-admin {
-  font-family: var(--font-family-b);
+  font-family: var(--font-family-b-admin);
   font-weight: 400;
   letter-spacing: 0;
   text-decoration: none;
   text-transform: none;
   @include a-set($title-responsive-admin);
   &-bold{
-    font-weight: 700;
+    font-weight: 900;
   }
   &-light{
     font-weight: 300;
@@ -364,7 +364,7 @@ $subtitle-responsive-admin: (
   )
 );
 .text-subtitle-admin {
-  font-family: var(--font-family-d);
+  font-family: var(--font-family-d-admin);
   font-weight: 400;
   letter-spacing: 0;
   text-decoration: none;
@@ -394,7 +394,7 @@ $body-responsive-admin: (
   )
 );
 .text-body-admin {
-  font-family: var(--font-family-d);
+  font-family: var(--font-family-d-admin);
   font-weight: 400;
   letter-spacing: 0;
   text-decoration: none;
@@ -415,16 +415,16 @@ $label-responsive-admin: (
     line-height: 16px
   ),
   md: (
-    font-size: 13px,
+    font-size: 12px,
     line-height: 20px
   ),
   lg: (
-    font-size: 13px,
+    font-size: 12px,
     line-height: 20px
   )
 );
 .text-label-admin {
-  font-family: var(--font-family-c);
+  font-family: var(--font-family-c-admin);
   font-weight: 400;
   letter-spacing: 0;
   text-decoration: none;

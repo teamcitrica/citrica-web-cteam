@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { Col, Container } from "@/styles/07-objects/objects";
+import { Col, Container } from "citrica-ui-toolkit";
 import { useReservas } from "@/hooks/reservas/use-reservas";
 import CardReservas from "./card-reservas";
 

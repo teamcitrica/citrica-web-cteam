@@ -1,8 +1,6 @@
 "use client";
 import React from 'react'
-import { Col, Container } from '@citrica/objects';
-import { Icon } from '@citrica-ui';
-import { Button, Text } from 'citrica-ui-toolkit';
+import { Button, Text, Icon, Col, Container } from 'citrica-ui-toolkit';
 import { siteConfig } from '@/config/site';
 
 interface NavLink {

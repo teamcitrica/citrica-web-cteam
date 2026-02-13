@@ -2,11 +2,9 @@
 import { Divider } from "@heroui/divider";
 import { Link } from "@heroui/link";
 import React, { useState } from 'react'
-import { Container } from '@/styles/07-objects/objects';
-import { Text, Button } from 'citrica-ui-toolkit';
+import { Text, Button, Container, Icon } from 'citrica-ui-toolkit';
 import Input from "../atoms/input";
 import Modal from '../molecules/modal';
-import Icon from '../atoms/icon';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 const ForgotPasswordPage = () => {

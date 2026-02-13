@@ -1,10 +1,8 @@
 "use client";
-
 import { Divider } from "@heroui/divider";
 import React from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-
 import { UserType } from "@/shared/types/types";
 import { DetailModal } from "@/shared/components/citrica-ui";
 import { Text } from "citrica-ui-toolkit";
@@ -33,18 +31,18 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose }) => {
             <div className="flex flex-col gap-[6px]">
               <div className="flex flex-col">
                 <p>
-                  <Text variant="label" color="#678CC5">Rol</Text>
+                  <Text isAdmin={true} variant="label" color="#678CC5">Rol</Text>
                 </p>
                 <p>
-                  <Text variant="body" color="#16305A">{user.role?.name || "-"}</Text>
+                  <Text isAdmin={true} variant="body" color="#16305A">{user.role?.name || "-"}</Text>
                 </p>
               </div>
               <div className="flex flex-col">
                 <p>
-                  <Text variant="label" color="#678CC5">Cargo</Text>
+                  <Text isAdmin={true} variant="label" color="#678CC5">Cargo</Text>
                 </p>
                 <p>
-                  <Text variant="body" color="#16305A">{user.cargo || "-"}</Text>
+                  <Text isAdmin={true} variant="body" color="#16305A">{user.cargo || "-"}</Text>
                 </p>
               </div>
             </div>
@@ -53,18 +51,18 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose }) => {
             <div className="flex flex-col gap-[6px]">
               <div className="flex flex-col">
                 <p>
-                  <Text variant="label" color="#678CC5">Email</Text>
+                  <Text isAdmin={true} variant="label" color="#678CC5">Email</Text>
                 </p>
                 <p>
-                  <Text variant="body" color="#16305A">{user.email || "-"}</Text>
+                  <Text isAdmin={true} variant="body" color="#16305A">{user.email || "-"}</Text>
                 </p>
               </div>
               <div className="flex flex-col">
                 <p>
-                  <Text variant="label" color="#678CC5">WhatsApp</Text>
+                  <Text isAdmin={true} variant="label" color="#678CC5">WhatsApp</Text>
                 </p>
                 <p>
-                  <Text variant="body" color="#16305A">{user.phone || "-"}</Text>
+                  <Text isAdmin={true} variant="body" color="#16305A">{user.phone || "-"}</Text>
                 </p>
               </div>
             </div>
@@ -76,23 +74,23 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose }) => {
           {/* Sección de Accesos */}
           <div className="mb-[16px]">
             <p className="mb-[6px]">
-              <Text variant="body" weight="bold" color="#265197">Accesos</Text>
+              <Text isAdmin={true} variant="body" weight="bold" color="#265197">Accesos</Text>
             </p>
             <div className="grid grid-cols-2 gap-x-6 pb-0">
               <div className="flex flex-col">
                 <p>
-                  <Text variant="label" color="#678CC5">Proyectos</Text>
+                  <Text isAdmin={true} variant="label" color="#678CC5">Proyectos</Text>
                 </p>
                 <p>
-                  <Text variant="body" color="#16305A">{user.user_metadata?.project_access_count || 0}</Text>
+                  <Text isAdmin={true} variant="body" color="#16305A">{user.user_metadata?.project_access_count || 0}</Text>
                 </p>
               </div>
               <div className="flex flex-col">
                 <p>
-                  <Text variant="label" color="#678CC5">Assets</Text>
+                  <Text isAdmin={true} variant="label" color="#678CC5">Assets</Text>
                 </p>
                 <p>
-                  <Text variant="body" color="#16305A">{user.user_metadata?.asset_access_count || 0}</Text>
+                  <Text isAdmin={true} variant="body" color="#16305A">{user.user_metadata?.asset_access_count || 0}</Text>
                 </p>
               </div>
             </div>
@@ -111,8 +109,8 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, onClose }) => {
         <div className="flex items-center gap-3">
           <AvatarTables color={getAvatarColor(userName || "User")} size={46} />
           <div className="flex flex-col">
-            <Text variant="body" weight="bold" color="#265197">{userName || "Sin nombre"}</Text>
-            <Text variant="label" weight="bold" color="#678CC5">{user.role?.name || "-"}</Text>
+            <Text isAdmin={true} variant="body" weight="bold" color="#265197">{userName || "Sin nombre"}</Text>
+            <Text isAdmin={true} variant="label" weight="bold" color="#678CC5">{user.role?.name || "-"}</Text>
           </div>
         </div>
       }

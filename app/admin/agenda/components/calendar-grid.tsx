@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useMemo } from "react";
 import { Text } from "citrica-ui-toolkit";
 import { Reserva } from "@/hooks/reservas/use-reservas";
@@ -80,8 +79,8 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       {/* Header: Días de la semana */}
       <div className="grid grid-cols-7 mb-2">
         {WEEK_DAYS.map((day, i) => (
-          <div key={`header-${i}`} className="text-center py-1 md:py-2">
-            <Text variant="label" weight="bold" color="#265197">
+          <div key={`header-${i}`} className="text-center">
+            <Text isAdmin={true} variant="label" weight="bold" color="#265197">
               {day}
             </Text>
           </div>
@@ -113,13 +112,13 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
               {/* Número del día */}
               <div className="flex justify-start mb-0.5 md:mb-1">
                 {isToday || isSelected ? (
-                  <span className="w-4 h-4 md:w-5 md:h-5 xl:w-6 xl:h-6 flex items-center justify-center rounded-full bg-[#265197] text-white text-[9px] md:text-[10px] xl:text-[11px] font-bold">
+                  <Text isAdmin={true} variant="label" color="color-white" className="w-4 h-4 md:w-5 md:h-5 xl:w-6 xl:h-6 flex items-center justify-center rounded-full bg-[#265197] text-white text-[9px] md:text-[10px] xl:text-[11px] font-bold">
                     {day}
-                  </span>
+                  </Text>
                 ) : (
-                  <span className="w-4 h-4 md:w-5 md:h-5 xl:w-6 xl:h-6 flex items-center justify-center text-[9px] md:text-[10px] xl:text-[11px] text-[#16305A]">
+                  <Text isAdmin={true} variant="label" color="#16305A" weight="bold" className="w-4 h-4 md:w-5 md:h-5 xl:w-6 xl:h-6 flex items-center justify-center text-[9px] md:text-[10px] xl:text-[11px] ">
                     {day}
-                  </span>
+                  </Text>
                 )}
               </div>
 

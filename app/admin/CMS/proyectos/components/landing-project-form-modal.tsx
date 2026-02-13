@@ -3,11 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import { addToast } from "@heroui/toast";
 import { Switch } from "@heroui/switch";
 import { Divider } from "@heroui/divider";
-
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
-import { Button, Input } from "citrica-ui-toolkit";
-import { Text } from "citrica-ui-toolkit";
-import Icon from "@ui/atoms/icon";
+import { Button, Input, Icon, Text } from "citrica-ui-toolkit";
 
 import {
   useLandingProjects,
@@ -44,7 +41,7 @@ function Section({ title, badge, children, defaultOpen = false }: SectionProps) 
         className="w-full flex items-center justify-between p-4 bg-[#F8FAFC] hover:bg-[#F1F5F9] transition-colors"
       >
         <div className="flex items-center gap-2">
-          <Text variant="body" weight="bold" color="#265197">{title}</Text>
+          <Text isAdmin={true} variant="body" weight="bold" color="#265197">{title}</Text>
           {badge !== undefined && (
             <span className="text-xs bg-[#265197] text-white px-2 py-0.5 rounded-full">
               {badge}
@@ -374,14 +371,14 @@ export default function LandingProjectFormModal({
       }
     >
       <div className="flex flex-col">
-        <div className="flex items-center gap-6 pb-2">
+        <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
             <Switch
               isSelected={formData.is_active}
               onValueChange={(val) => handleInputChange("is_active", val)}
               size="sm"
             />
-            <Text variant="label" color="#265197">Activo</Text>
+            <Text isAdmin={true} variant="label" color="#265197">Activo</Text>
           </div>
           <div className="flex items-center gap-2">
             <Switch
@@ -389,7 +386,7 @@ export default function LandingProjectFormModal({
               onValueChange={(val) => handleInputChange("featured", val)}
               size="sm"
             />
-            <Text variant="label" color="#265197">Destacado</Text>
+            <Text isAdmin={true} variant="label" color="#265197">Destacado</Text>
           </div>
           {/* Campo de orden comentado - usando "destacado" para priorizar proyectos
           <Input
@@ -404,7 +401,7 @@ export default function LandingProjectFormModal({
           */}
         </div>
 
-        <Divider className="bg-[#D4DEED]" />
+        <Divider className="bg-[#D4DEED] my-3" />
 
         <div className="flex flex-col">
           <Section title="Hero Section" defaultOpen={true}>
@@ -457,7 +454,7 @@ export default function LandingProjectFormModal({
               </div>
               <div className="col-span-2">
                 <div className="flex flex-col gap-2">
-                  <Text variant="label" color="#265197">Imagen Hero</Text>
+                  <Text isAdmin={true} variant="label" color="#265197">Imagen Hero</Text>
                   {formData.hero_image ? (
                     <div className="relative border border-[#D4DEED] rounded-[12px] p-3 bg-[#F8FAFC]">
                       <div className="flex items-center gap-4">
@@ -467,14 +464,15 @@ export default function LandingProjectFormModal({
                           className="w-24 h-24 object-cover rounded-lg"
                         />
                         <div className="flex-1 min-w-0">
-                          <Text variant="body" color="#265197" className="truncate block">
+                          <Text isAdmin={true} variant="body" color="#265197" className="truncate block">
                             {formData.hero_image.split("/").pop()}
                           </Text>
-                          <Text variant="label" color="#678CC5">
+                          <Text isAdmin={true} variant="label" color="#678CC5">
                             Imagen cargada
                           </Text>
                         </div>
                         <Button
+                          isAdmin={true}
                           isIconOnly
                           variant="flat"
                           size="sm"
@@ -498,17 +496,17 @@ export default function LandingProjectFormModal({
                               style={{ width: `${heroProgress}%` }}
                             />
                           </div>
-                          <Text variant="label" color="#678CC5">
+                          <Text isAdmin={true} variant="label" color="#678CC5">
                             Subiendo... {heroProgress}%
                           </Text>
                         </div>
                       ) : (
                         <>
                           <Icon name="Upload" className="w-8 h-8 text-[#678CC5] mx-auto mb-2" />
-                          <Text variant="body" color="#678CC5">
+                          <Text isAdmin={true} variant="body" color="#678CC5">
                             Click para subir imagen
                           </Text>
-                          <Text variant="label" color="#A7BDE2">
+                          <Text isAdmin={true} variant="label" color="#A7BDE2">
                             PNG, JPG, WEBP o GIF (máx. 5MB)
                           </Text>
                         </>
@@ -549,7 +547,7 @@ export default function LandingProjectFormModal({
           <Section title="El Desafío">
             <div className="flex flex-col">
               <div className="flex flex-col gap-2">
-                <Text variant="label" color="#265197">Imagen del Desafío</Text>
+                <Text isAdmin={true} variant="label" color="#265197">Imagen del Desafío</Text>
                 {formData.challenge_image ? (
                   <div className="relative border border-[#D4DEED] rounded-[12px] p-3 bg-[#F8FAFC]">
                     <div className="flex items-center gap-4">
@@ -559,14 +557,15 @@ export default function LandingProjectFormModal({
                         className="w-24 h-24 object-cover rounded-lg"
                       />
                       <div className="flex-1 min-w-0">
-                        <Text variant="body" color="#265197" className="truncate block">
+                        <Text isAdmin={true} variant="body" color="#265197" className="truncate block">
                           {formData.challenge_image.split("/").pop()}
                         </Text>
-                        <Text variant="label" color="#678CC5">
+                        <Text isAdmin={true} variant="label" color="#678CC5">
                           Imagen cargada
                         </Text>
                       </div>
                       <Button
+                        isAdmin={true}
                         isIconOnly
                         variant="flat"
                         size="sm"
@@ -590,17 +589,17 @@ export default function LandingProjectFormModal({
                             style={{ width: `${challengeProgress}%` }}
                           />
                         </div>
-                        <Text variant="label" color="#678CC5">
+                        <Text isAdmin={true} variant="label" color="#678CC5">
                           Subiendo... {challengeProgress}%
                         </Text>
                       </div>
                     ) : (
                       <>
                         <Icon name="Upload" className="w-8 h-8 text-[#678CC5] mx-auto mb-2" />
-                        <Text variant="body" color="#678CC5">
+                        <Text isAdmin={true} variant="body" color="#678CC5">
                           Click para subir imagen
                         </Text>
-                        <Text variant="label" color="#A7BDE2">
+                        <Text isAdmin={true} variant="label" color="#A7BDE2">
                           PNG, JPG, WEBP o GIF (máx. 5MB)
                         </Text>
                       </>
@@ -627,7 +626,7 @@ export default function LandingProjectFormModal({
           <Section title="La Solución">
             <div className="flex flex-col">
               <div className="flex flex-col gap-2">
-                <Text variant="label" color="#265197">Imagen de la Solución</Text>
+                <Text isAdmin={true} variant="label" color="#265197">Imagen de la Solución</Text>
                 {formData.solution_image ? (
                   <div className="relative border border-[#D4DEED] rounded-[12px] p-3 bg-[#F8FAFC]">
                     <div className="flex items-center gap-4">
@@ -637,14 +636,15 @@ export default function LandingProjectFormModal({
                         className="w-24 h-24 object-cover rounded-lg"
                       />
                       <div className="flex-1 min-w-0">
-                        <Text variant="body" color="#265197" className="truncate block">
+                        <Text isAdmin={true} variant="body" color="#265197" className="truncate block">
                           {formData.solution_image.split("/").pop()}
                         </Text>
-                        <Text variant="label" color="#678CC5">
+                        <Text isAdmin={true} variant="label" color="#678CC5">
                           Imagen cargada
                         </Text>
                       </div>
                       <Button
+                        isAdmin={true}
                         isIconOnly
                         variant="flat"
                         size="sm"

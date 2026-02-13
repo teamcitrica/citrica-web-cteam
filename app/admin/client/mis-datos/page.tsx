@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { useUserAssets } from "@/hooks/user-assets/use-user-assets";
-import { Col, Container } from "@/styles/07-objects/objects";
-import { Text } from "citrica-ui-toolkit";
+import { Text, Col, Container } from "citrica-ui-toolkit";
 
 export default function MisDatosPage() {
   const router = useRouter();

@@ -1,17 +1,15 @@
 "use client";
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-
 import AssetFormModal from "./components/asset-form-modal";
 import AssetDetailModal from "./components/asset-detail-modal";
 import DeleteAssetModal from "./components/delete-asset-modal";
-
 import { useAssetCRUD, Asset } from "@/hooks/assets/use-assets";
 import { useProjectCRUD } from "@/hooks/projects/use-projects";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { getAssetColumns } from "./columns/asset-columns";
-import { Col, Container } from "@/styles/07-objects/objects";
+import { Text, Col, Container } from "citrica-ui-toolkit";
 
 export default function AssetsPage() {
   const params = useParams();
@@ -143,17 +141,17 @@ export default function AssetsPage() {
 
   return (
     <Container>
-      <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+      <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }}>
         <div>
           <div className="flex items-center gap-3 mb-6">
             <h1 className="text-2xl font-bold text-[#265197]">
-              <span className="text-[#678CC5]">CRM</span> {'>'}{" "}
-              <span
-                className="text-[#678CC5] cursor-pointer hover:text-[#265197] transition-colors"
+              <Text isAdmin={true} variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}
+              <Text isAdmin={true} variant="title" weight="bold" color="#265197"
+                className="cursor-pointer hover:text-[#265197] transition-colors"
                 onClick={handleBackToProjects}
               >
                 Proyectos
-              </span> {'>'} {projectName}
+              </Text> {'>'} {projectName}
             </h1>
           </div>
 

@@ -1,7 +1,5 @@
-import { Container, Col } from "@citrica/objects";
 import Link from "next/link";
-import { Text, Button } from "citrica-ui-toolkit";
-import Icon from "@ui/atoms/icon";
+import { Text, Button, Icon, Container, Col } from "citrica-ui-toolkit";
 import { addToast } from "@heroui/toast";
 
 const ProjectsGallery = () => {

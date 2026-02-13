@@ -2,20 +2,10 @@
 import { Card, CardHeader, CardBody, CardFooter } from "@heroui/card";
 import { Skeleton } from "@heroui/skeleton";
 import { useState, useEffect } from "react";
-import { Col, Container } from "@/styles/07-objects/objects";
-import { Button, Input } from "citrica-ui-toolkit";
+import { Button, Input, Col, Container, Icon, Text } from "citrica-ui-toolkit";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
 import { addToast } from "@heroui/toast";
-import {
-  Database,
-  Upload,
-  Trash2,
-  FileText,
-  Loader2,
-  FolderOpen,
-  CheckCircle,
-  AlertCircle,
-} from "lucide-react";
+import { Divider } from "@heroui/divider";
 
 // Tipo para los storage de documentos
 interface DocumentStorage {
@@ -48,6 +38,7 @@ export default function DatabasesRAGPage() {
   const [selectedStorage, setSelectedStorage] = useState<DocumentStorage | null>(null);
   const [uploadingFiles, setUploadingFiles] = useState<Record<string, boolean>>({});
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [storageToDelete, setStorageToDelete] = useState<DocumentStorage | null>(null);
 
   // Cargar storages al montar el componente
@@ -187,11 +178,11 @@ export default function DatabasesRAGPage() {
   const getStatusIcon = (status: DocumentStorage["status"]) => {
     switch (status) {
       case "ready":
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
+        return <Icon name="CheckCircle" size={16} color="#22c55e" />;
       case "processing":
-        return <Loader2 className="w-5 h-5 text-yellow-500 animate-spin" />;
+        return <Icon name="Loader2" size={16} color="#eab308" className="animate-spin" />;
       case "error":
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
+        return <Icon name="AlertCircle" size={16} color="#ef4444" />;
     }
   };
 
@@ -208,44 +199,61 @@ export default function DatabasesRAGPage() {
 
   return (
     <Container>
-      <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+      <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }}>
         <div>
           {/* Header */}
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-[#265197] mb-2">
-              <span className="text-[#678CC5]">IA</span> {'>'} Bases de Datos RAG
+          <div className="mb-4">
+            <h1 className="text-2xl font-bold text-[#265197]">
+              <Text isAdmin={true} variant="title" weight="bold" color="#678CC5">IA</Text> {'>'}  <Text isAdmin={true} variant="title" weight="bold" color="#16305A">Bases de Datos RAG</Text>
             </h1>
-            <p className="text-sm text-gray-600">
-              Gestiona tus storages de documentos para el sistema RAG
+            <p>
+              <Text isAdmin={true} variant="label" color="#16305A">Gestiona tus storages de documentos para el sistema RAG</Text>
             </p>
           </div>
 
           {/* Info Card */}
           <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
-            <div className="flex items-start gap-3">
-              <Database className="w-6 h-6 text-[#265197] mt-1" />
+            <div className="flex items-start gap-2">
+              <Icon name="Database" size={24} color="#16305A" />
               <div>
-                <h3 className="font-semibold text-[#265197] mb-1">
-                  Gemini File Search + Vector Stores
+                <h3 className="mb-1">
+                  <Text isAdmin={true} variant="body" weight="bold" color="#16305A">Gemini File Search + Vector Stores</Text>
                 </h3>
-                <p className="text-sm text-gray-700">
-                  Los documentos se suben a Gemini File API y se procesan automáticamente.
-                  Gemini genera los embeddings y realiza búsquedas vectoriales internamente,
-                  proporcionando respuestas contextualizadas en el chat.
+                <p>
+                  <Text isAdmin={true} variant="body" color="#265197">
+                    Los documentos se suben a Gemini File API y se procesan automáticamente.
+                    Gemini genera los embeddings y realiza búsquedas vectoriales internamente,
+                    proporcionando respuestas contextualizadas en el chat.
+                  </Text>
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Botón Crear Storage */}
-          <div className="mb-6">
-            <Button isAdmin variant="primary"
-              style={{ backgroundColor: "#42668A" }} onClick={() => setIsCreateModalOpen(true)}>
-              <FolderOpen className="w-5 h-5" />
-              Nuevo Storage
-            </Button>
+          {/* Barra de búsqueda y botón Crear Storage */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <Input
+              type="text"
+              placeholder="Buscar storages..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              startContent={<Icon size={16} color="#265197" name="Search" />}
+              className="w-full sm:w-64"
+              variant="faded"
+              classNames={{
+                inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                label: "!text-[#265197]",
+                input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+              }}
+            />
+            <Button
+              isAdmin
+              variant="primary"
+              startContent={<Icon size={16} name="Plus" />}
+              onClick={() => setIsCreateModalOpen(true)}
+              label="Nuevo Storage"
+            />
           </div>
-
           {/* Grid de Storage Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Skeleton Loader */}
@@ -255,7 +263,7 @@ export default function DatabasesRAGPage() {
                   <Card key={i} className="w-full">
                     <CardHeader className="bg-gradient-to-r from-[#265197] to-[#42668A] p-4">
                       <Skeleton className="w-3/4 h-6 rounded-lg bg-white/20" />
-                    
+
                     </CardHeader>
                     <CardBody className="p-4">
                       <div className="grid grid-cols-2 gap-3 mb-4">
@@ -273,27 +281,29 @@ export default function DatabasesRAGPage() {
               </>
             ) : storages.length === 0 ? (
               <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
-                <FolderOpen className="w-16 h-16 text-gray-300 mb-3" />
+                <Icon name="FolderOpen" size={64} color="#9CA3AF" />
                 <h3 className="text-lg font-semibold text-gray-600 mb-1">
-                  No hay storages creados
+                  <Text isAdmin={true} variant="body" weight="bold" color="#16305A">No hay storages creados</Text>
                 </h3>
                 <p className="text-sm text-gray-500">
-                  Crea tu primer storage para comenzar a subir documentos
+                  <Text isAdmin={true} variant="body" color="#4B5563">
+                    Crea tu primer storage para comenzar a subir documentos
+                  </Text>
                 </p>
               </div>
             ) : (
-              storages.map((storage) => (
+              storages.filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase())).map((storage) => (
                 <Card
                   key={storage.id}
                   onPress={() => setSelectedStorage(storage)}
                   className="w-full hover:scale-[1.02] transition-transform"
                 >
-                  <CardHeader className="bg-gradient-to-r from-[#265197] to-[#42668A] p-4 flex-col items-start">
+                  <CardHeader className="p-4 flex-col items-start">
                     <div className="flex items-start justify-between w-full">
                       <div className="flex items-center gap-2">
-                        <Database className="w-6 h-6 text-white" />
-                        <h3 className="text-white font-bold text-lg truncate">
-                          {storage.name}
+                        <Icon name="Database" size={16} color="#16305A" />
+                        <h3 className="truncate">
+                          <Text isAdmin={true} variant="body" weight="bold" color="#16305A">{storage.name}</Text>
                         </h3>
                       </div>
                       <div
@@ -311,44 +321,48 @@ export default function DatabasesRAGPage() {
                           }
                         }}
                       >
-                        <Trash2 className="w-5 h-5" />
+                        <Icon name="Trash2" size={20} color="#EF4444" />
                       </div>
                     </div>
                     <p className="text-blue-100 text-sm mt-1">
-                      {storage.description}
+                      <Text isAdmin={true} variant="label" color="#265197">{storage.description || "Chat"}</Text>
                     </p>
                   </CardHeader>
+
+                  <Divider />
 
                   <CardBody className="p-4">
                     {/* Stats */}
                     <div className="grid grid-cols-2 gap-3 mb-4">
                       <div className="bg-gray-50 p-3 rounded-lg">
-                        <div className="text-xs text-gray-500 mb-1">Archivos</div>
+                        <div className="text-xs text-gray-500 mb-1">
+                          <Text isAdmin={true} variant="label" color="#4B5563">Archivos</Text>
+                        </div>
                         <div className="text-xl font-bold text-[#265197]">
-                          {storage.fileCount}
+                          <Text isAdmin={true} variant="body" color="#265197">{storage.fileCount}</Text>
                         </div>
                       </div>
                       <div className="bg-gray-50 p-3 rounded-lg">
-                        <div className="text-xs text-gray-500 mb-1">Tamaño</div>
+                        <div className="text-xs text-gray-500 mb-1">
+                          <Text isAdmin={true} variant="label" color="#4B5563">Tamaño</Text>
+                        </div>
                         <div className="text-xl font-bold text-[#265197]">
-                          {formatFileSize(storage.totalSize)}
+                          <Text isAdmin={true} variant="body" color="#265197">{formatFileSize(storage.totalSize)}</Text>
                         </div>
                       </div>
                     </div>
 
                     {/* Estado */}
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600">Estado:</span>
+                    <div className="grid grid-cols-2 gap-3 items-center">
+                      <div className="flex items-center gap-2">
+                        <Text isAdmin={true} variant="label" color="#4B5563">Estado:</Text>
                         <div className="flex items-center gap-1">
                           {getStatusIcon(storage.status)}
-                          <span className="text-xs font-medium">
-                            {getStatusText(storage.status)}
-                          </span>
+                          <Text isAdmin={true} variant="label" color="#265197">{getStatusText(storage.status)}</Text>
                         </div>
                       </div>
-                      <div className="text-xs text-gray-500">
-                        Creado: {new Date(storage.createdAt).toLocaleDateString("es-ES")}
+                      <div className="flex items-center justify-end">
+                        <Text isAdmin={true} variant="label" color="#4B5563">Creado: {new Date(storage.createdAt).toLocaleDateString("es-ES")}</Text>
                       </div>
                     </div>
                   </CardBody>
@@ -362,12 +376,12 @@ export default function DatabasesRAGPage() {
                     >
                       {uploadingFiles[storage.id] ? (
                         <>
-                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <Icon name="Loader2" size={20} className="animate-spin" />
                           <span className="text-sm font-medium">Subiendo...</span>
                         </>
                       ) : (
                         <>
-                          <Upload className="w-5 h-5" />
+                          <Icon name="Upload" size={20} />
                           <span className="text-sm font-medium">
                             Subir Archivos
                           </span>

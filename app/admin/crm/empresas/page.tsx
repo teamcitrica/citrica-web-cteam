@@ -1,17 +1,14 @@
 "use client";
 import { Divider } from "@heroui/divider";
 import { useState, useCallback, useMemo } from "react";
-
 import CreateCompanyModal from "./components/create-company-modal";
 import CompanyDetailModal from "./components/company-detail-modal";
 import EditCompanyModal from "./components/edit-company-modal";
 import DeleteCompanyModal from "./components/delete-company-modal";
 import { getCompanyColumns, getCompanyExportColumns } from "./columns/company-columns";
-
 import { useCompanyCRUD, Company } from "@/hooks/companies/use-companies";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
-import { Col, Container } from "@/styles/07-objects/objects";
-import { Text } from 'citrica-ui-toolkit';
+import { Text, Col, Container } from 'citrica-ui-toolkit';
 import { createBuilding } from "@/public/icon-svg/icon-create-building";
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
 
@@ -95,10 +92,10 @@ export default function EmpresasPage() {
 
   return (
     <Container>
-      <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+      <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="">
           <h1 className="text-2xl font-bold text-[#265197] mb-5">
-            <Text variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text variant="title" weight="bold" color="#265197">Empresas</Text>
+            <Text isAdmin={true} variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text isAdmin={true} variant="title" weight="bold" color="#265197">Empresas</Text>
           </h1>
 
           <DataTable<Company>

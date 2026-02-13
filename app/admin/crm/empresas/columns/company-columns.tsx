@@ -1,10 +1,9 @@
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import React from "react";
-import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { ExportColumn } from "@/shared/hooks/useTableFeatures";
 import { Company } from "@/hooks/companies/use-companies";
-import { Text, Button } from 'citrica-ui-toolkit';
+import { Text, Button, Icon } from 'citrica-ui-toolkit';
 import { AvatarTables } from "@/public/icon-svg/avatar-tables";
 import { getAvatarColor } from "@/shared/utils/avatar-colors";
 
@@ -29,8 +28,8 @@ export const getCompanyColumns = ({
       <div className="flex items-center gap-3">
         <AvatarTables color={getAvatarColor(company.name || "Company")} size={32} />
         <div className="flex flex-col">
-          <Text variant="body" weight="bold" color="#16305A">{company.name || "-"}</Text>
-          <Text variant="label" color="#678CC5" className="truncate max-w-[200px]">{company.sector || "-"}</Text>
+          <Text isAdmin={true} variant="body" weight="bold" color="#16305A">{company.name || "-"}</Text>
+          <Text isAdmin={true} variant="label" color="#678CC5" className="truncate max-w-[200px]">{company.sector || "-"}</Text>
         </div>
       </div>
     ),
@@ -46,8 +45,8 @@ export const getCompanyColumns = ({
       const relation = company.types_contact?.name || "-";
       return (
         <div className="flex flex-col items-start">
-          <Text variant="body" weight="bold" color="#16305A">{relation}</Text>
-          <Text variant="label" color="#678CC5">{location}</Text>
+          <Text isAdmin={true} variant="body" weight="bold" color="#16305A">{relation}</Text>
+          <Text isAdmin={true} variant="label" color="#678CC5">{location}</Text>
         </div>
       );
     },
@@ -66,7 +65,7 @@ export const getCompanyColumns = ({
             className="flex items-center gap-2 text-[#16305A] hover:text-green-700"
           >
             <Icon size={12} name="Phone" />
-            <Text variant="body" weight="bold" color="#16305A">{company.contact_phone}</Text>
+            <Text isAdmin={true} variant="body" weight="bold" color="#16305A">{company.contact_phone}</Text>
           </a>
         )}
         {company.contact_email && (
@@ -75,7 +74,7 @@ export const getCompanyColumns = ({
             className="flex items-center gap-2 text-[#678CC5] hover:text-blue-700"
           >
             <Icon size={12} name="Mail" />
-            <Text variant="label" color="#678CC5">{company.contact_email}</Text>
+            <Text isAdmin={true} variant="label" color="#678CC5">{company.contact_email}</Text>
           </a>
         )}
         {!company.contact_phone && !company.contact_email && (
@@ -95,6 +94,7 @@ export const getCompanyColumns = ({
         onClick={(e) => e.stopPropagation()}
       >
         <Button
+          isAdmin={true}
           isIconOnly
           variant="flat"
           onPress={() => onView(company)}
@@ -105,7 +105,7 @@ export const getCompanyColumns = ({
 
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0 hover:!bg-transparent">
+            <Button isAdmin={true} isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0 hover:!bg-transparent">
               <Icon className="text-[#265197] w-5 h-5" name="EllipsisVertical" />
             </Button>
           </DropdownTrigger>

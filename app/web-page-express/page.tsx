@@ -1,7 +1,6 @@
 "use client"
 import React from 'react'
-import { Container, Col } from '@citrica/objects'
-import { Text, Button } from 'citrica-ui-toolkit'
+import { Text, Button, Container, Col } from 'citrica-ui-toolkit'
 import Icon from '@ui/atoms/icon'
 import { addToast } from "@heroui/toast"
 import DotGrid from '../versions/yolanda/components/DotGrid'

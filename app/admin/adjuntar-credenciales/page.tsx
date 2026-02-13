@@ -1,14 +1,11 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { Button } from "citrica-ui-toolkit";
-import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import { Button,  Col, Container, Icon } from "citrica-ui-toolkit";
 import AttachCredentialsModal from "./components/modal-attach-credentials";
 import ViewCredentialModal from "./components/modal-view-credential";
 import EditCredentialModal from "./components/modal-edit-credential";
 import DeleteCredentialModal from "./components/modal-delete-credential";
 import { useCredentials, CredentialType } from "@/hooks/use-credentials";
-import { Col, Container } from "@/styles/07-objects/objects";
 
 export default function AdjuntarCredencialesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,7 +52,7 @@ export default function AdjuntarCredencialesPage() {
         </div>
         <Button
           color="primary"
-          startContent={<Plus size={20} />}
+          startContent={<Icon name="Plus" size={20} />}
           onPress={() => setIsModalOpen(true)}
         >
           Adjuntar Credenciales
@@ -107,21 +104,21 @@ export default function AdjuntarCredencialesPage() {
                           className="p-2 text-green-600 hover:bg-green-50 rounded"
                           title="Ver detalles"
                         >
-                          <Eye size={18} />
+                          <Icon name="Eye" size={18} />
                         </button>
                         <button
                           onClick={() => handleEdit(credential)}
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded"
                           title="Editar"
                         >
-                          <Pencil size={18} />
+                          <Icon name="Pencil" size={18} />
                         </button>
                         <button
                           onClick={() => handleDelete(credential)}
                           className="p-2 text-red-600 hover:bg-red-50 rounded"
                           title="Eliminar"
                         >
-                          <Trash2 size={18} />
+                          <Icon name="Trash2" size={18} />
                         </button>
                       </div>
                     </td>

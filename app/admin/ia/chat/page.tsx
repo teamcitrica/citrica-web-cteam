@@ -1,7 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { Col, Container } from "@/styles/07-objects/objects";
-import { Button, Select } from "citrica-ui-toolkit";
+import { Button, Select, Col, Container, Text, Icon } from "citrica-ui-toolkit";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
 import {
   Send,
@@ -205,7 +204,7 @@ export default function ChatPage() {
 
       // Detectar error 503 (modelo sobrecargado)
       const is503Error = error?.message?.includes("overloaded") ||
-                         error?.message?.includes("503");
+        error?.message?.includes("503");
 
       let errorContent = "❌ Lo siento, ocurrió un error al procesar tu mensaje. Por favor intenta de nuevo.";
 
@@ -242,10 +241,10 @@ export default function ChatPage() {
 
   return (
     <Container>
-      <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+      <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="h-[calc(100vh-120px)] flex flex-col">
-          <h1 className="text-2xl font-bold text-[#265197] mb-4">
-            <span className="text-[#678CC5]">IA</span> {'>'} Chat RAG
+          <h1 className="text-2xl font-bold text-[#265197]">
+            <Text isAdmin={true} variant="title" weight="bold" color="#678CC5">IA</Text> {'>'}  <Text isAdmin={true} variant="title" weight="bold" color="#16305A">Chat RAG</Text>
           </h1>
 
           {/* Selectores */}
@@ -311,7 +310,7 @@ export default function ChatPage() {
                 variant="secondary"
                 style={{ backgroundColor: "#dc2626", color: "white", minWidth: "auto" }}
               >
-                <Trash2 className="w-4 h-4" />
+                <Icon name="Trash2" size={16} />
               </Button>
             </div>
           </div>
@@ -321,106 +320,104 @@ export default function ChatPage() {
             {isLoadingHistory ? (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
-                  <Loader2 className="w-8 h-8 text-[#265197] animate-spin mx-auto mb-2" />
+                  <Icon name="Loader2" size={32} color="#265197" className="animate-spin mx-auto mb-2" />
                   <p className="text-sm text-gray-500">Cargando historial...</p>
                 </div>
               </div>
             ) : (
               <>
                 {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex gap-3 ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
-                {message.role === "assistant" && (
-                  <div className="w-8 h-8 rounded-full bg-[#265197] flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-5 h-5 text-white" />
-                  </div>
-                )}
-
-                <div
-                  className={`max-w-[70%] rounded-lg p-4 ${
-                    message.role === "user"
-                      ? "bg-[#265197] text-white"
-                      : "bg-gray-100 text-gray-800"
-                  }`}
-                >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-
-                  {message.isError && message.retryMessage && (
-                    <div className="mt-3 pt-3 border-t border-gray-300">
-                      <button
-                        onClick={() => handleSendMessage(message.retryMessage)}
-                        disabled={isLoading}
-                        className="flex items-center gap-2 px-4 py-2 bg-[#265197] text-white rounded-lg hover:bg-[#1e3f73] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                      >
-                        <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                        <span>Reintentar</span>
-                      </button>
-                    </div>
-                  )}
-
-                  {message.sources && message.sources.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-300">
-                      <div className="flex items-center gap-1 mb-2">
-                        <Sparkles className="w-3 h-3 text-[#265197]" />
-                        <span className="text-xs font-semibold text-[#265197]">
-                          Fuentes consultadas:
-                        </span>
+                  <div
+                    key={message.id}
+                    className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"
+                      }`}
+                  >
+                    {message.role === "assistant" && (
+                      <div className="w-8 h-8 rounded-full bg-[#265197] flex items-center justify-center flex-shrink-0">
+                        <Icon name="Bot" size={16} color="white" />
                       </div>
-                      {message.sources.map((source, idx) => (
-                        <div
-                          key={idx}
-                          className="text-xs text-gray-600 flex items-center gap-2 mt-1"
-                        >
-                          <span>📄 {source.document}</span>
-                          <span className="text-green-600 font-semibold">
-                            ✓ Usado como contexto
-                          </span>
+                    )}
+
+                    <div
+                      className={`max-w-[70%] rounded-lg p-4 ${message.role === "user"
+                          ? "bg-[#265197] text-white"
+                          : "bg-gray-100 text-gray-800"
+                        }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+
+                      {message.isError && message.retryMessage && (
+                        <div className="mt-3 pt-3 border-t border-gray-300">
+                          <button
+                            onClick={() => handleSendMessage(message.retryMessage)}
+                            disabled={isLoading}
+                            className="flex items-center gap-2 px-4 py-2 bg-[#265197] text-white rounded-lg hover:bg-[#1e3f73] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                          >
+                            <Icon name="RefreshCw" size={16} className={`${isLoading ? 'animate-spin' : ''}`} />
+                            <span>Reintentar</span>
+                          </button>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      )}
 
-                  {message.usage && (
-                    <div className="mt-2 pt-2 border-t border-gray-300">
-                      <div className="flex items-center gap-3 text-xs text-gray-600">
-                        <span>🔢 {message.usage.totalTokens} tokens</span>
-                        <span>💰 ${message.usage.estimatedCost.toFixed(6)}</span>
+                      {message.sources && message.sources.length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-gray-300">
+                          <div className="flex items-center gap-1 mb-2">
+                            <Icon name="Sparkles" size={12} color="#265197" />
+                            <span className="text-xs font-semibold text-[#265197]">
+                              Fuentes consultadas:
+                            </span>
+                          </div>
+                          {message.sources.map((source, idx) => (
+                            <div
+                              key={idx}
+                              className="text-xs text-gray-600 flex items-center gap-2 mt-1"
+                            >
+                              <span>📄 {source.document}</span>
+                              <span className="text-green-600 font-semibold">
+                                ✓ Usado como contexto
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {message.usage && (
+                        <div className="mt-2 pt-2 border-t border-gray-300">
+                          <div className="flex items-center gap-3 text-xs text-gray-600">
+                            <span>🔢 {message.usage.totalTokens} tokens</span>
+                            <span>💰 ${message.usage.estimatedCost.toFixed(6)}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      <span className="text-xs opacity-70 mt-2 block">
+                        {message.timestamp.toLocaleTimeString("es-ES", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+
+                    {message.role === "user" && (
+                      <div className="w-8 h-8 rounded-full bg-[#678CC5] flex items-center justify-center flex-shrink-0">
+                        <Icon name="User" size={16} color="white" />
                       </div>
+                    )}
+                  </div>
+                ))}
+
+                {isLoading && (
+                  <div className="flex gap-3 justify-start">
+                    <div className="w-8 h-8 rounded-full bg-[#265197] flex items-center justify-center flex-shrink-0">
+                      <Icon name="Bot" size={16} color="white" />
                     </div>
-                  )}
-
-                  <span className="text-xs opacity-70 mt-2 block">
-                    {message.timestamp.toLocaleTimeString("es-ES", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                </div>
-
-                {message.role === "user" && (
-                  <div className="w-8 h-8 rounded-full bg-[#678CC5] flex items-center justify-center flex-shrink-0">
-                    <User className="w-5 h-5 text-white" />
+                    <div className="bg-gray-100 rounded-lg p-4">
+                      <Icon name="Loader2" size={20} color="#265197" className="animate-spin" />
+                    </div>
                   </div>
                 )}
-              </div>
-            ))}
 
-            {isLoading && (
-              <div className="flex gap-3 justify-start">
-                <div className="w-8 h-8 rounded-full bg-[#265197] flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-5 h-5 text-white" />
-                </div>
-                <div className="bg-gray-100 rounded-lg p-4">
-                  <Loader2 className="w-5 h-5 text-[#265197] animate-spin" />
-                </div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
+                <div ref={messagesEndRef} />
               </>
             )}
           </div>
@@ -437,18 +434,19 @@ export default function ChatPage() {
                 disabled={isLoading}
                 className="w-full text-black px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#265197] disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
-              <MessageSquare className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Icon name="MessageSquare" size={16} color="#9ca3af" className="absolute right-3 top-1/2 transform -translate-y-1/2" />
             </div>
             <Button
               isAdmin
+              variant="primary"
               onClick={() => handleSendMessage()}
               disabled={!inputMessage.trim() || isLoading}
             >
               {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Icon name="Loader2" size={20} color="#265197" className="animate-spin" />
               ) : (
                 <>
-                  <Send className="w-5 h-5" />
+                  <Icon name="Send" size={16} color="white" />
                   <span>Enviar</span>
                 </>
               )}
@@ -457,8 +455,10 @@ export default function ChatPage() {
 
           {/* Información adicional */}
           <div className="mt-3 text-xs text-gray-500 text-center">
-            💡 Este chat utiliza RAG (Retrieval-Augmented Generation) con embeddings
-            de Gemini para proporcionar respuestas contextualizadas
+            <Text variant="label" weight="light" className="text-gray-500">
+              💡 Este chat utiliza RAG (Retrieval-Augmented Generation) con embeddings
+              de Gemini para proporcionar respuestas contextualizadas
+            </Text>
           </div>
         </div>
       </Col>

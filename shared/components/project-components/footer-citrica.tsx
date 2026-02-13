@@ -1,10 +1,8 @@
 "use client"
 import { Divider } from "@heroui/divider";
 import { Link } from "@heroui/link";
-import { Col, Container } from '@/styles/07-objects/objects'
 import React from 'react'
-import { Icon } from '../citrica-ui'
-import { Text } from 'citrica-ui-toolkit'
+import { Text, Icon, Col, Container } from 'citrica-ui-toolkit'
 
 export const FooterCitrica = () => {
   return (
@@ -33,40 +31,40 @@ export const FooterCitrica = () => {
               </Text>
             </h2>
             <div className="flex flex-col justify-center items-center gap-1">
-                          <div className="flex items-center space-x-2">
-                            <Icon name="Mail" color="#FFFFFF" size={20} />
-                            <Link href="mailto:contacto@citrica.dev">
-                              <Text variant="body" color="#FFFFFF" weight="bold">
-                                contacto@citrica.dev
-                              </Text>
-                            </Link>
-                          </div>
-                          <div className="flex gap-4">
-                            <div className="flex items-center space-x-2">
-                              <Icon name="Phone" color="#FFFFFF" size={20} />
-                              <Link
-                                href="tel:+51942627383"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <Text variant="body" color="#FFFFFF" weight="bold">
-                                  Perú: +51 942 627 383
-                                </Text>
-                              </Link>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Link
-                                href="tel:+59892041487"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <Text variant="body" color="#FFFFFF" weight="bold">
-                                  Uruguay: +598 92 041487
-                                </Text>
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
+              <div className="flex items-center space-x-2">
+                <Icon name="Mail" color="#FFFFFF" size={20} />
+                <Link href="mailto:contacto@citrica.dev">
+                  <Text variant="body" color="#FFFFFF" weight="bold">
+                    contacto@citrica.dev
+                  </Text>
+                </Link>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex items-center space-x-2">
+                  <Icon name="Phone" color="#FFFFFF" size={20} />
+                  <Link
+                    href="tel:+51942627383"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Text variant="body" color="#FFFFFF" weight="bold">
+                      Perú: +51 942 627 383
+                    </Text>
+                  </Link>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Link
+                    href="tel:+59892041487"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Text variant="body" color="#FFFFFF" weight="bold">
+                      Uruguay: +598 92 041487
+                    </Text>
+                  </Link>
+                </div>
+              </div>
+            </div>
           </Col>
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mt-8">
             <Divider className="mb-8 bg-gray-800" />

@@ -27,7 +27,7 @@ export const siteConfig = {
 	subItemSearchParam: SUBITEM_SEARCH_PARAM, // FOR SUBSECTIONS IN SIDEBAR
 	sidebarItems: [
 		{
-			title: "USUARIOS DE SISTEMA",
+			title: "USUARIOS DEL SISTEMA",
 			icon: "Users",
 			href: "/admin/users",
 			allowedRoles: [ROL_ADMIN],

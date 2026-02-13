@@ -1,8 +1,7 @@
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { Asset } from "@/hooks/assets/use-assets";
-import Icon from "@ui/atoms/icon";
-import { Button } from "citrica-ui-toolkit";
+import { Button, Icon } from "citrica-ui-toolkit";
 
 type AssetColumnsConfig = {
   onView: (asset: Asset) => void;
@@ -56,6 +55,7 @@ export const getAssetColumns = ({
         onClick={(e) => e.stopPropagation()}
       >
         <Button
+          isAdmin={true}
           isIconOnly
           variant="flat"
           onPress={() => onView(asset)}
@@ -66,7 +66,7 @@ export const getAssetColumns = ({
 
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0 hover:!bg-transparent">
+            <Button isAdmin={true} isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0 hover:!bg-transparent">
               <Icon className="text-[#265197] w-5 h-5" name="EllipsisVertical" />
             </Button>
           </DropdownTrigger>
