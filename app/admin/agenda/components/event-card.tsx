@@ -1,9 +1,7 @@
 "use client";
-
 import React, { useState } from "react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
-import { Button } from "citrica-ui-toolkit";
-import Icon from "@ui/atoms/icon";
+import { Button, Text, Icon } from "citrica-ui-toolkit";
 import { Reserva, ReservaEstado } from "@/hooks/reservas/use-reservas";
 import { STATUS_CONFIG } from "../booking-calendar-view";
 
@@ -67,21 +65,21 @@ const EventCard: React.FC<EventCardProps> = ({ booking, onStatusChange, onDelete
       <div className="p-3">
         {/* Fila superior: Hora + Badge de estado + Menú */}
         <div className="flex items-center justify-between pb-2 border-b border-[#D4DEED]">
-          <span className="text-[14px] font-bold text-[#265197]">
+          <Text isAdmin={true} variant="body" weight="bold" color="#16305A">
             {timeLabel}
-          </span>
+          </Text>
 
           <div className="flex items-center gap-0.5">
             {/* Badge de estado */}
-            <span
-              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium text-[#265197] bg-white border border-[#A7BDE2]"
+            <Text isAdmin={true} variant="label" color="#16305A"
+              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white border border-[#A7BDE2]"
             >
               <span
                 className="w-2 h-2 rounded-full"
                 style={{ backgroundColor: statusConfig.color }}
               />
               {statusConfig.label}
-            </span>
+            </Text>
 
             {/* Divider vertical + Menú de 3 puntos */}
             <span className="w-px self-stretch bg-[#D4DEED] ml-2.5" />
@@ -137,17 +135,15 @@ const EventCard: React.FC<EventCardProps> = ({ booking, onStatusChange, onDelete
           className="flex items-center justify-between gap-0.5 cursor-pointer pt-2"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <span
-            className={`text-[15px] font-bold text-[#265197] ${!isExpanded ? "truncate" : ""}`}
-          >
+          <Text isAdmin={true} variant="body" weight="bold" color="#16305A" className={`${!isExpanded ? "truncate" : ""}`}>
             {booking.name || "Sin nombre"}
-          </span>
+          </Text>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="w-px self-stretch bg-[#D4DEED]" />
+            <span className="w-px self-stretch bg-[#D4DEED]"/>
             <Icon
               name={isExpanded ? "ChevronUp" : "ChevronDown"}
               size={18}
-              className="text-[#265197]"
+              color="#265197"
             />
           </div>
         </div>
@@ -165,20 +161,20 @@ const EventCard: React.FC<EventCardProps> = ({ booking, onStatusChange, onDelete
 
           {/* Email */}
           {booking.email && (
-            <p className="text-xs text-[#265197] mb-2">
-              {booking.email}
+            <p className="mb-2">
+              <Text isAdmin={true} variant="label" color="#265197">{booking.email}</Text>
             </p>
           )}
 
           {/* Mensaje */}
           {booking.message && (
-            <div className="mt-1 pt-2 border-t border-[#D4DEED]">
-              <p className="text-[12px] font-extrabold text-[#265197] mb-1">
+            <div className="mt-1 pt-2 border-t border-[#D4DEED] flex flex-col">
+              <Text isAdmin={true} weight="bold" color="#16305A">
                 Mensaje
-              </p>
-              <p className="text-xs text-[#265197] leading-relaxed">
+              </Text>
+              <Text isAdmin={true} variant="label" color="#265197" className="leading-relaxed">
                 {booking.message}
-              </p>
+              </Text>
             </div>
           )}
         </div>

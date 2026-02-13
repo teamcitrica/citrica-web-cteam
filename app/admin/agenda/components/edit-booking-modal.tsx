@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button, Input, Select } from "citrica-ui-toolkit";
+import { Button, Input, Select, Text } from "citrica-ui-toolkit";
 import { Textarea } from "@heroui/input";
+import { Checkbox } from "@heroui/checkbox";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 import { Reserva, ReservaEstado } from "@/hooks/reservas/use-reservas";
 import { STATUS_CONFIG } from "../booking-calendar-view";
@@ -227,15 +228,19 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
         className="mt-4"
       />
       {status === "reminder" && (
-        <label className="flex items-center gap-2 mt-4 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={recurring}
-            onChange={(e) => setRecurring(e.target.checked)}
-            className="w-4 h-4 rounded border-[#D4DEED] accent-[#265197]"
+        <div className="flex items-center mt-4">
+          <Checkbox
+            isSelected={recurring}
+            onValueChange={setRecurring}
+            classNames={{
+              wrapper: "border border-gray-300 before:border-0 after:bg-[#00226c]",
+              icon: "text-white"
+            }}
           />
-          <span className="text-sm text-[#265197]">Repetir cada año</span>
-        </label>
+          <Text variant="label" textColor="color-black" className="opacity-60">
+            Repetir cada año
+          </Text>
+        </div>
       )}
     </DrawerCitricaAdmin>
   );

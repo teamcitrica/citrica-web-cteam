@@ -1,10 +1,7 @@
 "use client";
 import React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Container, Col } from "@citrica/objects";
-import { Button, Text } from "citrica-ui-toolkit";
-import Icon from "@ui/atoms/icon";
-
+import { Button, Text, Container, Col, Icon } from "citrica-ui-toolkit";
 import WeeklyScheduleManager from "./components/weekly-schedule-manager";
 import UnifiedAvailabilityManager from "./components/unified-availability-manager";
 
@@ -35,7 +32,10 @@ const DisponibilidadAdminPage = () => {
 
   return (
     <Container>
-      <Col cols={{ lg: 12, md: 6, sm: 4 }} className="space-y-6">
+      <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }} className="space-y-6">
+        <h1 className="text-2xl font-bold text-[#265197] mb-5">
+          <Text isAdmin={true} variant="title" weight="bold" color="#678CC5">AGENDA</Text> {'>'}  <Text isAdmin={true} variant="title" weight="bold" color="#265197">Disponibilidad</Text>
+        </h1>
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="flex items-center gap-3">

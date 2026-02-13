@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter, DrawerProps } from "@heroui/drawer";
 import { Text } from "citrica-ui-toolkit";
@@ -49,7 +48,7 @@ export const DrawerCitricaAdmin: React.FC<DrawerCitricaAdminProps> = ({
         {title && (
           <DrawerHeader className="flex flex-col gap-1 border-b" style={{ borderColor: '#D4DEED' }}>
             <h3>
-              <Text variant="subtitle" color="#16305A" weight="bold">
+              <Text isAdmin={true} variant="subtitle" color="#16305A" weight="bold">
                 {title}
               </Text>
             </h3>

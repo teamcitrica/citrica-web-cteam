@@ -1,8 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Container, Col } from '@citrica/objects'
-import { Button, Text, Input } from 'citrica-ui-toolkit'
+import { Button, Text, Input, Container, Col } from 'citrica-ui-toolkit'
 import { Card, CardBody } from "@heroui/card"
 import { addToast } from "@heroui/toast"
 import { UserAuth } from '@/shared/context/auth-context'

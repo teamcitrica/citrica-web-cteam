@@ -1,8 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { Container, Col } from '@/styles/07-objects/objects';
-import { Text, Button } from 'citrica-ui-toolkit';
-import Icon from '@/shared/components/citrica-ui/atoms/icon';
+import { Text, Button, Container, Col, Icon } from 'citrica-ui-toolkit';
 import Card from '@/shared/components/citrica-ui/atoms/card';
 
 const CitricaWireframe = () => {

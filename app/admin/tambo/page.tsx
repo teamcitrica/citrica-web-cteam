@@ -1,11 +1,8 @@
 "use client";
-import { Select, Input } from "citrica-ui-toolkit";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { useState, useCallback, useMemo } from "react";
-import Icon from "@/shared/components/citrica-ui/atoms/icon";
-import { Text } from "citrica-ui-toolkit";
-import { Col, Container } from "@/styles/07-objects/objects";
+import { Text, Col, Container, Select, Input } from "citrica-ui-toolkit";
 import { UserAuth } from "@/shared/context/auth-context";
 import { useExcelExport } from "@/hooks/use-excel-export";
 

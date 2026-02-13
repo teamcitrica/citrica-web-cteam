@@ -1,9 +1,7 @@
 "use client";
-
-import { Col, Container } from '@/styles/07-objects/objects'
 import React from 'react'
-import { Icon, Input, Textarea } from '../citrica-ui'
-import { Button, Text } from 'citrica-ui-toolkit'
+import {  Input, Textarea } from '../citrica-ui'
+import { Button, Text, Icon, Col, Container } from 'citrica-ui-toolkit'
 import { useContact } from '@/hooks/leads/use-leads'
 import AnimatedContent from './animated-content'
 import CalendarComponent from './calendar'
@@ -77,7 +75,7 @@ export const ContactSectionLanding = ({
 
   return (
     <>
-      <section className="py-[80px] bg-color-ct-surface-container">
+      <section id="contact" className="py-[80px] bg-color-ct-surface-container">
         <Container>
           <Col cols={{ lg: 6, md: 3, sm: 4 }}>
             <div className="mb-6">
@@ -242,7 +240,7 @@ export const ContactSectionLanding = ({
                         Tus datos
                       </Text>
                     </h3>
-                    <div className="flex flex-col gap-4 w-full mb-8">
+                    <div className="flex flex-col gap-3 w-full mb-8">
                       <Input
                         name="name"
                         label="Nombre"
@@ -274,7 +272,7 @@ export const ContactSectionLanding = ({
                       <Textarea
                         name="message"
                         label="Mensaje"
-                        placeholder="Cuéntanos sobre tu negocio y qué solución digital necesitas"
+                        placeholder="Cuéntanos sobre tu negocio y qué solución digital necesitas..."
                         variant="bordered"
                         color="primary"
                         radius="sm"
@@ -284,7 +282,7 @@ export const ContactSectionLanding = ({
                         className='!p-0'
                       />
                     </div>
-                    <div className="flex gap-4 w-full max-w-[380px] mx-auto">
+                    <div className="flex gap-4 w-full max-w-[380px]">
                       <Button
                         type="button"
                         label="Anterior"
@@ -326,7 +324,7 @@ export const ContactSectionLanding = ({
                       />
                     </div>
 
-                    <div className="flex gap-4 w-full max-w-[380px] mx-auto">
+                    <div className="flex flex-end gap-4">
                       <Button
                         type="button"
                         label="Siguiente"

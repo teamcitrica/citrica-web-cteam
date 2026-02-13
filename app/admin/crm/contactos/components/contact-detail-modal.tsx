@@ -48,42 +48,42 @@ export default function ContactDetailModal({
           <div className="flex flex-col gap-[8px]">
             <div className="flex flex-col">
               <p>
-                <Text variant="label" color="#678CC5">Tipo de Contacto</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">Tipo de Contacto</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{contact.types_contact?.name || "-"}</Text>
-              </p>
-            </div>
-            <div className="flex flex-col">
-              <p>
-                <Text variant="label" color="#678CC5">Empresa</Text>
-              </p>
-              <p>
-                <Text variant="body" color="#16305A">{getCompanyName(contact.company_id)}</Text>
+                <Text isAdmin={true} variant="body" color="#16305A">{contact.types_contact?.name || "-"}</Text>
               </p>
             </div>
             <div className="flex flex-col">
               <p>
-                <Text variant="label" color="#678CC5">Email</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">Empresa</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{contact.email || "-"}</Text>
-              </p>
-            </div>
-            <div className="flex flex-col">
-              <p>
-                <Text variant="label" color="#678CC5">WhatsApp</Text>
-              </p>
-              <p>
-                <Text variant="body" color="#16305A">{contact.phone || "-"}</Text>
+                <Text isAdmin={true} variant="body" color="#16305A">{getCompanyName(contact.company_id)}</Text>
               </p>
             </div>
             <div className="flex flex-col">
               <p>
-                <Text variant="label" color="#678CC5">Fecha de Cumpleaños</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">Email</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{formatDate(contact.birth_date)}</Text>
+                <Text isAdmin={true} variant="body" color="#16305A">{contact.email || "-"}</Text>
+              </p>
+            </div>
+            <div className="flex flex-col">
+              <p>
+                <Text isAdmin={true} variant="label" color="#678CC5">WhatsApp</Text>
+              </p>
+              <p>
+                <Text isAdmin={true} variant="body" color="#16305A">{contact.phone || "-"}</Text>
+              </p>
+            </div>
+            <div className="flex flex-col">
+              <p>
+                <Text isAdmin={true} variant="label" color="#678CC5">Fecha de Cumpleaños</Text>
+              </p>
+              <p>
+                <Text isAdmin={true} variant="body" color="#16305A">{formatDate(contact.birth_date)}</Text>
               </p>
             </div>
           </div>
@@ -92,26 +92,26 @@ export default function ContactDetailModal({
           <div className="flex flex-col gap-[8px]">
             <div className="flex flex-col">
               <p>
-                <Text variant="label" color="#678CC5">País</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">País</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{getCountryWithFlag(contact.country)}</Text>
-              </p>
-            </div>
-            <div className="flex flex-col">
-              <p>
-                <Text variant="label" color="#678CC5">Ciudad</Text>
-              </p>
-              <p>
-                <Text variant="body" color="#16305A">{contact.city || "-"}</Text>
+                <Text isAdmin={true} variant="body" color="#16305A">{getCountryWithFlag(contact.country)}</Text>
               </p>
             </div>
             <div className="flex flex-col">
               <p>
-                <Text variant="label" color="#678CC5">Dirección</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">Ciudad</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{contact.address || "-"}</Text>
+                <Text isAdmin={true} variant="body" color="#16305A">{contact.city || "-"}</Text>
+              </p>
+            </div>
+            <div className="flex flex-col">
+              <p>
+                <Text isAdmin={true} variant="label" color="#678CC5">Dirección</Text>
+              </p>
+              <p>
+                <Text isAdmin={true} variant="body" color="#16305A">{contact.address || "-"}</Text>
               </p>
             </div>
           </div>
@@ -131,8 +131,8 @@ export default function ContactDetailModal({
             <img src="/avatar-login.png" alt="Avatar" width="46" height="46" />
           </div>
           <div className="flex flex-col">
-            <Text variant="body" weight="bold" color="#265197">{`${contact.name || "Sin nombre"} ${contact.last_name || ""}`}</Text>
-            <Text variant="label" weight="bold" color="#678CC5">{contact.cargo || "-"}</Text>
+            <Text isAdmin={true} variant="body" weight="bold" color="#265197">{`${contact.name || "Sin nombre"} ${contact.last_name || ""}`}</Text>
+            <Text isAdmin={true} variant="label" weight="bold" color="#678CC5">{contact.cargo || "-"}</Text>
           </div>
         </div>
       }

@@ -3,12 +3,9 @@ import { Divider } from "@heroui/divider";
 import { Link } from "@heroui/link";
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-
 import { addToast } from "@heroui/toast"
 import { UserAuth } from '@/shared/context/auth-context'
-
-import { Button, Text, Input } from 'citrica-ui-toolkit'
-import { Icon } from '@/shared/components/citrica-ui'
+import { Button, Text, Input, Icon } from 'citrica-ui-toolkit'
 import { Container } from '@/styles/07-objects/objects'
 
 const LoginPage = () => {

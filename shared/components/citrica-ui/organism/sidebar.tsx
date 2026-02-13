@@ -1,10 +1,8 @@
 "use client"
 import React from "react"
 import { Suspense, useEffect, useState } from 'react';
-import { Button, Text } from "citrica-ui-toolkit"
-import { ChevronDown, Menu } from "lucide-react"
+import { Button, Text, Icon } from "citrica-ui-toolkit"
 import type { SidebarProps, MenuItem } from "../../../types/sidebar"
-import { Icon } from "@citrica-ui"
 import { IconName } from "@/shared/components/citrica-ui/atoms/icon"
 import { usePathname, useRouter } from 'next/navigation';
 import { UserAuth } from "@/shared/context/auth-context";
@@ -17,15 +15,16 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
   return (
     <div>
       <Button
+        isAdmin={true}
         variant="flat"
         className= {`w-full justify-between px-4 py-2 transition-colors hover:bg-gray-100`}
         onPress={onToggle}
       >
         <span className="flex items-center gap-2">
           <Icon name={item.icon as IconName} size={20} color="#265197" />
-          <Text variant="label" color="#8099B2">{item.title}</Text>
+          <Text isAdmin={true} variant="label" color="#265197">{item.title}</Text>
         </span>
-        <ChevronDown className={`h-4 w-4 text-[#8099B2] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+        <Icon name="ChevronDown" size={16} color="#265197" className={`text-[#8099B2] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
       </Button>
       {isOpen && item.subItems && (
         <div className="ml-6 mt-2 flex flex-col gap-2">
@@ -33,12 +32,13 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
             const isActive = pathname === subItem.href;
             return (
               <Button
-               variant="flat"
+                isAdmin={true}
+                variant="flat"
                 key={subItem.title}
                 className={`justify-start px-4 py-2 transition-colors hover:bg-[#EEF1F7] ${isActive ? "bg-[#EEF1F7]" : ""}`}
                 onPress={() => router.push(subItem.href)}
               >
-                <Text variant="label" color={isActive ? "#000" : "#8099B2"}>{subItem.title}</Text>
+                <Text isAdmin={true} variant="body" weight="bold" color={isActive ? "#16305A" : "#8099B2"}>{subItem.title}</Text>
               </Button>
             );
           })}
@@ -157,7 +157,7 @@ export function Sidebar({ items }: SidebarProps) {
     <>
       {/* Mobile Drawer */}
       <Button className="md:hidden" onPress={() => setIsOpen(true)}>
-        <Menu className="h-5 w-5" />
+        <Icon name="Menu" size={20} />
         <span className="sr-only">Toggle navigation menu</span>
       </Button>
 
@@ -170,7 +170,7 @@ export function Sidebar({ items }: SidebarProps) {
         <div className="flex h-16 items-center justify-between px-4">
           <h2 className="text-lg font-semibold">Navegación</h2>
           <Button onPress={() => setIsOpen(false)}>
-            <ChevronDown className="h-6 w-6 rotate-90" />
+            <Icon name="ChevronDown" size={24} className="rotate-90" />
           </Button>
         </div>
         <NavItems />

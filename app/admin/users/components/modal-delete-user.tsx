@@ -3,8 +3,7 @@ import { Modal, ModalContent } from "@heroui/modal";
 import { Divider } from "@heroui/divider";
 import React from "react";
 import { UserType } from "@/shared/types/types";
-import { Text, Button } from "citrica-ui-toolkit";
-import Icon from "@ui/atoms/icon";
+import { Text, Button, Icon } from "citrica-ui-toolkit";
 
 interface ModalDeleteUserProps {
   user: UserType | null;
@@ -43,7 +42,7 @@ const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
               <Icon size={28} className=" text-red-500" name="TriangleAlert" />
             </div>
             <h2 className="text-center">
-              <Text variant="title" color="#F04242" weight="bold">¿Quieres eliminar este elemento?</Text>
+              <Text isAdmin={true} variant="title" color="#F04242" weight="bold">¿Quieres eliminar este elemento?</Text>
             </h2>
           </div>
 
@@ -53,7 +52,7 @@ const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
               <span className="font-semibold">{userName}</span>?
             </Text>
             <p className="pt-2">
-              <Text variant="label" color="#16305A">
+              <Text isAdmin={true} variant="label" color="#16305A">
                 El usuario no podrá acceder al sistema.
               </Text>
             </p>
@@ -63,7 +62,7 @@ const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
 
           <div className="flex gap-3 justify-end">
             <Button
-              isAdmin
+              isAdmin={true}
               variant="secondary"
               className="w-[162px]"
               onPress={onCancel}
@@ -71,7 +70,7 @@ const ModalDeleteUser: React.FC<ModalDeleteUserProps> = ({
               Cancelar
             </Button>
             <Button
-              isAdmin
+              isAdmin={true}
               variant="primary"
               className="bg-[#F04242] w-[162px] !border-0"
               onPress={onConfirm}

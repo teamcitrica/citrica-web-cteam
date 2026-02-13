@@ -22,7 +22,7 @@ const DayDetailPanel: React.FC<DayDetailPanelProps> = ({ dateLabel, bookings, on
     <div className="flex flex-col h-full">
       {/* Header con la fecha seleccionada */}
       <div className="p-3 xl:p-4 border-b border-[#D4DEED]">
-        <Text variant="body" weight="bold" color="#16305A">
+        <Text isAdmin={true} variant="body" weight="bold" color="#16305A">
           {dateLabel || "Selecciona un día"}
         </Text>
       </div>
@@ -31,7 +31,7 @@ const DayDetailPanel: React.FC<DayDetailPanelProps> = ({ dateLabel, bookings, on
       <div className="flex-1 overflow-y-auto p-3 xl:p-4">
         {bookings.length === 0 ? (
           <div className="flex items-center justify-center h-full min-h-[60px]">
-            <Text variant="label" color="#678CC5">
+            <Text isAdmin={true} variant="label" color="#678CC5">
               No hay eventos para este día
             </Text>
           </div>

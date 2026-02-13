@@ -1,8 +1,6 @@
 "use client";
-
 import React, { useState, useEffect, useMemo } from "react";
-import { Button, Text } from "citrica-ui-toolkit";
-import Icon from "@ui/atoms/icon";
+import { Button, Text, Icon } from "citrica-ui-toolkit";
 import FilterDropdown from "@/shared/components/citrica-ui/molecules/filter-dropdown";
 import { useReservas, Reserva } from "@/hooks/reservas/use-reservas";
 import CalendarGrid from "./components/calendar-grid";
@@ -98,29 +96,31 @@ const BookingCalendarView = () => {
         {/* Navegación de mes: < Noviembre 2025 > */}
         <div className="flex items-center gap-2 shrink-0">
           <Button
+            isAdmin={true}
             isIconOnly
             variant="flat"
             size="sm"
             onPress={goToPreviousMonth}
             className="!min-w-8 !w-8 !h-[34px] !p-0 !border-solid !border !border-[#16305A] !rounded-md !bg-transparent"
           >
-            <Icon name="ChevronLeft" size={16} className="text-[#16305A]" />
+            <Icon name="ChevronLeft" size={16} color="#16305A"/>
           </Button>
 
           <div className="px-4 h-[34px] border border-[#16305A] rounded-md flex items-center">
-            <Text variant="body" weight="bold" color="#16305A">
+            <Text isAdmin={true} variant="body" weight="bold" color="#16305A">
               {monthYearLabel}
             </Text>
           </div>
 
           <Button
+            isAdmin={true}
             isIconOnly
             variant="flat"
             size="sm"
             onPress={goToNextMonth}
             className="!min-w-8 !w-8 !h-[34px] !p-0 !border-solid !border !border-[#16305A] !rounded-md !bg-transparent"
           >
-            <Icon name="ChevronRight" size={16} className="text-[#16305A]" />
+            <Icon name="ChevronRight" size={16} color="#16305A" />
           </Button>
         </div>
 
@@ -133,7 +133,7 @@ const BookingCalendarView = () => {
 
         {/* Botón crear recordatorio */}
         <Button
-          isAdmin
+          isAdmin={true}
           size="sm"
           variant="primary"
           onPress={() => setIsReminderModalOpen(true)}

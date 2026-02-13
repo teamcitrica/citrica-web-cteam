@@ -7,7 +7,6 @@ import { useState, useEffect, useCallback } from "react";
 import { addToast } from "@heroui/toast";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 import { Button, Input } from "citrica-ui-toolkit";
-
 import { useAssetCRUD, AssetInput, Asset } from "@/hooks/assets/use-assets";
 
 // Tipo para columnas con alias

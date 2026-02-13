@@ -1,8 +1,7 @@
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { LandingProject } from "@/hooks/landing-projects/use-landing-projects";
-import Icon from "@ui/atoms/icon";
-import { Text, Button } from "citrica-ui-toolkit";
+import { Text, Button, Icon } from "citrica-ui-toolkit";
 
 type LandingProjectColumnsConfig = {
   onView: (project: LandingProject) => void;
@@ -31,12 +30,12 @@ export const getLandingProjectColumns = ({
           )}
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <Text variant="body" weight="bold" color="#16305A">{project.hero_title}</Text>
+              <Text isAdmin={true} variant="body" weight="bold" color="#16305A">{project.hero_title}</Text>
               {project.featured && (
                 <Icon name="Star" className="w-4 h-4 text-yellow-500 fill-yellow-500" />
               )}
             </div>
-            <Text variant="label" color="#678CC5">{project.hero_category}</Text>
+            <Text isAdmin={true} variant="label" color="#678CC5">{project.hero_category}</Text>
           </div>
         </div>
       );
@@ -48,7 +47,7 @@ export const getLandingProjectColumns = ({
     sortable: true,
     render: (project) => (
       <div className="flex flex-col">
-        <Text variant="body" color="#16305A">/projects/{project.slug}</Text>
+        <Text isAdmin={true} variant="body" color="#16305A">/projects/{project.slug}</Text>
       </div>
     ),
   },
@@ -57,7 +56,7 @@ export const getLandingProjectColumns = ({
     uid: "services",
     sortable: false,
     render: (project) => (
-      <Text variant="body" color="#16305A">{project.services?.length || 0}</Text>
+      <Text isAdmin={true} variant="body" color="#16305A">{project.services?.length || 0}</Text>
     ),
   },
   {
@@ -65,7 +64,7 @@ export const getLandingProjectColumns = ({
     uid: "technologies",
     sortable: false,
     render: (project) => (
-      <Text variant="body" color="#16305A">{project.technologies?.length || 0}</Text>
+      <Text isAdmin={true} variant="body" color="#16305A">{project.technologies?.length || 0}</Text>
     ),
   },
   {
@@ -114,6 +113,7 @@ export const getLandingProjectColumns = ({
         onClick={(e) => e.stopPropagation()}
       >
         <Button
+          isAdmin={true}
           isIconOnly
           variant="flat"
           onPress={() => onView(project)}
@@ -124,7 +124,7 @@ export const getLandingProjectColumns = ({
 
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0 hover:!bg-transparent">
+            <Button isAdmin={true} isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0 hover:!bg-transparent">
               <Icon className="text-[#265197] w-5 h-5" name="EllipsisVertical" />
             </Button>
           </DropdownTrigger>

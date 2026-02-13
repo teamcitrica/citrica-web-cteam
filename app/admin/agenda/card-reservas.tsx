@@ -4,8 +4,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/d
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import Icon from "@ui/atoms/icon";
-import { Button, Text, Input } from "citrica-ui-toolkit";
+import { Button, Text, Input, Icon } from "citrica-ui-toolkit";
 import { useReservas, Reserva, ReservaEstado } from "@/hooks/reservas/use-reservas";
 import ReservaDetailModal from "./components/modal-details-reserva";
 

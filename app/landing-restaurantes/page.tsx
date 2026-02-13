@@ -1,8 +1,6 @@
 "use client";
 import React from "react";
-import { Container, Col } from "@citrica/objects";
-import { Icon, Header, Input } from "@citrica-ui";
-import Footer from "@ui/organism/footer";
+import {  Header } from "@citrica-ui";
 import GradientText from "@/shared/components/project-components/gradient-text";
 import {
   restaurantServices,
@@ -10,7 +8,7 @@ import {
 } from "@/shared/archivos js/landing-restaurant-data";
 import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";
 import { ContactSectionLanding } from "@/shared/components/project-components/contact-section";
-import { Text, Button } from "citrica-ui-toolkit";
+import { Text, Button, Icon, Container, Col,} from "citrica-ui-toolkit";
 
 // export const dynamic = "force-dynamic";
 

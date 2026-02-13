@@ -1,9 +1,9 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
-import { Button, Input } from "citrica-ui-toolkit";
+import { Button, Input, Text } from "citrica-ui-toolkit";
 import { Textarea } from "@heroui/input";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
+import { Checkbox } from "@heroui/checkbox";
 
 interface CreateReminderModalProps {
   isOpen: boolean;
@@ -28,7 +28,7 @@ const INPUT_CLASSNAMES = {
 
 const TEXTAREA_CLASSNAMES = {
   label: "!text-[#265197]",
-  input: "!text-[#265197]",
+  input: "!text-[#265197] placeholder:!text-[#A7BDE2]",
   inputWrapper: "bg-white !border-[#D4DEED]",
 };
 
@@ -165,17 +165,20 @@ const CreateReminderModal: React.FC<CreateReminderModalProps> = ({
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         classNames={TEXTAREA_CLASSNAMES}
-        className="mt-4"
       />
-      <label className="flex items-center gap-2 mt-4 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={recurring}
-          onChange={(e) => setRecurring(e.target.checked)}
-          className="w-4 h-4 rounded border-[#D4DEED] accent-[#265197]"
+      <div className="flex items-center mt-2">
+        <Checkbox
+          isSelected={recurring}
+          onValueChange={setRecurring}
+          classNames={{
+            wrapper: "border border-[#265197] before:border-0 after:bg-[#00226c]",
+            icon: "text-white"
+          }}
         />
-        <span className="text-sm text-[#265197]">Repetir cada año</span>
-      </label>
+        <Text variant="label" color="#265197">
+          Repetir cada año
+        </Text>
+      </div>
     </DrawerCitricaAdmin>
   );
 };

@@ -368,7 +368,7 @@ const DateSpecificManager = () => {
                 handleDateSelect(date);
               }
             }}
-            minValue={serverToday || today(getLocalTimeZone())}
+            minValue={(serverToday || today(getLocalTimeZone())) as any}
             classNames={{
               base: "max-w-none",
               content: "w-full"

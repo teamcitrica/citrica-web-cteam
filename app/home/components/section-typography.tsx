@@ -1,9 +1,6 @@
 "use client"
 import React from 'react'
-import { Text, Button } from 'citrica-ui-toolkit'
-import { Container, Col } from '@/styles/07-objects/objects';
-import Icon from '@ui/atoms/icon';
-import { Moon, Sun } from "lucide-react";
+import { Text, Button, Container, Col, Icon } from 'citrica-ui-toolkit'
 import { useTheme } from "next-themes";
 import {addToast} from "@heroui/toast";
 

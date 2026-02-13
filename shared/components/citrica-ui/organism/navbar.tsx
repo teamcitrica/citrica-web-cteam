@@ -2,7 +2,7 @@
 import { useDisclosure } from "@heroui/modal";
 import { Drawer, DrawerContent, DrawerHeader, DrawerBody } from "@heroui/drawer";
 import React, { useEffect, useRef, useState } from "react";
-import { Col, Container } from '@citrica/objects';
+import { Col, Container } from 'citrica-ui-toolkit'
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { siteConfig } from "@/config/site";

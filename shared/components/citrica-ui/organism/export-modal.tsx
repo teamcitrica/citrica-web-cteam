@@ -29,13 +29,13 @@ const ExportModal: React.FC<ExportModalProps> = ({
         {(onCloseModal) => (
           <>
             <ModalHeader className="flex flex-col gap-1 h-[64px] bg-white">
-              <Text variant="subtitle" weight="bold" color="#16305A">EXPORTAR TABLA</Text>
+              <Text isAdmin={true} variant="subtitle" weight="bold" color="#16305A">EXPORTAR TABLA</Text>
             </ModalHeader>
             <ModalBody className="bg-[#EDF1F7] h-[156px]">
               <div className="flex flex-col gap-4">
                 <p>
-                  <Text variant="body" weight="bold" color="#265197">Formato seleccionado:{" "}</Text>
-                  <Text variant="body" weight="bold" color="#265197" className="!uppercase">{exportFormat}</Text>
+                  <Text isAdmin={true} variant="body" weight="bold" color="#265197">Formato seleccionado:{" "}</Text>
+                  <Text isAdmin={true} variant="body" weight="bold" color="#265197" className="!uppercase">{exportFormat}</Text>
                 </p>
                 <Divider className="bg-[#A7BDE2]"/>
                 <div className="mb-4">
@@ -49,10 +49,12 @@ const ExportModal: React.FC<ExportModalProps> = ({
                       inputWrapper: "!border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
                       label: "!text-[#265197]",
                       input: "placeholder:text-[#A7BDE2] !text-[#265197]",
+                      description: "!text-xs !text-[#678CC5]"
                     }}
+                    //description="El nombre por defecto incluye la fecha actual."
                   />
                   <span className="bg-[#EDF1F7] block">
-                    <Text variant="label" color="#678CC5">El nombre por defecto incluye la fecha actual.</Text>
+                    <Text isAdmin={true} variant="label" color="#678CC5">El nombre por defecto incluye la fecha actual.</Text>
                   </span>
                 </div>
               </div>

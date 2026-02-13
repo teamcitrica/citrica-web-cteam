@@ -22,6 +22,7 @@ $border-extra-bold: "";
 // FONTS GOOGLE
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap');
 @import 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 // FONTS LOCALES
 @font-face {
@@ -122,6 +123,12 @@ $font-family-b: 'Poppins', sans-serif;
 $font-family-c: 'Poppins', sans-serif;
 $font-family-d: 'Sansation';
 
+// ADMIN SYSTEM TYPOGRAPHY
+$font-family-a-admin: 'Inter', sans-serif;
+$font-family-b-admin: 'Inter', sans-serif;
+$font-family-c-admin: 'Inter', sans-serif;
+$font-family-d-admin: 'Inter', sans-serif;
+
 // CITRICA SYSTEM OPACITY
 $opacity-1:"";
 $opacity-2:"";
@@ -193,6 +200,10 @@ $root-vars: (
         --font-family-b: $font-family-b,
         --font-family-c: $font-family-c,
         --font-family-d: $font-family-d,
+        --font-family-a-admin: $font-family-a-admin,
+        --font-family-b-admin: $font-family-b-admin,
+        --font-family-c-admin: $font-family-c-admin,
+        --font-family-d-admin: $font-family-d-admin,
         // CUSTOM
     ),
     md: (

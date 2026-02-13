@@ -189,7 +189,7 @@ export default function ContactFormDrawer({
       footer={
         <>
           <Button
-            isAdmin
+            isAdmin={true}
             variant="secondary"
             onPress={onClose}
             className=" bg-white w-[162px]"
@@ -197,7 +197,7 @@ export default function ContactFormDrawer({
             Cerrar
           </Button>
           <Button
-            isAdmin
+            isAdmin={true}
             variant="primary"
             className="w-[162px]"
             onPress={handleSubmit}

@@ -1,8 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Link } from "@heroui/link";
-import { Col, Container } from "@/styles/07-objects/objects";
-import { Button, Text } from "citrica-ui-toolkit";
+import { Button, Text, Col, Container } from "citrica-ui-toolkit";
 import { useLandingProjects, LandingProject } from "@/hooks/landing-projects/use-landing-projects";
 
 interface CompletedProjectsProps {

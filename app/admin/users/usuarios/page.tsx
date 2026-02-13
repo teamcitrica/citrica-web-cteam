@@ -1,7 +1,6 @@
 "use client";
 import { Divider } from "@heroui/divider";
 import { useState, useCallback, useMemo } from "react";
-
 import UserFormModal from "../components/modal-user-form";
 import UserDetailModal from "../components/modal-details-users";
 import ModalDeleteUser from "../components/modal-delete-user";
@@ -11,12 +10,11 @@ import { useUserCRUD } from "@/hooks/users/use-users";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { UserType } from "@/shared/types/types";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
-import { Col, Container } from "@/styles/07-objects/objects";
 import { addToast } from "@heroui/toast";
 import { UserAuth } from "@/shared/context/auth-context";
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
 import { createUsers } from "@/public/icon-svg/create-users";
-import { Text } from "citrica-ui-toolkit";
+import { Text, Col, Container } from "citrica-ui-toolkit";
 
 export default function UsersPage() {
   const { users, isLoading, refreshUsers, deleteUser, updateUserByRole } =
@@ -162,10 +160,10 @@ export default function UsersPage() {
 
   return (
     <Container>
-      <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+      <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }}>
         <div>         
           <h1 className="mb-4">
-            <Text variant="title" weight="bold" color="#265197">Usuarios del sistema</Text>
+            <Text isAdmin={true} variant="title"  weight="bold" color="#16305A">USUARIOS DEL SISTEMA</Text>
           </h1>
 
           <DataTable<UserType>

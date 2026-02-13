@@ -7,8 +7,7 @@ import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from 
 import { Pagination } from "@heroui/pagination";
 import React, { useCallback, useMemo, useState } from "react";
 import Image from "next/image";
-import Icon from "@ui/atoms/icon";
-import { Text, Button, Input, Autocomplete } from "citrica-ui-toolkit";
+import { Text, Button, Icon, Input, Autocomplete } from "citrica-ui-toolkit";
 import ExportModal from "./export-modal";
 import { useTableFeatures, ExportColumn } from "@/shared/hooks/useTableFeatures";
 // import "./data-table.css";
@@ -315,7 +314,7 @@ export function DataTable<T extends Record<string, any>>({
 
             {totalRecordsLabel && (
               <p>
-                <Text variant="label" color="#265197">{totalRecordsLabel}</Text>
+                <Text isAdmin={true} variant="label" color="#265197">{totalRecordsLabel}</Text>
               </p>
             )}
             {totalRecordsLabel && (permanentFilters.length > 0 || activeFilters.length > 0) && (
@@ -326,11 +325,11 @@ export function DataTable<T extends Record<string, any>>({
             {permanentFilters.length > 0 && (
               <div className="flex items-center gap-2">
                 <span>
-                  <Text variant="label" color="#265197">Filtro activo:</Text>
+                  <Text isAdmin={true} variant="label" color="#265197">Filtro activo:</Text>
                 </span>
                 {permanentFilters.map((filter, index) => (
                   <span key={index}>
-                    <Text variant="label" color="#265197">{filter.column} = {filter.value}</Text>
+                    <Text isAdmin={true} variant="label" color="#265197">{filter.column} = {filter.value}</Text>
                   </span>
                 ))}
               </div>
@@ -391,7 +390,7 @@ export function DataTable<T extends Record<string, any>>({
             }
           }}
           classNames={{
-            wrapper: "!p-0 rounded-none",
+            wrapper: "!p-0 rounded-2px",
             tr: "data-[odd=true]:bg-[#EEF1F7]",
           }}
         >

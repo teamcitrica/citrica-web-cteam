@@ -1,10 +1,8 @@
 "use client";
-
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { Divider } from "@heroui/divider";
 import { Asset } from "@/hooks/assets/use-assets";
-import { Icon } from "@/shared/components/citrica-ui";
-import { Text, Button } from "citrica-ui-toolkit";
+import { Text, Button, Icon } from "citrica-ui-toolkit";
 
 interface DeleteAssetModalProps {
   asset: Asset;
@@ -25,16 +23,16 @@ export default function DeleteAssetModal({
             <Icon size={28} className=" text-red-500" name="TriangleAlert" />
           </div>
           <h2 className="text-center">
-            <Text variant="title" color="#F04242" weight="bold">Confirmar Eliminación</Text>
+            <Text isAdmin={true} variant="title" color="#F04242" weight="bold">Confirmar Eliminación</Text>
           </h2>
         </ModalHeader>
         <ModalBody>
           <p>
-            <Text variant="body" color="#16305A">¿Está seguro de que desea eliminar el asset{" "}
+            <Text isAdmin={true} variant="body" color="#16305A">¿Está seguro de que desea eliminar el asset{" "}
               <span className="font-semibold">{asset.name || "Sin nombre"}</span>?</Text>
           </p>
           <p className="mb-2">
-            <Text variant="label" color="#16305A">Esta acción no se puede deshacer.</Text>
+            <Text isAdmin={true} variant="label" color="#16305A">Esta acción no se puede deshacer.</Text>
           </p>
           <Divider className="bg-[#A7BDE2]" />
         </ModalBody>

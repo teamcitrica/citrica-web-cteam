@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { Container, Col } from "@citrica/objects";
-import { Icon, Header } from "@citrica-ui";
-import { Button, Text } from "citrica-ui-toolkit";
+import {  Header } from "@citrica-ui";
+import { Button, Text, Container, Col, Icon } from "citrica-ui-toolkit";
 import { addToast } from "@heroui/toast";
 import { CompletedProjects } from "@/shared/components/project-components/other-projects";
 import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";

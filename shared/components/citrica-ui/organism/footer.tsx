@@ -1,4 +1,4 @@
-import { Container, Col } from "@citrica/objects";
+import { Container, Col } from "citrica-ui-toolkit";
 import Link from "next/link";
 
 const FooterCUI = () => {
