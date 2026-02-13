@@ -4,11 +4,9 @@ import { Link } from "@heroui/link";
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-
 import { Container } from "@/styles/07-objects/objects";
 import Input from "../atoms/input";
-import Icon from "../atoms/icon";
-import { Text, Button } from "citrica-ui-toolkit";
+import { Text, Button, Icon } from "citrica-ui-toolkit";
 import Modal from "../molecules/modal";
 
 const NewPasswordPage = () => {

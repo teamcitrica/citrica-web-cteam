@@ -2,7 +2,6 @@
 import { Divider } from "@heroui/divider";
 import { Skeleton } from "@heroui/skeleton";
 import { useEffect, useState } from "react";
-
 import { Project } from "@/hooks/projects/use-projects";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { useUserProjects } from "@/hooks/user-projects/use-user-projects";
@@ -56,24 +55,24 @@ export default function ProjectDetailModal({
       content: (
         <div className="flex flex-col">
           <p className="pb-2">
-            <Text variant="body" color="#265197" weight="bold">Nombre: {toCamelCase(project.name) || "-"}</Text>
+            <Text isAdmin={true} variant="body" color="#265197" weight="bold">Nombre: {toCamelCase(project.name) || "-"}</Text>
           </p>
           <div className="flex flex-col gap-1">
             {isLoadingCompany ? (
               <Skeleton className="h-5 w-48 rounded-lg" />
             ) : (
               <p className="flex flex-col pb-2">
-                <Text variant="label" color="#678CC5">Empresa:</Text>
-                <Text variant="body" color="#265197" weight="bold">{companyName ? toCamelCase(companyName) : "Sin empresa"}</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">Empresa:</Text>
+                <Text isAdmin={true} variant="body" color="#265197" weight="bold">{companyName ? toCamelCase(companyName) : "Sin empresa"}</Text>
               </p>
             )}
             <p className="flex flex-col pb-2">
-              <Text variant="label" color="#678CC5">Estado:</Text>
-              <Text variant="body" color="#265197" weight="bold">{toCamelCase(project.status) || "-"}</Text>
+              <Text isAdmin={true} variant="label" color="#678CC5">Estado:</Text>
+              <Text isAdmin={true} variant="body" color="#265197" weight="bold">{toCamelCase(project.status) || "-"}</Text>
             </p>
             <p className="flex flex-col pb-2">
-              <Text variant="label" color="#678CC5">Assets:</Text>
-              <Text variant="body" color="#265197" weight="bold">{project.asset_count ?? 0}</Text>
+              <Text isAdmin={true} variant="label" color="#678CC5">Assets:</Text>
+              <Text isAdmin={true} variant="body" color="#265197" weight="bold">{project.asset_count ?? 0}</Text>
             </p>
           </div>
         </div>
@@ -92,12 +91,12 @@ export default function ProjectDetailModal({
           ) : projectUsers.length > 0 ? (
             projectUsers.map((user) => (
               <p key={user.id} className="py-2">
-                <Text variant="label" color="#678CC5">{toCamelCase(user.first_name)} {toCamelCase(user.last_name)}</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">{toCamelCase(user.first_name)} {toCamelCase(user.last_name)}</Text>
               </p>
             ))
           ) : (
             <p className="py-2">
-              <Text variant="label" color="#678CC5">No hay usuarios asignados</Text>
+              <Text isAdmin={true} variant="label" color="#678CC5">No hay usuarios asignados</Text>
             </p>
           )}
         </div>
@@ -108,13 +107,13 @@ export default function ProjectDetailModal({
       content: (
         <div className="flex items-center gap-2 text-sm text-[#678CC5]">
           <span>
-            <Text variant="label" color="#678CC5">Creado el: </Text>
-            <Text variant="label" color="#678CC5">{project.created_at ? new Date(project.created_at).toLocaleDateString('es-ES') : '-'}</Text>
+            <Text isAdmin={true} variant="label" color="#678CC5">Creado el: </Text>
+            <Text isAdmin={true} variant="label" color="#678CC5">{project.created_at ? new Date(project.created_at).toLocaleDateString('es-ES') : '-'}</Text>
           </span>
           <Divider orientation="vertical" className="h-4" />
           <span>
-            <Text variant="label" color="#678CC5">Por: </Text>
-            <Text variant="label" color="#678CC5">{project.created_by_user ? `${toCamelCase(project.created_by_user.first_name)} ${toCamelCase(project.created_by_user.last_name)}` : '-'}</Text>
+            <Text isAdmin={true} variant="label" color="#678CC5">Por: </Text>
+            <Text isAdmin={true} variant="label" color="#678CC5">{project.created_by_user ? `${toCamelCase(project.created_by_user.first_name)} ${toCamelCase(project.created_by_user.last_name)}` : '-'}</Text>
           </span>
         </div>
       ),

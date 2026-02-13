@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 import { Button, Input } from "citrica-ui-toolkit";
 import { useSupabase } from "@/shared/context/supabase-context";
-
 import { Company, CompanyInput, useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { COUNTRIES } from "@/shared/data/countries";
 import { PHONE_CODES } from "@/shared/archivos js/phone-codes";
@@ -125,11 +124,11 @@ export default function EditCompanyModal({
       size="2xl"
       footer={
         <>
-          <Button isAdmin variant="secondary" onPress={onClose}>
+          <Button isAdmin={true} variant="secondary" onPress={onClose}>
             Cancelar
           </Button>
           <Button
-            isAdmin
+            isAdmin={true}
             variant="primary"
             className="bg-[#42668A]"
             onPress={handleSubmit}

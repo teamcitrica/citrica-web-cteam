@@ -1,11 +1,10 @@
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { Tooltip } from "@heroui/tooltip";
 import React from "react";
-import Icon from "@ui/atoms/icon";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { ExportColumn } from "@/shared/hooks/useTableFeatures";
 import { UserType } from "@/shared/types/types";
-import { Button } from "citrica-ui-toolkit";
+import { Button, Icon } from "citrica-ui-toolkit";
 import { AvatarTables } from "@/public/icon-svg/avatar-tables";
 import { getAvatarColor } from "@/shared/utils/avatar-colors";
 
@@ -102,7 +101,7 @@ export const getUserColumns = ({
           onPress={() => onView(user)}
           className=" hover:!bg-transparent !p-1 !min-w-0"
         >
-          <Icon className="w-5 h-5 text-[#265197]" name="Eye" />
+          <Icon size={20} color="#265197" name="Eye" />
         </Button>
 
         <Dropdown>

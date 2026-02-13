@@ -1,14 +1,12 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { addToast } from "@heroui/toast";
-import { Eye, EyeOff } from "lucide-react";
 import { useUserRole } from "@/hooks/role/use-role";
 import { useUserCRUD } from "@/hooks/users/use-users";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { UserType } from "@/shared/types/types";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin";
-import { Button, Select, Input } from "citrica-ui-toolkit";
+import { Button, Select, Input, Icon } from "citrica-ui-toolkit";
 
 type UserFormModalProps = {
   isOpen: boolean;
@@ -302,7 +300,7 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
       footer={
         <>
           <Button
-            isAdmin
+            isAdmin={true}
             variant="secondary"
             onPress={onClose}
             className="border-[#42668A] text-[#42668A] rounded-[8px] w-[162px]"
@@ -310,7 +308,7 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
             Cerrar
           </Button>
           <Button
-            isAdmin
+            isAdmin={true}
             variant="primary"
             style={{ backgroundColor: "#42668A" }}
             onPress={handleSubmit}
@@ -504,9 +502,9 @@ const UserFormModal = ({ isOpen, onClose, onSuccess, user }: UserFormModalProps)
                   aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
                   {showPassword ? (
-                    <EyeOff className="text-2xl text-[#A7BDE2] pointer-events-none" size={20} />
+                    <Icon name="EyeOff" className="text-2xl text-[#A7BDE2] pointer-events-none" size={20} />
                   ) : (
-                    <Eye className="text-2xl text-[#A7BDE2] pointer-events-none" size={20} />
+                    <Icon name="Eye" className="text-2xl text-[#A7BDE2] pointer-events-none" size={20} />
                   )}
                 </button>
               }

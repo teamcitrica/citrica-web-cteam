@@ -7,14 +7,12 @@ import { useParams } from "next/navigation";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { useSupabase } from "@/shared/context/supabase-context";
 import { useUserAssets } from "@/hooks/user-assets/use-user-assets";
-import { Button, Input } from "citrica-ui-toolkit";
-import { Col, Container } from "@/styles/07-objects/objects";
+import { Button, Input, Col, Container, Text } from "citrica-ui-toolkit";
 import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { format } from "date-fns";
 import { parseDate } from "@internationalized/date";
-import { Text } from "@/shared/components/citrica-ui";
 
 interface ExternalTableData {
   [key: string]: any;

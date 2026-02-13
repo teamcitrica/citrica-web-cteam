@@ -1,8 +1,7 @@
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { Project } from "@/hooks/projects/use-projects";
-import Icon from "@ui/atoms/icon";
-import { Text, Button } from "citrica-ui-toolkit";
+import { Text, Button, Icon } from "citrica-ui-toolkit";
 
 type ProjectColumnsConfig = {
   getCompanyName: (companyId: number | null) => string;
@@ -38,8 +37,8 @@ export const getProjectColumns = ({
           className="flex flex-col cursor-pointer hover:opacity-70 transition-opacity items-start"
           onClick={() => onNavigateToAssets?.(project.id)}
         >
-          <Text variant="body" weight="bold" color="#16305A">{name}</Text>
-          <Text variant="label" color="#678CC5">
+          <Text isAdmin={true} variant="body" weight="bold" color="#16305A">{name}</Text>
+          <Text isAdmin={true} variant="label" color="#678CC5">
             Assets: {assetCount}
           </Text>
         </div>
@@ -58,8 +57,8 @@ export const getProjectColumns = ({
 
       return (
         <div className="flex flex-col">
-          <Text variant="body" weight="bold" color="#16305A">{companyName}</Text>
-          <Text variant="label" color="#678CC5">
+          <Text isAdmin={true} variant="body" weight="bold" color="#16305A">{companyName}</Text>
+          <Text isAdmin={true} variant="label" color="#678CC5">
             Accesos: {accessCount}
           </Text>
         </div>
@@ -119,6 +118,7 @@ export const getProjectColumns = ({
         onClick={(e) => e.stopPropagation()}
       >
         <Button
+          isAdmin={true}
           isIconOnly
           variant="flat"
           onPress={() => onView(project)}
@@ -129,7 +129,7 @@ export const getProjectColumns = ({
 
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0 hover:!bg-transparent">
+            <Button isAdmin={true} isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0 hover:!bg-transparent">
               <Icon className="text-[#265197] w-5 h-5" name="EllipsisVertical" />
             </Button>
           </DropdownTrigger>

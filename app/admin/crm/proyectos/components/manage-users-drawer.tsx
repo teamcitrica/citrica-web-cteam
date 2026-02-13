@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 import { Button, Autocomplete } from "citrica-ui-toolkit";
-
 import { Project } from "@/hooks/projects/use-projects";
 import { useUserCRUD } from "@/hooks/users/use-users";
 import { useUserProjects } from "@/hooks/user-projects/use-user-projects";

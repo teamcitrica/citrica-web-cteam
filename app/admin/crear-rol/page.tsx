@@ -1,13 +1,10 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { Button } from "citrica-ui-toolkit";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Button, Col, Container, Icon } from "citrica-ui-toolkit";
 import { useUserRole, RoleType } from "@/hooks/role/use-role";
 import CreateRoleModal from "./components/modal-create-role";
 import EditRoleModal from "./components/modal-edit-role";
 import DeleteRoleModal from "./components/modal-delete-role";
-import { Col, Container } from "@/styles/07-objects/objects";
 
 export default function CrearRolPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,7 +40,7 @@ export default function CrearRolPage() {
         </div>
         <Button
           color="primary"
-          startContent={<Plus size={20} />}
+          startContent={<Icon name="Plus" size={20} />}
           onPress={() => setIsModalOpen(true)}
         >
           Crear Rol
@@ -91,7 +88,7 @@ export default function CrearRolPage() {
                           className="p-2 text-blue-600 hover:bg-blue-50 rounded min-w-0"
                           title="Editar"
                         >
-                          <Pencil size={18} />
+                          <Icon name="Pencil" size={18} />
                         </Button>
                         <Button
                           isAdmin
@@ -100,7 +97,7 @@ export default function CrearRolPage() {
                           className="p-2 text-red-600 hover:bg-red-50 rounded min-w-0"
                           title="Eliminar"
                         >
-                          <Trash2 size={18} />
+                          <Icon name="Trash2" size={18} />
                         </Button>
                       </div>
                     </td>

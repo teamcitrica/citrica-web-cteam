@@ -1,8 +1,6 @@
 "use client"
 import React from 'react'
-import { Text } from 'citrica-ui-toolkit';
-import { Container, Col } from '@/styles/07-objects/objects';
-import Icon from '@ui/atoms/icon';
+import { Text, Container, Col, Icon } from 'citrica-ui-toolkit';
 
 const SectionTypography = () => {
   return (

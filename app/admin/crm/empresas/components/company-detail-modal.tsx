@@ -45,35 +45,35 @@ export default function CompanyDetailModal({
           <div className="flex flex-col gap-[8px]">
             <div className="flex flex-col pt-[12px]">
               <p>
-                <Text variant="label" color="#678CC5">Relación</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">Relación</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{company.types_contact?.name || "-"}</Text>
+                <Text isAdmin={true} variant="body" color="#16305A">{company.types_contact?.name || "-"}</Text>
               </p>
             </div>
             <div className="flex flex-col pt-[8px]">
               <p>
-                <Text variant="label" color="#678CC5">Website</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">Website</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{company.website || "-"}</Text>
+                <Text isAdmin={true} variant="body" color="#16305A">{company.website || "-"}</Text>
               </p>
             </div>
 
             <div className="flex flex-col pt-[8px]">
               <p>
-                <Text variant="label" color="#678CC5">Teléfono</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">Teléfono</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{company.contact_phone || "-"}</Text>
+                <Text isAdmin={true} variant="body" color="#16305A">{company.contact_phone || "-"}</Text>
               </p>
             </div>
             <div className="flex flex-col pt-[8px]">
               <p>
-                <Text variant="label" color="#678CC5">Email</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">Email</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{company.contact_email || "-"}</Text>
+                <Text isAdmin={true} variant="body" color="#16305A">{company.contact_email || "-"}</Text>
               </p>
             </div>
 
@@ -82,26 +82,26 @@ export default function CompanyDetailModal({
           <div className="flex flex-col gap-[8px]">
             <div className="flex flex-col pt-[12px]">
               <p>
-                <Text variant="label" color="#678CC5">Sector:</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">Sector:</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{company.sector || "-"}</Text>
+                <Text isAdmin={true} variant="body" color="#16305A">{company.sector || "-"}</Text>
               </p>
             </div>
             <div className="flex flex-col pt-[8px]">
               <p>
-                <Text variant="label" color="#678CC5">Ubicación:</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">Ubicación:</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{company.country || "-"}</Text>
+                <Text isAdmin={true} variant="body" color="#16305A">{company.country || "-"}</Text>
               </p>
             </div>
             <div className="flex flex-col pt-[8px] pb-[16px]">
               <p>
-                <Text variant="label" color="#678CC5">Dirección:</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">Dirección:</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">
+                <Text isAdmin={true} variant="body" color="#16305A">
                   {company.street_or_avenue
                     ? ` ${company.street_or_avenue} ${company.address_number || ""}`
                     : " -"}
@@ -118,10 +118,10 @@ export default function CompanyDetailModal({
         <div className="flex gap-4 mb-[24px]">
           <div className="flex flex-col">
               <p>
-                <Text variant="label" color="#678CC5">Descripción</Text>
+                <Text isAdmin={true} variant="label" color="#678CC5">Descripción</Text>
               </p>
               <p>
-                <Text variant="body" color="#16305A">{company.description || "-"}</Text>
+                <Text isAdmin={true} variant="body" color="#16305A">{company.description || "-"}</Text>
               </p>
             </div>
         </div>
@@ -133,26 +133,26 @@ export default function CompanyDetailModal({
         <div className="flex gap-4 mb-[24px] mt-[12px]">
           <div className="flex items-center gap-1">
             <p>
-              <Text variant="label" color="#265197">Con acceso:</Text>
+              <Text isAdmin={true} variant="label" color="#265197">Con acceso:</Text>
             </p>
             <p>
-              <Text variant="body" color="#265197" weight="bold">{userStats.withAccess}</Text>
-            </p>
-          </div>
-          <div className="flex items-center gap-1">
-            <p>
-              <Text variant="label" color="#265197">Sin Acceso:</Text>
-            </p>
-            <p>
-              <Text variant="body" color="#265197" weight="bold">{userStats.withoutAccess}</Text>
+              <Text isAdmin={true} variant="body" color="#265197" weight="bold">{userStats.withAccess}</Text>
             </p>
           </div>
           <div className="flex items-center gap-1">
             <p>
-              <Text variant="label" color="#265197">Total:</Text>
+              <Text isAdmin={true} variant="label" color="#265197">Sin Acceso:</Text>
             </p>
             <p>
-              <Text variant="body" color="#265197" weight="bold">{userStats.total}</Text>
+              <Text isAdmin={true} variant="body" color="#265197" weight="bold">{userStats.withoutAccess}</Text>
+            </p>
+          </div>
+          <div className="flex items-center gap-1">
+            <p>
+              <Text isAdmin={true} variant="label" color="#265197">Total:</Text>
+            </p>
+            <p>
+              <Text isAdmin={true} variant="body" color="#265197" weight="bold">{userStats.total}</Text>
             </p>
           </div>
         </div>

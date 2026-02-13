@@ -1,7 +1,6 @@
 "use client";
-
 import { Suspense } from 'react';
-import { Container } from '@/styles/07-objects/objects';
+import { Container } from 'citrica-ui-toolkit';
 import NewPassword from '@/shared/components/citrica-ui/organism/new-password';
 
 // Forzar renderizado dinámico (no prerenderizar)

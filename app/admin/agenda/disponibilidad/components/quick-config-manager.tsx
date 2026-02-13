@@ -1,9 +1,8 @@
 "use client";
 import { Select } from "citrica-ui-toolkit";
 import React, { useState } from "react";
-import { Text, Button } from "citrica-ui-toolkit";
+import { Text, Button, Icon  } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
-import Icon from "@ui/atoms/icon";
 import Input from "@ui/atoms/input";
 
 import { useAdminBookings } from "@/hooks/disponibilidad/use-admin-bookings";

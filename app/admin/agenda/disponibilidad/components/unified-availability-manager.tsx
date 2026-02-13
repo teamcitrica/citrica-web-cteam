@@ -2,7 +2,7 @@
 import { Calendar } from "@heroui/calendar";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
 import React, { useState, useEffect } from "react";
-import { Button, Text, Select } from "citrica-ui-toolkit";
+import { Button, Text, Select, Col, Container } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { useAdminBookings } from "@/hooks/disponibilidad/use-admin-bookings";
@@ -10,7 +10,6 @@ import { useStudioConfig } from "@/hooks/disponibilidad/use-studio-config";
 import { useAvailability } from "@/app/contexts/AvailabilityContext";
 import { useSupabase } from '@/shared/context/supabase-context';
 import { useServerTime } from '@/hooks/use-server-time';
-import { Col, Container } from "@/styles/07-objects/objects";
 
 const UnifiedAvailabilityManager = () => {
   const {
@@ -726,7 +725,7 @@ const UnifiedAvailabilityManager = () => {
                     setSelectedDate(date);
                   }
                 }}
-                minValue={serverToday || today(getLocalTimeZone())}
+                minValue={(serverToday || today(getLocalTimeZone())) as any}
                 classNames={{
                   base: "max-w-none",
                   content: "w-full"

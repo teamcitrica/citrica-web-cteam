@@ -4,10 +4,8 @@ import { Tooltip } from "@heroui/tooltip";
 import { Divider } from "@heroui/divider";
 import { useState } from "react";
 import { addToast } from "@heroui/toast";
-
 import { UserType } from "@/shared/types/types";
-import { Text, Button } from "citrica-ui-toolkit";
-import Icon from "@/shared/components/citrica-ui/atoms/icon";
+import { Text, Button, Icon } from "citrica-ui-toolkit";
 import { useUserCRUD } from "@/hooks/users/use-users";
 
 interface AccessCredentialsModalProps {
@@ -84,8 +82,8 @@ export default function AccessCredentialsModal({
               <img src="/avatar-login.png" alt="Avatar" width="46" height="46" />
             </div>
             <div className="flex flex-col">
-              <Text variant="body" weight="bold" color="#265197">{userName || "Sin nombre"}</Text>
-              <Text variant="label" weight="bold" color="#678CC5">{user.cargo || "-"}</Text>
+              <Text isAdmin={true} variant="body" weight="bold" color="#265197">{userName || "Sin nombre"}</Text>
+              <Text isAdmin={true} variant="label" weight="bold" color="#678CC5">{user.cargo || "-"}</Text>
             </div>
           </div>
         </ModalHeader>
@@ -94,17 +92,17 @@ export default function AccessCredentialsModal({
           <div className="flex flex-col gap-4">
             {/* Información del usuario */}
             <div className="flex flex-row gap-2">
-              <Text variant="body" weight="bold" color="#265197">Empresa</Text>
-              <Text variant="body" weight="bold" color="#265197">{user.company?.name || "-"}</Text>
+              <Text isAdmin={true} variant="body" weight="bold" color="#265197">Empresa</Text>
+              <Text isAdmin={true} variant="body" weight="bold" color="#265197">{user.company?.name || "-"}</Text>
             </div>
             <div className="flex flex-col gap-1">
-              <Text variant="label" color="#678CC5">Rol</Text>
-              <Text variant="body" color="#16305A">{user.role?.name || "-"}</Text>
+              <Text isAdmin={true} variant="label" color="#678CC5">Rol</Text>
+              <Text isAdmin={true} variant="body" color="#16305A">{user.role?.name || "-"}</Text>
             </div>
 
             {/* Email de Acceso */}
             <div className="flex flex-col">
-              <Text variant="label" color="#678CC5">Email de Acceso</Text>
+              <Text isAdmin={true} variant="label" color="#678CC5">Email de Acceso</Text>
               <div className="flex items-center gap-2">
                 <Text variant="body" color="#333" className="flex-1 font-mono text-sm">
                   {user.email || "-"}
@@ -127,20 +125,20 @@ export default function AccessCredentialsModal({
             {/* Estado del Usuario */}
             <div className="flex flex-col gap-2 mb-4">
               <div className="flex flex-row gap-2">
-                <Text variant="body" weight="bold" color="#265197">Acceso:</Text>
+                <Text isAdmin={true} variant="body" weight="bold" color="#265197">Acceso:</Text>
                 <div className="flex flex-row gap-1">
                   <Icon
                     size={20}
                     className={`${isActive ? "text-[#10E5A4]" : "text-[#F04242]"}`}
                     name={isActive ? "ShieldCheck" : "ShieldX"}
                   />
-                  <Text variant="body" weight="bold" color={isActive ? "#059669" : "#DC2626"}>
+                  <Text isAdmin={true} variant="body" weight="bold" color={isActive ? "#059669" : "#DC2626"}>
                     {isActive ? "Habilitado" : "Inhabilitado"}
                   </Text>
                 </div>
               </div>
 
-              <Text variant="label" color="#678CC5">
+              <Text isAdmin={true} variant="label" color="#678CC5">
                 {isActive ? "" : "Este usuario tiene el acceso inhabilitado. Puedes reactivarlo para permitirle iniciar sesión nuevamente."}
               </Text>
             </div>
@@ -149,7 +147,7 @@ export default function AccessCredentialsModal({
 
         <ModalFooter className="flex justify-between">
           <Button
-            isAdmin
+            isAdmin={true}
             variant="secondary"
             onPress={onClose}
             className="w-[162px]"
@@ -159,7 +157,7 @@ export default function AccessCredentialsModal({
 
           {isActive ? (
             <Button
-              isAdmin
+              isAdmin={true}
               variant="primary"
               className="bg-[#F04242] w-[162px] !border-0"
               onPress={handleToggleAccess}
@@ -169,7 +167,7 @@ export default function AccessCredentialsModal({
             </Button>
           ) : (
             <Button
-              isAdmin
+              isAdmin={true}
               variant="primary"
               className="bg-[#10E5A4] text-[#16305A] w-[162px] !border-0"
               onPress={handleToggleAccess}

@@ -1,10 +1,8 @@
 "use client";
-
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { Divider } from "@heroui/divider";
 import { LandingProject } from "@/hooks/landing-projects/use-landing-projects";
-import { Icon } from "@/shared/components/citrica-ui";
-import { Text, Button } from "citrica-ui-toolkit";
+import { Text, Button, Icon } from "citrica-ui-toolkit";
 
 interface DeleteLandingProjectModalProps {
   project: LandingProject;
@@ -25,16 +23,16 @@ export default function DeleteLandingProjectModal({
             <Icon size={28} className="text-red-500" name="TriangleAlert" />
           </div>
           <h2 className="text-center">
-            <Text variant="title" color="#F04242" weight="bold">Confirmar Eliminación</Text>
+            <Text isAdmin={true} variant="title" color="#F04242" weight="bold">Confirmar Eliminación</Text>
           </h2>
         </ModalHeader>
         <ModalBody>
           <p>
-            <Text variant="body" color="#16305A">¿Está seguro que desea eliminar el proyecto{" "}
+            <Text isAdmin={true} variant="body" color="#16305A">¿Está seguro que desea eliminar el proyecto{" "}
             <strong>{project.hero_title}</strong>?</Text>
           </p>
           <p className="mb-2">
-            <Text variant="label" color="#16305A">Esta acción no se puede deshacer.</Text>
+            <Text isAdmin={true} variant="label" color="#16305A">Esta acción no se puede deshacer.</Text>
           </p>
           <Divider className="bg-[#A7BDE2]" />
         </ModalBody>

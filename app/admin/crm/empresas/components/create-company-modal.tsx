@@ -6,7 +6,6 @@ import { addToast } from "@heroui/toast";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 import { Button, Input } from "citrica-ui-toolkit";
 import { useSupabase } from "@/shared/context/supabase-context";
-
 import { useCompanyCRUD, CompanyInput } from "@/hooks/companies/use-companies";
 import { COUNTRIES } from "@/shared/data/countries";
 import { PHONE_CODES } from "@/shared/archivos js/phone-codes";
@@ -122,7 +121,7 @@ export default function CreateCompanyModal({
       footer={
         <>
           <Button
-            isAdmin
+            isAdmin={true}
             variant="secondary"
             onPress={onClose}
             className="w-[162px]"
@@ -130,7 +129,7 @@ export default function CreateCompanyModal({
             Cerrar
           </Button>
           <Button
-            isAdmin
+            isAdmin={true}
             variant="primary"
             className="bg-[#42668A] w-[162px]"
             onPress={handleSubmit}
