@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
-import { Text, Button } from "citrica-ui-toolkit";
+import { Button } from "citrica-ui-toolkit";
 import Icon from "@ui/atoms/icon";
 import { Reserva, ReservaEstado } from "@/hooks/reservas/use-reservas";
 import { STATUS_CONFIG } from "../booking-calendar-view";
@@ -67,9 +67,9 @@ const EventCard: React.FC<EventCardProps> = ({ booking, onStatusChange, onDelete
       <div className="p-3">
         {/* Fila superior: Hora + Badge de estado + Menú */}
         <div className="flex items-center justify-between pb-2 border-b border-[#D4DEED]">
-          <Text variant="body" weight="bold" color="#16305A">
+          <span className="text-[14px] font-bold text-[#265197]">
             {timeLabel}
-          </Text>
+          </span>
 
           <div className="flex items-center gap-0.5">
             {/* Badge de estado */}
@@ -138,7 +138,7 @@ const EventCard: React.FC<EventCardProps> = ({ booking, onStatusChange, onDelete
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <span
-            className={`text-sm font-semibold text-[#16305A] ${!isExpanded ? "truncate" : ""}`}
+            className={`text-[15px] font-bold text-[#265197] ${!isExpanded ? "truncate" : ""}`}
           >
             {booking.name || "Sin nombre"}
           </span>
@@ -158,7 +158,7 @@ const EventCard: React.FC<EventCardProps> = ({ booking, onStatusChange, onDelete
         <div className="mx-3 pb-3 pt-2">
           {/* Descripción / Comentario */}
           {booking.description && (
-            <p className="text-xs text-[#265197] mb-2">
+            <p className="text-[12px] font-normal text-[#265197] mb-2">
               {booking.description}
             </p>
           )}
@@ -173,7 +173,7 @@ const EventCard: React.FC<EventCardProps> = ({ booking, onStatusChange, onDelete
           {/* Mensaje */}
           {booking.message && (
             <div className="mt-1 pt-2 border-t border-[#D4DEED]">
-              <p className="text-xs font-bold text-[#16305A] mb-1">
+              <p className="text-[12px] font-extrabold text-[#265197] mb-1">
                 Mensaje
               </p>
               <p className="text-xs text-[#265197] leading-relaxed">
