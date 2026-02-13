@@ -190,7 +190,7 @@ export function DataTable<T extends Record<string, any>>({
               }))}
               variant="bordered"
               fullWidth={false}
-              className="w-full sm:w-56"
+              className="w-full sm:w-56 [&_[data-slot='input-wrapper']]:bg-transparent [&_[data-slot='input-wrapper']]:!border-[#D4DEED] [&_[data-slot='input-wrapper']:hover]:!border-[#265197] [&_[data-slot='input-wrapper'][data-hover=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus=true]]:!border-[#265197] [&_[data-slot='input-wrapper'][data-focus-visible=true]]:!border-[#265197] [&_[data-slot='input-wrapper']:focus-within]:!border-[#265197] [&_input]:text-black"
               classNames={{
                 base: "!border-none",
                 listboxWrapper: "!border-none",
