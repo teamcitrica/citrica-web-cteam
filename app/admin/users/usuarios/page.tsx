@@ -161,57 +161,57 @@ export default function UsersPage() {
   return (
     <Container>
       <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div>         
+        <div>
           <h1 className="mb-4">
             <Text isAdmin={true} variant="title"  weight="bold" color="#16305A">USUARIOS DEL SISTEMA</Text>
           </h1>
 
           <DataTable<UserType>
-            data={filteredUsers}
-            columns={columns}
-            isLoading={isLoading}
-            onAdd={handleOpenCreateModal}
-            addButtonText="Crear Usuario"
-            addButtonIcon={createUsers()}
-            emptyContent="No se encontraron usuarios"
-            headerColor="#265197"
-            headerTextColor="#ffffff"
-            paginationColor="#265197"
-            getRowKey={(user) => user.id || ""}
-            enableExport={true}
-            exportColumns={exportColumns}
-            exportTitle="Usuarios del S"
-            tableName="usuarios"
-            showRowsPerPageSelector={true}
-            showCustomAutocomplete={true}
-            customAutocompleteItems={[
-              { id: 'all', name: 'Todos los usuarios' },
-              ...users
-                .filter((user) => user.role_id !== 5)
-                .map(u => ({
-                  id: String(u.id),
-                  name: u.full_name || u.name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || 'Sin nombre'
-                }))
-            ]}
-            customAutocompletePlaceholder="Buscar por nombre..."
-            customAutocompleteSelectedKey={selectedUserId || "all"}
-            onCustomAutocompleteChange={(key) => setSelectedUserId(key)}
-            customFilters={
-              <>
-              <div className="flex gap-3 pb-4">
-                <FilterButtonGroup
-                  buttons={[
-                    { value: "all", label: "Todos" },
-                    { value: "citrica", label: "Citrica" },
-                    { value: "cliente", label: "Clientes" },
-                  ]}
-                  selectedValue={roleFilter}
-                  onValueChange={setRoleFilter}
-                />
-              </div>
-              <Divider className="bg-[#D4DEED]"/>
-              </>
-            }
+              data={filteredUsers}
+              columns={columns}
+              isLoading={isLoading}
+              onAdd={handleOpenCreateModal}
+              addButtonText="Crear Usuario"
+              addButtonIcon={createUsers()}
+              emptyContent="No se encontraron usuarios"
+              headerColor="#265197"
+              headerTextColor="#ffffff"
+              paginationColor="#265197"
+              getRowKey={(user) => user.id || ""}
+              enableExport={true}
+              exportColumns={exportColumns}
+              exportTitle="Usuarios del S"
+              tableName="usuarios"
+              showRowsPerPageSelector={true}
+              showCustomAutocomplete={true}
+              customAutocompleteItems={[
+                { id: 'all', name: 'Todos los usuarios' },
+                ...users
+                  .filter((user) => user.role_id !== 5)
+                  .map(u => ({
+                    id: String(u.id),
+                    name: u.full_name || u.name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email || 'Sin nombre'
+                  }))
+              ]}
+              customAutocompletePlaceholder="Buscar por nombre..."
+              customAutocompleteSelectedKey={selectedUserId || "all"}
+              onCustomAutocompleteChange={(key) => setSelectedUserId(key)}
+              customFilters={
+                <>
+                <div className="flex gap-3 pb-4">
+                  <FilterButtonGroup
+                    buttons={[
+                      { value: "all", label: "Todos" },
+                      { value: "citrica", label: "Citrica" },
+                      { value: "cliente", label: "Clientes" },
+                    ]}
+                    selectedValue={roleFilter}
+                    onValueChange={setRoleFilter}
+                  />
+                </div>
+                <Divider className="bg-[#D4DEED]"/>
+                </>
+              }
           />
 
           <UserFormModal
