@@ -277,23 +277,23 @@ const CreateReminderModal: React.FC<CreateReminderModalProps> = ({
       <div>
         <Calendar
           aria-label="Seleccionar fecha"
-          value={calendarDate}
-          onChange={(val) => { if (val) { setCalendarDate(val); setIsDirty(true); } }}
+          value={calendarDate as any}
+          onChange={(val: any) => { if (val) { setCalendarDate(val); setIsDirty(true); } }}
           showMonthAndYearPickers
           classNames={{
             base: "!shadow-none !border-[#D4DEED] !border !rounded-[12px] !bg-white !w-full !max-w-full",
-            content: "!w-full",
-            headerWrapper: "!bg-white !rounded-t-[12px] !py-2",
-            header: "!gap-1",
+            content: "!w-full !bg-white",
+            headerWrapper: "!bg-transparent !rounded-t-[12px] !py-2",
+            header: "!gap-1 !bg-[#EEF1F7] !px-3 !py-1 !rounded-lg !border !border-[#D4DEED] !w-auto",
             title: "!text-[#265197] !font-semibold !text-sm",
             prevButton: "!text-[#265197] !min-w-6 !w-6 !h-6",
             nextButton: "!text-[#265197] !min-w-6 !w-6 !h-6",
-            gridWrapper: "!w-full !px-3 !pb-3",
+            gridWrapper: "!w-full !px-0 !pb-3",
             grid: "!w-full",
             gridHeader: "!bg-white",
             gridHeaderRow: "!w-full",
             gridHeaderCell: "!text-[#265197] !font-medium !text-xs !flex-1 !w-auto !justify-center",
-            gridBody: "!bg-white",
+            gridBody: "!bg-transparent",
             gridBodyRow: "!w-full",
             cell: "!text-[#265197] !flex-1",
             cellButton: [

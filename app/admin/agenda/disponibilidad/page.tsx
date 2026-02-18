@@ -39,14 +39,14 @@ const DisponibilidadAdminPage = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="flex items-center gap-3">
-            <Icon name="Clock" size={24} className="text-[#ff5b00]" />
+            <Icon name="Clock" size={24} className="text-[#265197]" />
             <div>
               <p>
-              <Text variant="headline" color="#ff5b00">
+              <Text isAdmin variant="headline" color="#265197">
                 Horarios
               </Text>
               </p>
-              <Text variant="body" color="black">
+              <Text isAdmin variant="body" color="#16305A">
                 {getTabDescription()}
               </Text>
             </div>
@@ -55,6 +55,7 @@ const DisponibilidadAdminPage = () => {
           {/* Navegación de pestañas */}
           <Col cols={{ lg: 12, md: 6, sm: 4 }}  className="flex justify-end gap-4">
             <Button
+              isAdmin
               size="sm"
               variant={activeTab === "disponibilidad" ? "primary" : "secondary"}
               onPress={() => router.push("/admin/agenda/disponibilidad?page=disponibilidad")}
@@ -63,6 +64,7 @@ const DisponibilidadAdminPage = () => {
               Gestión de Disponibilidad
             </Button>
             <Button
+              isAdmin
               size="sm"
               variant={activeTab === "semanal" ? "primary" : "secondary"}
               onPress={() => router.push("/admin/agenda/disponibilidad?page=semanal")}
