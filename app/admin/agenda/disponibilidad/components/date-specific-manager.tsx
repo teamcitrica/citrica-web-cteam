@@ -330,7 +330,7 @@ const DateSpecificManager = () => {
       {/* Header */}
       <Card className="p-6">
         <div>
-          <Text variant="title" color="#964f20">
+          <Text variant="title" isAdmin color="#265197">
             Gestión por Fechas Específicas
           </Text>
           <Text variant="body" color="color-on-surface">
@@ -343,12 +343,13 @@ const DateSpecificManager = () => {
       {/* Calendario */}
       <Card className="p-6">
         <div className="flex flex-col items-center gap-4">
-          <Text variant="subtitle" color="#964f20">
+          <Text variant="subtitle" isAdmin color="#265197">
             Calendario de Disponibilidad
           </Text>
 
           {/* Botón de prueba para verificar el modal */}
           <Button
+            isAdmin
             variant="secondary"
             onPress={() => {
               const testDate = today(getLocalTimeZone());
@@ -398,7 +399,7 @@ const DateSpecificManager = () => {
         <ModalContent>
           <ModalHeader>
             <div>
-              <Text variant="title" color="#964f20">
+              <Text variant="title" isAdmin color="#265197">
                 Gestionar Horarios
               </Text>
               {selectedDate && (
@@ -423,14 +424,14 @@ const DateSpecificManager = () => {
                   <Button
                     size="sm"
                     onPress={blockEntireDay}
-                    className="bg-[#FF8C00] text-white hover:bg-green-500 transition-colors"
+                    className="bg-[#265197] text-white hover:bg-[#16305A] transition-colors"
                   >
                     Bloquear Todo el Día
                   </Button>
                   <Button
                     size="sm"
                     onPress={unblockEntireDay}
-                    className="bg-[#FF8C00] text-white hover:bg-green-500 transition-colors"
+                    className="bg-[#265197] text-white hover:bg-[#16305A] transition-colors"
                   >
                     Desbloquear Todo el Día
                   </Button>
@@ -472,7 +473,7 @@ const DateSpecificManager = () => {
 
                 {/* Leyenda */}
                 <div className="space-y-2 text-xs">
-                  <Text variant="subtitle" color="#964f20">
+                  <Text variant="subtitle" isAdmin color="#265197">
                     Leyenda
                   </Text>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -502,6 +503,7 @@ const DateSpecificManager = () => {
 
           <ModalFooter>
             <Button
+              isAdmin
               variant="secondary"
               onPress={() => setIsModalOpen(false)}
             >

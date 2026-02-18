@@ -695,12 +695,12 @@ const UnifiedAvailabilityManager = () => {
         <Card className="p-6">
           <div>
             <p>
-              <Text variant="title" color="#ff6b35">
+              <Text isAdmin variant="title" color="#265197">
                 Gestión Unificada de Disponibilidad
               </Text>
             </p>
             <p>
-              <Text variant="body" color="color-on-surface">
+              <Text isAdmin variant="body" color="#16305A">
                 Selecciona un día en el calendario y gestiona su disponibilidad slot por slot.
               </Text>
             </p>
@@ -712,7 +712,7 @@ const UnifiedAvailabilityManager = () => {
         <Card className="p-6">
           <div className="space-y-4">
             <p>
-              <Text variant="subtitle" color="#ff6b35">
+              <Text isAdmin variant="subtitle" color="#265197">
                 Calendario
               </Text>
             </p>
@@ -736,7 +736,7 @@ const UnifiedAvailabilityManager = () => {
             {/* Controles de horario */}
             <div className="space-y-3">
               <div className="flex gap-2 items-center flex-wrap">
-                <Text variant="body" color="#ff6b35" className="font-semibold">
+                <Text isAdmin variant="body" color="#265197" className="font-semibold">
                   Horario de Oficina:
                 </Text>
                 <Select
@@ -769,18 +769,18 @@ const UnifiedAvailabilityManager = () => {
               </div>
 
               <div className="flex gap-2 flex-wrap">
-                <Button size="sm" variant="flat" onPress={applyOfficeHours} className="bg-[#ff6b35] text-white hover:bg-[#e55a24]">
-                  🕘 Aplicar Horario de Oficina
+                <Button isAdmin size="sm" variant="flat" onPress={applyOfficeHours} className="bg-[#265197] text-white hover:bg-[#16305A]">
+                  Aplicar Horario de Oficina
                 </Button>
-                <Button size="sm" variant="flat" onPress={activateAllSlots} className="bg-[#ff6b35] text-white hover:bg-[#e55a24]">
-                  🌐 Activar Todos los Slots
+                <Button isAdmin size="sm" variant="flat" onPress={activateAllSlots} className="bg-[#265197] text-white hover:bg-[#16305A]">
+                  Activar Todos los Slots
                 </Button>
               </div>
 
               {/* Configuración de modo de visualización para usuarios */}
-              <div className="space-y-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <Text variant="body" color="#1e40af" className="font-semibold">
-                  🎛️ Configuración del Formulario Público:
+              <div className="space-y-2 p-3 bg-[#EEF1F7] rounded-lg border border-[#D4DEED]">
+                <Text isAdmin variant="body" color="#265197" className="font-semibold">
+                  Configuración del Formulario Público:
                 </Text>
                 <div className="flex gap-2 items-center flex-wrap">
                   <Text variant="body" color="color-on-surface" className="text-sm">
@@ -809,7 +809,7 @@ const UnifiedAvailabilityManager = () => {
                 </Text>
 
                 {/* Configuración de selección múltiple */}
-                <div className="pt-2 border-t border-blue-200">
+                <div className="pt-2 border-t border-[#D4DEED]">
                   <div className="flex gap-2 items-center flex-wrap">
                     <Text variant="body" color="color-on-surface" className="text-sm">
                       Permitir selección:
@@ -877,7 +877,7 @@ const UnifiedAvailabilityManager = () => {
         <Card className="p-6">
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <Text variant="subtitle" color="#ff6b35">
+              <Text isAdmin variant="subtitle" color="#265197">
                 Horarios - {selectedDate && formatDateForDisplay(selectedDate)}
               </Text>
             </div>
@@ -886,20 +886,22 @@ const UnifiedAvailabilityManager = () => {
             <div className="space-y-2">
               <div className="flex gap-2 flex-wrap">
                 <Button
+                  isAdmin
                   size="sm"
                   variant="flat"
                   onPress={blockEntireDay}
                   disabled={isLoading}
-                  className="bg-[#ff6b35] text-white hover:bg-[#e55a24]"
+                  className="bg-[#265197] text-white hover:bg-[#16305A]"
                 >
                   Bloquear Todo el Día
                 </Button>
                 <Button
+                  isAdmin
                   size="sm"
                   variant="flat"
                   onPress={unblockEntireDay}
                   disabled={isLoading}
-                  className="bg-[#ff6b35] text-white hover:bg-[#e55a24]"
+                  className="bg-[#265197] text-white hover:bg-[#16305A]"
                 >
                   Desbloquear Todo el Día
                 </Button>
@@ -1023,7 +1025,7 @@ const UnifiedAvailabilityManager = () => {
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
         <Card className="p-6">
           <div className="space-y-4">
-            <Text variant="subtitle" color="#ff6b35">
+            <Text isAdmin variant="subtitle" color="#265197">
               Reservas del día {selectedDate && formatDateForDisplay(selectedDate)}
             </Text>
 
@@ -1091,7 +1093,7 @@ const UnifiedAvailabilityManager = () => {
       <Modal isOpen={isOpen} onClose={onClose} size="lg">
         <ModalContent>
           <ModalHeader>
-            <Text variant="subtitle" color="#964f20">
+            <Text isAdmin variant="subtitle" color="#265197">
               ¿Desea Bloquear la hora {modalData?.timeSlot}?
             </Text>
           </ModalHeader>
@@ -1099,7 +1101,7 @@ const UnifiedAvailabilityManager = () => {
             <div className="space-y-3">
               <button
                 onClick={handleBlockForToday}
-                className="w-full p-4 bg-blue-50 hover:bg-blue-100 rounded-lg border-2 border-blue-200 hover:border-blue-400 transition-all cursor-pointer text-left"
+                className="w-full p-4 bg-[#EEF1F7] hover:bg-[#D4DEED] rounded-lg border-2 border-[#D4DEED] hover:border-[#A7BDE2] transition-all cursor-pointer text-left"
               >
                 <p>
                   <Text variant="body" color="color-on-surface" className="font-semibold mb-2">
@@ -1134,7 +1136,8 @@ const UnifiedAvailabilityManager = () => {
           </ModalBody>
           <ModalFooter>
             <Button
-              variant="flat"
+              isAdmin
+              variant="secondary"
               onPress={onClose}
               size="sm"
               fullWidth
