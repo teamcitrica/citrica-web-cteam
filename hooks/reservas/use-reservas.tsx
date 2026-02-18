@@ -20,6 +20,7 @@ export interface Reserva {
   notification_email?: string
   recurring?: string
   last_notified_year?: number | null
+  last_notified_date?: string | null
 }
 
 export const useReservas = () => {
@@ -150,7 +151,7 @@ export const useReservas = () => {
   )
 
   const updateReserva = useCallback(
-    async (id: string, data: Partial<Pick<Reserva, 'name' | 'email' | 'message' | 'description' | 'booking_date' | 'time_slots' | 'status'>>) => {
+    async (id: string, data: Partial<Pick<Reserva, 'name' | 'email' | 'message' | 'description' | 'booking_date' | 'time_slots' | 'status' | 'recurring'>>) => {
       try {
         setIsLoading(true)
         const { error } = await supabase

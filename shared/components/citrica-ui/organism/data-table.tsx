@@ -81,7 +81,7 @@ export function DataTable<T extends Record<string, any>>({
   data,
   columns,
   isLoading = false,
-  itemsPerPage = 50,
+  itemsPerPage = 8,
   searchFields = [],
   searchPlaceholder = "Buscar...",
   onAdd,
@@ -173,6 +173,7 @@ export function DataTable<T extends Record<string, any>>({
       )}
 
       {/* Barra de búsqueda y acciones */}
+      {(searchFields.length > 0 || showCustomAutocomplete || showCompanyFilter || headerActions || enableExport || onAdd) && (
       <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full py-3 flex-shrink-0 gap-3">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1 min-w-0">
           {/* Autocomplete personalizado O Filtro de empresa */}
@@ -305,6 +306,7 @@ export function DataTable<T extends Record<string, any>>({
           )}
         </div>
       </div>
+      )}
 
       {/* Indicadores de filtros activos - solo para client table */}
       {showFilterIndicators && (
@@ -368,7 +370,7 @@ export function DataTable<T extends Record<string, any>>({
       )}
 
       {/* Contenedor de tabla con scroll horizontal y vertical */}
-      <div className="table-scroll-container flex-1">
+      <div className="table-scroll-container flex-1 overflow-x-auto">
         {/* Tabla */}
         <Table
           isStriped
@@ -445,11 +447,11 @@ export function DataTable<T extends Record<string, any>>({
               showControls
               showShadow
               classNames={{
-                cursor: "text-white",
+                cursor: "bg-[#265197] text-white shadow-none",
+                item: "border-none shadow-none outline-none ring-0",
+                prev: "border-none shadow-none outline-none ring-0",
+                next: "border-none shadow-none outline-none ring-0",
               }}
-              style={{
-                "--pagination-active-bg": paginationColor,
-              } as React.CSSProperties}
               page={currentPage}
               total={Math.ceil(totalRecords / tableFeatures.rowsPerPage)}
               onChange={(page) => {
@@ -469,11 +471,11 @@ export function DataTable<T extends Record<string, any>>({
               showControls
               showShadow
               classNames={{
-                cursor: "text-white",
+                cursor: "bg-[#265197] text-white shadow-none",
+                item: "border-none shadow-none outline-none ring-0",
+                prev: "border-none shadow-none outline-none ring-0",
+                next: "border-none shadow-none outline-none ring-0",
               }}
-              style={{
-                "--pagination-active-bg": paginationColor,
-              } as React.CSSProperties}
               page={tableFeatures.page}
               total={tableFeatures.pages}
               onChange={tableFeatures.setPage}

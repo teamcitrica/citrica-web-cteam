@@ -331,7 +331,7 @@ export const ContactSectionLanding = ({
                         variant="primary"
                         fullWidth
                         onPress={nextStep}
-                        disabled={!formData.date}
+                        disabled={!formData.date || availableTimeSlots.length === 0}
                       />
                     </div>
                   </div>

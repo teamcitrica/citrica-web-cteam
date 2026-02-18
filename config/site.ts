@@ -67,6 +67,10 @@ export const siteConfig = {
 					href: "/admin/agenda/calendario",
 				},
 				{
+					title: "Recordatorios",
+					href: "/admin/agenda/recordatorios",
+				},
+				{
 					title: "Disponibilidad",
 					href: "/admin/agenda/disponibilidad",
 				},
