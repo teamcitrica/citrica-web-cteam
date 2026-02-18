@@ -155,7 +155,6 @@ export const CustomRecurrencePanel: React.FC<CustomRecurrencePanelProps> = ({ va
               classNames={INPUT_CLASSNAMES}
               className="w-[130px]"
               size="sm"
-              onFocus={() => update({ endType: "date" })}
             />
           </div>
 
@@ -175,7 +174,6 @@ export const CustomRecurrencePanel: React.FC<CustomRecurrencePanelProps> = ({ va
               className="w-[70px]"
               min={1}
               size="sm"
-              onFocus={() => update({ endType: "count" })}
             />
             <Text isAdmin variant="label" color="#265197" className="font-medium shrink-0">Concurrencias</Text>
           </div>
