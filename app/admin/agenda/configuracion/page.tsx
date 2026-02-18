@@ -226,7 +226,7 @@ export default function ConfiguracionPage() {
   };
 
   const getSlotClasses = (state: string) => {
-    const base = "w-[78px] h-[48px] flex items-center justify-center rounded-[8px] text-xs font-medium border transition-all";
+    const base = "w-[60px] h-[32px] flex items-center justify-center rounded-[8px] text-[12px] font-medium border transition-all";
     switch (state) {
       case "available":
         return `${base} bg-[#82EFCE] text-[#16305A] border-[#82EFCE] hover:bg-[#6DE0BC] cursor-pointer`;
@@ -264,7 +264,7 @@ export default function ConfiguracionPage() {
   return (
     <Container>
       <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }} className="space-y-3">
-        <h1>
+        <h1 className="text-2xl font-bold text-[#265197] mb-5">
           <Text isAdmin variant="title" weight="bold" color="#678CC5">AGENDA</Text>
           {" > "}
           <Text isAdmin variant="title" weight="bold" color="#265197">Configuración</Text>
@@ -284,21 +284,21 @@ export default function ConfiguracionPage() {
         {activeTab === "semanal" ? (
           <WeeklyScheduleManager />
         ) : (
-          <div className="flex flex-col xl:flex-row gap-4">
-            <div className="xl:w-[475px] xl:min-w-[475px]">
-              <div className="bg-white rounded-xl shadow-sm border border-[#D4DEED] px-6 pt-[12px] pb-6 h-[650px]">
-                  <Text isAdmin variant="subtitle" color="#265197" weight="bold">
+          <div className="flex flex-col xl:flex-row gap-3">
+            <div className="xl:w-[400px] xl:min-w-[400px]">
+              <div className="bg-white rounded-xl shadow-sm border border-[#D4DEED] px-3 pt-3 pb-6 h-[650px]">
+                  <Text isAdmin variant="label" color="#265197" weight="bold">
                     Configuración de disponibilidad
                   </Text>
 
-                  <div>
-                    <Text isAdmin variant="body" color="#16305A" weight="bold" className="mt-[20px]">
+                  <div className="mt-2">
+                    <Text isAdmin variant="body" color="#16305A" weight="bold">
                       Horario disponible
                     </Text>
 
-                    <div className="flex mt-[12px]">
+                    <div className="flex mt-3">
                       <div className="flex-1 space-y-3">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                           <Text isAdmin variant="label" color="#265197">¿Horario de oficina?</Text>
                           <Switch
                             isSelected={officeHoursEnabled}
@@ -307,8 +307,8 @@ export default function ConfiguracionPage() {
                             size="sm"
                           />
                         </div>
-                        <div className="flex gap-3">
-                          <div className="w-[100px] h-[52px] border border-[#D4DEED] rounded-lg px-3 pt-1.5 pb-0.5">
+                        <div className="flex gap-2">
+                          <div className="w-[110px] h-[52px] border border-[#D4DEED] rounded-lg px-2 pt-1.5 pb-0.5">
                             <span className="block text-[10px] text-[#265197] leading-none mb-1">Hora inicio</span>
                             <input
                               type="time"
@@ -320,10 +320,10 @@ export default function ConfiguracionPage() {
                                   if (officeHoursEnabled) applyOfficeHours(v, officeEndHour);
                                 }
                               }}
-                              className="w-full text-sm text-[#A7BDE2] font-medium bg-transparent outline-none [color-scheme:light] [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:saturate-100 [&::-webkit-calendar-picker-indicator]:[filter:invert(72%)_sepia(12%)_saturate(735%)_hue-rotate(182deg)_brightness(91%)_contrast(87%)]"
+                              className="w-full text-xs text-[#A7BDE2] font-medium bg-transparent outline-none [color-scheme:light] [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:saturate-100 [&::-webkit-calendar-picker-indicator]:[filter:invert(72%)_sepia(12%)_saturate(735%)_hue-rotate(182deg)_brightness(91%)_contrast(87%)]"
                             />
                           </div>
-                          <div className="w-[100px] h-[52px] border border-[#D4DEED] rounded-lg px-3 pt-1.5 pb-0.5">
+                          <div className="w-[110px] h-[52px] border border-[#D4DEED] rounded-lg px-2 pt-1.5 pb-0.5">
                             <span className="block text-[10px] text-[#265197] leading-none mb-1">Hora fin</span>
                             <input
                               type="time"
@@ -335,14 +335,14 @@ export default function ConfiguracionPage() {
                                   if (officeHoursEnabled) applyOfficeHours(officeStartHour, v);
                                 }
                               }}
-                              className="w-full text-sm text-[#A7BDE2] font-medium bg-transparent outline-none [color-scheme:light] [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:saturate-100 [&::-webkit-calendar-picker-indicator]:[filter:invert(72%)_sepia(12%)_saturate(735%)_hue-rotate(182deg)_brightness(91%)_contrast(87%)]"
+                              className="w-full text-xs text-[#A7BDE2] font-medium bg-transparent outline-none [color-scheme:light] [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:saturate-100 [&::-webkit-calendar-picker-indicator]:[filter:invert(72%)_sepia(12%)_saturate(735%)_hue-rotate(182deg)_brightness(91%)_contrast(87%)]"
                             />
                           </div>
                         </div>
                       </div>
-                      <div className="w-px bg-[#D4DEED] mx-4 self-stretch" />
-                      <div className="flex items-start pt-1">
-                        <div className="flex items-center gap-2">
+                      <div className="w-px bg-[#D4DEED] mx-2 self-stretch" />
+                      <div className="flex items-start">
+                        <div className="flex items-center gap-1.5">
                           <Text isAdmin variant="label" color="#265197">Activa todos los slots</Text>
                           <Switch
                             isSelected={allSlotsEnabled}
@@ -365,10 +365,10 @@ export default function ConfiguracionPage() {
                     </div>
                   </div>
 
-                  <Divider className="bg-[#D4DEED] mt-[16px]" />
+                  <Divider className="bg-[#D4DEED] my-3" />
 
                   <div className="space-y-4">
-                    <Text isAdmin variant="body" color="#265197" weight="bold">
+                    <Text isAdmin variant="label" color="#265197" weight="bold">
                       Configuración formulario público
                     </Text>
 
@@ -432,8 +432,8 @@ export default function ConfiguracionPage() {
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="bg-white rounded-xl shadow-sm border border-[#D4DEED] p-[16px] space-y-5">
-                <Text isAdmin variant="body" color="#265197" weight="bold" className="mt-[16px]">
+              <div className="bg-white rounded-xl shadow-sm border border-[#D4DEED] p-4 space-y-3">
+                <Text isAdmin variant="label" color="#265197" weight="bold" className="mt-4">
                   Fecha: {selectedDate && formatDate(selectedDate)}
                 </Text>
 
@@ -453,16 +453,16 @@ export default function ConfiguracionPage() {
                       title: "!text-[#265197] !font-semibold !text-sm",
                       prevButton: "!text-[#265197] !min-w-6 !w-6 !h-6",
                       nextButton: "!text-[#265197] !min-w-6 !w-6 !h-6",
-                      gridWrapper: "!w-full !px-0 !pb-3",
+                      gridWrapper: "!w-full !px-0 !pb-2",
                       grid: "!w-full",
                       gridHeader: "!bg-white",
                       gridHeaderRow: "!w-full",
                       gridHeaderCell: "!text-[#265197] !font-medium !text-xs !flex-1 !w-auto !justify-center",
                       gridBody: "!bg-transparent",
                       gridBodyRow: "!w-full",
-                      cell: "!text-[#265197] !flex-1",
+                      cell: "!text-[#265197] !flex-1 !py-0",
                       cellButton: [
-                        "!w-full !text-sm",
+                        "!w-full !h-8 !min-h-0 !text-sm",
                         "data-[selected=true]:!bg-[#265197] data-[selected=true]:!text-white",
                         "data-[today=true]:!bg-[#EEF1F7] data-[today=true]:!text-[#265197]",
                         "hover:!bg-[#EEF1F7]",
@@ -476,19 +476,19 @@ export default function ConfiguracionPage() {
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <Text isAdmin variant="body" color="#265197" weight="bold">Slots</Text>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <div className="flex items-center gap-1.5 border border-[#A7BDE2] rounded-full px-2.5 py-0.5">
+                    <div className="flex items-center gap-1.5 border border-[#A7BDE2] rounded-full px-2 py-0.5">
                       <div className="w-2.5 h-2.5 rounded-full bg-[#4CAF50]" />
                       <Text isAdmin variant="label" color="#16305A">Disponibles</Text>
                     </div>
-                    <div className="flex items-center gap-1.5 border border-[#A7BDE2] rounded-full px-2.5 py-0.5">
+                    <div className="flex items-center gap-1.5 border border-[#A7BDE2] rounded-full px-2 py-0.5">
                       <div className="w-2.5 h-2.5 rounded-full bg-[#FF9800]" />
                       <Text isAdmin variant="label" color="#16305A">Reservados</Text>
                     </div>
-                    <div className="flex items-center gap-1.5 border border-[#A7BDE2] rounded-full px-2.5 py-0.5">
+                    <div className="flex items-center gap-1.5 border border-[#A7BDE2] rounded-full px-2 py-0.5">
                       <div className="w-2.5 h-2.5 rounded-full bg-[#EF5350]" />
                       <Text isAdmin variant="label" color="#16305A">Bloqueados</Text>
                     </div>
-                    <div className="flex items-center gap-1.5 border border-[#A7BDE2] rounded-full px-2.5 py-0.5">
+                    <div className="flex items-center gap-1.5 border border-[#A7BDE2] rounded-full px-2 py-0.5">
                       <div className="w-2.5 h-2.5 rounded-full bg-[#D4DEED]" />
                       <Text isAdmin variant="label" color="#16305A">Inactivos</Text>
                     </div>
@@ -500,7 +500,7 @@ export default function ConfiguracionPage() {
                     <Text isAdmin variant="body" color="#678CC5">Cargando horarios...</Text>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-10 gap-2">
+                  <div className="grid grid-cols-8 gap-2">
                     {allTimeSlots.map((slot) => {
                       const state = getSlotState(slot);
                       const isReserved = state === "reserved";
@@ -518,7 +518,7 @@ export default function ConfiguracionPage() {
                   </div>
                 )}
 
-                <div className="flex items-center gap-3 pt-2">
+                <div className="flex items-center gap-3 pt-1">
                   <Text isAdmin variant="body" color="#16305A">Bloquea el día</Text>
                   <Switch
                     isSelected={blockDayEnabled}
