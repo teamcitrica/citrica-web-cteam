@@ -112,7 +112,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
               {/* Número del día */}
               <div className="flex justify-start mb-0.5 md:mb-1">
                 {isToday || isSelected ? (
-                  <Text isAdmin={true} variant="label" color="color-white" className="w-4 h-4 md:w-5 md:h-5 xl:w-6 xl:h-6 flex items-center justify-center rounded-full bg-[#265197] text-white text-[9px] md:text-[10px] xl:text-[11px] font-bold">
+                  <Text isAdmin={true} variant="label" color="#ffffff" className="w-4 h-4 md:w-5 md:h-5 xl:w-6 xl:h-6 flex items-center justify-center rounded-full bg-[#265197] !text-white text-[9px] md:text-[10px] xl:text-[11px] font-bold">
                     {day}
                   </Text>
                 ) : (

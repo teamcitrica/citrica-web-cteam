@@ -76,8 +76,11 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<ReservaEstado>("pending");
-  const [recurring, setRecurring] = useState(false);
+  const [recurringValue, setRecurringValue] = useState("none");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Si la recurrencia no es "none" ni "yearly", es una recurrencia avanzada que solo se muestra como texto
+  const isAdvancedRecurrence = recurringValue !== "none" && recurringValue !== "yearly";
 
   useEffect(() => {
     if (booking) {
@@ -87,7 +90,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
       setEmail(booking.email || "");
       setMessage(booking.message || "");
       setStatus(booking.status);
-      setRecurring(booking.recurring === "yearly");
+      setRecurringValue(booking.recurring || "none");
       const { start, end } = parseTimeSlots(booking.time_slots);
       setTimeStart(start);
       setTimeEnd(end);
@@ -107,7 +110,7 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
         email,
         message,
         status,
-        recurring: recurring ? "yearly" : "none",
+        recurring: recurringValue,
       });
 
       if (!error) {
@@ -229,17 +232,25 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
       />
       {status === "reminder" && (
         <div className="flex items-center mt-4">
-          <Checkbox
-            isSelected={recurring}
-            onValueChange={setRecurring}
-            classNames={{
-              wrapper: "border border-gray-300 before:border-0 after:bg-[#00226c]",
-              icon: "text-white"
-            }}
-          />
-          <Text variant="label" textColor="color-black" className="opacity-60">
-            Repetir cada año
-          </Text>
+          {isAdvancedRecurrence ? (
+            <Text isAdmin variant="label" color="#265197" className="opacity-60">
+              Recurrencia: {recurringValue === "daily" ? "Todos los días" : recurringValue === "weekly" ? "Semanal" : recurringValue === "monthly" ? "Mensual" : recurringValue === "weekdays" ? "Días hábiles" : "Personalizada"}
+            </Text>
+          ) : (
+            <>
+              <Checkbox
+                isSelected={recurringValue === "yearly"}
+                onValueChange={(checked) => setRecurringValue(checked ? "yearly" : "none")}
+                classNames={{
+                  wrapper: "border border-gray-300 before:border-0 after:bg-[#00226c]",
+                  icon: "text-white"
+                }}
+              />
+              <Text variant="label" textColor="color-black" className="opacity-60">
+                Repetir cada año
+              </Text>
+            </>
+          )}
         </div>
       )}
     </DrawerCitricaAdmin>

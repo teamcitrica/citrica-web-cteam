@@ -5,7 +5,6 @@ import FilterDropdown from "@/shared/components/citrica-ui/molecules/filter-drop
 import { useReservas, Reserva } from "@/hooks/reservas/use-reservas";
 import CalendarGrid from "./components/calendar-grid";
 import DayDetailPanel from "./components/day-detail-panel";
-import CreateReminderModal from "./components/create-reminder-modal";
 import EditBookingModal from "./components/edit-booking-modal";
 
 /** Tipos de estado para los filtros del calendario */
@@ -32,12 +31,11 @@ const FILTER_OPTIONS = [
 const capitalize = (str: string) => str.replace(/^\w/, (c) => c.toUpperCase());
 
 const BookingCalendarView = () => {
-  const { reservas: bookings, refreshReservas, createReminder, updateReservaStatus, deleteReserva, updateReserva } = useReservas();
+  const { reservas: bookings, refreshReservas, updateReservaStatus, deleteReserva, updateReserva } = useReservas();
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<BookingStatusFilter>("all");
-  const [isReminderModalOpen, setIsReminderModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingBooking, setEditingBooking] = useState<Reserva | null>(null);
 
@@ -131,17 +129,6 @@ const BookingCalendarView = () => {
           onValueChange={(val) => setStatusFilter(val as BookingStatusFilter)}
         />
 
-        {/* Botón crear recordatorio */}
-        <Button
-          isAdmin={true}
-          size="sm"
-          variant="primary"
-          onPress={() => setIsReminderModalOpen(true)}
-          startContent={<Icon name="Plus" size={16} />}
-          className="!ml-auto shrink-0"
-        >
-          Recordatorio
-        </Button>
       </div>
 
       {/* Contenido principal: calendario + panel lateral, separados 12px */}
@@ -178,14 +165,6 @@ const BookingCalendarView = () => {
           />
         </div>
       </div>
-
-      {/* Modal para crear recordatorio */}
-      <CreateReminderModal
-        isOpen={isReminderModalOpen}
-        onClose={() => setIsReminderModalOpen(false)}
-        onSubmit={createReminder}
-        defaultDate={selectedDate || undefined}
-      />
 
       {/* Drawer para editar reserva/recordatorio */}
       <EditBookingModal
