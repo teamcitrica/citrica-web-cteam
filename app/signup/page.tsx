@@ -101,22 +101,25 @@ const SignupPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Container>
+    <div className="min-h-screen flex items-center justify-center container-background">
+      <div className="light-top-right"></div>
+      <div className="ellipse2-top"></div>
+      <img src="/img/line-top.svg" alt="" className="line-top" />
+      <Container className='z-10'>
         <Col cols={{ lg: 4, md: 3, sm: 4 }} className="mx-auto">
           <Card className="p-6">
-            <CardBody className="space-y-6">
-              <div className="text-center">
+            <CardBody className="space-y-4">
+              <div className="flex flex-col items-center">
                 <Text variant="headline" textColor="color-on-container">
                   Crear Cuenta
                 </Text>
-                <Text variant="body" textColor="color-on-container" className="mt-2">
+                <Text variant="label" textColor="color-on-container" className="mt-2">
                   Completa los datos para registrarte
                 </Text>
               </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <form className="flex flex-col">
+                <div className="flex flex-row gap-3">
                   <Input
                     type="text"
                     label="Nombre"
@@ -202,8 +205,9 @@ const SignupPage = () => {
                   label={isLoading ? "Registrando..." : "Crear Cuenta"}
                   variant="primary"
                   textVariant="body"
+                  className='!mt-4'
                 />
-              </div>
+              </form>
 
               <div className="text-center">
                 <Text variant="label" textColor="color-on-container">
@@ -220,6 +224,9 @@ const SignupPage = () => {
           </Card>
         </Col>
       </Container>
+      <div className="light-bottom-left"></div>
+      <div className="ellipse2-bottom"></div>
+      <img src="/img/line-bottom.svg" alt="" className="line-bottom" />
     </div>
   )
 }
