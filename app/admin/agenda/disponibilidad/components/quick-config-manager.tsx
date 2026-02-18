@@ -89,7 +89,7 @@ const QuickConfigManager = () => {
       <Card className="p-6">
         <div>
           <p>
-            <Text variant="title" color="#964f20">
+            <Text variant="title" isAdmin color="#265197">
               Configuración Rápida
             </Text>
           </p>
@@ -105,7 +105,7 @@ const QuickConfigManager = () => {
       <Card className="p-6">
         <div className="space-y-4">
           <p>
-            <Text variant="subtitle" color="#964f20">
+            <Text variant="subtitle" isAdmin color="#265197">
               Configuraciones Predefinidas
             </Text>
           </p>
@@ -119,7 +119,7 @@ const QuickConfigManager = () => {
             {presets.map((preset, index) => (
               <div
                 key={index}
-                className="p-4 border border-gray-200 rounded-lg hover:border-[#964f20] transition-colors cursor-pointer"
+                className="p-4 border border-gray-200 rounded-lg hover:border-[#265197] transition-colors cursor-pointer"
                 onClick={async () => {
                   if (confirm(`¿Aplicar la configuración "${preset.name}"?\n\nEsto afectará la disponibilidad semanal actual.`)) {
                     try {
@@ -162,7 +162,7 @@ const QuickConfigManager = () => {
       <Card className="p-6">
         <div className="space-y-4">
           <p>
-            <Text variant="subtitle" color="#964f20">
+            <Text variant="subtitle" isAdmin color="#265197">
               Acciones por Lotes
             </Text>
           </p>
@@ -208,7 +208,7 @@ const QuickConfigManager = () => {
           </div>
 
           {batchConfig.startDate && batchConfig.endDate && (
-            <div className="p-4 bg-blue-50 rounded-lg">
+            <div className="p-4 bg-[#EEF1F7] rounded-lg">
               <Text variant="body" color="color-on-surface" className="text-sm">
                 <strong>Resumen:</strong> Se aplicará la acción "{batchConfig.action === 'generate' ? 'Generar Slots' : batchConfig.action === 'activate' ? 'Activar' : 'Desactivar'}"
                 a {calculateDaysBetween(batchConfig.startDate, batchConfig.endDate)} días
@@ -218,6 +218,7 @@ const QuickConfigManager = () => {
           )}
 
           <Button
+            isAdmin
             variant="primary"
             onPress={handleBatchAction}
             disabled={!batchConfig.startDate || !batchConfig.endDate || isLoading}
@@ -234,8 +235,8 @@ const QuickConfigManager = () => {
         <Card className="p-6">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Icon name="Zap" size={20} className="text-[#964f20]" />
-              <Text variant="subtitle" color="#964f20">
+              <Icon name="Zap" size={20} className="text-[#265197]" />
+              <Text variant="subtitle" isAdmin color="#265197">
                 Generación Automática
               </Text>
             </div>
@@ -344,8 +345,8 @@ const QuickConfigManager = () => {
         <Card className="p-6">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Icon name="AlertTriangle" size={20} className="text-orange-500" />
-              <Text variant="subtitle" color="#964f20">
+              <Icon name="AlertTriangle" size={20} className="text-[#678CC5]" />
+              <Text variant="subtitle" isAdmin color="#265197">
                 Acciones de Emergencia
               </Text>
             </div>
@@ -443,7 +444,7 @@ const QuickConfigManager = () => {
       {/* Información */}
       <Card className="p-6">
         <div className="space-y-3">
-          <Text variant="subtitle" color="#964f20">
+          <Text variant="subtitle" isAdmin color="#265197">
             Información Importante
           </Text>
           <div className="space-y-2 text-sm">

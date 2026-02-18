@@ -171,7 +171,7 @@ const WeeklyScheduleManager = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <p>
-            <Text variant="title" color="#964f20">
+            <Text variant="title" isAdmin color="#265197">
               Configuración Semanal de Horarios
             </Text>
             </p>
@@ -184,7 +184,7 @@ const WeeklyScheduleManager = () => {
             <Button
               size="sm"
               onPress={() => setShowStandardHoursModal(true)}
-              className="bg-[#FF8C00] text-white hover:bg-green-500 transition-colors"
+              className="bg-[#265197] text-white hover:bg-[#16305A] transition-colors"
             >
               Horario Estándar
             </Button>
@@ -192,7 +192,7 @@ const WeeklyScheduleManager = () => {
             <Button
               size="sm"
               onPress={handleOpenToggleAllModal}
-              className="bg-[#FF8C00] text-white hover:bg-green-500 transition-colors"
+              className="bg-[#265197] text-white hover:bg-[#16305A] transition-colors"
             >
               {areAllDaysClosed() ? "Abrir Todo" : "Cerrar Todo"}
             </Button>
@@ -286,7 +286,7 @@ const WeeklyScheduleManager = () => {
       {/* Leyenda */}
       <Card className="p-6">
         <div className="space-y-3">
-          <Text variant="subtitle" color="#964f20">
+          <Text variant="subtitle" isAdmin color="#265197">
             Leyenda
           </Text>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -321,6 +321,7 @@ const WeeklyScheduleManager = () => {
         footer={
           <div className="flex justify-end gap-2 w-full">
             <Button
+              isAdmin
               variant="primary"
               onPress={handleApplyStandardHours}
               startContent={<Icon name="Check" size={20} />}
@@ -328,6 +329,7 @@ const WeeklyScheduleManager = () => {
               Sí, aplicar horario estándar
             </Button>
             <Button
+              isAdmin
               variant="secondary"
               onPress={() => setShowStandardHoursModal(false)}
             >
@@ -337,16 +339,16 @@ const WeeklyScheduleManager = () => {
         }
       >
         <div className="space-y-4">
-          <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <Icon name="Info" size={20} className="text-blue-600 mt-0.5" />
+          <div className="flex items-start gap-2 bg-[#EEF1F7] border border-[#D4DEED] rounded-lg p-3">
+            <Icon name="Info" size={20} className="text-[#265197] mt-0.5" />
             <div>
               <p>
-                <Text variant="body" color="#2563eb" className="font-bold">
+                <Text variant="body" color="#265197" className="font-bold">
                   Configuración de Horario Estándar
                 </Text>
               </p>
               <p>
-                <Text variant="body" color="#1e40af" className="text-sm mt-1">
+                <Text variant="body" color="#16305A" className="text-sm mt-1">
                   Esta acción configurará los siguientes horarios:
                 </Text>
               </p>
@@ -356,11 +358,11 @@ const WeeklyScheduleManager = () => {
           <div className="space-y-2">
             <div className="flex justify-between py-2 border-b">
               <Text variant="body" color="color-on-surface">Lunes a Viernes:</Text>
-              <Text variant="body" color="#964f20" className="font-semibold">9:00 AM - 6:00 PM</Text>
+              <Text variant="body" isAdmin color="#265197" className="font-semibold">9:00 AM - 6:00 PM</Text>
             </div>
             <div className="flex justify-between py-2 border-b">
               <Text variant="body" color="color-on-surface">Sábado:</Text>
-              <Text variant="body" color="#964f20" className="font-semibold">10:00 AM - 4:00 PM</Text>
+              <Text variant="body" isAdmin color="#265197" className="font-semibold">10:00 AM - 4:00 PM</Text>
             </div>
             <div className="flex justify-between py-2">
               <Text variant="body" color="color-on-surface">Domingo:</Text>
@@ -369,7 +371,7 @@ const WeeklyScheduleManager = () => {
           </div>
 
           <p>
-            <Text variant="body" color="#964f20" className="font-semibold">
+            <Text variant="body" isAdmin color="#265197" className="font-semibold">
               ¿Deseas aplicar esta configuración a toda la semana?
             </Text>
           </p>
@@ -385,6 +387,7 @@ const WeeklyScheduleManager = () => {
         footer={
           <div className="flex justify-end gap-2 w-full">
             <Button
+              isAdmin
               startContent={<Icon name={isOpeningAll ? "Check" : "X"} size={20} />}
               variant={isOpeningAll ? "primary" : "danger"}
               onPress={handleToggleAllDays}
@@ -392,6 +395,7 @@ const WeeklyScheduleManager = () => {
               {isOpeningAll ? "Sí, abrir todos los días" : "Sí, cerrar todos los días"}
             </Button>
             <Button
+              isAdmin
               variant="secondary"
               onPress={() => setShowCloseAllModal(false)}
             >
@@ -402,27 +406,29 @@ const WeeklyScheduleManager = () => {
       >
         <div className="space-y-4">
           <div
-            className={`flex items-start gap-2 ${isOpeningAll ? "bg-green-50 border-green-200" : "bg-orange-50 border-orange-200"} border rounded-lg p-3`}
+            className={`flex items-start gap-2 bg-[#EEF1F7] border-[#D4DEED] border rounded-lg p-3`}
           >
             <Icon
-              className={`${isOpeningAll ? "text-green-600" : "text-orange-600"} mt-0.5`}
+              className="text-[#265197] mt-0.5"
               name="AlertCircle"
               size={20}
             />
             <div>
               <p>
                 <Text
+                  isAdmin
                   className="font-bold"
-                  color={isOpeningAll ? "#16a34a" : "#ea580c"}
+                  color="#265197"
                   variant="body"
                 >
-                  {isOpeningAll ? "Abrir Disponibilidad" : "⚠️ Cerrar Disponibilidad"}
+                  {isOpeningAll ? "Abrir Disponibilidad" : "Cerrar Disponibilidad"}
                 </Text>
               </p>
               <p>
                 <Text
+                  isAdmin
                   className="text-sm mt-1"
-                  color={isOpeningAll ? "#15803d" : "#c2410c"}
+                  color="#16305A"
                   variant="body"
                 >
                   {isOpeningAll
@@ -434,7 +440,7 @@ const WeeklyScheduleManager = () => {
           </div>
 
           <p>
-            <Text className="font-semibold" color="#964f20" variant="body">
+            <Text className="font-semibold" isAdmin color="#265197" variant="body">
               {isOpeningAll
                 ? "¿Deseas abrir todos los días de la semana?"
                 : "¿Confirmas que deseas cerrar todos los días de la semana?"}
