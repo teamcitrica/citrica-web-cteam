@@ -1,5 +1,6 @@
 "use client";
 import { Switch } from "@heroui/switch";
+import { addToast } from "@heroui/toast";
 import React, { useState, useEffect } from "react";
 import { Button, Text, Icon } from "citrica-ui-toolkit";
 import Card from "@ui/atoms/card";
@@ -63,32 +64,6 @@ const WeeklyScheduleManager = () => {
     }
   };
 
-  const handleBulkTimeUpdate = async (dayOfWeek: number, startTime: string, endTime: string, isActive: boolean) => {
-    const dayConfig = weeklyAvailability.find(day => day.day_of_week === dayOfWeek);
-    if (!dayConfig) return;
-
-    const startHour = parseInt(startTime.split(":")[0]);
-    const startMin = parseInt(startTime.split(":")[1]);
-    const endHour = parseInt(endTime.split(":")[0]);
-    const endMin = parseInt(endTime.split(":")[1]);
-
-    const updatedSlots = dayConfig.time_slots.map(slot => {
-      const slotHour = parseInt(slot.slot.split(":")[0]);
-      const slotMin = parseInt(slot.slot.split(":")[1]);
-
-      const slotTime = slotHour * 60 + slotMin;
-      const startTimeMin = startHour * 60 + startMin;
-      const endTimeMin = endHour * 60 + endMin;
-
-      if (slotTime >= startTimeMin && slotTime < endTimeMin) {
-        return { ...slot, active: isActive };
-      }
-      return slot;
-    });
-
-    await updateDayAvailability(dayOfWeek, dayConfig.is_active, updatedSlots);
-  };
-
   const getDayConfig = (dayOfWeek: number): WeeklyAvailability | undefined => {
     return weeklyAvailability.find(day => day.day_of_week === dayOfWeek);
   };
@@ -114,39 +89,52 @@ const WeeklyScheduleManager = () => {
 
   const handleApplyStandardHours = async () => {
     if (weeklyAvailability.length === 0) {
-      alert("Error: No se ha cargado la configuración semanal. Recarga la página.");
+      addToast({ title: "Error", description: "No se ha cargado la configuración semanal. Recarga la página.", color: "danger" });
       return;
     }
 
     // Horario estándar: 9:00 - 18:00 L-V, 10:00-16:00 S, cerrado D
-    const standardHours = {
-      1: { start: "09:00", end: "18:00", active: true }, // Lunes
-      2: { start: "09:00", end: "18:00", active: true }, // Martes
-      3: { start: "09:00", end: "18:00", active: true }, // Miércoles
-      4: { start: "09:00", end: "18:00", active: true }, // Jueves
-      5: { start: "09:00", end: "18:00", active: true }, // Viernes
-      6: { start: "10:00", end: "16:00", active: true }, // Sábado
-      0: { start: "00:00", end: "00:00", active: false }, // Domingo
+    const standardHours: Record<number, { start: string; end: string; active: boolean }> = {
+      1: { start: "09:00", end: "18:00", active: true },
+      2: { start: "09:00", end: "18:00", active: true },
+      3: { start: "09:00", end: "18:00", active: true },
+      4: { start: "09:00", end: "18:00", active: true },
+      5: { start: "09:00", end: "18:00", active: true },
+      6: { start: "10:00", end: "16:00", active: true },
+      0: { start: "00:00", end: "00:00", active: false },
     };
 
     try {
       for (const [day, config] of Object.entries(standardHours)) {
         const dayNum = parseInt(day);
+        const dayConfig = weeklyAvailability.find(d => d.day_of_week === dayNum);
 
-        // Primero activar el día
-        await handleDayToggle(dayNum, config.active);
-
-        // Luego configurar horarios si está activo
-        if (config.active && config.start !== "00:00") {
-          await handleBulkTimeUpdate(dayNum, config.start, config.end, true);
+        if (!config.active) {
+          await updateDayAvailability(dayNum, false);
+          continue;
         }
+
+        const startHour = parseInt(config.start.split(":")[0]);
+        const startMin = parseInt(config.start.split(":")[1]);
+        const endHour = parseInt(config.end.split(":")[0]);
+        const endMin = parseInt(config.end.split(":")[1]);
+        const startTimeMin = startHour * 60 + startMin;
+        const endTimeMin = endHour * 60 + endMin;
+
+        const updatedSlots = (dayConfig?.time_slots || timeSlots.map(s => ({ slot: s, active: false }))).map(slot => {
+          const [h, m] = slot.slot.split(":").map(Number);
+          const slotTime = h * 60 + m;
+          return { ...slot, active: slotTime >= startTimeMin && slotTime < endTimeMin };
+        });
+
+        await updateDayAvailability(dayNum, true, updatedSlots);
       }
 
-      alert("✅ Horario estándar aplicado exitosamente");
+      addToast({ title: "Éxito", description: "Horario estándar aplicado exitosamente", color: "success" });
       setShowStandardHoursModal(false);
     } catch (error) {
       console.error("Error applying standard hours:", error);
-      alert("❌ Error al aplicar horario estándar");
+      addToast({ title: "Error", description: "Error al aplicar horario estándar", color: "danger" });
     }
   };
 
@@ -162,6 +150,11 @@ const WeeklyScheduleManager = () => {
     }
 
     setShowCloseAllModal(false);
+    addToast({
+      title: "Éxito",
+      description: isOpeningAll ? "Todos los días fueron abiertos correctamente" : "Días cerrados correctamente",
+      color: "success",
+    });
   };
 
   return (
@@ -182,20 +175,20 @@ const WeeklyScheduleManager = () => {
 
           <div className="flex gap-2">
             <Button
+              isAdmin
+              variant="primary"
               size="sm"
               onPress={() => setShowStandardHoursModal(true)}
-              className="bg-[#265197] text-white hover:bg-[#16305A] transition-colors"
-            >
-              Horario Estándar
-            </Button>
+              label="Horario Estándar"
+            />
 
             <Button
+              isAdmin
+              variant="primary"
               size="sm"
               onPress={handleOpenToggleAllModal}
-              className="bg-[#265197] text-white hover:bg-[#16305A] transition-colors"
-            >
-              {areAllDaysClosed() ? "Abrir Todo" : "Cerrar Todo"}
-            </Button>
+              label={areAllDaysClosed() ? "Abrir Todo" : "Cerrar Todo"}
+            />
           </div>
         </div>
       </Card>
@@ -223,11 +216,11 @@ const WeeklyScheduleManager = () => {
                       <Switch
                         isSelected={dayConfig?.is_active || false}
                         onValueChange={(isActive) => handleDayToggle(day.id, isActive)}
-                        color="primary"
+                        classNames={{ wrapper: "group-data-[selected=true]:bg-[#10E5A4]" }}
                       />
                       <div>
                         <p>
-                        <Text variant="subtitle" color="color-on-surface">
+                        <Text variant="subtitle" isAdmin color="#265197">
                           {day.name}
                         </Text>
                         </p>
@@ -246,22 +239,18 @@ const WeeklyScheduleManager = () => {
 
                   {/* Grid de horarios */}
                   {dayConfig?.is_active && (
-                    <div className="grid grid-cols-6 md:grid-cols-12 gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {timeSlots.map((timeSlot) => {
                         const isActive = getTimeSlotStatus(day.id, timeSlot);
                         const hour = parseInt(timeSlot.split(":")[0]);
-                        const isBusinessHour = hour >= 8 && hour < 20;
-
                         return (
                           <div
                             key={timeSlot}
                             className={`
-                              p-2 text-center text-xs rounded cursor-pointer transition-colors
+                              w-[78px] h-[48px] flex items-center justify-center text-xs font-medium rounded-[8px] cursor-pointer transition-all border
                               ${isActive
-                                ? "bg-green-500 hover:bg-green-600 text-white"
-                                : isBusinessHour
-                                  ? "bg-red-300 hover:bg-red-400 text-white"
-                                  : "bg-gray-600 hover:bg-gray-700 text-white"
+                                ? "bg-[#82EFCE] hover:bg-[#6DE0BC] text-[#16305A] border-[#82EFCE]"
+                                : "bg-[#D4DEED] hover:bg-[#C0D0E5] text-[#A7BDE2] border-[#D4DEED]"
                               }
                             `}
                             title={`${timeSlot} - ${String(hour + (timeSlot.includes(":30") ? 1 : 0)).padStart(2, "0")}:${timeSlot.includes(":30") ? "00" : "30"}`}
@@ -289,23 +278,17 @@ const WeeklyScheduleManager = () => {
           <Text variant="subtitle" isAdmin color="#265197">
             Leyenda
           </Text>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-500 rounded"></div>
-              <Text variant="body" color="color-on-surface" className="text-sm">
+              <div className="w-4 h-4 bg-[#82EFCE] rounded"></div>
+              <Text variant="body" color="#16305A" className="text-sm">
                 Slot activo (disponible para reservas)
               </Text>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-red-300 rounded"></div>
-              <Text variant="body" color="color-on-surface" className="text-sm">
+              <div className="w-4 h-4 bg-[#D4DEED] rounded"></div>
+              <Text variant="body" color="#16305A" className="text-sm">
                 Slot inactivo (no disponible)
-              </Text>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-gray-600 rounded"></div>
-              <Text variant="body" color="color-on-surface" className="text-sm">
-                Horario fuera de horario comercial típico
               </Text>
             </div>
           </div>
@@ -389,7 +372,7 @@ const WeeklyScheduleManager = () => {
             <Button
               isAdmin
               startContent={<Icon name={isOpeningAll ? "Check" : "X"} size={20} />}
-              variant={isOpeningAll ? "primary" : "danger"}
+              variant="primary"
               onPress={handleToggleAllDays}
             >
               {isOpeningAll ? "Sí, abrir todos los días" : "Sí, cerrar todos los días"}

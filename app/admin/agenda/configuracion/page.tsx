@@ -158,20 +158,26 @@ export default function ConfiguracionPage() {
     if (!selectedDate) return;
     const dateStr = `${selectedDate.year}-${String(selectedDate.month).padStart(2, "0")}-${String(selectedDate.day).padStart(2, "0")}`;
     if (block) {
-      await createBlockedPeriod(dateStr, dateStr, "Día completo bloqueado");
-      setBlockedSlots([...allTimeSlots]);
       setBlockDayEnabled(true);
+      setSlotStatusMap((prev) => {
+        const updated = { ...prev };
+        allTimeSlots.forEach((s) => { updated[s] = "blocked"; });
+        return updated;
+      });
+      await createBlockedPeriod(dateStr, dateStr, "Día completo bloqueado");
     } else {
+      setBlockDayEnabled(false);
+      setSlotStatusMap((prev) => {
+        const updated = { ...prev };
+        allTimeSlots.forEach((s) => { if (updated[s] === "blocked") delete updated[s]; });
+        return updated;
+      });
       const { data: blocks } = await supabase
         .from("bookings").select("*").eq("type_id", 2).eq("booking_date", dateStr).neq("status", "cancelled");
       if (blocks?.length) {
         for (const b of blocks) await deleteBlockedPeriod(b.id);
       }
-      setBlockedSlots([]);
-      setBlockDayEnabled(false);
     }
-    await getBlockedPeriods();
-    await loadDayData(selectedDate);
   };
 
   const toggleSlot = async (timeSlot: string) => {
@@ -180,29 +186,28 @@ export default function ConfiguracionPage() {
     const dateStr = `${selectedDate.year}-${String(selectedDate.month).padStart(2, "0")}-${String(selectedDate.day).padStart(2, "0")}`;
 
     if (state === "blocked") {
+      setSlotStatusMap((prev) => { const updated = { ...prev }; delete updated[timeSlot]; return updated; });
       const { data: blocks } = await supabase
         .from("bookings").select("*").eq("type_id", 2).eq("booking_date", dateStr).neq("status", "cancelled");
       const target = blocks?.filter((b: any) => b.time_slots?.includes(timeSlot) || b.time_slots?.includes("00:00"));
       if (target?.length) {
         for (const b of target) {
           if (b.time_slots.includes("00:00")) {
+            setSlotStatusMap((prev) => ({ ...prev, [timeSlot]: "blocked" }));
             alert("Este slot forma parte de un bloqueo completo del día. Desactiva \"Bloquea el día\" primero.");
             return;
           }
           await deleteBlockedPeriod(b.id);
         }
       }
-      setBlockedSlots((prev) => prev.filter((s) => s !== timeSlot));
     } else if (state === "available") {
-      const result = await createSlotBlock(dateStr, timeSlot, `Slot ${timeSlot} bloqueado para ${dateStr}`);
-      if (result.success) setBlockedSlots((prev) => [...prev, timeSlot]);
+      setSlotStatusMap((prev) => ({ ...prev, [timeSlot]: "blocked" }));
+      createSlotBlock(dateStr, timeSlot, `Slot ${timeSlot} bloqueado para ${dateStr}`);
     } else if (state === "inactive" || state === "outside") {
       const newActive = [...weeklyActiveSlots, timeSlot];
       setWeeklyActiveSlots(newActive);
       await updateWeeklyConfig(newActive);
     }
-    await getBlockedPeriods();
-    await loadDayData(selectedDate);
   };
 
   const handleDisplayModeChange = async (mode: "30min" | "1hour") => {
@@ -286,13 +291,13 @@ export default function ConfiguracionPage() {
         ) : (
           <div className="flex flex-col xl:flex-row gap-4">
             <div className="xl:w-[475px] xl:min-w-[475px]">
-              <div className="bg-white rounded-xl shadow-sm border border-[#D4DEED] px-6 pt-[12px] pb-6 h-[650px]">
+              <div className="bg-white rounded-xl shadow-sm border border-[#D4DEED] px-6 pt-[12px] pb-6 h-[752px]">
                   <Text isAdmin variant="subtitle" color="#265197" weight="bold">
                     Configuración de disponibilidad
                   </Text>
 
                   <div>
-                    <Text isAdmin variant="body" color="#16305A" weight="bold" className="mt-[20px]">
+                    <Text isAdmin variant="body" color="#16305A" weight="bold" className="mt-[20px] !text-[15px] !leading-[18px] !tracking-[0.5px]">
                       Horario disponible
                     </Text>
 
@@ -320,7 +325,7 @@ export default function ConfiguracionPage() {
                                   if (officeHoursEnabled) applyOfficeHours(v, officeEndHour);
                                 }
                               }}
-                              className="w-full text-sm text-[#A7BDE2] font-medium bg-transparent outline-none [color-scheme:light] [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:saturate-100 [&::-webkit-calendar-picker-indicator]:[filter:invert(72%)_sepia(12%)_saturate(735%)_hue-rotate(182deg)_brightness(91%)_contrast(87%)]"
+                              className="w-full text-sm text-[#A7BDE2] font-medium bg-transparent outline-none [color-scheme:light] [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:[filter:invert(18%)_sepia(52%)_saturate(1564%)_hue-rotate(196deg)_brightness(92%)_contrast(91%)]"
                             />
                           </div>
                           <div className="w-[100px] h-[52px] border border-[#D4DEED] rounded-lg px-3 pt-1.5 pb-0.5">
@@ -335,7 +340,7 @@ export default function ConfiguracionPage() {
                                   if (officeHoursEnabled) applyOfficeHours(officeStartHour, v);
                                 }
                               }}
-                              className="w-full text-sm text-[#A7BDE2] font-medium bg-transparent outline-none [color-scheme:light] [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:saturate-100 [&::-webkit-calendar-picker-indicator]:[filter:invert(72%)_sepia(12%)_saturate(735%)_hue-rotate(182deg)_brightness(91%)_contrast(87%)]"
+                              className="w-full text-sm text-[#A7BDE2] font-medium bg-transparent outline-none [color-scheme:light] [&::-webkit-calendar-picker-indicator]:opacity-100 [&::-webkit-calendar-picker-indicator]:[filter:invert(18%)_sepia(52%)_saturate(1564%)_hue-rotate(196deg)_brightness(92%)_contrast(91%)]"
                             />
                           </div>
                         </div>
@@ -354,7 +359,7 @@ export default function ConfiguracionPage() {
                       </div>
                     </div>
 
-                    <div className="mt-[16px]">
+                    <div className="mt-[16px] leading-[16px]">
                       <Text isAdmin variant="label" color="#265197">
                         Lunes a Viernes {formatHour12(officeStartHour)} - {formatHour12(officeEndHour)}
                       </Text>
