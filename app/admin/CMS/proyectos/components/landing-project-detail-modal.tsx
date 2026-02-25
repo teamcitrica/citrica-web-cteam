@@ -77,7 +77,7 @@ export default function LandingProjectDetailModal({
       ),
     },
     {
-      title: `Servicios (${project.services?.length || 0})`,
+      title: `Características (${project.services?.length || 0})`,
       content: (
         <div className="flex flex-wrap gap-2 my-3">
           {project.services && project.services.length > 0 ? (
@@ -87,7 +87,7 @@ export default function LandingProjectDetailModal({
               </span>
             ))
           ) : (
-            <Text isAdmin={true} variant="label" color="#678CC5">Sin servicios</Text>
+            <Text isAdmin={true} variant="label" color="#678CC5">Sin características</Text>
           )}
         </div>
       ),

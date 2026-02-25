@@ -107,14 +107,16 @@ const ProjectTemplate = ({ project, slug }: ProjectTemplateProps) => {
                   </Text>
                 </h2>
 
-                <div className="flex gap-4 flex-wrap">
-                  <Button
-                    label={projectHero.buttonLabel}
-                    variant="primary"
-                    onPress={handleContactClick}
-                    className="bg-[#00FFFF] text-[#003333] rounded-full px-5"
-                  />
-                </div>
+                {projectHero.buttonVisible && (
+                  <div className="flex gap-4 flex-wrap">
+                    <Button
+                      label={projectHero.buttonLabel}
+                      variant="primary"
+                      onPress={handleContactClick}
+                      className="bg-[#00FFFF] text-[#003333] rounded-full px-5"
+                    />
+                  </div>
+                )}
               </div>
             </Col>
 
