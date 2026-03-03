@@ -444,7 +444,7 @@ export default function LandingProjectFormModal({
                 onChange={(e) => handleInputChange("hero_button_label", e.target.value)}
                 variant="faded"
                 classNames={inputClasses}
-                isDisabled={!formData.hero_button_visible}
+                disabled={!formData.hero_button_visible}
                 endContent={
                   <Switch
                     isSelected={formData.hero_button_visible}
