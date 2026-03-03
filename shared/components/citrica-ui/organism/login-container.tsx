@@ -69,16 +69,16 @@ const LoginPage = () => {
       <div className='container-inputs'>
         <img className='w-[80px] pb-3 items-center' src="/img/citrica-logo.png" alt="Logo" />
         <h2 className='text-center mb-1'>
-          <Text color="#FF5B00" variant="headline">
+          <Text color="#FF5B00" variant="title">
             ¡Bienvenido!
           </Text>
         </h2>
         <span>
-           <Text variant="body">
-            Ingresa tu correo electrónico y tu clave
+           <Text variant="label" textColor="#265197">
+            Ingresa tu correo electrónico y contraseña
           </Text>
         </span>
-        <form onSubmit={onSubmit} className='flex flex-col justify-center gap-5 mt-7'>
+        <form onSubmit={onSubmit} className='flex flex-col justify-center mt-4'>
           <Input
             label="Email"
             type="email"
@@ -120,7 +120,7 @@ const LoginPage = () => {
             disabled={isLoading}
             isLoading={isLoading}
             fullWidth={true}
-            className='mt-2'
+            className='!mt-3'
           />
         </form>
 
