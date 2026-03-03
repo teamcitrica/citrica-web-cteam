@@ -158,20 +158,26 @@ export default function ConfiguracionPage() {
     if (!selectedDate) return;
     const dateStr = `${selectedDate.year}-${String(selectedDate.month).padStart(2, "0")}-${String(selectedDate.day).padStart(2, "0")}`;
     if (block) {
-      await createBlockedPeriod(dateStr, dateStr, "Día completo bloqueado");
-      setBlockedSlots([...allTimeSlots]);
       setBlockDayEnabled(true);
+      setSlotStatusMap((prev) => {
+        const updated = { ...prev };
+        allTimeSlots.forEach((s) => { updated[s] = "blocked"; });
+        return updated;
+      });
+      await createBlockedPeriod(dateStr, dateStr, "Día completo bloqueado");
     } else {
+      setBlockDayEnabled(false);
+      setSlotStatusMap((prev) => {
+        const updated = { ...prev };
+        allTimeSlots.forEach((s) => { if (updated[s] === "blocked") delete updated[s]; });
+        return updated;
+      });
       const { data: blocks } = await supabase
         .from("bookings").select("*").eq("type_id", 2).eq("booking_date", dateStr).neq("status", "cancelled");
       if (blocks?.length) {
         for (const b of blocks) await deleteBlockedPeriod(b.id);
       }
-      setBlockedSlots([]);
-      setBlockDayEnabled(false);
     }
-    await getBlockedPeriods();
-    await loadDayData(selectedDate);
   };
 
   const toggleSlot = async (timeSlot: string) => {
@@ -180,29 +186,28 @@ export default function ConfiguracionPage() {
     const dateStr = `${selectedDate.year}-${String(selectedDate.month).padStart(2, "0")}-${String(selectedDate.day).padStart(2, "0")}`;
 
     if (state === "blocked") {
+      setSlotStatusMap((prev) => { const updated = { ...prev }; delete updated[timeSlot]; return updated; });
       const { data: blocks } = await supabase
         .from("bookings").select("*").eq("type_id", 2).eq("booking_date", dateStr).neq("status", "cancelled");
       const target = blocks?.filter((b: any) => b.time_slots?.includes(timeSlot) || b.time_slots?.includes("00:00"));
       if (target?.length) {
         for (const b of target) {
           if (b.time_slots.includes("00:00")) {
+            setSlotStatusMap((prev) => ({ ...prev, [timeSlot]: "blocked" }));
             alert("Este slot forma parte de un bloqueo completo del día. Desactiva \"Bloquea el día\" primero.");
             return;
           }
           await deleteBlockedPeriod(b.id);
         }
       }
-      setBlockedSlots((prev) => prev.filter((s) => s !== timeSlot));
     } else if (state === "available") {
-      const result = await createSlotBlock(dateStr, timeSlot, `Slot ${timeSlot} bloqueado para ${dateStr}`);
-      if (result.success) setBlockedSlots((prev) => [...prev, timeSlot]);
+      setSlotStatusMap((prev) => ({ ...prev, [timeSlot]: "blocked" }));
+      createSlotBlock(dateStr, timeSlot, `Slot ${timeSlot} bloqueado para ${dateStr}`);
     } else if (state === "inactive" || state === "outside") {
       const newActive = [...weeklyActiveSlots, timeSlot];
       setWeeklyActiveSlots(newActive);
       await updateWeeklyConfig(newActive);
     }
-    await getBlockedPeriods();
-    await loadDayData(selectedDate);
   };
 
   const handleDisplayModeChange = async (mode: "30min" | "1hour") => {
@@ -354,7 +359,7 @@ export default function ConfiguracionPage() {
                       </div>
                     </div>
 
-                    <div className="mt-[16px]">
+                    <div className="mt-[16px] leading-[16px]">
                       <Text isAdmin variant="label" color="#265197">
                         Lunes a Viernes {formatHour12(officeStartHour)} - {formatHour12(officeEndHour)}
                       </Text>

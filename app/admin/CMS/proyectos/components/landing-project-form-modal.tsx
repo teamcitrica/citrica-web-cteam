@@ -61,6 +61,7 @@ const emptyFormData: LandingProjectInput = {
   hero_title: "",
   hero_subtitle: "",
   hero_button_label: "Ver Demo",
+  hero_button_visible: true,
   hero_image: "",
   description_section_title: "Sobre el Proyecto",
   description_main_title: "",
@@ -205,6 +206,7 @@ export default function LandingProjectFormModal({
           hero_title: project.hero_title,
           hero_subtitle: project.hero_subtitle || "",
           hero_button_label: project.hero_button_label || "Ver Demo",
+          hero_button_visible: project.hero_button_visible ?? true,
           hero_image: project.hero_image || "",
           description_section_title: project.description_section_title || "Sobre el Proyecto",
           description_main_title: project.description_main_title || "",
@@ -377,6 +379,7 @@ export default function LandingProjectFormModal({
               isSelected={formData.is_active}
               onValueChange={(val) => handleInputChange("is_active", val)}
               size="sm"
+              classNames={{ wrapper: "group-data-[selected=true]:bg-[#10E5A4]" }}
             />
             <Text isAdmin={true} variant="label" color="#265197">Activo</Text>
           </div>
@@ -435,12 +438,21 @@ export default function LandingProjectFormModal({
                 description="Se usa en la URL: /projects/slug"
               />
               <Input
-                label="Texto Botón"
-                placeholder="Ver Demo"
-                value={formData.hero_button_label || ""}
+                label="Botón Hero"
+                placeholder={formData.hero_button_visible ? "Ver Demo" : "Botón desactivado"}
+                value={formData.hero_button_visible ? (formData.hero_button_label || "") : ""}
                 onChange={(e) => handleInputChange("hero_button_label", e.target.value)}
                 variant="faded"
                 classNames={inputClasses}
+                isDisabled={!formData.hero_button_visible}
+                endContent={
+                  <Switch
+                    isSelected={formData.hero_button_visible}
+                    onValueChange={(val) => handleInputChange("hero_button_visible", val)}
+                    size="sm"
+                    classNames={{ wrapper: "group-data-[selected=true]:bg-[#10E5A4]" }}
+                  />
+                }
               />
               <div className="col-span-2">
                 <Input
@@ -702,12 +714,12 @@ export default function LandingProjectFormModal({
             </div>
           </Section>
 
-          <Section title="Servicios" badge={formData.services.length}>
+          <Section title="Características" badge={formData.services.length}>
             <div className="flex flex-col">
               {formData.services.map((service, index) => (
                 <div key={index} className="border border-[#D4DEED] rounded-lg p-4">
                   <div className="flex justify-between items-center mb-3">
-                    <Text variant="label" color="#678CC5">Servicio {index + 1}</Text>
+                    <Text variant="label" color="#678CC5">Característica {index + 1}</Text>
                     <Button
                       isIconOnly
                       variant="flat"

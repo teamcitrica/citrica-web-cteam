@@ -107,14 +107,16 @@ const ProjectTemplate = ({ project, slug }: ProjectTemplateProps) => {
                   </Text>
                 </h2>
 
-                <div className="flex gap-4 flex-wrap">
-                  <Button
-                    label={projectHero.buttonLabel}
-                    variant="primary"
-                    onPress={handleContactClick}
-                    className="bg-[#00FFFF] text-[#003333] rounded-full px-5"
-                  />
-                </div>
+                {projectHero.buttonVisible && (
+                  <div className="flex gap-4 flex-wrap">
+                    <Button
+                      label={projectHero.buttonLabel}
+                      variant="primary"
+                      onPress={handleContactClick}
+                      className="bg-[#00FFFF] text-[#003333] rounded-full px-5"
+                    />
+                  </div>
+                )}
               </div>
             </Col>
 
@@ -155,15 +157,19 @@ const ProjectTemplate = ({ project, slug }: ProjectTemplateProps) => {
                 </h2>
               </div>
               <div className="flex justify-center backdrop-blur-sm rounded-2xl border border-white/10">
-                <p className="text-ch-width mt-2">
-                  <Text
-                    variant="body"
-                    color={projectDescription.textColor}
-                    className="leading-relaxed"
-                  >
-                    {projectDescription.description}
-                  </Text>
-                </p>
+                <div className="text-ch-width mt-2 space-y-4">
+                  {projectDescription.description?.split("\n\n").map((paragraph: string, i: number) => (
+                    <p key={i}>
+                      <Text
+                        variant="body"
+                        color={projectDescription.textColor}
+                        className="leading-relaxed whitespace-pre-line"
+                      >
+                        {paragraph}
+                      </Text>
+                    </p>
+                  ))}
+                </div>
               </div>
             </Col>
           </Container>
@@ -182,15 +188,19 @@ const ProjectTemplate = ({ project, slug }: ProjectTemplateProps) => {
                   </h2>
                 </header>
 
-                <p>
-                  <Text
-                    variant="body"
-                    color="#16141F"
-                    className="leading-relaxed-[28px]"
-                  >
-                    {projectDesafio.description}
-                  </Text>
-                </p>
+                <div className="space-y-4">
+                  {projectDesafio.description?.split("\n\n").map((paragraph: string, i: number) => (
+                    <p key={i}>
+                      <Text
+                        variant="body"
+                        color="#16141F"
+                        className="leading-relaxed whitespace-pre-line"
+                      >
+                        {paragraph}
+                      </Text>
+                    </p>
+                  ))}
+                </div>
               </div>
             </Col>
 
@@ -230,15 +240,19 @@ const ProjectTemplate = ({ project, slug }: ProjectTemplateProps) => {
                   </h2>
                 </header>
 
-                <p>
-                  <Text
-                    variant="body"
-                    color="#16141F"
-                    className="leading-relaxed"
-                  >
-                    {projectSolucion.description}
-                  </Text>
-                </p>
+                <div className="space-y-4">
+                  {projectSolucion.description?.split("\n\n").map((paragraph: string, i: number) => (
+                    <p key={i}>
+                      <Text
+                        variant="body"
+                        color="#16141F"
+                        className="leading-relaxed whitespace-pre-line"
+                      >
+                        {paragraph}
+                      </Text>
+                    </p>
+                  ))}
+                </div>
               </div>
             </Col>
           </Container>
