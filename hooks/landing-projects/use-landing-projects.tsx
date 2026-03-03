@@ -23,6 +23,7 @@ export interface LandingProject {
   hero_title: string;
   hero_subtitle: string | null;
   hero_button_label: string | null;
+  hero_button_visible: boolean;
   hero_image: string | null;
   description_section_title: string | null;
   description_main_title: string | null;

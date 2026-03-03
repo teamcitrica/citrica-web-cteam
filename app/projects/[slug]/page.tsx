@@ -46,6 +46,7 @@ export default function ProjectPage() {
       title: project.hero_title,
       subtitle: project.hero_subtitle,
       buttonLabel: project.hero_button_label || "Ver Demo",
+      buttonVisible: project.hero_button_visible ?? true,
       image: project.hero_image,
     },
     projectDescription: {

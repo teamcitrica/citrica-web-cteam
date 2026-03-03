@@ -70,10 +70,10 @@ export const siteConfig = {
 					title: "Recordatorios",
 					href: "/admin/agenda/recordatorios",
 				},
-				{
-					title: "Disponibilidad",
-					href: "/admin/agenda/disponibilidad",
-				},
+				// {
+				// 	title: "Disponibilidad",
+				// 	href: "/admin/agenda/disponibilidad",
+				// },
 				{
 					title: "Configuración",
 					href: "/admin/agenda/configuracion",
