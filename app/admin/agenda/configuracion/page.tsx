@@ -291,7 +291,7 @@ export default function ConfiguracionPage() {
         ) : (
           <div className="flex flex-col xl:flex-row gap-3">
             <div className="xl:w-[400px] xl:min-w-[400px]">
-              <div className="bg-white rounded-xl shadow-sm border border-[#D4DEED] px-3 pt-3 pb-6 h-[650px]">
+              <div className="bg-white rounded-xl shadow-sm border border-[#D4DEED] px-3 pt-3 pb-6 h-[761px]">
                   <Text isAdmin variant="label" color="#265197" weight="bold">
                     Configuración de disponibilidad
                   </Text>
@@ -437,7 +437,7 @@ export default function ConfiguracionPage() {
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="bg-white rounded-xl shadow-sm border border-[#D4DEED] p-4 space-y-3">
+              <div className="bg-white rounded-xl shadow-sm border border-[#D4DEED] p-4 space-y-3 h-[761px] overflow-y-auto">
                 <Text isAdmin variant="label" color="#265197" weight="bold" className="mt-4">
                   Fecha: {selectedDate && formatDate(selectedDate)}
                 </Text>
