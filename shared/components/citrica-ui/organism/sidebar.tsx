@@ -48,7 +48,7 @@ function AccordionItem({ item, isOpen, onToggle }: { item: MenuItem; isOpen: boo
   )
 }
 
-export function Sidebar({ items }: SidebarProps) {
+export function Sidebar({ items, roleName }: SidebarProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const [openItems, setOpenItems] = React.useState<Record<string, boolean>>({})
   const [companyName, setCompanyName] = useState<string | null>(null)
@@ -114,6 +114,13 @@ export function Sidebar({ items }: SidebarProps) {
           alt="Citrica Logo"
           className="m-4 h-16 w-auto"
         />
+        {roleName && (
+          <div className="px-4">
+            <Text isAdmin variant="body" color="#265197">
+              {roleName}
+            </Text>
+          </div>
+        )}
         {/* Nombre de la empresa - solo en vista MIS DATOS */}
         {companyName && pathname.includes('/admin/client/mis-datos') && (
           <div className="px-4 pb-2 w-full text-start">

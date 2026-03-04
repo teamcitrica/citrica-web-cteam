@@ -21,13 +21,11 @@ export const getLandingProjectColumns = ({
     render: (project) => {
       return (
         <div className="flex items-center gap-3">
-          {project.hero_image && (
-            <img
-              src={project.hero_image}
-              alt={project.hero_title}
-              className="w-12 h-12 rounded-lg object-cover"
-            />
-          )}
+          <img
+            src={project.hero_image || "/img/placeholder-project.svg"}
+            alt={project.hero_title}
+            className="w-12 h-12 rounded-lg object-cover"
+          />
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <Text isAdmin={true} variant="body" weight="bold" color="#16305A">{project.hero_title}</Text>
