@@ -63,9 +63,9 @@ export const CompletedProjects = ({ currentProjectSlug }: CompletedProjectsProps
             >
               <div className="h-48 gradient-project-hero flex items-center justify-center">
                 <img
-                  src={project.hero_image || "/img/placeholder.png"}
+                  src={project.hero_image || "/img/placeholder-project.svg"}
                   alt={project.hero_title}
-                  className="object-contain h-full"
+                  className={project.hero_image ? "object-contain h-full" : "object-cover w-full h-full"}
                 />
               </div>
 
