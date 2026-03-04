@@ -125,7 +125,7 @@ export default function PanelLayout({
     <div className="container-general-pase-admin w-full flex justify-center">
       <div className="w-full">
         <div className="h-full bg-[#ECF0F9] flex flex-row justify-start min-h-full">
-          <Sidebar items={sidebarItemsWithAssets} session={userSession} />
+          <Sidebar items={sidebarItemsWithAssets} session={userSession} roleName={userInfo?.role_name} />
           <div className="bg-[#ECF0F9] flex-1 text-white w-[80%] ">
             <Navbar session={userSession} />
             <div>

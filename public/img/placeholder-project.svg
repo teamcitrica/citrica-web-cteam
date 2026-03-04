@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1200 630" preserveAspectRatio="xMidYMid slice">
+  <rect width="1200" height="630" fill="#E8ECF2"/>
+  <!-- Cámara -->
+  <g transform="translate(600, 300) scale(2.5)">
+    <rect x="-50" y="-25" width="100" height="65" rx="10" fill="#C0C9D6"/>
+    <rect x="-15" y="-35" width="30" height="15" rx="4" fill="#C0C9D6"/>
+    <circle cx="0" cy="8" r="22" fill="#B0BAC8"/>
+    <circle cx="0" cy="8" r="14" fill="#A0ABBA"/>
+    <circle cx="-5" cy="3" r="5" fill="#B0BAC8" opacity="0.7"/>
+  </g>
+</svg>

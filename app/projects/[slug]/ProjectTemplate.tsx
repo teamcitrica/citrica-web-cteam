@@ -125,7 +125,7 @@ const ProjectTemplate = ({ project, slug }: ProjectTemplateProps) => {
                 {/* Placeholder para imagen del proyecto */}
                 <div className="w-full flex items-center justify-center">
                   <img
-                    src={projectHero.image}
+                    src={projectHero.image || "/img/placeholder-project.svg"}
                     alt="Project image"
                     className="proyect-page-hero-img-shadow"
                   />

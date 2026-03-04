@@ -5,13 +5,11 @@ import { toast } from "react-hot-toast";
 import { DropCitrica, DropdownItemConfig } from "@/shared/components/citrica-ui/organism/drop-citrica";
 
 export const UserBox = () => {
-  const { userInfo, signOut } = UserAuth();
+  const { userInfo } = UserAuth();
   const router = useRouter();
 
-  const handleLogout = async () => {
-    await signOut();
-    toast.success("Sesión cerrada correctamente");
-    router.push("/login");
+  const handleLogout = () => {
+    router.push("/logout");
   };
 
   const fullName = `${userInfo?.first_name || ""} ${userInfo?.last_name || ""}`.trim();
