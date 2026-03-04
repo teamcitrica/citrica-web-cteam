@@ -32,6 +32,7 @@ interface AuthValue {
   userInfo: {
     id: string;
     role_id?: number;
+    role_name?: string;
     first_name?: string;
     last_name?: string;
     name?: string;
