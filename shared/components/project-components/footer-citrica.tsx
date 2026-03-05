@@ -26,8 +26,7 @@ export const FooterCitrica = () => {
             </div>
             <h2 className="mb-8 lg:text-center md:text-center">
               <Text variant="label" color="#FFFFFF" className="opacity-70">
-                Transformamos ideas en soluciones digitales que impulsan el
-                crecimiento de tu negocio.
+                Soluciones Digitales de Alto Rendimiento.
               </Text>
             </h2>
             <div className="flex flex-col justify-center items-center gap-1">
@@ -71,7 +70,7 @@ export const FooterCitrica = () => {
             <div className="w-full flex justify-center">
               <h2 className="mb-8">
                 <Text variant="label" color="#FFFFFF" className="opacity-50">
-                  © 2025 Cítrica.
+                  © 2026 Cítrica. Todos los derechos reservados.
                 </Text>
               </h2>
             </div>

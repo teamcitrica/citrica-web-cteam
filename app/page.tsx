@@ -4,7 +4,7 @@ import { Header } from "@citrica-ui";
 import { Text, Button, Container, Col, Icon } from "citrica-ui-toolkit";
 import CurvedLoop from "./versions/yolanda/components/CurvedLoop";
 import DotGrid from "./versions/yolanda/components/DotGrid";
-import AnimatedHeadlines from "./home/components/animatedheadlines";
+
 import GradientText from "@/shared/components/project-components/gradient-text";
 import "aos/dist/aos.css";
 import AOS from "aos";
@@ -68,7 +68,7 @@ const CitricaWebsite = () => {
       {/* Hero Section */}
       <section
         id="inicio"
-        className="min-h-screen relative overflow-hidden hero-background-image"
+        className="min-h-screen relative overflow-hidden hero-background-image flex items-center"
       >
         <div className="absolute inset-0 -z-80">
           <DotGrid
@@ -86,32 +86,181 @@ const CitricaWebsite = () => {
         <Container>
           <Col
             cols={{ lg: 10, md: 6, sm: 4 }}
-            className="text-center mx-auto mt-[25vh]"
+            className="text-center mx-auto"
           >
-            <div className="bg-black/20 backdrop-blur-sm border-2 border-[#003333] rounded-2xl mb-14 p-8">
-              <h3 className="text-balance mb-4">
+            <div className="bg-black/20 backdrop-blur-sm border-2 border-[#003333] rounded-2xl p-8">
+              <h1 className="text-balance mb-2">
                 <Text variant="display" color="#FF5B00" weight="bold">
-                  INNOVACIÓN DIGITAL A TU MEDIDA
-                </Text>
-              </h3>
-              <h1 className="text-balance mb-8">
-                <Text variant="title" color="#FFFFFF" weight="bold">
-                  Software, SAAS y Aplicaciones de Vanguardia para un Negocio
-                  Imparable
+                  Soluciones Digitales
                 </Text>
               </h1>
-              <AnimatedHeadlines />
+              <h2 className="text-balance mb-4">
+                <Text variant="display" color="#FFFFFF" weight="bold">
+                  de Alto Rendimiento
+                </Text>
+              </h2>
+              <p className="text-balance mb-8">
+                <Text variant="subtitle" color="#FFFFFF" className="opacity-90">
+                  La infraestructura de tu negocio, construida para el futuro.
+                </Text>
+              </p>
+              <a href="#contacto">
+                <Button
+                  label="CONTÁCTANOS"
+                  variant="primary"
+                  textVariant="body"
+                  className="img-boton-hero"
+                />
+              </a>
             </div>
           </Col>
         </Container>
-        <a href="mailto:contacto@citrica.dev">
-          <Button
-            label="CONÓCENOS AHORA"
-            variant="primary"
-            textVariant="body"
-            className="absolute bottom-[10vh] left-1/2 -translate-x-1/2 img-boton-hero "
+        <div className="hero-marquee-wrapper">
+          <CurvedLoop
+            marqueeText={`Websites\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Landing Pages\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Web Apps\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Mobile Apps (IOS y Android)\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0SAAS\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Integraciones de IA\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0E-Commerce\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Plataformas web a Medida`}
+            speed={1}
+            curveAmount={0}
+            direction="right"
+            interactive={true}
+            className="custom-text-style"
           />
-        </a>
+        </div>
+      </section>
+
+      {/* Value Proposition */}
+      <section id="valores" className="py-20" style={{ background: 'linear-gradient(90deg, #003333 0%, #008282 100%)' }}>
+        <Container>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-10">
+            <h2 data-aos="fade-up" data-aos-duration="1500">
+              <Text variant="subtitle" color="#FF5B00" weight="bold">
+                La Promesa y el Valor
+              </Text>
+            </h2>
+            <h3 className="mt-2" data-aos="fade-up" data-aos-duration="1500">
+              <Text variant="title" color="#FFFFFF" weight="bold">
+                SU ACTIVO DIGITAL ASEGURADO
+              </Text>
+            </h3>
+            <Col cols={{ lgPush: 2, lg: 8, md: 6, sm: 4 }} className="mx-auto mt-4">
+              <p data-aos="fade-up" data-aos-duration="1500">
+                <Text variant="body" color="#FFFFFF" className="opacity-80">
+                  Su inversión digital es un activo estratégico que creamos para crecer sin límites. Esto lo garantizamos con la combinación perfecta de Ingeniería de Alto Rendimiento y Diseño UX/UI de Excelencia, un compromiso que se aplica rigurosamente a cada producto, ya sea una web, una app móvil o una plataforma SaaS.
+                </Text>
+              </p>
+            </Col>
+          </Col>
+
+          {/* Cards de valor */}
+          <Col cols={{ lg: 4, md: 2, sm: 4 }} className="text-center" data-aos="fade-up" data-aos-duration="1500">
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-color-ct-secondary flex items-center justify-center">
+              <Icon name="Handshake" className="text-[#16141F]" size={24} />
+            </div>
+            <h4 className="mb-2">
+              <Text variant="subtitle" color="#FFFFFF" weight="bold">
+                Somos tu socio estratégico
+              </Text>
+            </h4>
+            <Text variant="body" color="#FFFFFF" className="opacity-80">
+              Ingeniería, Diseño y Velocidad para la infraestructura de tu negocio.
+            </Text>
+          </Col>
+          <Col cols={{ lg: 4, md: 2, sm: 4 }} className="text-center" data-aos="fade-up" data-aos-duration="1500">
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-color-ct-secondary flex items-center justify-center">
+              <Icon name="Target" className="text-[#16141F]" size={24} />
+            </div>
+            <h4 className="mb-2">
+              <Text variant="subtitle" color="#FFFFFF" weight="bold">
+                Misión
+              </Text>
+            </h4>
+            <Text variant="body" color="#FFFFFF" className="opacity-80">
+              Transformar tu inversión digital en un activo estratégico que crece sin límites.
+            </Text>
+          </Col>
+          <Col cols={{ lg: 4, md: 2, sm: 4 }} className="text-center" data-aos="fade-up" data-aos-duration="1500">
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-color-ct-secondary flex items-center justify-center">
+              <Icon name="TrendingUp" className="text-[#16141F]" size={24} />
+            </div>
+            <h4 className="mb-2">
+              <Text variant="subtitle" color="#FFFFFF" weight="bold">
+                Resultado
+              </Text>
+            </h4>
+            <Text variant="body" color="#FFFFFF" className="opacity-80">
+              Soluciones robustas, escalables y orientadas 100% al negocio.
+            </Text>
+          </Col>
+        </Container>
+      </section>
+
+      {/* Equipo */}
+      <section className="py-20" style={{ backgroundColor: '#0A0F0F' }}>
+        <Container>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-10">
+            <h2 data-aos="fade-up" data-aos-duration="1500">
+              <Text variant="subtitle" color="#FF5B00" weight="bold">
+                El Equipo Integral de Alto Rendimiento
+              </Text>
+            </h2>
+            <h3 className="mt-2" data-aos="fade-up" data-aos-duration="1500">
+              <Text variant="title" color="#FFFFFF" weight="bold">
+                EXPERTOS DE PRIMERA LÍNEA DEDICADOS A TU PROYECTO
+              </Text>
+            </h3>
+            <Col cols={{ lgPush: 2, lg: 8, md: 6, sm: 4 }} className="mx-auto mt-4">
+              <p data-aos="fade-up" data-aos-duration="1500">
+                <Text variant="body" color="#FF5B00">
+                  Un Equipo 360: Ingenieros, Diseñadores, Desarrolladores y Arte.
+                </Text>
+              </p>
+              <p className="mt-2" data-aos="fade-up" data-aos-duration="1500">
+                <Text variant="body" color="#FFFFFF" className="opacity-80">
+                  La calidad superior de Cítrica se debe a nuestra estructura interna. Usted no contrata solo un desarrollador, sino un equipo completo de expertos enfocados en la calidad y la conversión.
+                </Text>
+              </p>
+              <p className="mt-4" data-aos="fade-up" data-aos-duration="1500">
+                <Text variant="body" color="#FFFFFF" className="opacity-80">
+                  Este enfoque multidisciplinar garantiza que el producto sea técnicamente superior y visualmente impecable.
+                </Text>
+              </p>
+            </Col>
+          </Col>
+
+          {/* Team Cards */}
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} noPadding className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mt-6">
+            {[
+              { name: 'FERNANDO MORALEZ', role: 'Ingeniero de Software', desc: 'Garantiza la robustez, seguridad y escalabilidad.' },
+              { name: 'BERNARDO BORRAT', role: 'UX/UI Designer', desc: 'Asegura una experiencia de usuario excelente y conversión.' },
+              { name: 'JUAN CARLOS VIGAR', role: 'Back End Developer', desc: 'Construye la funcionalidad robusta y los servicios del servidor.' },
+              { name: 'JOHAN FERNÁNDEZ', role: 'Front End Developer', desc: 'Ejecuta la interfaz dinámica y la velocidad de carga.' },
+              { name: 'YOLANDA CASTRO', role: 'QA Tester', desc: 'Certifica la calidad, usabilidad y ausencia de errores.' },
+            ].map((member, index) => (
+              <div
+                key={index}
+                data-aos="fade-up"
+                data-aos-duration="1500"
+                className="border border-[#003333] rounded-2xl p-6 flex flex-col items-center text-center"
+              >
+                <div className="w-12 h-12 mb-4 rounded-full bg-color-ct-secondary flex items-center justify-center">
+                  <Icon name="User" className="text-[#16141F]" size={24} />
+                </div>
+                <Text variant="label" color="#FF5B00" weight="bold">
+                  {member.name}
+                </Text>
+                <div className="mt-1">
+                  <Text variant="label" color="#FFFFFF" weight="bold">
+                    {member.role}
+                  </Text>
+                </div>
+                <div className="mt-2">
+                  <Text variant="label" color="#FFFFFF" className="opacity-70">
+                    {member.desc}
+                  </Text>
+                </div>
+              </div>
+            ))}
+          </Col>
+        </Container>
       </section>
 
       {/* Services Grid */}
@@ -185,88 +334,6 @@ const CitricaWebsite = () => {
                 />
               </div>
             ))}
-          </Col>
-        </Container>
-      </section>
-
-      <section id="servicios">
-        <Container noPadding noLimit>
-          <Col
-            cols={{ lg: 12, md: 6, sm: 4 }}
-            noPadding
-            className="flex justify-center p-0"
-          >
-            <CurvedLoop
-              marqueeText="Tiendas en línea • Mercados • Aplicaciones de streaming • Sitios web a medida • Landing pages • Plataformas SAAS • Implementación de IA • CRM • ERP • Herramientas de gestión de proyectos •"
-              speed={1}
-              curveAmount={0}
-              direction="right"
-              interactive={true}
-              className="custom-text-style"
-            />
-          </Col>
-        </Container>
-      </section>
-
-      {/* Value Proposition */}
-      <section id="valores" className="bg-color-ct-white py-20">
-        <Container>
-          {/* Íconos animados con contadores e información */}
-          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-            <div className="text-center mb-10">
-              <div
-                className="w-32 h-32 mx-auto mb-6 bg-color-ct-primary rounded-full flex items-center justify-center animate-spin-slow"
-                data-aos="fade-up"
-                data-aos-duration="1500"
-              >
-                <Icon name="Rocket" color="#FFFFFF" size={48} />
-              </div>
-              <h2 data-aos="fade-up" data-aos-duration="1500">
-                <Text variant="title" color="#16141F" weight="bold">
-                  Impulsamos tu crecimiento digital
-                </Text>
-              </h2>
-            </div>
-
-            {/* Stats Icons */}
-            <Col
-              cols={{ lg: 12, md: 4, sm: 4 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full"
-            >
-              {stats.map((stat, index) => (
-                <div
-                  key={index}
-                  className="text-center hover:scale-105 transition-transform duration-300"
-                >
-                  <div
-                    className="w-12 h-12 mx-auto mb-3 rounded-full bg-color-ct-secondary flex items-center justify-center"
-                    data-aos="fade-up"
-                    data-aos-duration="1500"
-                  >
-                    <Icon
-                      name={stat.icon as any}
-                      className="text-[#16141F]"
-                      size={24}
-                    />
-                  </div>
-                  <div
-                    className="text-2xl font-bold text-[#16141F] mb-1"
-                    data-aos="fade-up"
-                    data-aos-duration="1500"
-                  >
-                    {stat.number}
-                    {stat.suffix}
-                  </div>
-                  <div
-                    className="text-sm text-[#16141F]/80 font-medium"
-                    data-aos="fade-up"
-                    data-aos-duration="1500"
-                  >
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </Col>
           </Col>
         </Container>
       </section>
