@@ -267,6 +267,7 @@ export default function ConfiguracionPage() {
   };
 
   return (
+    <div className="pb-[100px]">
     <Container>
       <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }} className="space-y-3">
         <h1 className="text-2xl font-bold text-[#265197] mb-5">
@@ -534,5 +535,6 @@ export default function ConfiguracionPage() {
         )}
       </Col>
     </Container>
+    </div>
   );
 }
