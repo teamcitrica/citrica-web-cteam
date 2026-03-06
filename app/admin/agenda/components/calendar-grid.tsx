@@ -91,7 +91,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
       <div className="grid grid-cols-7 gap-1">
         {calendarDays.map((day, index) => {
           if (day === null) {
-            return <div key={`empty-${index}`} className="h-[72px] md:h-[90px] xl:h-[112px]" />;
+            return <div key={`empty-${index}`} className="h-[72px] md:h-[90px] xl:h-[88px]" />;
           }
 
           const dateStr = toDateStr(year, month, day);
@@ -104,7 +104,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({
             <div
               key={dateStr}
               className={`
-                h-[72px] md:h-[90px] xl:h-[112px] border border-[#D4DEED] rounded-lg p-1 md:p-2 cursor-pointer transition-colors relative
+                h-[72px] md:h-[90px] xl:h-[88px] border border-[#D4DEED] rounded-lg p-1 md:p-2 cursor-pointer transition-colors relative
                 ${isSelected ? "!border-[#265197] !border-2 bg-[#F0F4FA]" : "hover:bg-[#F8FAFC]"}
               `}
               onClick={() => onSelectDate(dateStr)}

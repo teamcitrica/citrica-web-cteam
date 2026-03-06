@@ -88,7 +88,7 @@ const BookingCalendarView = () => {
   }, [selectedDate]);
 
   return (
-    <div className="flex flex-col gap-3 h-full">
+    <div className="flex flex-col gap-3 pb-[100px]">
       {/* Barra superior: navegación de mes + filtros, envuelta en contenedor blanco */}
       <div className="flex flex-col md:flex-row items-start md:items-center gap-3 bg-white border border-[#D4DEED] rounded-xl px-4 py-2 overflow-hidden shadow-md">
         {/* Navegación de mes: < Noviembre 2025 > */}
@@ -132,9 +132,9 @@ const BookingCalendarView = () => {
       </div>
 
       {/* Contenido principal: calendario + panel lateral, separados 12px */}
-      <div className="flex flex-col xl:flex-row gap-3 flex-1">
+      <div className="flex flex-col xl:flex-row gap-3">
         {/* Grilla del calendario */}
-        <div className="flex-1 min-w-0 border border-[#D4DEED] rounded-xl overflow-hidden bg-white shadow-md">
+        <div className="flex-1 min-w-0 border border-[#D4DEED] rounded-xl overflow-hidden bg-white shadow-md h-[520px]">
           <CalendarGrid
             currentDate={currentDate}
             selectedDate={selectedDate}
@@ -144,7 +144,7 @@ const BookingCalendarView = () => {
         </div>
 
         {/* Panel lateral de detalles del día */}
-        <div className="xl:w-[320px] xl:min-w-[320px] border border-[#D4DEED] rounded-xl overflow-hidden bg-white shadow-md max-h-[400px] xl:max-h-none">
+        <div className="xl:w-[320px] xl:min-w-[320px] border border-[#D4DEED] rounded-xl overflow-hidden bg-white shadow-md max-h-[400px] xl:max-h-none xl:h-[520px]">
           <DayDetailPanel
             dateLabel={selectedDateLabel}
             bookings={selectedDayBookings}
