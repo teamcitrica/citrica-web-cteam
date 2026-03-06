@@ -5,12 +5,10 @@ import { Text, Button, Container, Col, Icon } from "citrica-ui-toolkit";
 import CurvedLoop from "./versions/yolanda/components/CurvedLoop";
 import DotGrid from "./versions/yolanda/components/DotGrid";
 
-import GradientText from "@/shared/components/project-components/gradient-text";
+
 import "aos/dist/aos.css";
 import AOS from "aos";
 import {
-  services,
-  technologies,
   process,
   stats,
 } from "@/shared/archivos js/citrica-data";
@@ -193,9 +191,9 @@ const CitricaWebsite = () => {
         </Container>
       </section>
 
-      {/* Equipo */}
-      <section className="py-20" style={{ backgroundColor: '#0A0F0F' }}>
-        <Container>
+      {/* Equipo + Services */}
+      <section className="hero-background-image-flip">
+        <Container className="py-20">
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-10">
             <h2 data-aos="fade-up" data-aos-duration="1500">
               <Text variant="subtitle" color="#FF5B00" weight="bold">
@@ -213,7 +211,7 @@ const CitricaWebsite = () => {
                   Un Equipo 360: Ingenieros, Diseñadores, Desarrolladores y Arte.
                 </Text>
               </p>
-              <p className="mt-2" data-aos="fade-up" data-aos-duration="1500">
+              <p className="" data-aos="fade-up" data-aos-duration="1500">
                 <Text variant="body" color="#FFFFFF" className="opacity-80">
                   La calidad superior de Cítrica se debe a nuestra estructura interna. Usted no contrata solo un desarrollador, sino un equipo completo de expertos enfocados en la calidad y la conversión.
                 </Text>
@@ -263,171 +261,95 @@ const CitricaWebsite = () => {
         </Container>
       </section>
 
-      {/* Services Grid */}
-      <section id="servicios" className="hero-background-image-flip">
+      <section className="hero-background-image">
         <Container className="py-20">
-          <Col
-            cols={{ lg: 12, md: 6, sm: 4 }}
-            className="mb-6 flex items-center justify-center text-center"
-          >
+          {/* Services Header */}
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-6">
             <h2 data-aos="fade-up" data-aos-duration="1500">
-              <Text
-                variant="headline"
-                color="#FF5B00"
-                weight="bold"
-                data-aos="fade-up"
-                data-aos-duration="1500"
-              >
-                Innovando en cada Solución
+              <Text variant="subtitle" color="#FF5B00" weight="bold">
+                Soluciones
               </Text>
             </h2>
+            <h3 className="mt-2" data-aos="fade-up" data-aos-duration="1500">
+              <Text variant="title" color="#FFFFFF" weight="bold">
+                INFRAESTRUCTURA DIGITAL 360
+              </Text>
+            </h3>
+            <p className="mt-4" data-aos="fade-up" data-aos-duration="1500">
+              <Text variant="body" color="#FFFFFF" className="opacity-80">
+                Somos su único socio para toda su infraestructura digital.
+              </Text>
+            </p>
           </Col>
-          <Col
-            cols={{ lg: 12, md: 6, sm: 4 }}
-            noPadding
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4"
-          >
-            {services.map((service, index) => (
-              <div
-                key={index}
-                data-aos="fade-up"
-                data-aos-duration="1500"
-                className="bg-black/20 backdrop-blur-xl border-2 border-[#003333] rounded-2xl p-6 flex flex-col items-center text-center "
-              >
-                <div
-                  className="mb-4 flex items-center justify-center"
-                  style={{
-                    backgroundColor: "#16141F",
-                    width: "48px",
-                    height: "48px",
-                    borderRadius: "9999px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Icon
-                    name={service.icon as any}
-                    color={service.color}
-                    size={32}
-                  />
+
+          {/* SERVICIOS A MEDIDA */}
+          <div id="servicios" />
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mt-8 mb-6">
+            <h4 data-aos="fade-up" data-aos-duration="1500">
+              <Text variant="subtitle" color="#FF5B00" weight="bold">
+                SERVICIOS A MEDIDA
+              </Text>
+            </h4>
+          </Col>
+          {[
+            { icon: 'Globe', color: '#E1FF00', title: 'Desarrollo Base', desc: 'Websites | Landing Pages\nWeb Apps | Mobile Apps' },
+            { icon: 'Monitor', color: '#00E5FF', title: 'Plataformas SaaS & AI', desc: 'Desarrollo de software como servicio a la medida y la integración de IA en sus flujos de trabajo.' },
+            { icon: 'Code', color: '#FF5B00', title: 'Servicios Secundarios', desc: 'Diseño de Identidad de Marca.\nMarketing Digital.' },
+          ].map((service, index) => (
+            <Col key={index} cols={{ lg: 4, md: 2, sm: 4 }} data-aos="fade-up" data-aos-duration="1500">
+              <div className="border border-[#003333] rounded-2xl p-6 flex flex-col items-center text-center h-full">
+                <div className="w-12 h-12 mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#16141F' }}>
+                  <Icon name={service.icon as any} color={service.color} size={24} />
                 </div>
-                <h2 className="mb-4">
-                  <GradientText
-                    colors={service.gradientColors}
-                    animationSpeed={3}
-                    showBorder={false}
-                  >
-                    <Text variant="subtitle" weight="bold" className="">
-                      {service.title}
-                    </Text>
-                  </GradientText>
-                </h2>
-                <Text variant="body" color="#ffffff" className="opacity-80">
-                  {service.description}
+                <h4 className="mb-3">
+                  <Text variant="subtitle" color={service.color} weight="bold">
+                    {service.title}
+                  </Text>
+                </h4>
+                <Text variant="body" color="#FFFFFF" className="opacity-80 whitespace-pre-line">
+                  {service.desc}
                 </Text>
                 <div
-                  className="mt-8 h-1 w-full rounded-full"
-                  style={{
-                    background: `linear-gradient(90deg, ${service.color}00, ${service.color}, ${service.color}00)`,
-                  }}
+                  className="mt-auto pt-6 h-1 w-full rounded-full"
+                  style={{ background: `linear-gradient(90deg, ${service.color}00, ${service.color}, ${service.color}00)` }}
                 />
               </div>
-            ))}
-          </Col>
-        </Container>
-      </section>
-
-      {/* About Us */}
-      <section className="py-20 hero-background-image">
-        <Container>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
-            <h2 className="mb-6" data-aos="fade-up" data-aos-duration="1500">
-              <Text
-                variant="headline"
-                color="#FF5B00"
-                weight="bold"
-                className=""
-              >
-                ¿Quiénes somos?
-              </Text>
-            </h2>
-            <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
-              <p
-                className="text-ch-width text-balance"
-                data-aos="fade-up"
-                data-aos-duration="1500"
-              >
-                <Text variant="body" color="#FFFFFF" className="opacity-90">
-                  Somos un equipo de desarrolladores y diseñadores apasionados
-                  por crear experiencias digitales excepcionales que transforman
-                  negocios.
-                </Text>
-              </p>
             </Col>
+          ))}
+
+          {/* PRODUCTOS ESPECIALIZADOS POR NICHO */}
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mt-12 mb-6">
+            <h4 data-aos="fade-up" data-aos-duration="1500">
+              <Text variant="subtitle" color="#FF5B00" weight="bold">
+                PRODUCTOS ESPECIALIZADOS POR NICHO
+              </Text>
+            </h4>
           </Col>
-
-          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-            <div
-              className="relative max-w-4xl mx-auto"
-              data-aos="fade-up"
-              data-aos-duration="1500"
-            >
-              {/* Línea central */}
-              <div className="absolute left-1/2 h-full w-0.5 bg-white opacity-50 -translate-x-1/2"></div>
-
-              <div className="relative mb-12 flex items-center w-full">
-                <div className="w-1/2 pr-12 text-right">
-                  <h3 className="mb-2">
-                    <Text variant="subtitle" color="#FF5B00" weight="bold">
-                      Equipo Experto
-                    </Text>
-                  </h3>
-                  <Text variant="body" color="#FFFFFF" className="opacity-80">
-                    Desarrolladores senior con amplia experiencia
+          {[
+            { icon: 'Globe', color: '#E1FF00', title: 'Plataformas Web B2B y B2C', desc: 'Elimina la \'Inversión Múltiple\'. Agenda, CRM, Sistema de Notificaciones, IA y CMS integrados en tu Website.' },
+            { icon: 'Monitor', color: '#00E5FF', title: 'Plataforma Web Restaurantes', desc: 'Gestión integral que cubre desde pedidos online y comandero hasta sistemas de caja y fidelización de clientes.' },
+            { icon: 'Code', color: '#FF5B00', title: 'Tienda en Línea', desc: 'Control total de inventario, pasarelas de pago y logística en una plataforma escalable. Convierte tu catálogo en un motor de ventas eficiente y automático.' },
+          ].map((service, index) => (
+            <Col key={`nicho-${index}`} cols={{ lg: 4, md: 2, sm: 4 }} data-aos="fade-up" data-aos-duration="1500">
+              <div className="border border-[#003333] rounded-2xl p-6 flex flex-col items-center text-center h-full">
+                <div className="w-12 h-12 mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#16141F' }}>
+                  <Icon name={service.icon as any} color={service.color} size={24} />
+                </div>
+                <h4 className="mb-3">
+                  <Text variant="subtitle" color={service.color} weight="bold">
+                    {service.title}
                   </Text>
-                </div>
-                <div className="absolute left-1/2 -translate-x-1/2 bg-[#16141F] p-3 rounded-full border-2 border-[#FF5B00]">
-                  <Icon name="Users" color="#FF5B00" size={32} />
-                </div>
-                <div className="w-1/2"></div>
+                </h4>
+                <Text variant="body" color="#FFFFFF" className="opacity-80">
+                  {service.desc}
+                </Text>
+                <div
+                  className="mt-auto pt-6 h-1 w-full rounded-full"
+                  style={{ background: `linear-gradient(90deg, ${service.color}00, ${service.color}, ${service.color}00)` }}
+                />
               </div>
-
-              <div className="relative mb-12 flex items-center w-full">
-                <div className="w-1/2"></div>
-                <div className="absolute left-1/2 -translate-x-1/2 bg-[#16141F] p-3 rounded-full border-2 border-[#00FFFF]">
-                  <Icon name="Award" color="#00FFFF" size={32} />
-                </div>
-                <div className="w-1/2 pl-12 text-left">
-                  <h3 className="mb-2">
-                    <Text variant="subtitle" color="#00FFFF" weight="bold">
-                      Calidad Garantizada
-                    </Text>
-                  </h3>
-                  <Text variant="body" color="#FFFFFF" className="opacity-80">
-                    Procesos de calidad certificados y mejores prácticas
-                  </Text>
-                </div>
-              </div>
-
-              <div className="relative mb-12 flex items-center w-full">
-                <div className="w-1/2 pr-12 text-right">
-                  <h3 className="mb-2">
-                    <Text variant="subtitle" color="#E1FF00" weight="bold">
-                      Innovación Constante
-                    </Text>
-                  </h3>
-                  <Text variant="body" color="#FFFFFF" className="opacity-80">
-                    Siempre a la vanguardia de las últimas tecnologías
-                  </Text>
-                </div>
-                <div className="absolute left-1/2 -translate-x-1/2 bg-[#16141F] p-3 rounded-full border-2 border-[#E1FF00]">
-                  <Icon name="Zap" color="#E1FF00" size={24} />
-                </div>
-                <div className="w-1/2"></div>
-              </div>
-            </div>
-          </Col>
+            </Col>
+          ))}
         </Container>
       </section>
 
@@ -442,83 +364,162 @@ const CitricaWebsite = () => {
         className="pb-20 pt-20 hero-background-image-flip"
       >
         <Container>
-          {/* Título principal */}
-          <Col
-            cols={{ lgPush: 2, lg: 8, md: 6, sm: 4 }}
-            className="text-center mb-12"
-          >
-            <h2 className="mb-6" data-aos="fade-up" data-aos-duration="1500">
-              <Text variant="headline" color="#FF5B00" weight="bold">
-                Tecnología de punta para resultados excepcionales
+          {/* Header */}
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-10">
+            <h2 data-aos="fade-up" data-aos-duration="1500">
+              <Text variant="subtitle" color="#FF5B00" weight="bold">
+                Tecnologías y Beneficios
               </Text>
             </h2>
-            <Col cols={{ lg: 8, md: 6, sm: 4 }} className="mx-auto">
+            <h3 className="mt-2" data-aos="fade-up" data-aos-duration="1500">
+              <Text variant="title" color="#FFFFFF" weight="bold">
+                EL STACK QUE GARANTIZA EL RENDIMIENTO
+              </Text>
+            </h3>
+            <Col cols={{ lgPush: 1, lg: 10, md: 6, sm: 4 }} className="mx-auto mt-4">
               <p data-aos="fade-up" data-aos-duration="1500">
-                <Text variant="body" color="#FFFFFF" className="opacity-90">
-                  En Cítrica, utilizamos un conjunto de tecnologías de
-                  vanguardia para garantizar que tus productos digitales sean de
-                  la más alta calidad:
+                <Text variant="body" color="#FFFFFF" className="opacity-80">
+                  Nuestra arquitectura de desarrollo es de clase mundial. Combinamos las tecnologías más rápidas, y escalables del mercado con herramientas de Inteligencia Artificial de vanguardia para garantizar la máxima calidad, eficiencia y seguridad en cada línea de código.
                 </Text>
               </p>
             </Col>
           </Col>
 
-          {/* Grid de tecnologías */}
-          <Col
-            cols={{ lg: 12, md: 6, sm: 4 }}
-            noPadding
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-          >
-            {technologies.map((tech, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl p-4 flex flex-col items-center text-center shadow-md border-4 transition-all duration-300 hover:shadow-xl hover:scale-105"
-                style={{ borderColor: tech.color }}
-                data-aos="fade-up"
-                data-aos-duration="1500"
-              >
-                {/* Icono */}
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
-                  style={{ backgroundColor: tech.color }}
-                >
-                  <Icon name={tech.icon as any} color="#16141F" size={24} />
-                </div>
-
-                {/* Título */}
-                <h3 className="text-lg font-bold text-gray-900 mb-3">
-                  <Text variant="body" color="#16141F" weight="bold">
+          {/* Row 1: 3 cards */}
+          {[
+            { icon: 'Code', color: '#E1FF00', title: 'Stack Principal', desc: 'Next JS | React Native | Vercel\nSupabase | AWS S3' },
+            { icon: 'Sparkles', color: '#FF5B00', title: 'Herramientas AI', desc: 'Stitch | Gemini | NotebookLM\nClaude Code | Nano Banana' },
+            { icon: 'Gauge', color: '#00E5FF', title: 'Velocidad Ultra-Rápida', desc: 'Fundamental para SEO y UX.' },
+          ].map((tech, index) => (
+            <Col key={index} cols={{ lg: 4, md: 2, sm: 4 }} data-aos="fade-up" data-aos-duration="1500">
+              <div className="border border-[#003333] rounded-2xl p-6 h-full">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#16141F', border: `1px solid ${tech.color}` }}>
+                    <Icon name={tech.icon as any} color={tech.color} size={20} />
+                  </div>
+                  <Text variant="subtitle" color={tech.color} weight="bold">
                     {tech.title}
                   </Text>
-                </h3>
-
-                {/* Descripción */}
-                <p
-                  className="text-description text-gray-600 text-sm leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: tech.description }}
-                ></p>
+                </div>
+                <Text variant="body" color="#FFFFFF" className="opacity-80 whitespace-pre-line">
+                  {tech.desc}
+                </Text>
               </div>
-            ))}
-          </Col>
+            </Col>
+          ))}
 
-          {/* Texto final */}
-          <div className="text-center mt-10 max-w-3xl mx-auto">
-            <p
-              className="text-white text-sm"
-              data-aos="fade-up"
-              data-aos-duration="1500"
-            >
-              <Text variant="body" color="#ffffff" weight="bold">
-                Estas herramientas nos permiten crear productos digitales de
-                alto rendimiento, escalables y fáciles de mantener, asegurando
-                una experiencia excepcional para tus usuarios.
-              </Text>
-            </p>
-          </div>
+          {/* Row 2: 2 cards */}
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="mt-8" />
+          {[
+            { icon: 'Sprout', color: '#FF00FF', title: 'Escalabilidad Total', desc: 'Su plataforma evoluciona con su crecimiento.' },
+            { icon: 'ShieldCheck', color: '#E1FF00', title: 'Seguridad Máxima', desc: 'Infraestructura estable y blindada.' },
+          ].map((tech, index) => (
+            <Col key={`row2-${index}`} cols={{ lg: 4, md: 3, sm: 4 }} data-aos="fade-up" data-aos-duration="1500">
+              <div className="border border-[#003333] rounded-2xl p-6 h-full">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#16141F', border: `1px solid ${tech.color}` }}>
+                    <Icon name={tech.icon as any} color={tech.color} size={20} />
+                  </div>
+                  <Text variant="subtitle" color={tech.color} weight="bold">
+                    {tech.title}
+                  </Text>
+                </div>
+                <Text variant="body" color="#FFFFFF" className="opacity-80">
+                  {tech.desc}
+                </Text>
+              </div>
+            </Col>
+          ))}
         </Container>
       </section>
 
-      {/* Process */}
+      {/* El Sistema Cítrica */}
+      <section className="py-20 hero-background-image">
+        <Container>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
+            <h2 data-aos="fade-up" data-aos-duration="1500">
+              <Text variant="subtitle" color="#FF5B00" >
+                La Diferenciación y Agilidad
+              </Text>
+            </h2>
+            <h3 className="" data-aos="fade-up" data-aos-duration="1500">
+              <Text variant="title" color="#FFFFFF" weight="bold">
+                EL SISTEMA CÍTRICA
+              </Text>
+            </h3>
+            <Col cols={{ lgPush: 2, lg: 8, md: 6, sm: 4 }} className="mx-auto mt-4">
+              <p data-aos="fade-up" data-aos-duration="1500">
+                <Text variant="body" color="#FFFFFF" className="opacity-80">
+                  Nuestra agilidad es un diferenciador clave, pero nunca sacrificamos la calidad.
+                </Text>
+              </p>
+            </Col>
+          </Col>
+
+          <Col cols={{ lg: 12, md: 6, sm: 4 }}>
+            <div className="relative max-w-3xl mx-auto">
+              {/* Línea central */}
+              <div className="absolute left-1/2 h-full w-0.5 bg-white opacity-30 -translate-x-1/2"></div>
+
+              {/* Item 1: Design System Propio - texto a la izquierda */}
+              <div className="relative mb-16 flex items-center w-full" data-aos="fade-up" data-aos-duration="1500">
+                <div className="w-1/2 pr-12 text-right">
+                  <h4 className="mb-2">
+                    <Text variant="subtitle" color="#FF5B00" weight="bold">
+                      Design System Propio
+                    </Text>
+                  </h4>
+                  <Text variant="body" color="#FFFFFF" className="opacity-80">
+                    Hemos creado una librería de componentes y un Design System multipropósito que acelera el desarrollo y asegura la coherencia.
+                  </Text>
+                </div>
+                <div className="absolute left-1/2 -translate-x-1/2 bg-[#16141F] p-3 rounded-full border-2 border-[#FF5B00] z-10">
+                  <Icon name="PenLine" color="#FF5B00" size={24} />
+                </div>
+                <div className="w-1/2"></div>
+              </div>
+
+              {/* Item 2: Tokens de Diseño - texto a la derecha */}
+              <div className="relative mb-16 flex items-center w-full" data-aos="fade-up" data-aos-duration="1500">
+                <div className="w-1/2"></div>
+                <div className="absolute left-1/2 -translate-x-1/2 bg-[#16141F] p-3 rounded-full border-2 border-[#00E5FF] z-10">
+                  <Icon name="Braces" color="#00E5FF" size={24} />
+                </div>
+                <div className="w-1/2 pl-12 text-left">
+                  <h4 className="mb-2">
+                    <Text variant="subtitle" color="#00E5FF" weight="bold">
+                      Tokens de Diseño
+                    </Text>
+                  </h4>
+                  <Text variant="body" color="#FFFFFF" className="opacity-80">
+                    Nos permiten una customización total e ilimitada en cada proyecto, sin necesidad de reescribir código base.
+                  </Text>
+                </div>
+              </div>
+
+              {/* Item 3: AI + Criterio Humano - texto a la izquierda */}
+              <div className="relative flex items-center w-full" data-aos="fade-up" data-aos-duration="1500">
+                <div className="w-1/2 pr-12 text-right">
+                  <h4 className="mb-2">
+                    <Text variant="subtitle" color="#E1FF00" weight="bold">
+                      AI + Criterio Humano
+                    </Text>
+                  </h4>
+                  <Text variant="body" color="#FFFFFF" className="opacity-80">
+                    La Inteligencia Artificial nos asiste en el prototipado, generando textos e imágenes preliminares para que usted defina contenidos rápidamente y aseguremos una entrega ágil. Su calidad siempre está supervisada por nuestro equipo experto.
+                  </Text>
+                </div>
+                <div className="absolute left-1/2 -translate-x-1/2 bg-[#16141F] p-3 rounded-full border-2 border-[#E1FF00] z-10">
+                  <Icon name="Sparkles" color="#E1FF00" size={24} />
+                </div>
+                <div className="w-1/2"></div>
+              </div>
+            </div>
+          </Col>
+        </Container>
+      </section>
+
+      {/* Process - comentado temporalmente
       <section id="process" className="py-20 bg-white">
         <Container>
           <div className="space-y-12">
@@ -550,7 +551,6 @@ const CitricaWebsite = () => {
               {process.map((step, index) => (
                 <div key={index} className="relative">
                   <div className="relative p-8 h-full border-2 rounded-xl hover:shadow-xl transition-all duration-500 group-hover:scale-105 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm hover:from-white/20 hover:to-white/10">
-                    {/* Step Number */}
                     <div
                       className="absolute -top-4 -left-4 w-12 h-12 rounded-full flex items-center justify-center border-4 border-white shadow-lg z-10"
                       style={{ backgroundColor: step.color }}
@@ -592,8 +592,6 @@ const CitricaWebsite = () => {
                         </Text>
                       </p>
                     </div>
-
-                    {/* Connection Line for larger screens - solo en desktop */}
                     {index < process.length - 1 && index % 3 !== 2 && (
                       <div className="hidden lg:block absolute -right-4 top-1/2 transform -translate-y-1/2 z-0">
                         <div className="w-8 h-0.5 bg-gray-300"></div>
@@ -605,8 +603,6 @@ const CitricaWebsite = () => {
                         ></div>
                       </div>
                     )}
-
-                    {/* Connection Line vertical para el layout de 2 columnas */}
                     {index < process.length - 1 && index % 2 !== 1 && (
                       <div className="hidden md:block lg:hidden absolute -bottom-4 left-1/2 transform -translate-x-1/2 z-0">
                         <div className="h-8 w-0.5 bg-gray-300"></div>
@@ -618,8 +614,6 @@ const CitricaWebsite = () => {
                         ></div>
                       </div>
                     )}
-
-                    {/* Connection Line vertical para mobile */}
                     {index < process.length - 1 && (
                       <div className="block md:hidden absolute -bottom-4 left-1/2 transform -translate-x-1/2 z-0">
                         <div className="h-8 w-0.5 bg-gray-300"></div>
@@ -638,10 +632,11 @@ const CitricaWebsite = () => {
           </div>
         </Container>
       </section>
+      */}
 
       {/* Contact Section */}
       <section id="contacto">
-       <ContactSectionLanding variant="home"/>
+       <ContactSectionLanding variant="home" layout="landing"/>
 
       </section>
       <FooterCitrica />

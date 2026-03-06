@@ -42,8 +42,8 @@ export const CompletedProjects = ({ currentProjectSlug }: CompletedProjectsProps
   return (
     <>
       <Container>
-        <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-16">
-          <h2 className="mb-6" data-aos="fade-up" data-aos-duration="1500">
+        <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-[48px]">
+          <h2 className="" data-aos="fade-up" data-aos-duration="1500">
             <Text variant="subtitle" color="#FF5B00" weight="bold">
               Soluciones reales para desafíos de negocio reales.
             </Text>
@@ -55,12 +55,12 @@ export const CompletedProjects = ({ currentProjectSlug }: CompletedProjectsProps
           </h3>
           <p data-aos="fade-up" data-aos-duration="1500">
             <Text variant="body" color="#E5FFFF">
-              Sabemos que en tecnología, la mejor prueba es el funcionamiento real. Aquí pueden ver cómo nuestra infraestructura de alto rendimiento está resolviendo problemas hoy mismo
+              Sabemos que en tecnología, la mejor prueba es el funcionamiento real. Aquí pueden ver cómo nuestra infraestructura de<br/>alto rendimiento está resolviendo problemas hoy mismo
             </Text>
           </p>
         </Col>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-[400px] md:max-w-none mx-auto">
           {filteredProjects.map((project) => (
             <article
               key={project.id}

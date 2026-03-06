@@ -12,6 +12,7 @@ export type ContactVariant = keyof typeof ctaSectionVariants;
 
 interface ContactSectionProps {
   variant?: ContactVariant;
+  layout?: 'default' | 'landing';
   customContent?: {
     title?: string;
     subtitle?: string;
@@ -21,6 +22,7 @@ interface ContactSectionProps {
 
 export const ContactSectionLanding = ({
   variant = 'home',
+  layout = 'default',
   customContent
 }: ContactSectionProps) => {
   const {
@@ -47,32 +49,269 @@ export const ContactSectionLanding = ({
   // Obtener el contenido según la variante seleccionada
   const content = {
     ...ctaSectionVariants[variant],
-    ...customContent // Permite override personalizado
+    ...customContent 
   };
 
-  // Usar los horarios cargados dinámicamente según la configuración y fecha
+  
   const timeSlots = availableTimeSlots
 
-  // Obtener horarios ocupados para la fecha seleccionada
+
   const occupiedSlots = (() => {
     if (!formData.date) return []
 
-    // Convertir CalendarDate a string YYYY-MM-DD
+
     let dateStr: string
     if (formData.date.year && formData.date.month && formData.date.day) {
-      // Es un objeto CalendarDate de @internationalized/date
+
       const year = formData.date.year
       const month = String(formData.date.month).padStart(2, '0')
       const day = String(formData.date.day).padStart(2, '0')
       dateStr = `${year}-${month}-${day}`
     } else {
-      // Fallback
+
       dateStr = formData.date.toString()
     }
 
     return getOccupiedSlots(dateStr)
   })()
 
+  // Landing layout (dark, centered, calendar+time together)
+  if (layout === 'landing') {
+    return (
+      <section id="contact" className="py-20 gradient-project-hero">
+        <Container>
+          {/* Header centrado */}
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mb-10">
+            <h2>
+              <Text variant="subtitle" color="#FF5B00" weight="bold">
+                {content.title}
+              </Text>
+            </h2>
+            <h3 className="mt-2">
+              <Text variant="title" color="#FFFFFF" weight="bold">
+                {content.subtitle}
+              </Text>
+            </h3>
+            <Col cols={{ lgPush: 2, lg: 8, md: 6, sm: 4 }} className="mx-auto mt-4">
+              <p className="my-4">
+                <Text variant="body" color="#FFFFFF" weight="bold">
+                  Hablemos con Transparencia. Agenda tu Asesoría.
+                </Text>
+              </p>
+              <p>
+                <Text variant="body" color="#FFFFFF" className="opacity-80">
+                  Nuestro compromiso es ser amistosos, claros y transparentes. Antes de cualquier inversión, te ofrecemos una asesoría sin compromiso. Queremos entender a fondo su desafío digital para asegurarnos de que la solución que le entregamos sea exactamente lo que necesita.
+                </Text>
+              </p>
+            </Col>
+          </Col>
+
+          {/* Card del calendario */}
+          <Col cols={{ lgPush: 2, lg: 8, md: 6, sm: 4 }} className="mx-auto">
+            <div className="bg-[#16141F]/80 backdrop-blur-sm border-2 border-[#007F7F]/60 rounded-2xl p-6 max-w-[584px] mx-auto">
+              <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
+                {/* Mensaje de éxito */}
+                {status === "success" && (
+                  <AnimatedContent key="success" direction="vertical" distance={20}>
+                    <div className="flex flex-col items-center justify-center gap-6 w-full py-12">
+                      <div className="w-20 h-20 bg-[#FF5B00] rounded-full flex items-center justify-center">
+                        <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <Text variant="headline" weight="bold" color="#FFFFFF">
+                        ¡Enviado con éxito!
+                      </Text>
+                    </div>
+                  </AnimatedContent>
+                )}
+
+                {/* Mensaje de error */}
+                {status === "error" && (
+                  <AnimatedContent key="error" direction="vertical" distance={20}>
+                    <div className="flex flex-col items-center justify-center gap-6 w-full py-12">
+                      <div className="w-20 h-20 bg-red-900/50 rounded-full flex items-center justify-center">
+                        <svg className="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </div>
+                      <Text variant="headline" weight="bold" color="#FF4444">
+                        Error al enviar el mensaje
+                      </Text>
+                      <Text variant="body" color="#FFFFFF" className="opacity-80">
+                        Por favor, inténtalo de nuevo.
+                      </Text>
+                    </div>
+                  </AnimatedContent>
+                )}
+
+                {/* Paso 1: Calendario + Horarios juntos */}
+                {currentStep === 1 && status === 'idle' && (
+                  <AnimatedContent key="step1-landing" direction="horizontal" distance={50}>
+                    <div className="flex flex-col items-center gap-6 w-full">
+                      <Text variant="subtitle" color="#FFFFFF" weight="bold">
+                        Selecciona Día y Hora para la Reunión
+                      </Text>
+
+                      <div className="flex flex-col md:flex-row gap-6 w-full">
+                        {/* Calendario */}
+                        <div className="flex-1 flex justify-center calendar-dark-wrapper">
+                          <CalendarComponent
+                            value={formData.date}
+                            onChange={handleDateChange}
+                            variant="dark"
+                            isDateFullyBooked={isDateFullyBookedSync}
+                            serverToday={serverToday}
+                          />
+                        </div>
+
+                        {/* Horarios */}
+                        <div className="flex-1 flex flex-col items-stretch gap-3">
+                          <Text variant="body" color="#FFFFFF" className="opacity-80 text-center">
+                            Horarios disponibles para este día.
+                          </Text>
+                          <Text variant="label" color="#FF5B00" className="text-center">
+                            Zona horaria de Lima, Perú (GMT-5)
+                          </Text>
+
+                          {timeSlots.length === 0 ? (
+                            <div className="text-center py-8">
+                              <Text variant="body" color="#FFFFFF" className="opacity-60">
+                                Selecciona una fecha para ver horarios
+                              </Text>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-2 gap-2 w-full max-h-56 overflow-y-auto">
+                              {timeSlots.map((slot) => {
+                                const isOccupied = occupiedSlots.includes(slot)
+                                const isSelected = studioConfig.allow_multiple_time_slots
+                                  ? selectedTimeSlots.includes(slot)
+                                  : formData.timeSlot === slot
+
+                                // Mostrar solo hora de inicio (ej: "10:00 AM - 10:30 AM" → "10:00")
+                                const displayTime = slot.includes(' - ')
+                                  ? slot.split(' - ')[0].replace(/ AM| PM/gi, '').trim()
+                                  : slot
+
+                                return (
+                                  <button
+                                    key={slot}
+                                    type="button"
+                                    onClick={() => !isOccupied && handleTimeSlotChange(slot)}
+                                    disabled={isOccupied}
+                                    className={`
+                                      py-1.5 px-2 rounded-lg border-2 text-sm text-center transition-all duration-200
+                                      ${isOccupied
+                                        ? 'border-gray-600 bg-gray-800 text-gray-500 cursor-not-allowed opacity-50'
+                                        : isSelected
+                                          ? 'border-[#FF5B00] bg-[#FF5B00] text-white font-medium'
+                                          : 'border-[#FF5B00] bg-transparent text-white hover:bg-[#FF5B00]/20'
+                                      }
+                                    `}
+                                  >
+                                    {displayTime}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          )}
+
+                          <Button
+                            type="button"
+                            label="Siguiente"
+                            variant="primary"
+                            fullWidth
+                            className="mt-auto"
+                            onPress={nextStep}
+                            disabled={
+                              studioConfig.allow_multiple_time_slots
+                                ? selectedTimeSlots.length === 0
+                                : !formData.timeSlot
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </AnimatedContent>
+                )}
+
+                {/* Paso 2: Datos del usuario */}
+                {currentStep === 2 && status === 'idle' && (
+                  <AnimatedContent key="step2-landing" direction="horizontal" distance={50}>
+                    <div className="flex flex-col items-center gap-4 w-full">
+                      <Text variant="subtitle" color="#FFFFFF" weight="bold">
+                        Tus datos
+                      </Text>
+                      <div className="flex flex-col gap-3 w-full mb-4">
+                        <Input
+                          name="name"
+                          label="Nombre"
+                          placeholder="Tu nombre"
+                          type="text"
+                          variant="bordered"
+                          color="primary"
+                          radius="sm"
+                          fullWidth
+                          value={formData.name}
+                          onChange={handleChange}
+                          required
+                        />
+                        <Input
+                          name="email"
+                          label="Email"
+                          placeholder="Tu email"
+                          type="email"
+                          variant="bordered"
+                          color="primary"
+                          radius="sm"
+                          fullWidth
+                          value={formData.email}
+                          onChange={handleChange}
+                          required
+                        />
+                        <Textarea
+                          name="message"
+                          label="Mensaje"
+                          placeholder="Cuéntanos sobre tu negocio y qué solución digital necesitas..."
+                          variant="bordered"
+                          color="primary"
+                          radius="sm"
+                          fullWidth
+                          value={formData.message}
+                          onChange={handleChange}
+                          className='!p-0'
+                          classNames={{ inputWrapper: "!bg-white" }}
+                        />
+                      </div>
+                      <div className="flex gap-4 w-full max-w-[380px]">
+                        <Button
+                          type="button"
+                          label="Anterior"
+                          variant="secondary"
+                          fullWidth
+                          onPress={prevStep}
+                        />
+                        <Button
+                          type="button"
+                          label={isLoading ? "Enviando..." : "Agendar cita"}
+                          variant="primary"
+                          fullWidth
+                          isDisabled={isLoading || !formData.message}
+                          onPress={() => handleSubmit({ preventDefault: () => {} } as React.FormEvent)}
+                        />
+                      </div>
+                    </div>
+                  </AnimatedContent>
+                )}
+              </form>
+            </div>
+          </Col>
+        </Container>
+      </section>
+    );
+  }
+
+  // Default layout
   return (
     <>
       <section id="contact" className="py-[80px] bg-color-ct-surface-container">
@@ -177,11 +416,6 @@ export const ContactSectionLanding = ({
                         >
                           ¡Enviado con éxito!
                         </Text>
-                        {/* <div className="mt-2">
-                          <Text variant="body" textColor="color-on-surface-var">
-                            Nos pondremos en contacto contigo pronto.
-                          </Text>
-                        </div> */}
                       </div>
                     </div>
                   </AnimatedContent>
@@ -280,6 +514,7 @@ export const ContactSectionLanding = ({
                         value={formData.message}
                         onChange={handleChange}
                         className='!p-0'
+                        classNames={{ inputWrapper: "!bg-white" }}
                       />
                     </div>
                     <div className="flex gap-4 w-full max-w-[380px]">
