@@ -136,6 +136,157 @@ $calendar-citrica-ui: (
   }
 }
 
+// Dark variant for landing
+.calendar-dark-wrapper {
+  .calendar-citrica-ui {
+    box-shadow: none !important;
+    background: #16141F !important;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+}
+
+.calendar-citrica-ui.calendar-dark {
+  box-shadow: none !important;
+  background-color: #16141F !important;
+  padding: 0 !important;
+
+  // Override HeroUI CSS variables
+  * {
+    --heroui-default-100: #2a2a3e;
+    --heroui-default-200: #242424;
+    --heroui-content1: #242424;
+    --heroui-background: #242424;
+  }
+
+  // Header (flechas y mes)
+  [data-slot="base"] {
+    background-color: #242424 !important;
+    box-shadow: none !important;
+  }
+
+  [data-slot="header-wrapper"] {
+    background-color: #242424 !important;
+    color: #ffffff !important;
+  }
+
+  [data-slot="header"] {
+    color: #ffffff !important;
+  }
+
+  [data-slot="title"] {
+    color: rgba(255, 255, 255, 0.5) !important;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
+  [data-slot="prev-button"],
+  [data-slot="next-button"] {
+    color: rgba(255, 255, 255, 0.5) !important;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      color: #ffffff !important;
+    }
+  }
+
+  // Grid
+  [data-slot="grid-wrapper"] {
+    background-color: #16141F !important;
+  }
+
+  [data-slot="grid-header"],
+  [data-slot="grid-header-row"] {
+    background-color: #242424 !important;
+  }
+
+  [data-slot="grid-header-cell"] {
+    color: rgba(255, 255, 255, 0.5) !important;
+    font-weight: 500;
+    background-color: #242424 !important;
+  }
+
+  [data-slot="grid-body"] {
+    background-color: #16141F !important;
+  }
+
+  // Celdas
+  [data-slot="cell"] {
+    color: #ffffff !important;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+  }
+
+  [data-slot="cell-button"] {
+    color: #ffffff !important;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    // Día seleccionado - naranja
+    &[data-selected="true"] {
+      background-color: #FF5B00 !important;
+      color: #ffffff !important;
+      font-weight: 600;
+      border-radius: 50% !important;
+
+      &:hover {
+        background-color: #e65200 !important;
+      }
+    }
+
+    // Hoy - sin color especial, se marca solo si se selecciona
+    &[data-today="true"] {
+      background-color: transparent !important;
+      color: #ffffff !important;
+      font-weight: 400;
+    }
+
+    // Fechas no disponibles (pasadas, domingos)
+    &[data-unavailable="true"],
+    &[data-disabled="true"] {
+      color: rgba(255, 255, 255, 0.15) !important;
+      text-decoration: none !important;
+    }
+
+    &[data-focus-visible="true"] {
+      background-color: rgba(255, 91, 0, 0.3) !important;
+      outline: none !important;
+    }
+  }
+
+  // Overrides globales de seleccion
+  [data-selected="true"] {
+    background-color: #FF5B00 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+
+    &:hover {
+      background-color: #e65200 !important;
+    }
+  }
+
+  [data-focus-visible="true"] {
+    background-color: rgba(255, 91, 0, 0.3) !important;
+    outline: none !important;
+    border-color: rgba(255, 91, 0, 0.3) !important;
+  }
+
+  // Forzar transparencia en tablas
+  td, th, tr, thead, tbody, table {
+    background-color: transparent !important;
+  }
+
+  // Quitar cualquier borde/sombra de contenedores internos
+  > div {
+    background-color: #242424 !important;
+    box-shadow: none !important;
+  }
+}
+
 .calendar-secondary {
   [data-selected="true"] {
     background-color: var(--color-secondary-calendar-cell-selected) !important;

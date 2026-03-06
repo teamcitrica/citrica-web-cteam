@@ -2,9 +2,9 @@
 export const ctaSectionVariants = {
   // Homepage principal
   home: {
-    title: "¿Listo para Innovar y llevar tu negocio al siguiente nivel?",
-    subtitle: "Agenda tu cita estratégica hoy.",
-    description: "Elige una fecha y hora para conversar sobre tu proyecto de crecimiento digital.",
+    title: "Agenda una Asesoría Sin Compromiso.",
+    subtitle: "QUEREMOS ENTENDER SU DESAFÍO DIGITAL A FONDO",
+    description: "Hablemos con Transparencia. Agenda tu Asesoría. Nuestro compromiso es ser amistosos, claros y transparentes. Antes de cualquier inversión, te ofrecemos una asesoría sin compromiso. Queremos entender a fondo su desafío digital para asegurarnos de que la solución que le entregamos sea exactamente lo que necesita.",
   },
 
   // Página de Proyectos

@@ -19,7 +19,8 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
 }) => {
   const text = useMemo(() => {
     const hasTrailing = /\s|\u00A0$/.test(marqueeText);
-    return (hasTrailing ? marqueeText.replace(/\s+$/, '') : marqueeText) + '\u00A0';
+    const spacer = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0';
+    return (hasTrailing ? marqueeText.replace(/\s+$/, '') : marqueeText) + spacer;
   }, [marqueeText]);
 
   const measureRef = useRef<SVGTextElement | null>(null);
@@ -29,7 +30,7 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
   const [offset, setOffset] = useState(0);
   const uid = useId();
   const pathId = `curve-${uid}`;
-  const pathD = `M-100,40 Q500,${40 + curveAmount} 1540,40`;
+  const pathD = `M-500,40 Q960,${40 + curveAmount} 2420,40`;
 
   const dragRef = useRef(false);
   const lastXRef = useRef(0);
@@ -38,7 +39,7 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
 
   const textLength = spacing;
   const totalText = textLength
-    ? Array(Math.ceil(1800 / textLength) + 2)
+    ? Array(Math.ceil(1920 / textLength) + 3)
         .fill(text)
         .join('')
     : text;
@@ -116,7 +117,7 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
       onPointerUp={endDrag}
       onPointerLeave={endDrag}
     >
-      <svg className="curved-loop-svg" viewBox="0 0 1440 80">
+      <svg className="curved-loop-svg" viewBox="0 0 1440 80" preserveAspectRatio="none">
         <text ref={measureRef} xmlSpace="preserve" style={{ visibility: 'hidden', opacity: 0, pointerEvents: 'none' }}>
           {text}
         </text>

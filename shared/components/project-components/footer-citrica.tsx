@@ -8,73 +8,80 @@ export const FooterCitrica = () => {
   return (
     <>
       <footer
-        className="pt-12"
+        className="pt-6 pb-4"
         style={{
           backgroundColor: "#16141F",
-          borderTop: "1px solid rgba(225, 255, 0, 0.2)",
+          borderTop: "1px solid rgba(0, 200, 200, 0.3)",
         }}
       >
         <Container>
           <Col
             cols={{ lg: 12, md: 6, sm: 4 }}
-            className="flex flex-col text-center justify-center gap-2"
+            className="flex flex-col text-center justify-center gap-1"
           >
-            <div className="flex items-center justify-center lg:justify-center space-x-2">
-              <div className="w-24 h-16">
+            <div className="flex items-center justify-center space-x-2">
+              <div className=" h-14">
                 <img src="/img/citrica-logo.png" alt="Logo Cítrica" />
               </div>
             </div>
-            <h2 className="mb-8 lg:text-center md:text-center">
-              <Text variant="label" color="#FFFFFF" className="opacity-70">
-                Transformamos ideas en soluciones digitales que impulsan el
-                crecimiento de tu negocio.
-              </Text>
-            </h2>
-            <div className="flex flex-col justify-center items-center gap-1">
+            <Text variant="body" color="#FF5B00">
+              Soluciones Digitales de Alto Rendimiento
+            </Text>
+            {/* Redes sociales */}
+            <div className="flex items-center justify-center gap-3 mt-[28px]">
+              <Link href="https://www.facebook.com/citrica.dev" target="_blank" rel="noopener noreferrer">
+                <Icon name="Facebook" color="#FFFFFF" size={18} />
+              </Link>
+              <Link href="https://www.instagram.com/citrica.dev" target="_blank" rel="noopener noreferrer">
+                <Icon name="Instagram" color="#FFFFFF" size={18} />
+              </Link>
+              <Link href="https://www.linkedin.com/company/citrica-dev" target="_blank" rel="noopener noreferrer">
+                <Icon name="Linkedin" color="#FFFFFF" size={18} />
+              </Link>
+              <Link href="https://wa.me/51942627383" target="_blank" rel="noopener noreferrer">
+                <Icon name="MessageCircle" color="#FFFFFF" size={18} />
+              </Link>
+            </div>
+            {/* Contacto */}
+            <div className="flex flex-col justify-center items-center gap-1 mt-[20px]">
               <div className="flex items-center space-x-2">
-                <Icon name="Mail" color="#FFFFFF" size={20} />
+                <Icon name="Mail" color="#FFFFFF" size={14} />
                 <Link href="mailto:contacto@citrica.dev">
-                  <Text variant="body" color="#FFFFFF" weight="bold">
+                  <Text variant="label" color="#FFFFFF">
                     contacto@citrica.dev
                   </Text>
                 </Link>
               </div>
-              <div className="flex gap-4">
-                <div className="flex items-center space-x-2">
-                  <Icon name="Phone" color="#FFFFFF" size={20} />
-                  <Link
-                    href="tel:+51942627383"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Text variant="body" color="#FFFFFF" weight="bold">
-                      Perú: +51 942 627 383
+              <div className="flex flex-wrap justify-center gap-x-3 gap-y-1">
+                <div className="flex items-center space-x-1">
+                  <Icon name="Phone" color="#FFFFFF" size={14} />
+                  <Link href="tel:+51942627383" target="_blank" rel="noopener noreferrer">
+                    <Text variant="label" color="#FFFFFF">
+                      Perú: +51 942 627383
                     </Text>
                   </Link>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Link
-                    href="tel:+59892041487"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Text variant="body" color="#FFFFFF" weight="bold">
+                <div className="flex items-center space-x-1">
+                  <Link href="tel:+59892041487" target="_blank" rel="noopener noreferrer">
+                    <Text variant="label" color="#FFFFFF">
                       Uruguay: +598 92 041487
+                    </Text>
+                  </Link>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Link href="tel:+34919934651" target="_blank" rel="noopener noreferrer">
+                    <Text variant="label" color="#FFFFFF">
+                      España: +34 91 9934651
                     </Text>
                   </Link>
                 </div>
               </div>
             </div>
           </Col>
-          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center mt-8">
-            <Divider className="mb-8 bg-gray-800" />
-            <div className="w-full flex justify-center">
-              <h2 className="mb-8">
-                <Text variant="label" color="#FFFFFF" className="opacity-50">
-                  © 2025 Cítrica.
-                </Text>
-              </h2>
-            </div>
+          <Col cols={{ lg: 12, md: 6, sm: 4 }} className="text-center my-[32px]">
+            <Text variant="label" color="#FFFFFF" className="opacity-50">
+              © 2026 Cítrica. Todos los derechos reservados.
+            </Text>
           </Col>
         </Container>
       </footer>
