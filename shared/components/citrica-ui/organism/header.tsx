@@ -47,6 +47,8 @@ const Header = ({
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
+    } else {
+      window.location.href = href;
     }
     setIsOpen(false);
   };
