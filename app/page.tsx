@@ -48,7 +48,7 @@ const CitricaWebsite = () => {
     },
     {
       title: "Área clientes",
-      href: "/panel",
+      href: "/login",
     },
   ];
 
