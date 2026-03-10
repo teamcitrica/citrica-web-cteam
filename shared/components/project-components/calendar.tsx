@@ -72,7 +72,7 @@ export default function CalendarComponent({
     gridBody: "bg-[#16141F]",
     gridBodyRow: "bg-[#16141F]",
     cell: "text-white",
-    cellButton: "text-white data-[unavailable=true]:text-white/15 data-[unavailable=true]:[text-decoration:none] data-[disabled=true]:text-white/15 data-[selected=true]:bg-[#FF5B00] data-[selected=true]:text-white data-[selected=true]:font-semibold",
+    cellButton: "text-white data-[unavailable=true]:text-white/15 data-[unavailable=true]:[text-decoration:none] data-[disabled=true]:text-white/15 data-[outside-visible-range=true]:text-white/15 data-[outside-month=true]:text-white/15 data-[selected=true]:bg-[#FF5B00] data-[selected=true]:text-white data-[selected=true]:font-semibold",
     content: "bg-[#16141F]",
   } : undefined;
 
