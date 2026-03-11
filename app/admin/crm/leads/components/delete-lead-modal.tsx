@@ -1,0 +1,70 @@
+"use client";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
+import { Divider } from "@heroui/divider";
+import { Lead } from "@/hooks/leads/use-leads-crud";
+import { Text, Button, Icon } from "citrica-ui-toolkit";
+
+interface DeleteLeadModalProps {
+  isOpen: boolean;
+  lead: Lead | null;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+export default function DeleteLeadModal({
+  isOpen,
+  lead,
+  onConfirm,
+  onCancel,
+}: DeleteLeadModalProps) {
+  if (!lead) return null;
+
+  return (
+    <Modal isOpen={isOpen} onClose={onCancel} size="md">
+      <ModalContent>
+        <ModalHeader className="flex flex-col gap-1 mt-4">
+          <div className="flex items-center justify-center mb-2">
+            <Icon size={28} className="text-red-500" name="TriangleAlert" />
+          </div>
+          <h2 className="text-center">
+            <Text isAdmin={true} variant="title" color="#F04242" weight="bold">Eliminar Lead</Text>
+          </h2>
+        </ModalHeader>
+        <ModalBody>
+          <p>
+            <Text isAdmin={true} variant="body" color="#16305A">
+              ¿Estás seguro de que deseas eliminar el lead{" "}
+              <span className="font-semibold">{lead.name || "este lead"}</span>?
+            </Text>
+          </p>
+          <p className="mb-2">
+            <Text isAdmin={true} variant="label" color="#16305A">
+              Esta acción no se puede deshacer.
+            </Text>
+          </p>
+          <Divider className="bg-[#A7BDE2]" />
+        </ModalBody>
+        <ModalFooter>
+          <div className="flex gap-3 justify-end">
+            <Button
+              isAdmin={true}
+              variant="secondary"
+              className="w-[162px]"
+              onPress={onCancel}
+            >
+              Cancelar
+            </Button>
+            <Button
+              isAdmin={true}
+              variant="primary"
+              className="bg-[#F04242] w-[162px] !border-0"
+              onPress={onConfirm}
+            >
+              Eliminar
+            </Button>
+          </div>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
+  );
+}

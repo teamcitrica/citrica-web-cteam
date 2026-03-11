@@ -91,6 +91,10 @@ export const siteConfig = {
 					href: "/admin/crm/contactos",
 				},
 				{
+					title: "Leads",
+					href: "/admin/crm/leads",
+				},
+				{
 					title: "Empresas",
 					href: "/admin/crm/empresas",
 				},
