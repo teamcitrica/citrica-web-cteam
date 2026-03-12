@@ -23,7 +23,8 @@ export const useContact = () => {
     getAvailableSlots,
     isDateFullyBooked,
     studioConfig,
-    convertUserFormatToSlots
+    convertUserFormatToSlots,
+    inactiveDays
   } = useBookingsAvailability()
 
   // Obtener la fecha y hora del servidor + zona horaria del usuario
@@ -373,6 +374,8 @@ export const useContact = () => {
     serverToday,
     isLoadingServerTime,
     isLoadingBookedDates,
+    // Días inactivos de la semana
+    inactiveDays,
     // Zona horaria del usuario
     userTimezone,
     userTimezoneLabel,

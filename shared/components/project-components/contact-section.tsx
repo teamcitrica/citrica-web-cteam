@@ -1,6 +1,6 @@
 "use client";
-import React from 'react'
-import {  Input, Textarea } from '../citrica-ui'
+import React, { useState } from 'react'
+import { Input, Textarea } from '../citrica-ui'
 import { Button, Text, Icon, Col, Container } from 'citrica-ui-toolkit'
 import { useContact } from '@/hooks/leads/use-leads'
 import { convertSlotToUserTimezone } from '@/hooks/use-server-time'
@@ -8,6 +8,7 @@ import { Spinner } from '@heroui/spinner'
 import AnimatedContent from './animated-content'
 import CalendarComponent from './calendar'
 import { ctaSectionVariants } from '@/shared/archivos js/cta-section-data'
+import PhoneInput from '../citrica-ui/phoneInput';
 
 // Tipos para las variantes disponibles
 export type ContactVariant = keyof typeof ctaSectionVariants;
@@ -47,11 +48,13 @@ export const ContactSectionLanding = ({
     studioConfig,
     serverToday,
     isLoadingServerTime,
+    inactiveDays,
     userTimezone,
     userTimezoneLabel,
     isUserInBusinessTz,
   } = useContact()
 
+  const [phone, setPhone] = useState(formData.phone || "")
   // Obtener dateStr para conversión de zona horaria
   const currentDateStr = formData.date
     ? `${formData.date.year}-${String(formData.date.month).padStart(2, '0')}-${String(formData.date.day).padStart(2, '0')}`
@@ -60,10 +63,10 @@ export const ContactSectionLanding = ({
   // Obtener el contenido según la variante seleccionada
   const content = {
     ...ctaSectionVariants[variant],
-    ...customContent 
+    ...customContent
   };
 
-  
+
   const timeSlots = availableTimeSlots
 
 
@@ -173,6 +176,7 @@ export const ContactSectionLanding = ({
                             variant="dark"
                             isDateFullyBooked={isDateFullyBookedSync}
                             serverToday={serverToday}
+                            inactiveDays={inactiveDays}
                           />
                         </div>
 
@@ -265,7 +269,7 @@ export const ContactSectionLanding = ({
                       <Text variant="subtitle" color="#FFFFFF" weight="bold">
                         Tus datos
                       </Text>
-                      <div className="flex flex-col gap-3 w-full mb-4">
+                      <div className="flex flex-col gap-4 w-full mb-4">
                         <Input
                           name="name"
                           label="Nombre"
@@ -291,6 +295,10 @@ export const ContactSectionLanding = ({
                           value={formData.email}
                           onChange={handleChange}
                           required
+                        />
+                        <PhoneInput
+                          value={phone}
+                          onChange={(value) => setPhone(value)}
                         />
                         <Textarea
                           name="message"
@@ -320,7 +328,7 @@ export const ContactSectionLanding = ({
                           variant="primary"
                           fullWidth
                           isDisabled={isLoading || !formData.message}
-                          onPress={() => handleSubmit({ preventDefault: () => {} } as React.FormEvent)}
+                          onPress={() => handleSubmit({ preventDefault: () => { } } as React.FormEvent)}
                         />
                       </div>
                     </div>
@@ -554,172 +562,173 @@ export const ContactSectionLanding = ({
                         variant="primary"
                         fullWidth
                         isDisabled={isLoading || !formData.message}
-                        onPress={() => handleSubmit({ preventDefault: () => {} } as React.FormEvent)}
+                        onPress={() => handleSubmit({ preventDefault: () => { } } as React.FormEvent)}
                       />
                     </div>
                   </AnimatedContent>
                 )}
 
-              {/* Paso 2: Seleccionar Fecha */}
-              {currentStep === 1 && status === 'idle' && (
-                <AnimatedContent key="step1" direction="horizontal" distance={50}>
-                  <div className="flex flex-col items-center gap-4 w-full">
-                    <Text
-                      variant="subtitle"
-                      weight="bold"
-                      textColor="color-primary"
-                    >
-                      Selecciona una fecha
-                    </Text>
+                {/* Paso 2: Seleccionar Fecha */}
+                {currentStep === 1 && status === 'idle' && (
+                  <AnimatedContent key="step1" direction="horizontal" distance={50}>
+                    <div className="flex flex-col items-center gap-4 w-full">
+                      <Text
+                        variant="subtitle"
+                        weight="bold"
+                        textColor="color-primary"
+                      >
+                        Selecciona una fecha
+                      </Text>
 
-                    <div className="flex justify-center w-full">
-                      <CalendarComponent
-                        value={formData.date}
-                        onChange={handleDateChange}
-                        variant="primary"
-                        isDateFullyBooked={isDateFullyBookedSync}
-                        serverToday={serverToday}
-                      />
+                      <div className="flex justify-center w-full">
+                        <CalendarComponent
+                          value={formData.date}
+                          onChange={handleDateChange}
+                          variant="primary"
+                          isDateFullyBooked={isDateFullyBookedSync}
+                          serverToday={serverToday}
+                          inactiveDays={inactiveDays}
+                        />
+                      </div>
+
+                      <div className="flex flex-end gap-4">
+                        <Button
+                          type="button"
+                          label="Siguiente"
+                          variant="primary"
+                          fullWidth
+                          onPress={nextStep}
+                          disabled={!formData.date || availableTimeSlots.length === 0}
+                        />
+                      </div>
                     </div>
+                  </AnimatedContent>
+                )}
 
-                    <div className="flex flex-end gap-4">
-                      <Button
-                        type="button"
-                        label="Siguiente"
-                        variant="primary"
-                        fullWidth
-                        onPress={nextStep}
-                        disabled={!formData.date || availableTimeSlots.length === 0}
-                      />
-                    </div>
-                  </div>
-                </AnimatedContent>
-              )}
+                {/* Paso 3: Seleccionar Horario */}
+                {currentStep === 2 && status === 'idle' && (
+                  <AnimatedContent key="step2" direction="horizontal" distance={50}>
+                    <div className="flex flex-col items-center gap-4 w-full">
+                      <Text
+                        variant="subtitle"
+                        weight="bold"
+                        textColor="color-primary"
+                      >
+                        Seleccionar Horario
+                      </Text>
 
-              {/* Paso 3: Seleccionar Horario */}
-              {currentStep === 2 && status === 'idle' && (
-                <AnimatedContent key="step2" direction="horizontal" distance={50}>
-                  <div className="flex flex-col items-center gap-4 w-full">
-                    <Text
-                      variant="subtitle"
-                      weight="bold"
-                      textColor="color-primary"
-                    >
-                      Seleccionar Horario
-                    </Text>
+                      {formData.date && (
+                        <div className="text-center mb-2">
+                          <Text variant="body" textColor="color-on-surface" className="font-medium">
+                            Fecha seleccionada: {(() => {
+                              const months = [
+                                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                              ];
+                              const date = formData.date;
+                              return `${date.day} de ${months[date.month - 1]} de ${date.year}`;
+                            })()}
+                          </Text>
+                        </div>
+                      )}
 
-                    {formData.date && (
-                      <div className="text-center mb-2">
-                        <Text variant="body" textColor="color-on-surface" className="font-medium">
-                          Fecha seleccionada: {(() => {
-                            const months = [
-                              'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                              'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-                            ];
-                            const date = formData.date;
-                            return `${date.day} de ${months[date.month - 1]} de ${date.year}`;
-                          })()}
-                        </Text>
-                      </div>
-                    )}
+                      {studioConfig.allow_multiple_time_slots && (
+                        <div className="text-center">
+                          <Text variant="body" textColor="color-on-surface-var" className="text-sm">
+                            Puedes seleccionar múltiples horarios
+                          </Text>
+                        </div>
+                      )}
 
-                    {studioConfig.allow_multiple_time_slots && (
-                      <div className="text-center">
-                        <Text variant="body" textColor="color-on-surface-var" className="text-sm">
-                          Puedes seleccionar múltiples horarios
-                        </Text>
-                      </div>
-                    )}
+                      {isLoadingSlots ? (
+                        <div className="flex items-center justify-center py-8">
+                          <Spinner size="lg" color="primary" />
+                        </div>
+                      ) : timeSlots.length === 0 ? (
+                        <div className="text-center py-8">
+                          <Text variant="body" textColor="color-on-surface-var">
+                            No hay horarios disponibles para esta fecha
+                          </Text>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-3 w-full max-h-96 overflow-y-auto">
+                          {timeSlots.map((slot) => {
+                            const isOccupied = occupiedSlots.includes(slot)
+                            const isSelected = studioConfig.allow_multiple_time_slots
+                              ? selectedTimeSlots.includes(slot)
+                              : formData.timeSlot === slot
 
-                    {isLoadingSlots ? (
-                      <div className="flex items-center justify-center py-8">
-                        <Spinner size="lg" color="primary" />
-                      </div>
-                    ) : timeSlots.length === 0 ? (
-                      <div className="text-center py-8">
-                        <Text variant="body" textColor="color-on-surface-var">
-                          No hay horarios disponibles para esta fecha
-                        </Text>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-2 gap-3 w-full max-h-96 overflow-y-auto">
-                        {timeSlots.map((slot) => {
-                          const isOccupied = occupiedSlots.includes(slot)
-                          const isSelected = studioConfig.allow_multiple_time_slots
-                            ? selectedTimeSlots.includes(slot)
-                            : formData.timeSlot === slot
+                            // Convertir a zona horaria del usuario
+                            const displaySlot = !isUserInBusinessTz && currentDateStr
+                              ? convertSlotToUserTimezone(slot, currentDateStr, userTimezone)
+                              : slot
 
-                          // Convertir a zona horaria del usuario
-                          const displaySlot = !isUserInBusinessTz && currentDateStr
-                            ? convertSlotToUserTimezone(slot, currentDateStr, userTimezone)
-                            : slot
-
-                          return (
-                            <button
-                              key={slot}
-                              type="button"
-                              onClick={() => !isOccupied && handleTimeSlotChange(slot)}
-                              disabled={isOccupied}
-                              className={`
+                            return (
+                              <button
+                                key={slot}
+                                type="button"
+                                onClick={() => !isOccupied && handleTimeSlotChange(slot)}
+                                disabled={isOccupied}
+                                className={`
                                   px-4 py-3 rounded-lg border-2 transition-all duration-200
                                   ${isOccupied
-                                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                                  : isSelected
-                                    ? 'border-color-ct-primary bg-color-ct-primary text-white'
-                                    : 'border-color-ct-outline bg-white text-color-ct-on-surface hover:border-color-ct-tertiary hover:bg-color-ct-tertiary hover:bg-opacity-10'
-                                }
-                                `}
-                            >
-                              <Text
-                                variant="label"
-                                textColor={
-                                  isOccupied
-                                    ? 'color-on-surface-var'
+                                    ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
                                     : isSelected
-                                      ? 'color-white'
-                                      : 'color-on-surface'
-                                }
+                                      ? 'border-color-ct-primary bg-color-ct-primary text-white'
+                                      : 'border-color-ct-outline bg-white text-color-ct-on-surface hover:border-color-ct-tertiary hover:bg-color-ct-tertiary hover:bg-opacity-10'
+                                  }
+                                `}
                               >
-                                {displaySlot}
-                                {isOccupied && ' (Ocupado)'}
-                              </Text>
-                            </button>
-                          )
-                        })}
+                                <Text
+                                  variant="label"
+                                  textColor={
+                                    isOccupied
+                                      ? 'color-on-surface-var'
+                                      : isSelected
+                                        ? 'color-white'
+                                        : 'color-on-surface'
+                                  }
+                                >
+                                  {displaySlot}
+                                  {isOccupied && ' (Ocupado)'}
+                                </Text>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      )}
+
+                      <div className="flex gap-4 w-full max-w-[380px] mx-auto">
+                        <Button
+                          type="button"
+                          label="Anterior"
+                          variant="secondary"
+                          fullWidth
+                          onPress={prevStep}
+                        />
+                        <Button
+                          type="button"
+                          label="Siguiente"
+                          variant="primary"
+                          fullWidth
+                          onPress={nextStep}
+                          disabled={
+                            studioConfig.allow_multiple_time_slots
+                              ? selectedTimeSlots.length === 0
+                              : !formData.timeSlot
+                          }
+                        />
                       </div>
-                    )}
-
-                    <div className="flex gap-4 w-full max-w-[380px] mx-auto">
-                      <Button
-                        type="button"
-                        label="Anterior"
-                        variant="secondary"
-                        fullWidth
-                        onPress={prevStep}
-                      />
-                      <Button
-                        type="button"
-                        label="Siguiente"
-                        variant="primary"
-                        fullWidth
-                        onPress={nextStep}
-                        disabled={
-                          studioConfig.allow_multiple_time_slots
-                            ? selectedTimeSlots.length === 0
-                            : !formData.timeSlot
-                        }
-                      />
                     </div>
-                  </div>
-                </AnimatedContent>
-              )}
+                  </AnimatedContent>
+                )}
 
-              {/* Paso 4: Teléfono y Mensaje */}
-            </form>
-          </div>
-        </Col>
-      </Container>
-    </section >
+                {/* Paso 4: Teléfono y Mensaje */}
+              </form>
+            </div>
+          </Col>
+        </Container>
+      </section >
     </>
   );
 };
