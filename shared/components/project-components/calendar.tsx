@@ -29,6 +29,18 @@ export default function CalendarComponent({
   const effectiveToday = serverToday || today(getLocalTimeZone());
   const effectiveMinValue = minValue !== undefined ? minValue : effectiveToday;
 
+  // No renderizar hasta que serverToday esté disponible (evita mostrar fechas pasadas incorrectas)
+  if (!serverToday) {
+    return (
+      <div className="flex items-center justify-center w-[280px] h-[280px]">
+        <div className="animate-pulse flex flex-col gap-2 w-full">
+          <div className="h-8 bg-gray-200 rounded w-1/2 mx-auto" />
+          <div className="h-48 bg-gray-200 rounded" />
+        </div>
+      </div>
+    );
+  }
+
   let isDateUnavailable = (date: any) => {
     // Verificar si es domingo específicamente
     // isWeekend incluye sábado y domingo, pero queremos solo domingo

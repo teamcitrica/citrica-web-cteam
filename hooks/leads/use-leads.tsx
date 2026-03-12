@@ -26,8 +26,12 @@ export const useContact = () => {
     convertUserFormatToSlots
   } = useBookingsAvailability()
 
-  // Obtener la fecha y hora del servidor
-  const { serverToday, serverCurrentTime, serverHours, serverMinutes, isLoading: isLoadingServerTime } = useServerTime()
+  // Obtener la fecha y hora del servidor + zona horaria del usuario
+  const {
+    serverToday, serverCurrentTime, serverHours, serverMinutes,
+    isLoading: isLoadingServerTime,
+    userTimezone, userTimezoneLabel, isUserInBusinessTz
+  } = useServerTime()
 
   const [currentStep, setCurrentStep] = useState(1)
   const [formData, setFormData] = useState<ContactFormData>({
@@ -43,6 +47,7 @@ export const useContact = () => {
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([])
   const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>([]) // Para selección múltiple
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false)
   const [fullyBookedDates, setFullyBookedDates] = useState<Set<string>>(new Set()) // Cache de fechas completamente reservadas
   const [isLoadingBookedDates, setIsLoadingBookedDates] = useState(true) // Estado de carga de fechas bloqueadas
 
@@ -124,6 +129,7 @@ export const useContact = () => {
 
     // Cargar los horarios disponibles para esta fecha
     if (date) {
+      setIsLoadingSlots(true)
       try {
         // Convertir CalendarDate a string YYYY-MM-DD
         let dateStr: string
@@ -190,6 +196,8 @@ export const useContact = () => {
       } catch (error) {
         console.error('Error loading available slots:', error)
         setAvailableTimeSlots([])
+      } finally {
+        setIsLoadingSlots(false)
       }
     }
   }
@@ -359,10 +367,15 @@ export const useContact = () => {
     // Nuevos estados y configuración
     availableTimeSlots,
     selectedTimeSlots,
+    isLoadingSlots,
     studioConfig,
     // Fecha del servidor
     serverToday,
     isLoadingServerTime,
-    isLoadingBookedDates
+    isLoadingBookedDates,
+    // Zona horaria del usuario
+    userTimezone,
+    userTimezoneLabel,
+    isUserInBusinessTz,
   }
 }

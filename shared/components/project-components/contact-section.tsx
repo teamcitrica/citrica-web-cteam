@@ -3,6 +3,8 @@ import React from 'react'
 import {  Input, Textarea } from '../citrica-ui'
 import { Button, Text, Icon, Col, Container } from 'citrica-ui-toolkit'
 import { useContact } from '@/hooks/leads/use-leads'
+import { convertSlotToUserTimezone } from '@/hooks/use-server-time'
+import { Spinner } from '@heroui/spinner'
 import AnimatedContent from './animated-content'
 import CalendarComponent from './calendar'
 import { ctaSectionVariants } from '@/shared/archivos js/cta-section-data'
@@ -41,10 +43,19 @@ export const ContactSectionLanding = ({
     isDateFullyBookedSync,
     availableTimeSlots,
     selectedTimeSlots,
+    isLoadingSlots,
     studioConfig,
     serverToday,
-    isLoadingServerTime
+    isLoadingServerTime,
+    userTimezone,
+    userTimezoneLabel,
+    isUserInBusinessTz,
   } = useContact()
+
+  // Obtener dateStr para conversión de zona horaria
+  const currentDateStr = formData.date
+    ? `${formData.date.year}-${String(formData.date.month).padStart(2, '0')}-${String(formData.date.day).padStart(2, '0')}`
+    : ''
 
   // Obtener el contenido según la variante seleccionada
   const content = {
@@ -171,10 +182,17 @@ export const ContactSectionLanding = ({
                             Horarios disponibles para este día.
                           </Text>
                           <Text variant="label" color="#FF5B00" className="text-center">
-                            Zona horaria de Lima, Perú (GMT-5)
+                            {isUserInBusinessTz
+                              ? 'Zona horaria de Lima, Perú (GMT-5)'
+                              : `Tu zona horaria: ${userTimezoneLabel}`
+                            }
                           </Text>
 
-                          {timeSlots.length === 0 ? (
+                          {isLoadingSlots ? (
+                            <div className="flex items-center justify-center py-8">
+                              <Spinner size="lg" color="warning" />
+                            </div>
+                          ) : timeSlots.length === 0 ? (
                             <div className="text-center py-8">
                               <Text variant="body" color="#FFFFFF" className="opacity-60">
                                 Selecciona una fecha para ver horarios
@@ -188,10 +206,15 @@ export const ContactSectionLanding = ({
                                   ? selectedTimeSlots.includes(slot)
                                   : formData.timeSlot === slot
 
-                                // Mostrar solo hora de inicio (ej: "10:00 AM - 10:30 AM" → "10:00")
-                                const displayTime = slot.includes(' - ')
-                                  ? slot.split(' - ')[0].replace(/ AM| PM/gi, '').trim()
+                                // Convertir a zona horaria del usuario si es diferente a Lima
+                                const convertedSlot = !isUserInBusinessTz && currentDateStr
+                                  ? convertSlotToUserTimezone(slot, currentDateStr, userTimezone)
                                   : slot
+
+                                // Mostrar solo hora de inicio
+                                const displayTime = convertedSlot.includes(' - ')
+                                  ? convertedSlot.split(' - ')[0].replace(/ AM| PM/gi, '').trim()
+                                  : convertedSlot
 
                                 return (
                                   <button
@@ -608,7 +631,11 @@ export const ContactSectionLanding = ({
                       </div>
                     )}
 
-                    {timeSlots.length === 0 ? (
+                    {isLoadingSlots ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Spinner size="lg" color="primary" />
+                      </div>
+                    ) : timeSlots.length === 0 ? (
                       <div className="text-center py-8">
                         <Text variant="body" textColor="color-on-surface-var">
                           No hay horarios disponibles para esta fecha
@@ -621,6 +648,11 @@ export const ContactSectionLanding = ({
                           const isSelected = studioConfig.allow_multiple_time_slots
                             ? selectedTimeSlots.includes(slot)
                             : formData.timeSlot === slot
+
+                          // Convertir a zona horaria del usuario
+                          const displaySlot = !isUserInBusinessTz && currentDateStr
+                            ? convertSlotToUserTimezone(slot, currentDateStr, userTimezone)
+                            : slot
 
                           return (
                             <button
@@ -648,7 +680,7 @@ export const ContactSectionLanding = ({
                                       : 'color-on-surface'
                                 }
                               >
-                                {slot}
+                                {displaySlot}
                                 {isOccupied && ' (Ocupado)'}
                               </Text>
                             </button>
