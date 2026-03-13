@@ -145,14 +145,15 @@ export const getLeadColumns = ({
 ];
 
 export const getLeadExportColumns = (): ExportColumn[] => [
-  { header: "Nombre", accessor: "name" },
-  { header: "Email", accessor: "email" },
-  { header: "Fecha Reserva", accessor: "date" },
-  { header: "Horario", accessor: "time_slot" },
-  { header: "Estado", accessor: "status" },
-  { header: "Mensaje", accessor: "message" },
+  { header: "Nombre", key: "name" },
+  { header: "Email", key: "email" },
+  { header: "Fecha Reserva", key: "date" },
+  { header: "Horario", key: "time_slot" },
+  { header: "Estado", key: "status" },
+  { header: "Mensaje", key: "message" },
   {
     header: "Fecha Registro",
-    accessor: (lead) => new Date(lead.created_at).toLocaleDateString("es-ES"),
+    key: "created_at",
+    format: (value) => new Date(value).toLocaleDateString("es-ES"),
   },
 ];

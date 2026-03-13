@@ -103,13 +103,14 @@ export const getReunionColumns = ({
 ];
 
 export const getReunionExportColumns = (): ExportColumn[] => [
-  { header: "Nombre", accessor: "name" },
-  { header: "Email", accessor: "email" },
-  { header: "Fecha Reserva", accessor: "booking_date" },
+  { header: "Nombre", key: "name" },
+  { header: "Email", key: "email" },
+  { header: "Fecha Reserva", key: "booking_date" },
   {
     header: "Horarios",
-    accessor: (r) => r.time_slots?.join(", ") || "-",
+    key: "time_slots",
+    format: (value) => value?.join(", ") || "-",
   },
-  { header: "Estado", accessor: "status" },
-  { header: "Mensaje", accessor: "message" },
+  { header: "Estado", key: "status" },
+  { header: "Mensaje", key: "message" },
 ];
