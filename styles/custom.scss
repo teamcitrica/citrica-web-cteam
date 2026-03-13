@@ -297,9 +297,9 @@
 }
 
 $hero-marquee-wrapper: (
-  sm: (bottom: 8svh,),
-  md: (bottom: 7vh,),
-  lg: (bottom: 7vh,),
+  sm: (bottom: 24px,),
+  md: (bottom: 24px,),
+  lg: (bottom: 24px,),
 );
 
 .hero-marquee-wrapper {
@@ -513,6 +513,13 @@ input[type="time"]::-webkit-datetime-edit-ampm-field:focus {
 
 .balance-text {
   text-wrap: balance;
+}
+
+.hero-landing-background {
+  background: url("https://citrica-websites.s3.us-east-1.amazonaws.com/citrica-web-cteam-landing/bg-hero-landing-citrica.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 .hero-background-image {

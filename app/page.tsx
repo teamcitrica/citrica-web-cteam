@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { Header } from "@citrica-ui";
 import { Text, Button, Container, Col, Icon } from "citrica-ui-toolkit";
 import CurvedLoop from "./versions/yolanda/components/CurvedLoop";
-import DotGrid from "./versions/yolanda/components/DotGrid";
 
 
 import "aos/dist/aos.css";
@@ -66,51 +65,36 @@ const CitricaWebsite = () => {
       {/* Hero Section */}
       <section
         id="inicio"
-        className="min-h-screen relative overflow-hidden hero-background-image flex items-center"
+        className="min-h-screen relative overflow-hidden hero-landing-background flex items-center"
       >
-        <div className="absolute inset-0 -z-80">
-          <DotGrid
-            dotSize={4}
-            gap={16}
-            baseColor="#006666"
-            activeColor="#E1ff00"
-            proximity={120}
-            shockRadius={250}
-            shockStrength={5}
-            resistance={750}
-            returnDuration={1.5}
-          />
-        </div>
         <Container>
           <Col
             cols={{ lg: 10, md: 6, sm: 4 }}
             className="text-center mx-auto"
           >
-            <div className="bg-black/20 backdrop-blur-sm border-2 border-[#003333] rounded-2xl p-8">
-              <h1 className="text-balance mb-2">
-                <Text variant="display" color="#FF5B00" weight="bold">
-                  Soluciones Digitales
-                </Text>
-              </h1>
-              <h2 className="text-balance mb-4">
-                <Text variant="display" color="#FFFFFF" weight="bold">
-                  de Alto Rendimiento
-                </Text>
-              </h2>
-              <p className="text-balance mb-8">
-                <Text variant="subtitle" color="#FFFFFF" className="opacity-90">
-                  La infraestructura de tu negocio, construida para el futuro.
-                </Text>
-              </p>
-              <a href="#contacto">
-                <Button
-                  label="CONTÁCTANOS"
-                  variant="primary"
-                  textVariant="body"
-                  className="img-boton-hero"
-                />
-              </a>
-            </div>
+            <h1 className="text-balance mb-2">
+              <Text variant="display" color="#FF5B00" weight="bold">
+                Soluciones Digitales
+              </Text>
+            </h1>
+            <h2 className="text-balance mb-4">
+              <Text variant="display" color="#FFFFFF" weight="bold">
+                de Alto Rendimiento
+              </Text>
+            </h2>
+            <p className="text-balance mb-8">
+              <Text variant="subtitle" color="#FFFFFF" className="opacity-90">
+                La infraestructura de tu negocio, construida para el futuro.
+              </Text>
+            </p>
+            <a href="#contacto">
+              <Button
+                label="CONTÁCTANOS"
+                variant="primary"
+                textVariant="body"
+                className="img-boton-hero"
+              />
+            </a>
           </Col>
         </Container>
         <div className="hero-marquee-wrapper">
@@ -297,11 +281,11 @@ const CitricaWebsite = () => {
             { icon: 'Code', color: '#FF5B00', title: 'Servicios Secundarios', desc: 'Diseño de Identidad de Marca.\nMarketing Digital.' },
           ].map((service, index) => (
             <Col key={index} cols={{ lg: 4, md: 2, sm: 4 }} data-aos="fade-up" data-aos-duration="1500">
-              <div className="border border-[#003333] rounded-2xl p-6 flex flex-col items-center text-center h-full">
-                <div className="w-12 h-12 mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#16141F' }}>
-                  <Icon name={service.icon as any} color={service.color} size={24} />
+              <div className="rounded-2xl px-5 pt-4 pb-6 flex flex-col items-center text-center h-full" style={{ backgroundColor: 'rgba(0,0,0,0.2)', border: '2px solid #003333' }}>
+                <div className="w-10 h-10 mb-2 rounded-full flex items-center justify-center" style={{ backgroundColor: '#16141F' }}>
+                  <Icon name={service.icon as any} color={service.color} size={20} />
                 </div>
-                <h4 className="mb-3">
+                <h4 className="mb-1">
                   <Text variant="subtitle" color={service.color} weight="bold">
                     {service.title}
                   </Text>
@@ -309,10 +293,12 @@ const CitricaWebsite = () => {
                 <Text variant="body" color="#FFFFFF" className="opacity-80 whitespace-pre-line">
                   {service.desc}
                 </Text>
-                <div
-                  className="mt-auto pt-6 h-1 w-full rounded-full"
-                  style={{ background: `linear-gradient(90deg, ${service.color}00, ${service.color}, ${service.color}00)` }}
-                />
+                <div className="mt-auto pt-4 w-full">
+                  <div
+                    className="w-[95%] mx-auto"
+                    style={{ height: '2px', background: `linear-gradient(90deg, transparent, ${service.color}, transparent)` }}
+                  />
+                </div>
               </div>
             </Col>
           ))}
@@ -331,11 +317,11 @@ const CitricaWebsite = () => {
             { icon: 'Code', color: '#FF5B00', title: 'Tienda en Línea', desc: 'Control total de inventario, pasarelas de pago y logística en una plataforma escalable. Convierte tu catálogo en un motor de ventas eficiente y automático.' },
           ].map((service, index) => (
             <Col key={`nicho-${index}`} cols={{ lg: 4, md: 2, sm: 4 }} data-aos="fade-up" data-aos-duration="1500">
-              <div className="border border-[#003333] rounded-2xl p-6 flex flex-col items-center text-center h-full">
-                <div className="w-12 h-12 mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: '#16141F' }}>
-                  <Icon name={service.icon as any} color={service.color} size={24} />
+              <div className="rounded-2xl px-5 pt-4 pb-6 flex flex-col items-center text-center h-full" style={{ backgroundColor: 'rgba(0,0,0,0.2)', border: '2px solid #003333' }}>
+                <div className="w-10 h-10 mb-2 rounded-full flex items-center justify-center" style={{ backgroundColor: '#16141F' }}>
+                  <Icon name={service.icon as any} color={service.color} size={20} />
                 </div>
-                <h4 className="mb-3">
+                <h4 className="mb-1">
                   <Text variant="subtitle" color={service.color} weight="bold">
                     {service.title}
                   </Text>
@@ -343,10 +329,12 @@ const CitricaWebsite = () => {
                 <Text variant="body" color="#FFFFFF" className="opacity-80">
                   {service.desc}
                 </Text>
-                <div
-                  className="mt-auto pt-6 h-1 w-full rounded-full"
-                  style={{ background: `linear-gradient(90deg, ${service.color}00, ${service.color}, ${service.color}00)` }}
-                />
+                <div className="mt-auto pt-4 w-full">
+                  <div
+                    className="w-[95%] mx-auto"
+                    style={{ height: '2px', background: `linear-gradient(90deg, transparent, ${service.color}, transparent)` }}
+                  />
+                </div>
               </div>
             </Col>
           ))}

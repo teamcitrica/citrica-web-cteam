@@ -28,7 +28,7 @@ export const FooterCitrica = () => {
               Soluciones Digitales de Alto Rendimiento
             </Text>
             {/* Redes sociales */}
-            <div className="flex items-center justify-center gap-3 mt-[28px]">
+            {/* <div className="flex items-center justify-center gap-3 mt-[28px]">
               <Link href="https://www.facebook.com/citrica.dev" target="_blank" rel="noopener noreferrer">
                 <Icon name="Facebook" color="#FFFFFF" size={18} />
               </Link>
@@ -41,7 +41,7 @@ export const FooterCitrica = () => {
               <Link href="https://wa.me/51942627383" target="_blank" rel="noopener noreferrer">
                 <Icon name="MessageCircle" color="#FFFFFF" size={18} />
               </Link>
-            </div>
+            </div> */}
             {/* Contacto */}
             <div className="flex flex-col justify-center items-center gap-1 mt-[20px]">
               <div className="flex items-center space-x-2">
@@ -55,21 +55,21 @@ export const FooterCitrica = () => {
               <div className="flex flex-wrap justify-center gap-x-3 gap-y-1">
                 <div className="flex items-center space-x-1">
                   <Icon name="Phone" color="#FFFFFF" size={14} />
-                  <Link href="tel:+51942627383" target="_blank" rel="noopener noreferrer">
+                  <Link href="https://wa.me/51942627383" target="_blank" rel="noopener noreferrer">
                     <Text variant="label" color="#FFFFFF">
                       Perú: +51 942 627383
                     </Text>
                   </Link>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Link href="tel:+59892041487" target="_blank" rel="noopener noreferrer">
+                  <Link href="https://wa.me/59892041487" target="_blank" rel="noopener noreferrer">
                     <Text variant="label" color="#FFFFFF">
                       Uruguay: +598 92 041487
                     </Text>
                   </Link>
                 </div>
                 <div className="flex items-center space-x-1">
-                  <Link href="tel:+34919934651" target="_blank" rel="noopener noreferrer">
+                  <Link href="https://wa.me/34919934651" target="_blank" rel="noopener noreferrer">
                     <Text variant="label" color="#FFFFFF">
                       España: +34 91 9934651
                     </Text>
