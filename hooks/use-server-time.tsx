@@ -19,6 +19,38 @@ interface ServerTimeResponse {
 }
 
 /**
+ * Calcula el offset UTC de una zona horaria para una fecha específica.
+ * Retorna minutos tal que: hora_local = hora_UTC + offset
+ * Ej: Lima (UTC-5) retorna -300
+ */
+function getTimezoneOffsetMinutes(tz: string, year: number, month: number, day: number): number {
+  // Usar mediodía UTC como referencia para evitar problemas en límites de DST
+  const refUtc = new Date(Date.UTC(year, month - 1, day, 12, 0, 0))
+
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false
+  }).formatToParts(refUtc)
+
+  const get = (type: string) => {
+    const val = parseInt(parts.find(p => p.type === type)?.value || '0')
+    // hour12:false puede devolver 24 para medianoche en algunos navegadores
+    return type === 'hour' && val === 24 ? 0 : val
+  }
+
+  // Reconstruir el timestamp UTC que representa la hora local mostrada
+  const localAsUtc = Date.UTC(
+    get('year'), get('month') - 1, get('day'),
+    get('hour'), get('minute'), get('second')
+  )
+
+  // offset = horaLocal - horaUTC (en minutos)
+  return Math.round((localAsUtc - refUtc.getTime()) / 60000)
+}
+
+/**
  * Obtiene la zona horaria del usuario y un nombre legible para mostrar
  */
 function getUserTimezoneInfo() {
@@ -35,19 +67,39 @@ function getUserTimezoneInfo() {
   // Extraer ciudad del timezone (ej: "America/Lima" → "Lima", "Europe/Madrid" → "Madrid")
   const city = tz.split('/').pop()?.replace(/_/g, ' ') || tz
 
-  return { timezone: tz, city, gmtLabel, label: `${city} (${gmtLabel})` }
+  // Comparar offset real con Lima (no por nombre de timezone)
+  // Esto maneja correctamente America/Bogota, America/Guayaquil, etc. que comparten UTC-5
+  const userOffset = getTimezoneOffsetMinutes(tz, now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate())
+  const limaOffset = getTimezoneOffsetMinutes(BUSINESS_TIMEZONE, now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate())
+  const sameOffsetAsLima = userOffset === limaOffset
+
+  return { timezone: tz, city, gmtLabel, label: `${city} (${gmtLabel})`, sameOffsetAsLima }
 }
 
 /**
- * Convierte un horario de Lima (AM/PM) a la zona horaria del usuario
- * Ej: "10:00 AM - 10:30 AM" en Lima → "16:00 - 16:30" en Madrid
+ * Convierte un horario de Lima (AM/PM) a la zona horaria del usuario.
+ *
+ * Flujo:
+ *   1. Parsear "11:00 AM" → 11:00 en formato 24h
+ *   2. Calcular offset de Lima para esa fecha → -300 min (UTC-5)
+ *   3. Convertir a UTC: 11:00 - (-300) = 16:00 UTC
+ *   4. Calcular offset del usuario para esa fecha → ej: -180 min (UTC-3, Uruguay)
+ *   5. Convertir a hora local: 16:00 + (-180) = 13:00 → 1:00 PM
+ *
+ * Ejemplo: "11:00 AM - 12:00 PM" Lima → "1:00 PM - 2:00 PM" Uruguay
  */
 export function convertSlotToUserTimezone(slot: string, dateStr: string, userTimezone: string): string {
-  // Si el usuario está en Lima, no convertir
-  if (userTimezone === BUSINESS_TIMEZONE) return slot
-
   const parts = slot.split(' - ')
   if (parts.length !== 2) return slot
+
+  const [year, month, day] = dateStr.split('-').map(Number)
+
+  // Calcular offsets para esta fecha específica
+  const limaOffsetMin = getTimezoneOffsetMinutes(BUSINESS_TIMEZONE, year, month, day)
+  const userOffsetMin = getTimezoneOffsetMinutes(userTimezone, year, month, day)
+
+  // Si tienen el mismo offset, no hay nada que convertir
+  if (limaOffsetMin === userOffsetMin) return slot
 
   const convertTime = (timeStr: string): string => {
     const match = timeStr.trim().match(/(\d+):(\d+)\s*(AM|PM)/i)
@@ -57,48 +109,30 @@ export function convertSlotToUserTimezone(slot: string, dateStr: string, userTim
     const minutes = parseInt(match[2])
     const period = match[3].toUpperCase()
 
-    // Convertir a 24h
+    // Convertir AM/PM a formato 24h
     if (period === 'PM' && hours !== 12) hours += 12
     if (period === 'AM' && hours === 12) hours = 0
 
-    // Crear una fecha en Lima con ese horario
-    const [year, month, day] = dateStr.split('-').map(Number)
-    const limaDateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`
+    // Paso 1: hora de Lima en minutos totales
+    const limaMinutes = hours * 60 + minutes
 
-    // Usar Intl para obtener el offset de Lima en esa fecha
-    const limaFormatter = new Intl.DateTimeFormat('en-US', {
-      timeZone: BUSINESS_TIMEZONE,
-      year: 'numeric', month: '2-digit', day: '2-digit',
-      hour: '2-digit', minute: '2-digit', second: '2-digit',
-      hour12: false
-    })
+    // Paso 2: convertir Lima → UTC (UTC = local - offset)
+    const utcMinutes = limaMinutes - limaOffsetMin
 
-    const userFormatter = new Intl.DateTimeFormat('en-US', {
-      timeZone: userTimezone,
-      hour: '2-digit', minute: '2-digit',
-      hour12: false
-    })
+    // Paso 3: convertir UTC → hora del usuario (local = UTC + offset)
+    const userMinutes = utcMinutes + userOffsetMin
 
-    // Crear fecha UTC ajustada desde Lima
-    // Primero obtener el offset de Lima para esta fecha
-    const tempDate = new Date(limaDateStr + 'Z') // tratarlo como UTC temporalmente
-    const limaTime = limaFormatter.format(tempDate)
-    const limaParts = limaTime.match(/(\d+)\/(\d+)\/(\d+),?\s+(\d+):(\d+):(\d+)/)
-    if (!limaParts) return timeStr
+    // Normalizar a rango 0-1439 (por si cruza medianoche)
+    const normalized = ((userMinutes % 1440) + 1440) % 1440
 
-    // El offset de Lima es la diferencia entre la hora UTC y la hora que Lima muestra
-    // Creamos la fecha real en UTC: si en Lima son las 10:00 y Lima es UTC-5, en UTC son las 15:00
-    const limaOffsetMs = tempDate.getTime() - new Date(
-      parseInt(limaParts[3]), parseInt(limaParts[1]) - 1, parseInt(limaParts[2]),
-      parseInt(limaParts[4]), parseInt(limaParts[5]), parseInt(limaParts[6])
-    ).getTime()
+    const userHours = Math.floor(normalized / 60)
+    const userMins = normalized % 60
 
-    // Fecha UTC real del slot
-    const utcDate = new Date(tempDate.getTime() + limaOffsetMs)
+    // Formatear como AM/PM
+    const userPeriod = userHours >= 12 ? 'PM' : 'AM'
+    const displayHour = userHours === 0 ? 12 : userHours > 12 ? userHours - 12 : userHours
 
-    // Formatear en la zona del usuario
-    const userTime = userFormatter.format(utcDate)
-    return userTime.replace(/^24:/, '00:')
+    return `${displayHour}:${String(userMins).padStart(2, '0')} ${userPeriod}`
   }
 
   const startConverted = convertTime(parts[0])
@@ -188,6 +222,6 @@ export const useServerTime = () => {
     error,
     userTimezone: userTimezoneInfo.timezone,
     userTimezoneLabel: userTimezoneInfo.label,
-    isUserInBusinessTz: userTimezoneInfo.timezone === BUSINESS_TIMEZONE,
+    isUserInBusinessTz: userTimezoneInfo.sameOffsetAsLima,
   }
 }
