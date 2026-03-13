@@ -19,6 +19,7 @@ export const useContact = () => {
   const { supabase } = useSupabase()
   const {
     bookings,
+    fetchBookings,
     getOccupiedSlots,
     getAvailableSlots,
     isDateFullyBooked,
@@ -45,7 +46,7 @@ export const useContact = () => {
     phoneCode: '+51'
   })
   const [isLoading, setIsLoading] = useState(false)
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'conflict'>('idle')
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([])
   const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>([]) // Para selección múltiple
   const [isLoadingSlots, setIsLoadingSlots] = useState(false)
@@ -272,6 +273,21 @@ export const useContact = () => {
         slotsToSend = convertUserFormatToSlots(formData.timeSlot)
       }
 
+      // Validar que los slots no estén ya ocupados (refrescar bookings antes de verificar)
+      if (dateStr && slotsToSend.length > 0) {
+        const freshBookings = await fetchBookings()
+        const occupiedForDate = (freshBookings || [])
+          .filter(b => b.booking_date === dateStr)
+          .flatMap(b => b.time_slots)
+
+        const conflict = slotsToSend.some(slot => occupiedForDate.includes(slot))
+        if (conflict) {
+          setStatus('conflict')
+          setIsLoading(false)
+          return
+        }
+      }
+
       // Primero crear el contacto en la tabla contact (para leads del formulario)
       // Preparar el time_slot para guardar
       const timeSlotToSave = studioConfig.allow_multiple_time_slots && selectedTimeSlots.length > 0
@@ -317,6 +333,9 @@ export const useContact = () => {
         ])
 
       if (error) throw error
+
+      // Refrescar bookings para que los slots recién reservados aparezcan como ocupados
+      await fetchBookings()
 
       setStatus('success')
       setFormData({ name: '', email: '', message: '', date: null, timeSlot: '', phone: '', phoneCode: '+51' })
