@@ -1,6 +1,6 @@
 import { Calendar } from "@heroui/calendar";
 import { today, getLocalTimeZone } from "@internationalized/date";
-import { useLocale } from "@react-aria/i18n";
+import { useLocale, I18nProvider } from "@react-aria/i18n";
 
 interface CalendarComponentProps {
   value?: any;
@@ -91,15 +91,16 @@ export default function CalendarComponent({
   } : undefined;
 
   return (
-    <Calendar
-      aria-label="Seleccionar fecha"
-      className={`calendar-citrica-ui ${calendarClass} ${className}`}
-      classNames={darkClassNames}
-      isDateUnavailable={isDateUnavailable}
-      minValue={effectiveMinValue}
-      value={value}
-      onChange={onChange}
-      locale={locale}
-    />
+    <I18nProvider locale={locale}>
+      <Calendar
+        aria-label="Seleccionar fecha"
+        className={`calendar-citrica-ui ${calendarClass} ${className}`}
+        classNames={darkClassNames}
+        isDateUnavailable={isDateUnavailable}
+        minValue={effectiveMinValue}
+        value={value}
+        onChange={onChange}
+      />
+    </I18nProvider>
   );
 }
