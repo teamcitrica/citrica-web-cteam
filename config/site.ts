@@ -98,10 +98,10 @@ export const siteConfig = {
 					title: "Empresas",
 					href: "/admin/crm/empresas",
 				},
-				{
-				title: "Reuniones",
-				href: "/admin/crm/reuniones",
-			},
+				// {
+			// 	title: "Reuniones",
+			// 	href: "/admin/crm/reuniones",
+			// },
 				{
 					title: "Proyectos",
 					href: "/admin/crm/proyectos",
@@ -129,14 +129,14 @@ export const siteConfig = {
 					title: "Proyectos",
 					href: "/admin/CMS/proyectos",
 				},
-				{
-					title: "Solution card",
-					href: "/admin/CMS/solution_card",
-				},
-				{
-					title: "Configuración",
-					href: "/admin/CMS/configuracion",
-				},
+				// {
+				// 	title: "Solution card",
+				// 	href: "/admin/CMS/solution_card",
+				// },
+				// {
+				// 	title: "Configuración",
+				// 	href: "/admin/CMS/configuracion",
+				// },
 			],
 		},
 
