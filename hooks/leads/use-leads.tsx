@@ -284,6 +284,8 @@ export const useContact = () => {
           {
             name: formData.name,
             email: formData.email,
+            phone: formData.phone || null,
+            phone_code: formData.phoneCode || null,
             message: formData.message,
             time_slot: timeSlotToSave,
             date: dateStr,
