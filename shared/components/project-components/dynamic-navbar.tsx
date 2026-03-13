@@ -1,5 +1,6 @@
 "use client";
 import { Link } from "@heroui/link";
+import NextLink from "next/link";
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Button, Text, Icon, Container, Col } from "citrica-ui-toolkit";
@@ -43,7 +44,17 @@ export const DynamicNavbar = () => {
           noPadding
           className="flex justify-between items-center pt-4"
         >
-          <Link href="/">
+          {isProjectPage ? (
+            <a href="/" className="flex items-center space-x-2 cursor-pointer">
+              <div className="w-24 h-17">
+                <img
+                  src="/img/citrica-logo.png"
+                  alt="Logo Cítrica"
+                  className="h-12"
+                />
+              </div>
+            </a>
+          ) : (
             <div className="flex items-center space-x-2">
               <div className="w-24 h-17">
                 <img
@@ -53,7 +64,7 @@ export const DynamicNavbar = () => {
                 />
               </div>
             </div>
-          </Link>
+          )}
 
           <div className="hidden lg:flex space-x-8">
             {links.map((link) => (

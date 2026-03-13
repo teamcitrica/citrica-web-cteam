@@ -11,6 +11,7 @@ interface CalendarComponentProps {
   disabledRanges?: Array<[any, any]>;
   isDateFullyBooked?: (date: string) => boolean;
   serverToday?: any; // Nueva prop para la fecha del servidor
+  inactiveDays?: number[]; // Días de la semana inactivos (0=Dom, 1=Lun, etc.)
 }
 
 export default function CalendarComponent({
@@ -22,6 +23,7 @@ export default function CalendarComponent({
   disabledRanges = [],
   isDateFullyBooked,
   serverToday,
+  inactiveDays = [0],
 }: CalendarComponentProps) {
   let { locale } = useLocale();
 
@@ -29,11 +31,22 @@ export default function CalendarComponent({
   const effectiveToday = serverToday || today(getLocalTimeZone());
   const effectiveMinValue = minValue !== undefined ? minValue : effectiveToday;
 
+  // No renderizar hasta que serverToday esté disponible (evita mostrar fechas pasadas incorrectas)
+  if (!serverToday) {
+    return (
+      <div className="flex items-center justify-center w-[280px] h-[280px]">
+        <div className="animate-pulse flex flex-col gap-2 w-full">
+          <div className="h-8 bg-gray-200 rounded w-1/2 mx-auto" />
+          <div className="h-48 bg-gray-200 rounded" />
+        </div>
+      </div>
+    );
+  }
+
   let isDateUnavailable = (date: any) => {
-    // Verificar si es domingo específicamente
-    // isWeekend incluye sábado y domingo, pero queremos solo domingo
+    // Verificar si el día de la semana está inactivo en la configuración semanal
     const jsDate = date.toDate(getLocalTimeZone());
-    const isSunday = jsDate.getDay() === 0; // 0 = Domingo en JavaScript
+    const isDayInactive = inactiveDays.includes(jsDate.getDay());
 
     // Verificar si la fecha es anterior a hoy (usando la fecha del servidor si está disponible)
     const isPastDate = date.compare(effectiveToday) < 0;
@@ -47,7 +60,7 @@ export default function CalendarComponent({
 
     return (
       isPastDate ||
-      isSunday ||
+      isDayInactive ||
       isFullyBooked ||
       disabledRanges.some(
         (interval) =>

@@ -19,7 +19,7 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
 }) => {
   const text = useMemo(() => {
     const hasTrailing = /\s|\u00A0$/.test(marqueeText);
-    const spacer = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0';
+    const spacer = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0';
     return (hasTrailing ? marqueeText.replace(/\s+$/, '') : marqueeText) + spacer;
   }, [marqueeText]);
 

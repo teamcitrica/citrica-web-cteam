@@ -98,10 +98,10 @@ export const siteConfig = {
 					title: "Empresas",
 					href: "/admin/crm/empresas",
 				},
-				// {
-				// 	title: "Reuniones",
-				// 	href: "/admin/crm/reuniones",
-				// },
+				{
+				title: "Reuniones",
+				href: "/admin/crm/reuniones",
+			},
 				{
 					title: "Proyectos",
 					href: "/admin/crm/proyectos",

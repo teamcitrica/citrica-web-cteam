@@ -27,6 +27,7 @@ export const useBookingsAvailability = () => {
   const { serverToday, serverHours, serverMinutes } = useServerTime()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [inactiveDays, setInactiveDays] = useState<number[]>([0]) // Días de la semana inactivos (0=Dom, 1=Lun, etc.)
   const [studioConfig, setStudioConfig] = useState<StudioConfig>({
     user_display_mode: '1hour',
     allow_multiple_time_slots: true
@@ -308,11 +309,35 @@ export const useBookingsAvailability = () => {
     return availableSlots
   }, [getBaseAvailableSlots, getOccupiedSlots, serverToday, serverHours, serverMinutes])
 
+  // Cargar días inactivos de la semana desde studio_availability
+  const loadInactiveDays = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('studio_availability')
+        .select('day_of_week, is_active')
+
+      if (error) {
+        console.error('Error loading inactive days:', error)
+        return
+      }
+
+      if (data) {
+        const inactive = data
+          .filter(day => !day.is_active)
+          .map(day => day.day_of_week)
+        setInactiveDays(inactive)
+      }
+    } catch (error) {
+      console.error('Error loading inactive days:', error)
+    }
+  }, [supabase])
+
   // Cargar configuración y reservas al montar
   useEffect(() => {
     loadStudioConfig()
     fetchBookings()
-  }, [loadStudioConfig, fetchBookings])
+    loadInactiveDays()
+  }, [loadStudioConfig, fetchBookings, loadInactiveDays])
 
   return {
     bookings,
@@ -324,6 +349,7 @@ export const useBookingsAvailability = () => {
     isDateFullyBooked,
     loadStudioConfig,
     convertUserFormatToSlots,
+    inactiveDays,
     serverToday,
     serverHours,
     serverMinutes

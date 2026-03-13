@@ -43,9 +43,9 @@ const ProjectTemplate = ({ project, slug }: ProjectTemplateProps) => {
     });
   };
   const logo = (
-    <div className="flex items-center space-x-2">
+    <a href="/" className="flex items-center space-x-2">
       <img src="/img/citrica-logo.png" alt="Cítrica Logo" className="h-10" />
-    </div>
+    </a>
   );
   const navLinksRestaurantes = [
     {
