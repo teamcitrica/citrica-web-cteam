@@ -337,17 +337,19 @@ const Header = ({
           <Col cols={{ lg: 12, md: 6, sm: 4 }} className="flex justify-between items-center py-2">
             
             {/* Logo */}
-            <a href="#home" className="flex items-center">
-              {logo ? (
-                logo
-              ) : (
+            {logo ? (
+              <div className="flex items-center">
+                {logo}
+              </div>
+            ) : (
+              <a href="#home" className="flex items-center">
                 <img
                   src="/img/logo-lienzo.svg"
                   alt="Lienzo Production Studio Logo"
                   className="h-10 w-auto"
                 />
-              )}
-            </a>
+              </a>
+            )}
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
