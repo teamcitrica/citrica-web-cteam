@@ -45,8 +45,9 @@ export default function CalendarComponent({
 
   let isDateUnavailable = (date: any) => {
     // Verificar si el día de la semana está inactivo en la configuración semanal
-    const jsDate = date.toDate(getLocalTimeZone());
-    const isDayInactive = inactiveDays.includes(jsDate.getDay());
+    // Usar getDayOfWeek con la zona de Lima para evitar desfases por timezone del cliente
+    const dayOfWeek = date.toDate('America/Lima').getDay();
+    const isDayInactive = inactiveDays.includes(dayOfWeek);
 
     // Verificar si la fecha es anterior a hoy (usando la fecha del servidor si está disponible)
     const isPastDate = date.compare(effectiveToday) < 0;
@@ -98,6 +99,7 @@ export default function CalendarComponent({
       minValue={effectiveMinValue}
       value={value}
       onChange={onChange}
+      locale={locale}
     />
   );
 }
