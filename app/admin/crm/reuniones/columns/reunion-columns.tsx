@@ -102,7 +102,7 @@ export const getReunionColumns = ({
   },
 ];
 
-export const getReunionExportColumns = (): ExportColumn<Reserva>[] => [
+export const getReunionExportColumns = (): ExportColumn[] => [
   { header: "Nombre", accessor: "name" },
   { header: "Email", accessor: "email" },
   { header: "Fecha Reserva", accessor: "booking_date" },

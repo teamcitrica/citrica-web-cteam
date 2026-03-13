@@ -144,7 +144,7 @@ export const getLeadColumns = ({
   },
 ];
 
-export const getLeadExportColumns = (): ExportColumn<Lead>[] => [
+export const getLeadExportColumns = (): ExportColumn[] => [
   { header: "Nombre", accessor: "name" },
   { header: "Email", accessor: "email" },
   { header: "Fecha Reserva", accessor: "date" },
