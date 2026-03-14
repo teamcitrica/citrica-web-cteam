@@ -33,16 +33,14 @@ export const useBookingsAvailability = () => {
     allow_multiple_time_slots: true
   })
 
-  // Mapeo de slots de 30 minutos a formato de usuario
+  // Mapeo de slots de 30 minutos a formato de usuario (hora militar 24h)
   const convertSlotToUserFormat = (slot: string): string => {
-    // Convertir "10:00" a "10:00 AM - 11:00 AM" (formato 1 hora)
-    // o "10:00 AM - 10:30 AM" (formato 30 minutos)
+    // Convertir "10:00" a "10:00 - 11:00" (formato 1 hora)
+    // o "10:00 - 10:30" (formato 30 minutos)
     const [hours, minutes] = slot.split(':').map(Number)
 
     const formatTime = (h: number, m: number) => {
-      const period = h >= 12 ? 'PM' : 'AM'
-      const displayHour = h === 0 ? 12 : h > 12 ? h - 12 : h
-      return `${displayHour}:${String(m).padStart(2, '0')} ${period}`
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
     }
 
     if (studioConfig.user_display_mode === '1hour') {
@@ -61,28 +59,17 @@ export const useBookingsAvailability = () => {
     }
   }
 
-  // Convertir formato de usuario a slots de 30 minutos
+  // Convertir formato de usuario (24h) a slots de 30 minutos
   const convertUserFormatToSlots = (userSlot: string): string[] => {
-    // "10:00 AM - 11:00 AM" -> ["10:00", "10:30"]
-    // "1:00 PM - 2:00 PM" -> ["13:00", "13:30"]
-    console.log('🔄 Convirtiendo slot:', userSlot);
-
-    const match = userSlot.match(/(\d+):(\d+)\s+(AM|PM)/)
+    // "10:00 - 11:00" -> ["10:00", "10:30"]
+    // "13:00 - 14:00" -> ["13:00", "13:30"]
+    const match = userSlot.match(/(\d{1,2}):(\d{2})/)
     if (!match) {
-      console.error('❌ No se pudo parsear el slot:', userSlot);
       return []
     }
 
-    const hours = parseInt(match[1])
+    const hour24 = parseInt(match[1])
     const minutes = parseInt(match[2])
-    const period = match[3]
-
-    let hour24 = hours
-    if (period === 'PM' && hours !== 12) {
-      hour24 = hours + 12
-    } else if (period === 'AM' && hours === 12) {
-      hour24 = 0
-    }
 
     const firstSlot = `${String(hour24).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
     const slots = [firstSlot]
@@ -93,7 +80,6 @@ export const useBookingsAvailability = () => {
       slots.push(secondSlot)
     }
 
-    console.log('✅ Slots convertidos:', slots);
     return slots
   }
 
