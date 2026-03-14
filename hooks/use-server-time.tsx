@@ -102,16 +102,12 @@ export function convertSlotToUserTimezone(slot: string, dateStr: string, userTim
   if (limaOffsetMin === userOffsetMin) return slot
 
   const convertTime = (timeStr: string): string => {
-    const match = timeStr.trim().match(/(\d+):(\d+)\s*(AM|PM)/i)
+    // Parsear formato 24h: "10:00" o "13:00"
+    const match = timeStr.trim().match(/(\d{1,2}):(\d{2})/)
     if (!match) return timeStr
 
-    let hours = parseInt(match[1])
+    const hours = parseInt(match[1])
     const minutes = parseInt(match[2])
-    const period = match[3].toUpperCase()
-
-    // Convertir AM/PM a formato 24h
-    if (period === 'PM' && hours !== 12) hours += 12
-    if (period === 'AM' && hours === 12) hours = 0
 
     // Paso 1: hora de Lima en minutos totales
     const limaMinutes = hours * 60 + minutes
@@ -128,11 +124,8 @@ export function convertSlotToUserTimezone(slot: string, dateStr: string, userTim
     const userHours = Math.floor(normalized / 60)
     const userMins = normalized % 60
 
-    // Formatear como AM/PM
-    const userPeriod = userHours >= 12 ? 'PM' : 'AM'
-    const displayHour = userHours === 0 ? 12 : userHours > 12 ? userHours - 12 : userHours
-
-    return `${displayHour}:${String(userMins).padStart(2, '0')} ${userPeriod}`
+    // Formatear como hora militar 24h
+    return `${String(userHours).padStart(2, '0')}:${String(userMins).padStart(2, '0')}`
   }
 
   const startConverted = convertTime(parts[0])
