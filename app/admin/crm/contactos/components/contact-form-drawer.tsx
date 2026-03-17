@@ -17,6 +17,7 @@ interface ContactFormDrawerProps {
   onSuccess?: () => void;
   contact?: Contact | null;
   mode: "create" | "edit";
+  initialData?: Partial<ContactInput> | null;
 }
 
 // Helper para validar y parsear fechas ISO
@@ -44,6 +45,7 @@ export default function ContactFormDrawer({
   onSuccess,
   contact,
   mode,
+  initialData,
 }: ContactFormDrawerProps) {
   const { createContact, updateContact, isLoading } = useContactCRUD();
   const { companies } = useCompanyCRUD();
@@ -96,6 +98,33 @@ export default function ContactFormDrawer({
           setPhoneCode(matchedCode.value);
         }
       }
+    } else if (initialData) {
+      // Modo crear con datos pre-cargados (ej: desde lead)
+      setFormData({
+        name: initialData.name || null,
+        cargo: initialData.cargo || null,
+        email: initialData.email || null,
+        address: initialData.address || null,
+        phone: initialData.phone || null,
+        company_id: initialData.company_id || null,
+        user_id: null,
+        type_id: initialData.type_id || null,
+        code: null,
+        email_access: null,
+        last_name: initialData.last_name || null,
+        birth_date: initialData.birth_date || null,
+        country: initialData.country || null,
+        city: initialData.city || null,
+      });
+
+      if (initialData.phone) {
+        const matchedCode = PHONE_CODES.find(code =>
+          initialData.phone?.startsWith(code.value)
+        );
+        if (matchedCode) {
+          setPhoneCode(matchedCode.value);
+        }
+      }
     } else {
       // Resetear formulario en modo crear
       setFormData({
@@ -115,7 +144,7 @@ export default function ContactFormDrawer({
         city: null,
       });
     }
-  }, [mode, contact, isOpen]);
+  }, [mode, contact, initialData, isOpen]);
 
   const handleInputChange = (field: keyof ContactInput, value: string | number | null) => {
     setFormData((prev) => ({

@@ -15,6 +15,7 @@ export interface Lead {
   created_at: string
   phone?: string
   phoneCode?: string
+  origin?: string
 }
 
 export const useLeadsCRUD = () => {
