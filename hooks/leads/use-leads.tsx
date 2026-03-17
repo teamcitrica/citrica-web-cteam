@@ -238,6 +238,11 @@ export const useContact = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!formData.name || !formData.email || !formData.phone) {
+      return
+    }
+
     setIsLoading(true)
     setStatus('idle')
 
@@ -306,7 +311,8 @@ export const useContact = () => {
             time_slot: timeSlotToSave,
             date: dateStr,
             status: 'pendiente',
-            type_id: 2 // type_id 2 = lead
+            type_id: 2, // type_id 2 = lead
+            origin: 'landing_home'
           }
         ])
 

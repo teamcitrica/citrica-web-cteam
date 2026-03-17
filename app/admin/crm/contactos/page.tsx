@@ -125,6 +125,7 @@ export default function ContactosPage() {
 
           <DataTable<Contact>
             data={filteredContacts}
+            itemsPerPage={5}
             customFilters={
               <>
               <div className="flex flex-col md:flex-row gap-3 pb-4 w-full">

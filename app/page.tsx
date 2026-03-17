@@ -99,12 +99,13 @@ const CitricaWebsite = () => {
         </Container>
         <div className="hero-marquee-wrapper">
           <CurvedLoop
-            marqueeText={`Websites\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Landing Pages\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Web Apps\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Mobile Apps (IOS y Android)\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0SAAS\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Integraciones de IA\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0E-Commerce\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Plataformas web a Medida`}
+            items={["Websites", "Landing Pages", "Web Apps", "Mobile Apps (IOS y Android)", "SAAS", "Integraciones de IA", "E-Commerce", "Plataformas web a Medida"]}
             speed={1}
-            curveAmount={0}
             direction="right"
             interactive={true}
-            className="custom-text-style"
+            textVariant="h3"
+            textColor="#FF5B00"
+            separator=""
           />
         </div>
       </section>

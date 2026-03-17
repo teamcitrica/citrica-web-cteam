@@ -11,7 +11,7 @@ type ValidationRule = {
 };
 
 interface InputProps {
-  label?: string;
+  label?: React.ReactNode;
   placeholder?: string;
   value?: string;
   defaultValue?: string;
