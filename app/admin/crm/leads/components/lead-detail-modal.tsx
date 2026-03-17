@@ -6,8 +6,8 @@ import { Text } from "citrica-ui-toolkit";
 import { AvatarTables } from "@/public/icon-svg/avatar-tables";
 import { getAvatarColor } from "@/shared/utils/avatar-colors";
 
-const STATUS_CONFIG: Record<string, { color: string; bgColor: string; label: string }> = {
-  pendiente: { color: "#16305A", bgColor: "#F9E124", label: "Pendiente" },
+const ORIGIN_CONFIG: Record<string, { color: string; bgColor: string; label: string }> = {
+  "landing_home": { color: "#16305A", bgColor: "#D4DEED", label: "Landing Home" },
 };
 
 interface LeadDetailModalProps {
@@ -41,7 +41,8 @@ export default function LeadDetailModal({ lead, onClose }: LeadDetailModalProps)
     }
   };
 
-  const statusConfig = STATUS_CONFIG[lead.status] || { color: "#16305A", bgColor: "#D4DEED", label: lead.status };
+  const origin = lead.origin || "landing_home";
+  const originConfig = ORIGIN_CONFIG[origin] || { color: "#16305A", bgColor: "#D4DEED", label: origin };
 
   const sections = [
     {
@@ -77,13 +78,13 @@ export default function LeadDetailModal({ lead, onClose }: LeadDetailModalProps)
           </div>
           <div className="flex flex-col gap-[8px]">
             <div className="flex flex-col">
-              <p><Text isAdmin variant="label" color="#678CC5">Estado</Text></p>
+              <p><Text isAdmin variant="label" color="#678CC5">Origen</Text></p>
               <div className="mt-1">
                 <span
                   className="px-3 py-1 rounded-full text-[12px] font-semibold"
-                  style={{ backgroundColor: statusConfig.bgColor, color: statusConfig.color }}
+                  style={{ backgroundColor: originConfig.bgColor, color: originConfig.color }}
                 >
-                  {statusConfig.label}
+                  {originConfig.label}
                 </span>
               </div>
             </div>

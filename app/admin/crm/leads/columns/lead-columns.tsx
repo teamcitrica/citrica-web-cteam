@@ -8,20 +8,20 @@ import { AvatarTables } from "@/public/icon-svg/avatar-tables";
 import { getAvatarColor } from "@/shared/utils/avatar-colors";
 import { Tooltip } from "@heroui/tooltip";
 
-const STATUS_CONFIG: Record<string, { color: string; bgColor: string; label: string }> = {
-  pendiente: { color: "#16305A", bgColor: "#F9E124", label: "Pendiente" },
-  confirmada: { color: "#16305A", bgColor: "#82EFCE", label: "Confirmada" },
-  cancelada: { color: "#FFFFFF", bgColor: "#F04242", label: "Cancelada" },
+const ORIGIN_CONFIG: Record<string, { color: string; bgColor: string; label: string }> = {
+  "landing_home": { color: "#16305A", bgColor: "#D4DEED", label: "Landing Home" },
 };
 
 type LeadColumnsConfig = {
   onView: (lead: Lead) => void;
   onDelete: (lead: Lead) => void;
+  onConvert: (lead: Lead) => void;
 };
 
 export const getLeadColumns = ({
   onView,
   onDelete,
+  onConvert,
 }: LeadColumnsConfig): Column<Lead>[] => [
   {
     name: "NOMBRE",
@@ -71,11 +71,12 @@ export const getLeadColumns = ({
     },
   },
   {
-    name: "ESTADO",
-    uid: "status",
+    name: "ORIGEN",
+    uid: "origin",
     sortable: true,
     render: (lead) => {
-      const config = STATUS_CONFIG[lead.status] || { color: "#16305A", bgColor: "#D4DEED", label: lead.status };
+      const origin = lead.origin || "landing_home";
+      const config = ORIGIN_CONFIG[origin] || { color: "#16305A", bgColor: "#D4DEED", label: origin };
       return (
         <span
           className="px-3 py-1 rounded-full text-[12px] font-semibold whitespace-nowrap"
@@ -134,6 +135,11 @@ export const getLeadColumns = ({
             <Icon name="Eye" size={16} color="#265197" />
           </button>
         </Tooltip>
+        <Tooltip content="Convertir a contacto" delay={200} closeDelay={0}>
+          <button onClick={() => onConvert(lead)} className="p-1.5 hover:bg-green-50 rounded-md transition-colors">
+            <Icon name="UserPlus" size={16} color="#22C55E" />
+          </button>
+        </Tooltip>
         <Tooltip content="Eliminar" delay={200} closeDelay={0}>
           <button onClick={() => onDelete(lead)} className="p-1.5 hover:bg-red-50 rounded-md transition-colors">
             <Icon name="Trash2" size={16} color="#F04242" />
@@ -149,7 +155,7 @@ export const getLeadExportColumns = (): ExportColumn[] => [
   { header: "Email", key: "email" },
   { header: "Fecha Reserva", key: "date" },
   { header: "Horario", key: "time_slot" },
-  { header: "Estado", key: "status" },
+  { header: "Origen", key: "origin", format: (value) => value || "Landing Home" },
   { header: "Mensaje", key: "message" },
   {
     header: "Fecha Registro",
