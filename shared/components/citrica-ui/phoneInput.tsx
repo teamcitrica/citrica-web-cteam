@@ -9,6 +9,7 @@ import Image from "next/image";
 interface PhoneInputProps {
   value?: string;
   onChange?: (phone: string) => void;
+  required?: boolean;
 }
 
 function FlagImg({ code, size = 20 }: { code: string; size?: number }) {
@@ -27,6 +28,7 @@ function FlagImg({ code, size = 20 }: { code: string; size?: number }) {
 export default function PhoneInput({
   value = "",
   onChange,
+  required = false,
 }: PhoneInputProps) {
   const [country, setCountry] = useState("PE");
   const [phone, setPhone] = useState(value);
@@ -80,11 +82,12 @@ export default function PhoneInput({
 
       <Input
         type="tel"
-        label="Teléfono"
+        label={required ? <span>Teléfono <span style={{ color: '#f31260' }}>*</span></span> : "Teléfono"}
         value={phone}
         onValueChange={handlePhoneChange}
         placeholder="987654321"
         variant="bordered"
+        color="primary"
         radius="sm"
         fullWidth
       />

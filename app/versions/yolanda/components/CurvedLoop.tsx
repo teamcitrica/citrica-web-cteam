@@ -1,82 +1,70 @@
-import { useRef, useEffect, useState, useMemo, useId, FC, PointerEvent } from 'react';
+"use client";
+
+import { useRef, useEffect, useState, FC, PointerEvent } from 'react';
+import { Text } from 'citrica-ui-toolkit';
 
 interface CurvedLoopProps {
   marqueeText?: string;
+  items?: string[];
   speed?: number;
   className?: string;
-  curveAmount?: number;
   direction?: 'left' | 'right';
   interactive?: boolean;
+  separator?: string;
+  textVariant?: string;
+  textColor?: string;
 }
 
 const CurvedLoop: FC<CurvedLoopProps> = ({
   marqueeText = '',
-  speed = 2,
+  items,
+  speed = 1,
   className,
-  curveAmount = 400,
   direction = 'left',
-  interactive = true
+  interactive = true,
+  separator = '•',
+  textVariant = 'h3',
+  textColor = '#ffffff',
 }) => {
-  const text = useMemo(() => {
-    const hasTrailing = /\s|\u00A0$/.test(marqueeText);
-    const spacer = '\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0';
-    return (hasTrailing ? marqueeText.replace(/\s+$/, '') : marqueeText) + spacer;
-  }, [marqueeText]);
-
-  const measureRef = useRef<SVGTextElement | null>(null);
-  const textPathRef = useRef<SVGTextPathElement | null>(null);
-  const pathRef = useRef<SVGPathElement | null>(null);
-  const [spacing, setSpacing] = useState(0);
-  const [offset, setOffset] = useState(0);
-  const uid = useId();
-  const pathId = `curve-${uid}`;
-  const pathD = `M-500,40 Q960,${40 + curveAmount} 2420,40`;
-
+  const containerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [contentWidth, setContentWidth] = useState(0);
+  const offsetRef = useRef(0);
   const dragRef = useRef(false);
   const lastXRef = useRef(0);
   const dirRef = useRef<'left' | 'right'>(direction);
   const velRef = useRef(0);
 
-  const textLength = spacing;
-  const totalText = textLength
-    ? Array(Math.ceil(1920 / textLength) + 3)
-        .fill(text)
-        .join('')
-    : text;
-  const ready = spacing > 0;
+  // Parse items from marqueeText if items prop not provided
+  const textItems = items || marqueeText.split(/\u00A0{2,}/).filter(Boolean);
 
+  // Measure content width
   useEffect(() => {
-    if (measureRef.current) setSpacing(measureRef.current.getComputedTextLength());
-  }, [text, className]);
-
-  useEffect(() => {
-    if (!spacing) return;
-    if (textPathRef.current) {
-      const initial = -spacing;
-      textPathRef.current.setAttribute('startOffset', initial + 'px');
-      setOffset(initial);
+    if (innerRef.current) {
+      const firstSet = innerRef.current.children[0] as HTMLElement;
+      if (firstSet) {
+        setContentWidth(firstSet.offsetWidth);
+      }
     }
-  }, [spacing]);
+  }, [textItems]);
 
+  // Animation loop
   useEffect(() => {
-    if (!spacing || !ready) return;
+    if (!contentWidth) return;
     let frame = 0;
     const step = () => {
-      if (!dragRef.current && textPathRef.current) {
+      if (!dragRef.current && innerRef.current) {
         const delta = dirRef.current === 'right' ? speed : -speed;
-        const currentOffset = parseFloat(textPathRef.current.getAttribute('startOffset') || '0');
-        let newOffset = currentOffset + delta;
-        const wrapPoint = spacing;
-        if (newOffset <= -wrapPoint) newOffset += wrapPoint;
-        if (newOffset > 0) newOffset -= wrapPoint;
-        textPathRef.current.setAttribute('startOffset', newOffset + 'px');
-        setOffset(newOffset);
+        offsetRef.current += delta;
+        if (offsetRef.current <= -contentWidth) offsetRef.current += contentWidth;
+        if (offsetRef.current > 0) offsetRef.current -= contentWidth;
+        innerRef.current.style.transform = `translateX(${offsetRef.current}px)`;
       }
       frame = requestAnimationFrame(step);
     };
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
-  }, [spacing, speed, ready]);
+  }, [contentWidth, speed]);
 
   const onPointerDown = (e: PointerEvent) => {
     if (!interactive) return;
@@ -87,17 +75,14 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
   };
 
   const onPointerMove = (e: PointerEvent) => {
-    if (!interactive || !dragRef.current || !textPathRef.current) return;
+    if (!interactive || !dragRef.current || !innerRef.current) return;
     const dx = e.clientX - lastXRef.current;
     lastXRef.current = e.clientX;
     velRef.current = dx;
-    const currentOffset = parseFloat(textPathRef.current.getAttribute('startOffset') || '0');
-    let newOffset = currentOffset + dx;
-    const wrapPoint = spacing;
-    if (newOffset <= -wrapPoint) newOffset += wrapPoint;
-    if (newOffset > 0) newOffset -= wrapPoint;
-    textPathRef.current.setAttribute('startOffset', newOffset + 'px');
-    setOffset(newOffset);
+    offsetRef.current += dx;
+    if (offsetRef.current <= -contentWidth) offsetRef.current += contentWidth;
+    if (offsetRef.current > 0) offsetRef.current -= contentWidth;
+    innerRef.current.style.transform = `translateX(${offsetRef.current}px)`;
   };
 
   const endDrag = () => {
@@ -106,33 +91,40 @@ const CurvedLoop: FC<CurvedLoopProps> = ({
     dirRef.current = velRef.current > 0 ? 'right' : 'left';
   };
 
-  const cursorStyle = interactive ? (dragRef.current ? 'grabbing' : 'grab') : 'auto';
+  const cursorStyle = interactive ? 'grab' : 'auto';
+
+  const renderSet = (keyPrefix: string) => (
+    <div className="flex items-center shrink-0" key={keyPrefix}>
+      {textItems.map((item, i) => (
+        <div key={`${keyPrefix}-${i}`} className="flex items-center shrink-0">
+          <Text variant={textVariant as any} color={textColor} className={`whitespace-nowrap px-4 ${className || ''}`}>
+            {item}
+          </Text>
+          {separator && (
+            <Text variant={textVariant as any} color={textColor} className="whitespace-nowrap px-4 opacity-50">
+              {separator}
+            </Text>
+          )}
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <div
-      className="curved-loop-jacket"
-      style={{ visibility: ready ? 'visible' : 'hidden', cursor: cursorStyle }}
+      ref={containerRef}
+      className="overflow-hidden w-full"
+      style={{ cursor: cursorStyle }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
       onPointerLeave={endDrag}
     >
-      <svg className="curved-loop-svg" viewBox="0 0 1440 80" preserveAspectRatio="none">
-        <text ref={measureRef} xmlSpace="preserve" style={{ visibility: 'hidden', opacity: 0, pointerEvents: 'none' }}>
-          {text}
-        </text>
-        <defs>
-          <path ref={pathRef} id={pathId} d={pathD} fill="none" stroke="transparent" />
-        </defs>
-        {ready && (
-          <text fontWeight="bold" xmlSpace="preserve" className={className}   dominantBaseline="middle" 
-  textAnchor="middle">
-            <textPath ref={textPathRef} href={`#${pathId}`} startOffset={offset + 'px'} xmlSpace="preserve">
-              {totalText}
-            </textPath>
-          </text>
-        )}
-      </svg>
+      <div ref={innerRef} className="flex items-center w-max will-change-transform">
+        {renderSet('a')}
+        {renderSet('b')}
+        {renderSet('c')}
+      </div>
     </div>
   );
 };

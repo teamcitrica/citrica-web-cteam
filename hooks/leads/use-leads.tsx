@@ -238,6 +238,11 @@ export const useContact = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!formData.name || !formData.email || !formData.phone) {
+      return
+    }
+
     setIsLoading(true)
     setStatus('idle')
 

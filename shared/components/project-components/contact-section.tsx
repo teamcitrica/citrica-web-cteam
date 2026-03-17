@@ -316,7 +316,7 @@ export const ContactSectionLanding = ({
                         />
                         <PhoneInput
                           value={phone}
-                          onChange={(value) => setPhone(value)}
+                          onChange={(value) => { setPhone(value); updateField('phone', value); }}
                         />
                         <Textarea
                           name="message"
@@ -345,7 +345,7 @@ export const ContactSectionLanding = ({
                           label={isLoading ? "Enviando..." : "Agendar cita"}
                           variant="primary"
                           fullWidth
-                          isDisabled={isLoading || !formData.message}
+                          isDisabled={isLoading || !formData.name || !formData.email || !phone}
                           onPress={() => handleSubmit({ preventDefault: () => { } } as React.FormEvent)}
                         />
                       </div>
@@ -594,7 +594,11 @@ export const ContactSectionLanding = ({
                         onChange={handleChange}
                         required
                       />
-
+                      <PhoneInput
+                        value={phone}
+                        onChange={(value) => { setPhone(value); updateField('phone', value); }}
+                        required
+                      />
                       <Textarea
                         name="message"
                         label="Mensaje"
@@ -622,7 +626,7 @@ export const ContactSectionLanding = ({
                         label={isLoading ? "Enviando..." : "Agendar cita"}
                         variant="primary"
                         fullWidth
-                        isDisabled={isLoading || !formData.message}
+                        isDisabled={isLoading || !formData.name || !formData.email || !phone}
                         onPress={() => handleSubmit({ preventDefault: () => { } } as React.FormEvent)}
                       />
                     </div>
@@ -785,7 +789,7 @@ export const ContactSectionLanding = ({
                 )}
 
                 {/* Paso 4: Teléfono y Mensaje */}
-              </form>
+              </form> 
             </div>
           </Col>
         </Container>
