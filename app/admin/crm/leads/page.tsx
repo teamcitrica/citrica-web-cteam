@@ -8,6 +8,7 @@ import LeadDetailModal from "./components/lead-detail-modal";
 import DeleteLeadModal from "./components/delete-lead-modal";
 import ContactFormDrawer from "@/app/admin/crm/contactos/components/contact-form-drawer";
 import { ContactInput } from "@/hooks/contact/use-contact";
+import TodayMeetingsBanner from "@/shared/components/citrica-ui/admin/today-meetings-banner";
 
 export default function LeadsPage() {
   const { leads, isLoading, deleteLead, refreshLeads } = useLeadsCRUD();
@@ -70,8 +71,11 @@ export default function LeadsPage() {
               <Text isAdmin={true} variant="title" weight="bold" color="#265197">Leads</Text>
             </h1>
 
+            <TodayMeetingsBanner />
+
             <DataTable<Lead>
               data={filteredLeads}
+              defaultSortDirection="descending"
               columns={columns}
               isLoading={isLoading}
               searchPlaceholder="Buscar leads..."

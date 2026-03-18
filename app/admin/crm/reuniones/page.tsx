@@ -68,6 +68,7 @@ export default function ReunionesPage() {
 
             <DataTable<Reserva>
               data={filteredReuniones}
+              defaultSortDirection="descending"
               customFilters={
                 <>
                   <div className="flex flex-col md:flex-row gap-3 pb-4 w-full">
@@ -77,6 +78,8 @@ export default function ReunionesPage() {
                           { value: "all", label: "Todas" },
                           { value: "confirmed", label: "Confirmadas" },
                           { value: "pending", label: "Sin confirmar" },
+                          { value: "completed", label: "Completadas" },
+                          { value: "expired", label: "Expiradas" },
                           { value: "cancelled", label: "Canceladas" },
                         ]}
                         selectedValue={statusFilter}

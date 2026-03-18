@@ -41,6 +41,7 @@ export interface DataTableProps<T extends Record<string, any>> {
   exportColumns?: ExportColumn[];
   exportTitle?: string;
   tableName?: string;
+  defaultSortDirection?: "ascending" | "descending";
   showRowsPerPageSelector?: boolean;
   showCompanyFilter?: boolean;
   companies?: Array<{ id: number; name: string | null }>;
@@ -121,6 +122,7 @@ export function DataTable<T extends Record<string, any>>({
   headerActions,
   showFilterIndicators = false,
   totalRecordsLabel,
+  defaultSortDirection = "ascending",
   activeFilters = [],
   permanentFilters = [],
 }: DataTableProps<T>) {
@@ -131,7 +133,7 @@ export function DataTable<T extends Record<string, any>>({
     initialRowsPerPage: itemsPerPage,
     searchFields,
     defaultSortColumn: columns[0]?.uid as keyof T,
-    defaultSortDirection: "ascending",
+    defaultSortDirection,
     companyFilterField,
   });
 
