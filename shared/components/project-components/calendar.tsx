@@ -1,6 +1,6 @@
 import { Calendar } from "@heroui/calendar";
 import { today, getLocalTimeZone } from "@internationalized/date";
-import { useLocale, I18nProvider } from "@react-aria/i18n";
+import { I18nProvider } from "@react-aria/i18n";
 
 interface CalendarComponentProps {
   value?: any;
@@ -25,8 +25,6 @@ export default function CalendarComponent({
   serverToday,
   inactiveDays = [0],
 }: CalendarComponentProps) {
-  let { locale } = useLocale();
-
   // Usar serverToday si está disponible, sino usar la fecha del cliente
   const effectiveToday = serverToday || today(getLocalTimeZone());
   const effectiveMinValue = minValue !== undefined ? minValue : effectiveToday;
@@ -44,9 +42,11 @@ export default function CalendarComponent({
   }
 
   let isDateUnavailable = (date: any) => {
-    // Verificar si el día de la semana está inactivo en la configuración semanal
-    // Usar getDayOfWeek con la zona de Lima para evitar desfases por timezone del cliente
-    const dayOfWeek = date.toDate('America/Lima').getDay();
+    // Calcular día de la semana sin dependencia de locale
+    // Usar Date.UTC para evitar problemas de timezone entre navegadores
+    const jsDate = new Date(Date.UTC(date.year, date.month - 1, date.day, 12, 0, 0));
+    // getUTCDay retorna 0=Dom, 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb
+    const dayOfWeek = jsDate.getUTCDay();
     const isDayInactive = inactiveDays.includes(dayOfWeek);
 
     // Verificar si la fecha es anterior a hoy (usando la fecha del servidor si está disponible)
@@ -90,9 +90,13 @@ export default function CalendarComponent({
     content: "bg-[#16141F]",
   } : undefined;
 
+  // Forzar locale en-US y firstDayOfWeek para consistencia total entre navegadores
+  // Chrome puede usar es-MX del sistema y Safari en-US, causando diferencias
+  // firstDayOfWeek='sun' fuerza que la semana empiece en Domingo en ambos navegadores
   return (
-    <I18nProvider locale={locale}>
+    <I18nProvider locale="en-US">
       <Calendar
+        key={`calendar-en-US-${serverToday.year}-${serverToday.month}-${serverToday.day}`}
         aria-label="Seleccionar fecha"
         className={`calendar-citrica-ui ${calendarClass} ${className}`}
         classNames={darkClassNames}
@@ -100,6 +104,7 @@ export default function CalendarComponent({
         minValue={effectiveMinValue}
         value={value}
         onChange={onChange}
+        firstDayOfWeek="sun"
       />
     </I18nProvider>
   );

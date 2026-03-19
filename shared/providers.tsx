@@ -13,7 +13,7 @@ export interface ProvidersProps {
 
 export function Providers({ children, themeProps }: ProvidersProps) {
 	return (
-		<HeroUIProvider locale="es-ES">
+		<HeroUIProvider locale="en-US">
 			<ToastProvider placement={"top-right"}/>
 			<NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
 		</HeroUIProvider>
