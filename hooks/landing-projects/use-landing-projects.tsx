@@ -125,7 +125,6 @@ export const useLandingProjects = () => {
         .from("landing_projects")
         .select("*")
         .eq("slug", slug)
-        .eq("is_active", true)
         .single();
 
       if (error) {
