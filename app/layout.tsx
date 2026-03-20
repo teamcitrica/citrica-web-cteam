@@ -40,13 +40,14 @@ export default function RootLayout({
 						<Providers themeProps={{ attribute: "data-theme", defaultTheme: "light" }}>
 							{/* <Navbar /> */}
 							{children}
+							<FooterCitrica />
 						</Providers>
 					</AuthContextProvider>
 				</SupabaseProvider>
-				 
+
 			</body>
 		</html>
 	);
 }
-					
-						
+
+

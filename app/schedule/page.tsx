@@ -5,8 +5,6 @@ export default function SchedulePage() {
   return (
     <>
       <ContactSectionLanding variant="home" layout="landing" />
-
-      <FooterCitrica />
-    </>
+   </>
   );
 }
