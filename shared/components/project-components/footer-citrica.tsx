@@ -3,6 +3,7 @@ import { Divider } from "@heroui/divider";
 import { Link } from "@heroui/link";
 import React from 'react'
 import { Text, Icon, Col, Container } from 'citrica-ui-toolkit'
+import { WhassapLogo } from "@/public/icon-svg/whassap-footer";
 
 export const FooterCitrica = () => {
   return (
@@ -54,7 +55,7 @@ export const FooterCitrica = () => {
               </div>
               <div className="flex flex-wrap justify-center gap-x-3 gap-y-1">
                 <div className="flex items-center space-x-1">
-                  <Icon name="Phone" color="#FFFFFF" size={14} />
+                  <WhassapLogo />
                   <Link href="https://wa.me/51942627383" target="_blank" rel="noopener noreferrer">
                     <Text variant="label" color="#FFFFFF">
                       Perú: +51 942 627383

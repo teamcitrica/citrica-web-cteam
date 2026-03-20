@@ -1,11 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Button, Input, Select, Text } from "citrica-ui-toolkit";
+import { Button, Input, Select, Text, Icon } from "citrica-ui-toolkit";
 import { Textarea } from "@heroui/input";
 import { Checkbox } from "@heroui/checkbox";
+import { Divider } from "@heroui/divider";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 import { Reserva, ReservaEstado } from "@/hooks/reservas/use-reservas";
+import { useLeadNotes } from "@/hooks/leads/use-lead-notes";
+import { useSupabase } from "@/shared/context/supabase-context";
 import { STATUS_CONFIG } from "../booking-calendar-view";
 
 interface EditBookingModalProps {
@@ -33,6 +36,8 @@ const TEXTAREA_CLASSNAMES = {
 const STATUS_OPTIONS = [
   { value: "pending", label: "Sin confirmar" },
   { value: "confirmed", label: "Confirmada" },
+  { value: "completed", label: "Completada" },
+  { value: "expired", label: "Expirada" },
   { value: "cancelled", label: "Cancelada" },
   { value: "reminder", label: "Recordatorio" },
 ];
@@ -78,6 +83,10 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
   const [status, setStatus] = useState<ReservaEstado>("pending");
   const [recurringValue, setRecurringValue] = useState("none");
   const [isLoading, setIsLoading] = useState(false);
+  const [leadId, setLeadId] = useState<string | null>(null);
+  const [newNote, setNewNote] = useState("");
+  const { supabase } = useSupabase();
+  const { notes, fetchNotes, addNote, deleteNote, isLoading: isLoadingNotes } = useLeadNotes();
 
   // Si la recurrencia no es "none" ni "yearly", es una recurrencia avanzada que solo se muestra como texto
   const isAdvancedRecurrence = recurringValue !== "none" && recurringValue !== "yearly";
@@ -94,8 +103,27 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
       const { start, end } = parseTimeSlots(booking.time_slots);
       setTimeStart(start);
       setTimeEnd(end);
+
+      // Buscar lead asociado por email y cargar notas
+      if (booking.email) {
+        supabase
+          .from("leads")
+          .select("id")
+          .eq("email", booking.email)
+          .eq("type_id", 2)
+          .limit(1)
+          .then(({ data }) => {
+            if (data && data.length > 0) {
+              const id = String(data[0].id);
+              setLeadId(id);
+              fetchNotes(id);
+            } else {
+              setLeadId(null);
+            }
+          });
+      }
     }
-  }, [booking]);
+  }, [booking, supabase, fetchNotes]);
 
   const handleSubmit = async () => {
     if (!booking || !name || !date) return;
@@ -230,6 +258,74 @@ const EditBookingModal: React.FC<EditBookingModalProps> = ({
         classNames={TEXTAREA_CLASSNAMES}
         className="mt-4"
       />
+      {/* Notas del lead */}
+      {leadId && (
+        <>
+          <Divider className="my-4 bg-[#D4DEED]" />
+          <div className="flex flex-col gap-3">
+            <Text isAdmin variant="subtitle" weight="bold" color="#265197">
+              Notas del Lead
+            </Text>
+
+            {/* Agregar nota */}
+            <div className="flex gap-2">
+              <Input
+                placeholder="Escribir nota..."
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                variant="faded"
+                classNames={INPUT_CLASSNAMES}
+                className="flex-1"
+              />
+              <Button
+                isAdmin
+                variant="primary"
+                className="bg-[#265197] shrink-0"
+                isDisabled={!newNote.trim() || isLoadingNotes}
+                onPress={async () => {
+                  if (leadId && newNote.trim()) {
+                    await addNote(leadId, newNote.trim());
+                    setNewNote("");
+                  }
+                }}
+              >
+                <Icon name="Plus" size={16} />
+              </Button>
+            </div>
+
+            {/* Lista de notas */}
+            {isLoadingNotes ? (
+              <Text isAdmin variant="label" color="#678CC5">Cargando notas...</Text>
+            ) : notes.length === 0 ? (
+              <Text isAdmin variant="label" color="#A7BDE2">Sin notas aún</Text>
+            ) : (
+              <div className="flex flex-col gap-2 max-h-48 overflow-y-auto">
+                {notes.map((note) => (
+                  <div key={note.id} className="bg-[#EEF1F7] rounded-lg p-3 flex justify-between items-start gap-2">
+                    <div className="flex-1">
+                      <Text isAdmin variant="body" color="#16305A">{note.note}</Text>
+                      <div className="flex gap-2 mt-1">
+                        <Text isAdmin variant="label" color="#A7BDE2">
+                          {note.user_email} · {new Date(note.created_at).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })}
+                        </Text>
+                      </div>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        if (leadId) await deleteNote(note.id, leadId);
+                      }}
+                      className="p-1 hover:bg-[#D4DEED] rounded-md transition-colors shrink-0"
+                    >
+                      <Icon name="Trash2" size={14} color="#F04242" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
       {status === "reminder" && (
         <div className="flex items-center mt-4">
           {isAdvancedRecurrence ? (
