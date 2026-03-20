@@ -2,10 +2,17 @@
 import { Divider } from "@heroui/divider";
 import { Link } from "@heroui/link";
 import React from 'react'
+import { usePathname } from 'next/navigation'
 import { Text, Icon, Col, Container } from 'citrica-ui-toolkit'
 import { WhassapLogo } from "@/public/icon-svg/whassap-footer";
 
 export const FooterCitrica = () => {
+  const pathname = usePathname();
+
+  if (pathname.startsWith('/admin') || pathname.startsWith('/login') || pathname.startsWith('/logout')) {
+    return null;
+  }
+
   return (
     <>
       <footer

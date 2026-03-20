@@ -13,7 +13,7 @@ import {
 } from "@/shared/archivos js/citrica-data";
 import { CompletedProjects } from "@/shared/components/project-components/other-projects";
 import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";
-import {ContactSectionLanding } from "@/shared/components/project-components/contact-section";
+import { ContactSectionLanding } from "@/shared/components/project-components/contact-section";
 
 const CitricaWebsite = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,7 +33,7 @@ const CitricaWebsite = () => {
       title: "Inicio",
       href: "#inicio",
     },
-        {
+    {
       title: "Servicios",
       href: "#servicios",
     },
@@ -41,7 +41,7 @@ const CitricaWebsite = () => {
       title: "Proyectos",
       href: "#proyectos",
     },
-        {
+    {
       title: "Contacto",
       href: "#contacto",
     },
@@ -625,10 +625,10 @@ const CitricaWebsite = () => {
 
       {/* Contact Section */}
       <section id="contacto">
-       <ContactSectionLanding variant="home" layout="landing"/>
+        <ContactSectionLanding variant="home" layout="landing" />
 
       </section>
-      <FooterCitrica />
+
     </div>
   );
 };

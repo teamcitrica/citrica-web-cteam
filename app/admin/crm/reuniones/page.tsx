@@ -3,7 +3,7 @@ import { useState, useMemo, useCallback } from "react";
 import { Divider } from "@heroui/divider";
 import { useReservas, Reserva } from "@/hooks/reservas/use-reservas";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
-import { Text, Col, Container, Button } from "citrica-ui-toolkit";
+import { Text, Col, Container } from "citrica-ui-toolkit";
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
 import { getReunionColumns, getReunionExportColumns } from "./columns/reunion-columns";
 import EditBookingModal from "@/app/admin/agenda/components/edit-booking-modal";
@@ -12,9 +12,9 @@ import CreateReunionDrawer from "./components/create-reunion-drawer";
 export default function ReunionesPage() {
   const { reservas, isLoading, refreshReservas, updateReserva } = useReservas();
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [timeFilter, setTimeFilter] = useState<string>("upcoming");
   const [selectedReunion, setSelectedReunion] = useState<Reserva | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [showTodayOnly, setShowTodayOnly] = useState(false);
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false);
 
   const handleViewReunion = useCallback((reunion: Reserva) => {
@@ -46,14 +46,19 @@ export default function ReunionesPage() {
       filtered = filtered.filter((r) => r.status === statusFilter);
     }
 
-    if (showTodayOnly) {
+    // Filtro por tiempo (próximas / pasadas)
+    if (timeFilter !== "all") {
       const today = new Date();
       const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-      filtered = filtered.filter((r) => r.booking_date === todayStr);
+      if (timeFilter === "upcoming") {
+        filtered = filtered.filter((r) => r.booking_date && r.booking_date >= todayStr);
+      } else if (timeFilter === "past") {
+        filtered = filtered.filter((r) => r.booking_date && r.booking_date < todayStr);
+      }
     }
 
     return filtered;
-  }, [reuniones, statusFilter, showTodayOnly]);
+  }, [reuniones, statusFilter, timeFilter]);
 
   return (
     <div className="pb-[100px]">
@@ -71,35 +76,34 @@ export default function ReunionesPage() {
               defaultSortDirection="descending"
               customFilters={
                 <>
-                  <div className="flex flex-col md:flex-row gap-3 pb-4 w-full">
-                    <div className="w-full md:w-auto">
+                  <div className="flex flex-col gap-3 pb-4 w-full">
+                    <div className="w-fit">
                       <FilterButtonGroup
                         buttons={[
+                          { value: "upcoming", label: "Próximas" },
+                          { value: "past", label: "Pasadas" },
                           { value: "all", label: "Todas" },
-                          { value: "confirmed", label: "Confirmadas" },
-                          { value: "pending", label: "Sin confirmar" },
-                          { value: "completed", label: "Completadas" },
-                          { value: "expired", label: "Expiradas" },
-                          { value: "cancelled", label: "Canceladas" },
                         ]}
-                        selectedValue={statusFilter}
-                        onValueChange={setStatusFilter}
+                        selectedValue={timeFilter}
+                        onValueChange={setTimeFilter}
                       />
                     </div>
                   </div>
                   <Divider className="bg-[#D4DEED]" />
                 </>
               }
-              headerActions={
-                <Button
-                  isAdmin
-                  variant="primary"
-                  className="!bg-[#265197]"
-                  onPress={() => setShowTodayOnly(!showTodayOnly)}
-                >
-                  {showTodayOnly ? "Ver todas" : "Hoy"}
-                </Button>
-              }
+              showCustomAutocomplete={true}
+              customAutocompleteItems={[
+                { id: "all", name: "Todos los estados" },
+                { id: "confirmed", name: "Confirmadas" },
+                { id: "pending", name: "Sin confirmar" },
+                { id: "completed", name: "Completadas" },
+                { id: "expired", name: "Expiradas" },
+                { id: "cancelled", name: "Canceladas" },
+              ]}
+              customAutocompletePlaceholder="Filtrar por estado..."
+              customAutocompleteSelectedKey={statusFilter}
+              onCustomAutocompleteChange={(key) => setStatusFilter(key)}
               onAdd={() => setIsCreateDrawerOpen(true)}
               addButtonText="Nueva reunión"
               columns={columns}
