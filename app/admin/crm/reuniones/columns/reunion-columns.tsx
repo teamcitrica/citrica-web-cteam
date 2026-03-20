@@ -9,6 +9,8 @@ const STATUS_CONFIG: Record<string, { color: string; label: string }> = {
   confirmed: { color: "#10E5A4", label: "Confirmada" },
   pending: { color: "#F9E124", label: "Sin confirmar" },
   cancelled: { color: "#F04242", label: "Cancelada" },
+  completed: { color: "#265197", label: "Completada" },
+  expired: { color: "#A7BDE2", label: "Expirada" },
 };
 
 const formatRelativeDate = (dateStr: string | null): { date: string; isRelative: boolean } => {
@@ -61,9 +63,12 @@ export const getReunionColumns = ({
     uid: "name",
     sortable: true,
     render: (reunion) => (
-      <div className="whitespace-nowrap">
+      <div className="flex flex-col whitespace-nowrap">
         <Text isAdmin variant="body" weight="bold" color="#16305A">
           {reunion.name || "-"}
+        </Text>
+        <Text isAdmin variant="label" color="#678CC5">
+          {reunion.email || "-"}
         </Text>
       </div>
     ),

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useSupabase } from '@/shared/context/supabase-context'
 
-export type ReservaEstado = 'confirmed' | 'cancelled' | 'pending' | 'reminder'
+export type ReservaEstado = 'confirmed' | 'cancelled' | 'pending' | 'reminder' | 'completed' | 'expired'
 
 export interface Reserva {
   id: string
@@ -53,7 +53,30 @@ export const useReservas = () => {
         })
         return
       }
-      setReservas(data || [])
+
+      // Auto-expirar reuniones pasadas que siguen en pending
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+
+      const expiredIds: string[] = []
+      const updatedData = (data || []).map((r: Reserva) => {
+        if (r.status === 'pending' && r.booking_date && r.booking_date < todayStr) {
+          expiredIds.push(r.id)
+          return { ...r, status: 'expired' as ReservaEstado }
+        }
+        return r
+      })
+
+      // Actualizar en base de datos los expirados
+      if (expiredIds.length > 0) {
+        await supabase
+          .from('bookings')
+          .update({ status: 'expired' })
+          .in('id', expiredIds)
+      }
+
+      setReservas(updatedData)
     } catch (err) {
       console.error('Error en fetchReservas:', err)
     } finally {

@@ -11,6 +11,7 @@ import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
 import { Text, Col, Container } from 'citrica-ui-toolkit';
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
+import TodayMeetingsBanner from "@/shared/components/citrica-ui/admin/today-meetings-banner";
 
 export default function ContactosPage() {
   const { contacts, isLoading, refreshContacts, deleteContact } = useContactCRUD();
@@ -122,6 +123,8 @@ export default function ContactosPage() {
           <h1 className="text-2xl font-bold text-[#265197] mb-5">
             <Text isAdmin={true} variant="title" weight="bold" color="#678CC5">CRM</Text> {'>'}  <Text isAdmin={true} variant="title" weight="bold" color="#265197">Contactos</Text>
           </h1>
+
+          <TodayMeetingsBanner />
 
           <DataTable<Contact>
             data={filteredContacts}

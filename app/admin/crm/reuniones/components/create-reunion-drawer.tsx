@@ -28,6 +28,7 @@ const TEXTAREA_CLASSNAMES = {
 const STATUS_OPTIONS = [
   { value: "pending", label: "Sin confirmar" },
   { value: "confirmed", label: "Confirmada" },
+  { value: "completed", label: "Completada" },
 ];
 
 export default function CreateReunionDrawer({
@@ -40,7 +41,7 @@ export default function CreateReunionDrawer({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [date, setDate] = useState("");
-  const [availableLeads, setAvailableLeads] = useState<{ id: string; name: string; email: string }[]>([]);
+  const [availableLeads, setAvailableLeads] = useState<{ id: string; name: string; email: string; bookingCount: number }[]>([]);
   const [timeStart, setTimeStart] = useState("09:00");
   const [timeEnd, setTimeEnd] = useState("10:00");
   const [status, setStatus] = useState("pending");
@@ -54,9 +55,19 @@ export default function CreateReunionDrawer({
     ]);
 
     const leads = leadsRes.data || [];
-    const bookedEmails = new Set((bookingsRes.data || []).map((b: { email: string }) => b.email?.toLowerCase()));
+    const bookings = bookingsRes.data || [];
 
-    setAvailableLeads(leads.filter((l) => !bookedEmails.has(l.email?.toLowerCase())));
+    // Contar reuniones por email
+    const bookingCountMap = new Map<string, number>();
+    bookings.forEach((b: { email: string }) => {
+      const key = b.email?.toLowerCase() || "";
+      bookingCountMap.set(key, (bookingCountMap.get(key) || 0) + 1);
+    });
+
+    setAvailableLeads(leads.map((l) => ({
+      ...l,
+      bookingCount: bookingCountMap.get(l.email?.toLowerCase()) || 0,
+    })));
   }, [supabase]);
 
   useEffect(() => {
@@ -169,7 +180,7 @@ export default function CreateReunionDrawer({
           }}
           options={availableLeads.map((l) => ({
             value: l.id,
-            label: `${l.name} — ${l.email}`,
+            label: `${l.name} — ${l.email} (${l.bookingCount > 0 ? `${l.bookingCount} reunión${l.bookingCount > 1 ? 'es' : ''}` : 'sin reuniones'})`,
           }))}
           variant="faded"
           classNames={{
