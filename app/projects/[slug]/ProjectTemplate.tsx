@@ -366,7 +366,6 @@ const ProjectTemplate = ({ project, slug }: ProjectTemplateProps) => {
           {/* <CtaSection /> */}
           <ContactSectionLanding variant="projects" />
         </section>
-        <FooterCitrica />
       </div>
     </>
 

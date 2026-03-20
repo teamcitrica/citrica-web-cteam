@@ -495,7 +495,6 @@ const LandingRestaurantes = () => {
         </Container> */}
       </section>
      
-      <FooterCitrica />
     </>
   );
 };
