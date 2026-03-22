@@ -343,6 +343,21 @@ export const useContact = () => {
       // Refrescar bookings para que los slots recién reservados aparezcan como ocupados
       await fetchBookings()
 
+      // Enviar notificaciones por email (fire-and-forget)
+      fetch('/api/email/registration-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          phoneCode: formData.phoneCode,
+          date: dateStr,
+          timeSlot: timeSlotToSave,
+          message: formData.message,
+        }),
+      }).catch((err) => console.error('Error enviando notificación email:', err))
+
       setStatus('success')
       setFormData({ name: '', email: '', message: '', date: null, timeSlot: '', phone: '', phoneCode: '+51' })
       setSelectedTimeSlots([])
