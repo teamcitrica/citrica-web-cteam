@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSupabase } from '@/shared/context/supabase-context'
 import { useServerTime } from '@/hooks/use-server-time'
+import { useAvailability } from '@/app/contexts/AvailabilityContext'
 
 interface Booking {
   id: string
@@ -25,6 +26,14 @@ interface StudioConfig {
 export const useBookingsAvailability = () => {
   const { supabase } = useSupabase()
   const { serverToday, serverHours, serverMinutes } = useServerTime()
+
+  // 🚀 USAR CONTEXTO COMPARTIDO - Extraer propiedades específicas
+  const {
+    bookings: contextBookings,
+    studioAvailability,
+    getWeeklyAvailability
+  } = useAvailability()
+
   const [bookings, setBookings] = useState<Booking[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [inactiveDays, setInactiveDays] = useState<number[]>([0]) // Días de la semana inactivos (0=Dom, 1=Lun, etc.)
@@ -105,16 +114,26 @@ export const useBookingsAvailability = () => {
     } catch (error) {
       console.error('Error loading studio config:', error)
     }
-  }, [supabase])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])  // ✅ supabase es estable, no necesita ser dependencia
 
   // Obtener todas las reservas activas y bloqueos administrativos
   const fetchBookings = useCallback(async () => {
     try {
       setIsLoading(true)
+
+      // 🚀 OPTIMIZACIÓN: Usar bookings del contexto en lugar de hacer query
+      if (contextBookings && contextBookings.length >= 0) {
+        setBookings(contextBookings)
+        setIsLoading(false)
+        return contextBookings
+      }
+
+      // Fallback: si el contexto no tiene datos, hacer query manual (backup)
       const { data, error } = await supabase
         .from('bookings')
         .select('id, booking_date, time_slots, status, type_id')
-        .in('status', ['confirmed', 'pending']) // Incluir confirmadas y pendientes
+        .in('status', ['confirmed', 'pending'])
         .not('booking_date', 'is', null)
 
       if (error) {
@@ -122,7 +141,6 @@ export const useBookingsAvailability = () => {
         return []
       }
 
-      // Incluir tanto reservas de clientes (type_id=1) como bloqueos administrativos (type_id=2)
       const validBookings: Booking[] = (data || [])
         .filter(booking =>
           booking.time_slots &&
@@ -145,7 +163,7 @@ export const useBookingsAvailability = () => {
     } finally {
       setIsLoading(false)
     }
-  }, [supabase])
+  }, [contextBookings])  // ✅ Solo contextBookings (cambia cuando hay nuevas reservas)
 
   // Obtener configuración semanal base para una fecha específica
   const getWeeklyAvailabilityForDate = useCallback(async (date: string) => {
@@ -153,27 +171,23 @@ export const useBookingsAvailability = () => {
       const targetDate = new Date(date + 'T00:00:00')
       const dayOfWeek = targetDate.getDay()
 
-      const { data, error } = await supabase
-        .from('studio_availability')
-        .select('is_active, time_slots')
-        .eq('day_of_week', dayOfWeek)
-        .single()
+      // 🚀 OPTIMIZACIÓN: Usar contexto en lugar de query a BD
+      const dayConfig = getWeeklyAvailability(dayOfWeek)
 
-      if (error || !data?.is_active) {
-        return [] // Día no disponible
+      if (dayConfig && dayConfig.is_active) {
+        // Obtener solo los slots activos de la configuración semanal
+        const activeSlots = dayConfig.time_slots
+          .filter(slot => slot.active)
+          .map(slot => slot.slot)
+        return activeSlots
       }
 
-      // Obtener solo los slots activos de la configuración semanal
-      const activeSlots = (data.time_slots as TimeSlot[])
-        .filter(slot => slot.active)
-        .map(slot => slot.slot)
-
-      return activeSlots
+      return [] // Día no disponible
     } catch (error) {
       console.error('Error fetching weekly availability:', error)
       return []
     }
-  }, [supabase])
+  }, [getWeeklyAvailability])  // ✅ Solo la función específica
 
   // Obtener slots disponibles base (desde configuración semanal)
   const getBaseAvailableSlots = useCallback(async (date: string) => {
@@ -298,6 +312,19 @@ export const useBookingsAvailability = () => {
   // Cargar días inactivos de la semana desde studio_availability
   const loadInactiveDays = useCallback(async () => {
     try {
+      // 🚀 OPTIMIZACIÓN: Usar studioAvailability del contexto
+      if (studioAvailability && studioAvailability.size > 0) {
+        const inactive: number[] = []
+        studioAvailability.forEach((dayConfig, dayOfWeek) => {
+          if (!dayConfig.is_active) {
+            inactive.push(dayOfWeek)
+          }
+        })
+        setInactiveDays(inactive)
+        return
+      }
+
+      // Fallback (backup) - solo si el contexto no tiene datos
       const { data, error } = await supabase
         .from('studio_availability')
         .select('day_of_week, is_active')
@@ -316,14 +343,33 @@ export const useBookingsAvailability = () => {
     } catch (error) {
       console.error('Error loading inactive days:', error)
     }
-  }, [supabase])
+  }, [studioAvailability])  // ✅ Solo studioAvailability (Map estable)
 
-  // Cargar configuración y reservas al montar
+  // Sincronizar bookings del contexto automáticamente (real-time)
+  useEffect(() => {
+    if (contextBookings) {
+      setBookings(contextBookings)
+    }
+  }, [contextBookings])  // ✅ Reacciona solo cuando contextBookings cambia
+
+  // Sincronizar inactiveDays del contexto automáticamente
+  useEffect(() => {
+    if (studioAvailability && studioAvailability.size > 0) {
+      const inactive: number[] = []
+      studioAvailability.forEach((dayConfig, dayOfWeek) => {
+        if (!dayConfig.is_active) {
+          inactive.push(dayOfWeek)
+        }
+      })
+      setInactiveDays(inactive)
+    }
+  }, [studioAvailability])  // ✅ Reacciona solo cuando studioAvailability cambia
+
+  // Cargar configuración al montar (solo studio_config que no está en contexto)
   useEffect(() => {
     loadStudioConfig()
-    fetchBookings()
-    loadInactiveDays()
-  }, [loadStudioConfig, fetchBookings, loadInactiveDays])
+    // fetchBookings y loadInactiveDays ya no se necesitan porque usan el contexto
+  }, [loadStudioConfig])
 
   return {
     bookings,
