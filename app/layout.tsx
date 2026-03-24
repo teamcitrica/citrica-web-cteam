@@ -5,6 +5,7 @@ import { Providers } from "../shared/providers";
 // import { Toaster } from 'react-hot-toast';
 import SupabaseProvider from "@/shared/context/supabase-context"
 import { AuthContextProvider } from "@/shared/context/auth-context";
+import { AvailabilityProvider } from "@/app/contexts/AvailabilityContext";
 import Navbar from "@ui/organism/navbar";
 import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";
 import { DynamicNavbar } from "@/shared/components/project-components/dynamic-navbar";
@@ -37,11 +38,13 @@ export default function RootLayout({
 				{/* <Toaster/>  SE CAMBIÓ POR HEROUI TOAST*/}
 				<SupabaseProvider>
 					<AuthContextProvider>
-						<Providers themeProps={{ attribute: "data-theme", defaultTheme: "light" }}>
-							{/* <Navbar /> */}
-							{children}
-							<FooterCitrica />
-						</Providers>
+						<AvailabilityProvider>
+							<Providers themeProps={{ attribute: "data-theme", defaultTheme: "light" }}>
+								{/* <Navbar /> */}
+								{children}
+								<FooterCitrica />
+							</Providers>
+						</AvailabilityProvider>
 					</AuthContextProvider>
 				</SupabaseProvider>
 
