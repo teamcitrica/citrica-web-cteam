@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     const [adminResult, userResult] = await Promise.allSettled([
       // Email 1: Notificacion al admin
       resend.emails.send({
-        from: 'Citrica Agenda <onboarding@resend.dev>',
+        from: 'Citrica Agenda <notificaciones@citrica.dev>',
         to: ADMIN_EMAIL,
         subject: `Nuevo registro: ${name}`,
         html: `
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       }),
       // Email 2: Confirmacion al usuario
       resend.emails.send({
-        from: 'Citrica Agenda <onboarding@resend.dev>',
+        from: 'Citrica Agenda <notificaciones@citrica.dev>',
         to: email,
         subject: 'Gracias por tu registro en Citrica!',
         html: `
