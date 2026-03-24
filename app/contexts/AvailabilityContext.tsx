@@ -96,7 +96,6 @@ export const AvailabilityProvider: React.FC<{ children: React.ReactNode }> = ({ 
           })
         })
         setStudioAvailability(availabilityMap)
-        console.log('✅ Studio availability cached (7 days):', availabilityMap.size)
       }
     } catch (error) {
       console.error('❌ Error in refreshStudioAvailability:', error)
@@ -133,7 +132,6 @@ export const AvailabilityProvider: React.FC<{ children: React.ReactNode }> = ({ 
           }))
 
         setBookings(validBookings)
-        console.log('✅ Bookings cached:', validBookings.length)
       }
     } catch (error) {
       console.error('❌ Error in refreshBookings:', error)
@@ -165,8 +163,6 @@ export const AvailabilityProvider: React.FC<{ children: React.ReactNode }> = ({ 
     let bookingsChannel: RealtimeChannel | null = null
 
     const setupRealtimeSubscriptions = async () => {
-      console.log('🔄 Setting up real-time subscriptions...')
-
       // Subscription para studio_availability
       studioChannel = supabase
         .channel('studio_availability_changes')
@@ -178,14 +174,10 @@ export const AvailabilityProvider: React.FC<{ children: React.ReactNode }> = ({ 
             table: 'studio_availability'
           },
           (payload) => {
-            console.log('🔔 studio_availability changed:', payload)
-            // Recargar toda la configuración semanal (son solo 7 filas)
             refreshStudioAvailability()
           }
         )
-        .subscribe((status) => {
-          console.log('📡 studio_availability subscription status:', status)
-        })
+        .subscribe()
 
       // Subscription para bookings
       bookingsChannel = supabase
@@ -198,8 +190,6 @@ export const AvailabilityProvider: React.FC<{ children: React.ReactNode }> = ({ 
             table: 'bookings'
           },
           (payload) => {
-            console.log('🔔 bookings changed:', payload)
-
             if (payload.eventType === 'INSERT') {
               const newBooking = payload.new as any
               if (newBooking.time_slots && ['confirmed', 'pending'].includes(newBooking.status)) {
@@ -210,7 +200,6 @@ export const AvailabilityProvider: React.FC<{ children: React.ReactNode }> = ({ 
                   status: newBooking.status,
                   type_id: newBooking.type_id
                 }])
-                console.log('➕ Booking added to cache')
               }
             } else if (payload.eventType === 'UPDATE') {
               const updatedBooking = payload.new as any
@@ -225,17 +214,13 @@ export const AvailabilityProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     }
                   : b
               ).filter(b => ['confirmed', 'pending'].includes(b.status)))
-              console.log('✏️ Booking updated in cache')
             } else if (payload.eventType === 'DELETE') {
               const deletedBooking = payload.old as any
               setBookings(prev => prev.filter(b => b.id !== deletedBooking.id))
-              console.log('🗑️ Booking removed from cache')
             }
           }
         )
-        .subscribe((status) => {
-          console.log('📡 bookings subscription status:', status)
-        })
+        .subscribe()
     }
 
     setupRealtimeSubscriptions()
@@ -243,11 +228,9 @@ export const AvailabilityProvider: React.FC<{ children: React.ReactNode }> = ({ 
     // Cleanup
     return () => {
       if (studioChannel) {
-        console.log('🔌 Unsubscribing from studio_availability channel')
         supabase.removeChannel(studioChannel)
       }
       if (bookingsChannel) {
-        console.log('🔌 Unsubscribing from bookings channel')
         supabase.removeChannel(bookingsChannel)
       }
     }

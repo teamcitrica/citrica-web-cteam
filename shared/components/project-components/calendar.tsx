@@ -90,13 +90,11 @@ export default function CalendarComponent({
     content: "bg-[#16141F]",
   } : undefined;
 
-  // Forzar locale en-US y firstDayOfWeek para consistencia total entre navegadores
-  // Chrome puede usar es-MX del sistema y Safari en-US, causando diferencias
-  // firstDayOfWeek='sun' fuerza que la semana empiece en Domingo en ambos navegadores
+  // Configurar calendario en español con semana comenzando en Lunes
   return (
-    <I18nProvider locale="en-US">
+    <I18nProvider locale="es-ES">
       <Calendar
-        key={`calendar-en-US-${serverToday.year}-${serverToday.month}-${serverToday.day}`}
+        key={`calendar-es-ES-${serverToday.year}-${serverToday.month}-${serverToday.day}`}
         aria-label="Seleccionar fecha"
         className={`calendar-citrica-ui ${calendarClass} ${className}`}
         classNames={darkClassNames}
@@ -104,7 +102,7 @@ export default function CalendarComponent({
         minValue={effectiveMinValue}
         value={value}
         onChange={onChange}
-        firstDayOfWeek="sun"
+        firstDayOfWeek="mon"
       />
     </I18nProvider>
   );
