@@ -152,8 +152,8 @@ export const useContact = () => {
         if (serverToday && serverHours !== null) {
           // Comparar si la fecha seleccionada es hoy
           const isToday = date.year === serverToday.year &&
-                         date.month === serverToday.month &&
-                         date.day === serverToday.day
+            date.month === serverToday.month &&
+            date.day === serverToday.day
 
           if (isToday) {
             // Filtrar horarios que ya pasaron
@@ -342,6 +342,34 @@ export const useContact = () => {
 
       // Refrescar bookings para que los slots recién reservados aparezcan como ocupados
       await fetchBookings()
+
+      // Enviar notificaciones por email (fire-and-forget)
+      fetch('/api/email/registration-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          phoneCode: formData.phoneCode,
+          date: dateStr,
+          timeSlot: timeSlotToSave,
+          message: formData.message,
+        }),
+      }).catch((err) => console.error('Error enviando notificación email:', err))
+
+      fetch('/api/notificaciones/registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phoneCode
+            ? `${formData.phoneCode.replace('+', '')}${formData.phone}`
+            : formData.phone,
+        }),
+      }).catch((err) => console.error('Error WhatsApp:', err))
+
 
       setStatus('success')
       setFormData({ name: '', email: '', message: '', date: null, timeSlot: '', phone: '', phoneCode: '+51' })
