@@ -47,12 +47,21 @@ const WeeklyScheduleManager = () => {
 
   const timeSlots = generateTimeSlots();
 
+  const showSaveToast = () => {
+    addToast({
+      title: "Cambios guardados",
+      description: "La configuración se actualizó correctamente",
+      color: "success",
+    });
+  };
+
   const handleDayToggle = async (dayOfWeek: number, isActive: boolean) => {
-    // Llamar al hook que ya tiene actualización optimista integrada
     const result = await updateDayAvailability(dayOfWeek, isActive);
 
     if (!result.success) {
       console.error("Error updating day availability:", result.error);
+    } else {
+      showSaveToast();
     }
   };
 
@@ -61,6 +70,8 @@ const WeeklyScheduleManager = () => {
 
     if (!result.success) {
       console.error("Error toggling slot:", result.error);
+    } else {
+      showSaveToast();
     }
   };
 
