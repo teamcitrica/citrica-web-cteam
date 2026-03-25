@@ -51,3 +51,6 @@ next-env.d.ts
 
 # Deleted Supabase files
 _XDELETEDsupabase/
+
+# Supabase Edge Functions (se despliegan directo a Supabase, no a Vercel)
+supabase/functions/
