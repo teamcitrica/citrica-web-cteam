@@ -6,6 +6,7 @@ import { Switch } from "@heroui/switch";
 import { Divider } from "@heroui/divider";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { Text, Container, Col } from "citrica-ui-toolkit";
+import { addToast } from "@heroui/toast";
 import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
 import { useAdminBookings } from "@/hooks/disponibilidad/use-admin-bookings";
 import { useStudioConfig } from "@/hooks/disponibilidad/use-studio-config";
@@ -142,6 +143,7 @@ export default function ConfiguracionPage() {
     if (enabled) {
       setAllSlotsEnabled(false);
       await applyOfficeHours();
+      showSaveToast();
     }
   };
 
@@ -151,6 +153,7 @@ export default function ConfiguracionPage() {
       setOfficeHoursEnabled(false);
       setWeeklyActiveSlots([...allTimeSlots]);
       await updateWeeklyConfig([...allTimeSlots]);
+      showSaveToast();
     }
   };
 
@@ -165,6 +168,7 @@ export default function ConfiguracionPage() {
         return updated;
       });
       await createBlockedPeriod(dateStr, dateStr, "Día completo bloqueado");
+      showSaveToast();
     } else {
       setBlockDayEnabled(false);
       setSlotStatusMap((prev) => {
@@ -177,6 +181,7 @@ export default function ConfiguracionPage() {
       if (blocks?.length) {
         for (const b of blocks) await deleteBlockedPeriod(b.id);
       }
+      showSaveToast();
     }
   };
 
@@ -200,24 +205,33 @@ export default function ConfiguracionPage() {
           await deleteBlockedPeriod(b.id);
         }
       }
+      showSaveToast();
     } else if (state === "available") {
       setSlotStatusMap((prev) => ({ ...prev, [timeSlot]: "blocked" }));
       createSlotBlock(dateStr, timeSlot, `Slot ${timeSlot} bloqueado para ${dateStr}`);
+      showSaveToast();
     } else if (state === "inactive" || state === "outside") {
       const newActive = [...weeklyActiveSlots, timeSlot];
       setWeeklyActiveSlots(newActive);
       await updateWeeklyConfig(newActive);
+      showSaveToast();
     }
   };
 
   const handleDisplayModeChange = async (mode: "30min" | "1hour") => {
     const result = await updateUserDisplayMode(mode);
-    if (result.success) setUserDisplayMode(mode);
+    if (result.success) {
+      setUserDisplayMode(mode);
+      showSaveToast();
+    }
   };
 
   const handleMultipleSlotsChange = async (allowed: boolean) => {
     const result = await updateAllowMultipleTimeSlots(allowed);
-    if (result.success) setAllowMultipleTimeSlots(allowed);
+    if (result.success) {
+      setAllowMultipleTimeSlots(allowed);
+      showSaveToast();
+    }
   };
 
   const getSlotState = (timeSlot: string) => {
@@ -260,6 +274,14 @@ export default function ConfiguracionPage() {
     if (hour === 12) return "12:00pm";
     if (hour > 12) return `${hour - 12}:00pm`;
     return `${hour}:00am`;
+  };
+
+  const showSaveToast = () => {
+    addToast({
+      title: "Cambios guardados",
+      description: "La configuración se actualizó correctamente",
+      color: "success",
+    });
   };
 
   const switchClassNames = {
