@@ -625,7 +625,7 @@ const CitricaWebsite = () => {
 
       {/* Contact Section */}
       <section id="contacto">
-        <ContactSectionLanding variant="home" layout="landing" />
+        <ContactSectionLanding variant="home" layout="landing" showDescription={false} />
 
       </section>
 

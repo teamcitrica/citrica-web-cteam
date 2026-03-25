@@ -16,6 +16,7 @@ export type ContactVariant = keyof typeof ctaSectionVariants;
 interface ContactSectionProps {
   variant?: ContactVariant;
   layout?: 'default' | 'landing';
+  showDescription?: boolean;
   customContent?: {
     title?: string;
     subtitle?: string;
@@ -26,6 +27,7 @@ interface ContactSectionProps {
 export const ContactSectionLanding = ({
   variant = 'home',
   layout = 'default',
+  showDescription = true,
   customContent
 }: ContactSectionProps) => {
   const {
@@ -106,18 +108,20 @@ export const ContactSectionLanding = ({
                 {content.subtitle}
               </Text>
             </h3>
-            <Col cols={{ lgPush: 2, lg: 8, md: 6, sm: 4 }} className="mx-auto mt-4">
-              <p className="my-4">
-                <Text variant="body" color="#FFFFFF" weight="bold">
-                  Hablemos con Transparencia. Agenda tu Asesoría.
-                </Text>
-              </p>
-              <p>
-                <Text variant="body" color="#FFFFFF" className="opacity-80">
-                  Nuestro compromiso es ser amistosos, claros y transparentes. Antes de cualquier inversión, te ofrecemos una asesoría sin compromiso. Queremos entender a fondo su desafío digital para asegurarnos de que la solución que le entregamos sea exactamente lo que necesita.
-                </Text>
-              </p>
-            </Col>
+            {showDescription && (
+              <Col cols={{ lgPush: 2, lg: 8, md: 6, sm: 4 }} className="mx-auto mt-4">
+                <p className="my-4">
+                  <Text variant="body" color="#FFFFFF" weight="bold">
+                    Hablemos con Transparencia. Agenda tu Asesoría.
+                  </Text>
+                </p>
+                <p>
+                  <Text variant="body" color="#FFFFFF" className="opacity-80">
+                    Nuestro compromiso es ser amistosos, claros y transparentes. Antes de cualquier inversión, te ofrecemos una asesoría sin compromiso. Queremos entender a fondo su desafío digital para asegurarnos de que la solución que le entregamos sea exactamente lo que necesita.
+                  </Text>
+                </p>
+              </Col>
+            )}
           </Col>
 
           {/* Card del calendario */}
