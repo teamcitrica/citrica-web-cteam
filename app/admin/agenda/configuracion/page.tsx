@@ -284,6 +284,7 @@ export default function ConfiguracionPage() {
     });
   };
 
+
   const switchClassNames = {
     wrapper: "group-data-[selected=true]:bg-[#10E5A4]",
   };
