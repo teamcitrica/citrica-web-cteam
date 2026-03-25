@@ -16,9 +16,10 @@ export default function HeaderWrapper() {
     <Header
       logo={logo}
       variant="standard"
-      className="bg-color-ct-black"
+      className="bg-color-ct-black header-schedule"
       showButton={false}
       navLinks={[]}
+      buttonText="false"
     />
   );
 }

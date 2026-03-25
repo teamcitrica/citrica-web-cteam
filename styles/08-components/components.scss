@@ -1,3 +1,17 @@
+.header-schedule {
+  .md\:hidden {
+    display: none !important;
+  }
+
+  [class*="justify-between"] {
+    justify-content: center;
+
+    @media (min-width: 611px) {
+      justify-content: flex-start;
+    }
+  }
+}
+
 .card-container{
   cursor: pointer;
   border-radius: 24px;
