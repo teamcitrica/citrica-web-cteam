@@ -54,3 +54,6 @@ _XDELETEDsupabase/
 
 # Supabase Edge Functions (se despliegan directo a Supabase, no a Vercel)
 supabase/functions/
+
+# MCP config (contiene tokens sensibles)
+.mcp.json
