@@ -93,7 +93,11 @@ export function useServicePayments() {
   );
 
   const markAsPaid = useCallback(
-    async (paymentId: number, paymentDate: string, contractedServiceId: number): Promise<boolean> => {
+    async (
+      paymentId: number,
+      paymentDate: string,
+      contractedServiceId: number,
+    ): Promise<boolean> => {
       try {
         const { error } = await supabase
           .from("service_payments")
@@ -131,7 +135,10 @@ export function useServicePayments() {
   );
 
   const markAsPending = useCallback(
-    async (paymentId: number, contractedServiceId: number): Promise<boolean> => {
+    async (
+      paymentId: number,
+      contractedServiceId: number,
+    ): Promise<boolean> => {
       try {
         const { error } = await supabase
           .from("service_payments")
@@ -215,6 +222,68 @@ export function useServicePayments() {
     [supabase],
   );
 
+  const regeneratePayments = useCallback(
+    async (
+      contractedServiceId: number,
+      startDate: string,
+      recurrence: Recurrence,
+      periods: number,
+      amount: number,
+    ): Promise<boolean> => {
+      try {
+        // Verificar si hay pagos pagados
+        const { data: paidPayments, error: checkError } = await supabase
+          .from("service_payments")
+          .select("id")
+          .eq("contracted_service_id", contractedServiceId)
+          .eq("status", "pagado")
+          .limit(1);
+
+        if (checkError) throw checkError;
+
+        if (paidPayments && paidPayments.length > 0) {
+          addToast({
+            title: "No se puede modificar",
+            description:
+              "Hay pagos registrados. Elimina el servicio y crea uno nuevo o revierte el pago antes de cambiar la fecha de inicio, recurrencia o cantidad de periodos.",
+            color: "warning",
+          });
+
+          return false;
+        }
+
+        // Eliminar pagos existentes
+        const { error: deleteError } = await supabase
+          .from("service_payments")
+          .delete()
+          .eq("contracted_service_id", contractedServiceId);
+
+        if (deleteError) throw deleteError;
+
+        // Generar nuevos pagos
+        await generatePayments(
+          contractedServiceId,
+          startDate,
+          recurrence,
+          periods,
+          amount,
+        );
+
+        return true;
+      } catch (err: any) {
+        console.error("Error regenerating payments:", err);
+        addToast({
+          title: "Error",
+          description: "Error al regenerar periodos de pago",
+          color: "danger",
+        });
+
+        return false;
+      }
+    },
+    [supabase, generatePayments],
+  );
+
   return {
     payments,
     isLoading,
@@ -222,5 +291,6 @@ export function useServicePayments() {
     markAsPaid,
     markAsPending,
     generatePayments,
+    regeneratePayments,
   };
 }

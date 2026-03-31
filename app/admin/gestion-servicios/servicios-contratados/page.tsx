@@ -33,7 +33,7 @@ export default function ServiciosContratadosPage() {
     deleteContractedService,
   } = useContractedServices();
 
-  const { generatePayments } = useServicePayments();
+  const { generatePayments, regeneratePayments } = useServicePayments();
   const { companies, fetchCompanies } = useCompanyCRUD();
   const { contacts, fetchContacts } = useContactCRUD();
   const { services, fetchServices } = useServices();
@@ -94,6 +94,23 @@ export default function ServiciosContratadosPage() {
 
   const handleSave = async (data: ContractedServiceInput) => {
     if (selectedItem) {
+      const dateChanged =
+        data.start_date !== selectedItem.start_date ||
+        data.recurrence !== selectedItem.recurrence ||
+        data.periods !== selectedItem.periods;
+
+      if (dateChanged) {
+        const canRegenerate = await regeneratePayments(
+          selectedItem.id,
+          data.start_date,
+          data.recurrence,
+          data.periods,
+          data.amount,
+        );
+
+        if (!canRegenerate) return;
+      }
+
       const success = await updateContractedService(selectedItem.id, data);
 
       if (success) handleCloseDrawer();
