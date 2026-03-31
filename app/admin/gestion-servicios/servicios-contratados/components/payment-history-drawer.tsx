@@ -197,7 +197,7 @@ export default function PaymentHistoryDrawer({
                                 <Icon name="Undo2" size={18} />
                               </button>
                             </Tooltip>
-                          ) : visualStatus === "pendiente" ? (
+                          ) : (
                             <Tooltip content="Marcar como pagado">
                               <button
                                 className="text-lg cursor-pointer active:opacity-50 text-default-400 hover:text-green-500"
@@ -211,7 +211,7 @@ export default function PaymentHistoryDrawer({
                                 <Icon name="CircleCheck" size={18} />
                               </button>
                             </Tooltip>
-                          ) : null}
+                          )}
                         </TableCell>
                       </TableRow>
                     );

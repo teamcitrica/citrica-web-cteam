@@ -85,7 +85,7 @@ export default function ServiceTypeDrawer({
               }
             />
 
-            <Textarea
+            <Input
               label="Descripción (opcional)"
               placeholder="Describe brevemente este tipo de servicio"
               value={formData.description}
