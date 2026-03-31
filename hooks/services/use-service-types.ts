@@ -189,6 +189,13 @@ export function useServiceTypes() {
 
   const toggleActive = useCallback(
     async (id: number, isActive: boolean): Promise<boolean> => {
+      // Actualización optimista
+      setServiceTypes((prev) =>
+        prev.map((t) =>
+          t.id === id ? { ...t, is_active: isActive } : t,
+        ),
+      );
+
       try {
         const { error: updateError } = await supabase
           .from("service_types")
@@ -203,6 +210,12 @@ export function useServiceTypes() {
         return true;
       } catch (err: any) {
         console.error("Error toggling service type status:", err);
+        // Revertir si falla
+        setServiceTypes((prev) =>
+          prev.map((t) =>
+            t.id === id ? { ...t, is_active: !isActive } : t,
+          ),
+        );
 
         return false;
       }

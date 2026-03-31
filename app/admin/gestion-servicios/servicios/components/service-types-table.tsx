@@ -25,10 +25,11 @@ import {
   ModalFooter,
 } from "@heroui/modal";
 import { Divider } from "@heroui/divider";
+import { Skeleton } from "@heroui/skeleton";
 
 import { Text, Button, Icon } from "citrica-ui-toolkit";
 
-import type { ServiceType } from "../page";
+import type { ServiceType } from "@/hooks/services/use-service-types";
 
 const columns = [
   { name: "NOMBRE", uid: "name", sortable: true },
@@ -39,13 +40,15 @@ const columns = [
 
 interface ServiceTypesTableProps {
   types: ServiceType[];
+  isLoading: boolean;
   onEdit: (type: ServiceType) => void;
   onDelete: (id: number) => void;
-  onToggleActive: (id: number) => void;
+  onToggleActive: (id: number, isActive: boolean) => void;
 }
 
 export default function ServiceTypesTable({
   types,
+  isLoading,
   onEdit,
   onDelete,
   onToggleActive,
@@ -92,7 +95,7 @@ export default function ServiceTypesTable({
               color="default"
               isSelected={type.is_active}
               size="sm"
-              onChange={() => onToggleActive(type.id)}
+              onChange={() => onToggleActive(type.id, !type.is_active)}
             />
           );
         case "actions":
@@ -136,6 +139,27 @@ export default function ServiceTypesTable({
     },
     [onEdit, onToggleActive, handleDelete],
   );
+
+  if (isLoading) {
+    return (
+      <div className="w-full space-y-4">
+        <div className="w-full border border-gray-200 rounded-lg p-4">
+          <div className="flex gap-4 mb-4 pb-2 border-b">
+            {columns.map((_col, i) => (
+              <Skeleton key={i} className="h-4 w-1/4 rounded" />
+            ))}
+          </div>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex gap-4 py-3 border-b border-gray-100">
+              {columns.map((_col, j) => (
+                <Skeleton key={j} className="h-6 w-1/4 rounded" />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

@@ -12,12 +12,12 @@ import { Switch } from "@heroui/switch";
 
 import { Text, Button, Input, Textarea } from "citrica-ui-toolkit";
 
-import type { ServiceType } from "../page";
+import type { ServiceType, ServiceTypeInput } from "@/hooks/services/use-service-types";
 
 interface ServiceTypeDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: Omit<ServiceType, "id">) => void;
+  onSave: (data: ServiceTypeInput) => void;
   serviceType: ServiceType | null;
 }
 

@@ -10,14 +10,15 @@ import {
 } from "@heroui/drawer";
 import { Switch } from "@heroui/switch";
 
-import { Text, Button, Input, Select, Textarea } from "citrica-ui-toolkit";
+import { Text, Button, Input, Select } from "citrica-ui-toolkit";
 
-import type { Service, ServiceType } from "../page";
+import type { Service, ServiceInput } from "@/hooks/services/use-services";
+import type { ServiceType } from "@/hooks/services/use-service-types";
 
 interface ServiceDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: Omit<Service, "id">) => void;
+  onSave: (data: ServiceInput) => void;
   service: Service | null;
   serviceTypes: ServiceType[];
 }
@@ -31,9 +32,8 @@ export default function ServiceDrawer({
 }: ServiceDrawerProps) {
   const [formData, setFormData] = useState({
     name: "",
-    typeId: 0,
-    referenceAmount: 0,
-    description: "",
+    type_id: 0,
+    reference_amount: 0,
     is_active: true,
   });
 
@@ -42,17 +42,15 @@ export default function ServiceDrawer({
       if (service) {
         setFormData({
           name: service.name,
-          typeId: service.typeId,
-          referenceAmount: service.referenceAmount,
-          description: service.description,
+          type_id: service.type_id,
+          reference_amount: service.reference_amount,
           is_active: service.is_active,
         });
       } else {
         setFormData({
           name: "",
-          typeId: 0,
-          referenceAmount: 0,
-          description: "",
+          type_id: 0,
+          reference_amount: 0,
           is_active: true,
         });
       }
@@ -60,7 +58,7 @@ export default function ServiceDrawer({
   }, [isOpen, service]);
 
   const handleSubmit = () => {
-    if (!formData.name.trim() || !formData.typeId) return;
+    if (!formData.name.trim() || !formData.type_id) return;
     onSave(formData);
   };
 
@@ -106,30 +104,30 @@ export default function ServiceDrawer({
               options={selectOptions}
               placeholder="Selecciona un tipo"
               required
-              selectedKeys={formData.typeId ? [formData.typeId.toString()] : []}
+              selectedKeys={formData.type_id ? [formData.type_id.toString()] : []}
               variant="bordered"
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
 
-                setFormData({ ...formData, typeId: parseInt(selected) || 0 });
+                setFormData({ ...formData, type_id: parseInt(selected) || 0 });
               }}
             />
 
             <Input
-              label="Monto referencial (USD)"
+              label="Monto referencial (S/.)"
               placeholder="Ej: 50"
               type="number"
-              value={formData.referenceAmount.toString()}
+              value={formData.reference_amount.toString()}
               variant="primary"
               onValueChange={(value) =>
                 setFormData({
                   ...formData,
-                  referenceAmount: parseFloat(value) || 0,
+                  reference_amount: parseFloat(value) || 0,
                 })
               }
             />
 
-<div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <Text color="#A1A1AA" variant="label">
                 Servicio activo
               </Text>
@@ -156,7 +154,7 @@ export default function ServiceDrawer({
           </Button>
           <Button
             isAdmin
-            isDisabled={!formData.name.trim() || !formData.typeId}
+            isDisabled={!formData.name.trim() || !formData.type_id}
             variant="primary"
             onPress={handleSubmit}
           >

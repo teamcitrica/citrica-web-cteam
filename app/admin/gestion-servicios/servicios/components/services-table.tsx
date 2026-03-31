@@ -25,15 +25,17 @@ import {
   ModalFooter,
 } from "@heroui/modal";
 import { Divider } from "@heroui/divider";
+import { Skeleton } from "@heroui/skeleton";
 
 import { Text, Button, Icon } from "citrica-ui-toolkit";
 
-import type { Service, ServiceType } from "../page";
+import type { Service } from "@/hooks/services/use-services";
+import type { ServiceType } from "@/hooks/services/use-service-types";
 
 const columns = [
   { name: "NOMBRE", uid: "name", sortable: true },
-  { name: "TIPO DE SERVICIO", uid: "typeId" },
-  { name: "MONTO REF.", uid: "referenceAmount" },
+  { name: "TIPO DE SERVICIO", uid: "type_id" },
+  { name: "MONTO REF.", uid: "reference_amount" },
   { name: "ESTADO", uid: "is_active" },
   { name: "ACCIONES", uid: "actions" },
 ];
@@ -41,14 +43,16 @@ const columns = [
 interface ServicesTableProps {
   services: Service[];
   serviceTypes: ServiceType[];
+  isLoading: boolean;
   onEdit: (service: Service) => void;
   onDelete: (id: number) => void;
-  onToggleActive: (id: number) => void;
+  onToggleActive: (id: number, isActive: boolean) => void;
 }
 
 export default function ServicesTable({
   services,
   serviceTypes,
+  isLoading,
   onEdit,
   onDelete,
   onToggleActive,
@@ -69,10 +73,7 @@ export default function ServicesTable({
   };
 
   const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat("es-AR", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
+    return `S/. ${amount.toFixed(2)}`;
   };
 
   const renderCell = useCallback(
@@ -84,18 +85,21 @@ export default function ServicesTable({
               {service.name}
             </Text>
           );
-        case "typeId":
-          const typeName = serviceTypes.find((t) => t.id === service.typeId)?.name || "Sin tipo";
+        case "type_id":
+          const typeName =
+            service.service_type?.name ||
+            serviceTypes.find((t) => t.id === service.type_id)?.name ||
+            "Sin tipo";
 
           return (
             <Text color="#4B5563" variant="label">
               {typeName}
             </Text>
           );
-        case "referenceAmount":
+        case "reference_amount":
           return (
             <Text color="#374151" variant="label" weight="medium">
-              {formatAmount(service.referenceAmount)}
+              {formatAmount(service.reference_amount)}
             </Text>
           );
         case "is_active":
@@ -110,7 +114,7 @@ export default function ServicesTable({
               color="default"
               isSelected={service.is_active}
               size="sm"
-              onChange={() => onToggleActive(service.id)}
+              onChange={() => onToggleActive(service.id, !service.is_active)}
             />
           );
         case "actions":
@@ -155,6 +159,27 @@ export default function ServicesTable({
     [onEdit, onToggleActive, handleDelete, serviceTypes],
   );
 
+  if (isLoading) {
+    return (
+      <div className="w-full space-y-4">
+        <div className="w-full border border-gray-200 rounded-lg p-4">
+          <div className="flex gap-4 mb-4 pb-2 border-b">
+            {columns.map((_col, i) => (
+              <Skeleton key={i} className="h-4 w-1/5 rounded" />
+            ))}
+          </div>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex gap-4 py-3 border-b border-gray-100">
+              {columns.map((_col, j) => (
+                <Skeleton key={j} className="h-6 w-1/5 rounded" />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <Table aria-label="Tabla de servicios" isStriped>
@@ -194,27 +219,21 @@ export default function ServicesTable({
             <div className="flex items-center justify-center mb-2">
               <Icon color="#F04242" name="TriangleAlert" size={28} />
             </div>
-            <h2 className="text-center">
-              <Text color="#F04242" variant="title" weight="bold">
-                Eliminar Servicio
-              </Text>
-            </h2>
+            <Text as="h2" className="text-center" color="#F04242" variant="title" weight="bold">
+              Eliminar Servicio
+            </Text>
           </ModalHeader>
           <ModalBody>
-            <p>
-              <Text color="#1F1F1F" variant="body">
-                ¿Estás seguro de que deseas eliminar el servicio{" "}
-                <span className="font-semibold">
-                  {serviceToDelete?.name}
-                </span>
-                ?
-              </Text>
-            </p>
-            <p className="mb-2">
-              <Text color="#1F1F1F" variant="label">
-                Esta acción no se puede deshacer.
-              </Text>
-            </p>
+            <Text as="p" color="#1F1F1F" variant="body">
+              ¿Estás seguro de que deseas eliminar el servicio{" "}
+              <span className="font-semibold">
+                {serviceToDelete?.name}
+              </span>
+              ?
+            </Text>
+            <Text as="p" className="mb-2" color="#1F1F1F" variant="label">
+              Esta acción no se puede deshacer.
+            </Text>
             <Divider className="bg-[#94A3B8]" />
           </ModalBody>
           <ModalFooter>

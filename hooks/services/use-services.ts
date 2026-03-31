@@ -193,6 +193,13 @@ export function useServices() {
 
   const toggleActive = useCallback(
     async (id: number, isActive: boolean): Promise<boolean> => {
+      // Actualización optimista
+      setServices((prev) =>
+        prev.map((s) =>
+          s.id === id ? { ...s, is_active: isActive } : s,
+        ),
+      );
+
       try {
         const { error: updateError } = await supabase
           .from("services")
@@ -207,6 +214,12 @@ export function useServices() {
         return true;
       } catch (err: any) {
         console.error("Error toggling service status:", err);
+        // Revertir si falla
+        setServices((prev) =>
+          prev.map((s) =>
+            s.id === id ? { ...s, is_active: !isActive } : s,
+          ),
+        );
 
         return false;
       }
