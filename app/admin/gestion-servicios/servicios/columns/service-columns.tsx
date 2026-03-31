@@ -43,7 +43,7 @@ export const getServiceColumns = ({
     name: "MONTO REF.",
     uid: "reference_amount",
     render: (service) => (
-      <Text color="#374151" variant="label" weight="medium">
+      <Text color="#374151" variant="label" weight="bold">
         {formatAmount(service.reference_amount)}
       </Text>
     ),

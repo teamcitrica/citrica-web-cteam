@@ -54,6 +54,9 @@ export default function ServiciosPage() {
   const [isTypeDrawerOpen, setIsTypeDrawerOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<ServiceType | null>(null);
 
+  // Filtro por tipo
+  const [selectedTypeFilter, setSelectedTypeFilter] = useState<string>("all");
+
   // Delete modals
   const [serviceToDelete, setServiceToDelete] = useState<Service | null>(null);
   const [typeToDelete, setTypeToDelete] = useState<ServiceType | null>(null);
@@ -146,6 +149,15 @@ export default function ServiciosPage() {
     await toggleTypeActive(id, isActive);
   }, [toggleTypeActive]);
 
+  // Servicios filtrados por tipo
+  const filteredServices = useMemo(() => {
+    if (selectedTypeFilter === "all") return services;
+
+    return services.filter(
+      (s) => s.type_id.toString() === selectedTypeFilter,
+    );
+  }, [services, selectedTypeFilter]);
+
   // Columnas
   const serviceColumns = useMemo(
     () =>
@@ -186,12 +198,23 @@ export default function ServiciosPage() {
         {/* Tabla según tab */}
         {selectedTab === "servicios" ? (
           <DataTable<Service>
-            data={services}
+            data={filteredServices}
             columns={serviceColumns}
             isLoading={isLoadingServices}
             searchFields={[]}
+            showCustomAutocomplete={true}
+            customAutocompleteItems={[
+              { id: "all", name: "Tipos de servicio" },
+              ...serviceTypes.map((t) => ({
+                id: t.id.toString(),
+                name: t.name,
+              })),
+            ]}
+            customAutocompletePlaceholder="Filtrar por tipo de servicio..."
+            customAutocompleteSelectedKey={selectedTypeFilter}
+            onCustomAutocompleteChange={(key) => setSelectedTypeFilter(key || "all")}
             onAdd={handleCreate}
-            addButtonText="Nuevo servicio"
+            addButtonText="Nuevo registro"
             addButtonIcon={<Icon name="Plus" size={16} />}
             emptyContent="No hay servicios creados"
             headerColor="#265197"
@@ -221,7 +244,7 @@ export default function ServiciosPage() {
             isLoading={isLoadingTypes}
             searchFields={[]}
             onAdd={handleCreate}
-            addButtonText="Nuevo tipo"
+            addButtonText="Nuevo registro"
             addButtonIcon={<Icon name="Plus" size={16} />}
             emptyContent="No hay tipos de servicio creados"
             headerColor="#265197"
