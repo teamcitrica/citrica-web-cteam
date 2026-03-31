@@ -9,6 +9,8 @@ import {
   DrawerFooter,
 } from "@heroui/drawer";
 
+import { addToast } from "@heroui/toast";
+
 import { Text, Button, Input, Select, Autocomplete } from "citrica-ui-toolkit";
 
 import { RECURRENCE_LABELS } from "../types";
@@ -186,7 +188,15 @@ export default function ContractedServiceDrawer({
   const endDate = calculateEndDate(startDate, recurrence, parseInt(periods) || 0);
 
   const handleSubmit = () => {
-    if (!contactId || !companyId || !serviceName || !amount || !startDate || !periods) return;
+    if (!contactId || !companyId || !serviceName || !amount || !startDate || !periods) {
+      addToast({
+        title: "Faltan datos",
+        description: "Por favor completa todos los campos obligatorios",
+        color: "warning",
+      });
+
+      return;
+    }
 
     onSave({
       contact_id: contactId,
