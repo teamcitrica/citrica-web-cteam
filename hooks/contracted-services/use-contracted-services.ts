@@ -19,7 +19,6 @@ export interface ContractedService {
   recurrence: Recurrence;
   periods: number;
   status: PaymentStatus;
-  is_active: boolean;
   created_at: string;
   updated_at: string;
   contact?: {
@@ -80,11 +79,11 @@ export function useContractedServices() {
   }, [supabase]);
 
   const createContractedService = useCallback(
-    async (data: ContractedServiceInput): Promise<boolean> => {
+    async (data: ContractedServiceInput): Promise<number | null> => {
       try {
         setIsLoading(true);
 
-        const { error } = await supabase
+        const { data: inserted, error } = await supabase
           .from("contracted_services")
           .insert([{
             contact_id: data.contact_id,
@@ -97,7 +96,9 @@ export function useContractedServices() {
             recurrence: data.recurrence,
             periods: data.periods,
             status: data.status,
-          }]);
+          }])
+          .select("id")
+          .single();
 
         if (error) throw error;
 
@@ -108,7 +109,7 @@ export function useContractedServices() {
         });
         await fetchContractedServices();
 
-        return true;
+        return inserted?.id || null;
       } catch (err: any) {
         console.error("Error creating contracted service:", err);
         addToast({
@@ -117,7 +118,7 @@ export function useContractedServices() {
           color: "danger",
         });
 
-        return false;
+        return null;
       } finally {
         setIsLoading(false);
       }

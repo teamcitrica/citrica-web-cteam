@@ -10,6 +10,7 @@ import { RECURRENCE_LABELS, STATUS_LABELS } from "../types";
 type ContractedServiceColumnsConfig = {
   onEdit: (item: ContractedService) => void;
   onDelete: (item: ContractedService) => void;
+  onViewDetail: (item: ContractedService) => void;
 };
 
 const formatAmount = (amount: number) => {
@@ -27,6 +28,7 @@ const formatDate = (dateStr: string) => {
 export const getContractedServiceColumns = ({
   onEdit,
   onDelete,
+  onViewDetail,
 }: ContractedServiceColumnsConfig): Column<ContractedService>[] => [
   {
     name: "CLIENTE Y EMPRESA",
@@ -107,6 +109,7 @@ export const getContractedServiceColumns = ({
         <Tooltip content="Ver detalle">
           <button
             className="text-lg cursor-pointer active:opacity-50 text-default-400 hover:text-blue-500"
+            onClick={() => onViewDetail(item)}
           >
             <Icon name="Eye" size={20} />
           </button>

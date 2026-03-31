@@ -6,6 +6,7 @@ import { Divider } from "@heroui/divider";
 import { Container, Col, Text, Icon } from "citrica-ui-toolkit";
 
 import { useContractedServices } from "@/hooks/contracted-services/use-contracted-services";
+import { useServicePayments } from "@/hooks/contracted-services/use-service-payments";
 import { useCompanyCRUD } from "@/hooks/companies/use-companies";
 import { useContactCRUD } from "@/hooks/contact/use-contact";
 import { useServices } from "@/hooks/services/use-services";
@@ -15,6 +16,7 @@ import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-b
 import { getContractedServiceColumns } from "./columns/contracted-service-columns";
 import ContractedServiceDrawer from "./components/contracted-service-drawer";
 import DeleteContractedServiceModal from "./components/delete-contracted-service-modal";
+import PaymentHistoryDrawer from "./components/payment-history-drawer";
 
 import type { ContractedService, ContractedServiceInput } from "@/hooks/contracted-services/use-contracted-services";
 
@@ -31,6 +33,7 @@ export default function ServiciosContratadosPage() {
     deleteContractedService,
   } = useContractedServices();
 
+  const { generatePayments } = useServicePayments();
   const { companies, fetchCompanies } = useCompanyCRUD();
   const { contacts, fetchContacts } = useContactCRUD();
   const { services, fetchServices } = useServices();
@@ -39,9 +42,13 @@ export default function ServiciosContratadosPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("todos");
   const [companyFilter, setCompanyFilter] = useState<string>("all");
 
-  // Drawer
+  // Drawer crear/editar
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<ContractedService | null>(null);
+
+  // Drawer historial de pagos
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [historyItem, setHistoryItem] = useState<ContractedService | null>(null);
 
   // Delete modal
   const [itemToDelete, setItemToDelete] = useState<ContractedService | null>(null);
@@ -69,6 +76,11 @@ export default function ServiciosContratadosPage() {
     setItemToDelete(item);
   }, []);
 
+  const handleViewDetail = useCallback((item: ContractedService) => {
+    setHistoryItem(item);
+    setIsHistoryOpen(true);
+  }, []);
+
   const handleConfirmDelete = async () => {
     if (!itemToDelete) return;
     await deleteContractedService(itemToDelete.id);
@@ -81,14 +93,24 @@ export default function ServiciosContratadosPage() {
   };
 
   const handleSave = async (data: ContractedServiceInput) => {
-    let success = false;
-
     if (selectedItem) {
-      success = await updateContractedService(selectedItem.id, data);
+      const success = await updateContractedService(selectedItem.id, data);
+
+      if (success) handleCloseDrawer();
     } else {
-      success = await createContractedService(data);
+      const newId = await createContractedService(data);
+
+      if (newId) {
+        await generatePayments(
+          newId,
+          data.start_date,
+          data.recurrence,
+          data.periods,
+          data.amount,
+        );
+        handleCloseDrawer();
+      }
     }
-    if (success) handleCloseDrawer();
   };
 
   // Datos filtrados
@@ -111,8 +133,9 @@ export default function ServiciosContratadosPage() {
       getContractedServiceColumns({
         onEdit: handleEdit,
         onDelete: handleDelete,
+        onViewDetail: handleViewDetail,
       }),
-    [handleEdit, handleDelete],
+    [handleEdit, handleDelete, handleViewDetail],
   );
 
   // Opciones de filtro empresa
@@ -172,7 +195,7 @@ export default function ServiciosContratadosPage() {
           }
         />
 
-        {/* Drawer */}
+        {/* Drawer crear/editar */}
         <ContractedServiceDrawer
           isOpen={isDrawerOpen}
           contractedService={selectedItem}
@@ -181,6 +204,17 @@ export default function ServiciosContratadosPage() {
           services={services}
           onClose={handleCloseDrawer}
           onSave={handleSave}
+        />
+
+        {/* Drawer historial de pagos */}
+        <PaymentHistoryDrawer
+          isOpen={isHistoryOpen}
+          contractedService={historyItem}
+          onClose={() => {
+            setIsHistoryOpen(false);
+            setHistoryItem(null);
+          }}
+          onStatusUpdated={fetchContractedServices}
         />
 
         {/* Delete modal */}
