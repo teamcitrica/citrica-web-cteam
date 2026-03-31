@@ -200,27 +200,21 @@ export default function ServiceTypesTable({
             <div className="flex items-center justify-center mb-2">
               <Icon color="#F04242" name="TriangleAlert" size={28} />
             </div>
-            <h2 className="text-center">
-              <Text color="#F04242" variant="title" weight="bold">
-                Eliminar Tipo de Servicio
-              </Text>
-            </h2>
+            <Text as="h2" className="text-center" color="#F04242" variant="title" weight="bold">
+              Eliminar Tipo de Servicio
+            </Text>
           </ModalHeader>
           <ModalBody>
-            <p>
-              <Text color="#1F1F1F" variant="body">
-                ¿Estás seguro de que deseas eliminar el tipo{" "}
-                <span className="font-semibold">
-                  {typeToDelete?.name}
-                </span>
-                ?
-              </Text>
-            </p>
-            <p className="mb-2">
-              <Text color="#1F1F1F" variant="label">
-                Si hay servicios con este tipo, no se podrá eliminar.
-              </Text>
-            </p>
+            <Text as="p" color="#1F1F1F" variant="body">
+              ¿Estás seguro de que deseas eliminar el tipo{" "}
+              <span className="font-semibold">
+                {typeToDelete?.name}
+              </span>
+              ?
+            </Text>
+            <Text as="p" className="mb-2" color="#1F1F1F" variant="label">
+              Si hay servicios con este tipo, no se podrá eliminar.
+            </Text>
             <Divider className="bg-[#94A3B8]" />
           </ModalBody>
           <ModalFooter>
