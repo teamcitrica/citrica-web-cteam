@@ -1,15 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 
-import { Container, Col, Text, Button, Icon } from "citrica-ui-toolkit";
+import { Divider } from "@heroui/divider";
+import { Container, Col, Text, Icon } from "citrica-ui-toolkit";
 
 import { useServiceTypes } from "@/hooks/services/use-service-types";
 import { useServices } from "@/hooks/services/use-services";
+import { DataTable } from "@/shared/components/citrica-ui/organism/data-table";
+import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-button-group";
 
-import ServicesTable from "./components/services-table";
+import { getServiceColumns } from "./columns/service-columns";
+import { getServiceTypeColumns } from "./columns/service-type-columns";
+import DeleteServiceModal from "./components/delete-service-modal";
+import DeleteServiceTypeModal from "./components/delete-service-type-modal";
 import ServiceDrawer from "./components/service-drawer";
-import ServiceTypesTable from "./components/service-types-table";
 import ServiceTypeDrawer from "./components/service-type-drawer";
 
 import type { ServiceType, ServiceTypeInput } from "@/hooks/services/use-service-types";
@@ -49,6 +54,10 @@ export default function ServiciosPage() {
   const [isTypeDrawerOpen, setIsTypeDrawerOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<ServiceType | null>(null);
 
+  // Delete modals
+  const [serviceToDelete, setServiceToDelete] = useState<Service | null>(null);
+  const [typeToDelete, setTypeToDelete] = useState<ServiceType | null>(null);
+
   // Fetch inicial
   useEffect(() => {
     fetchServiceTypes();
@@ -61,9 +70,19 @@ export default function ServiciosPage() {
     setIsServiceDrawerOpen(true);
   };
 
-  const handleEditService = (service: Service) => {
+  const handleEditService = useCallback((service: Service) => {
     setSelectedService(service);
     setIsServiceDrawerOpen(true);
+  }, []);
+
+  const handleDeleteService = useCallback((service: Service) => {
+    setServiceToDelete(service);
+  }, []);
+
+  const handleConfirmDeleteService = async () => {
+    if (!serviceToDelete) return;
+    await deleteService(serviceToDelete.id);
+    setServiceToDelete(null);
   };
 
   const handleCloseServiceDrawer = () => {
@@ -82,13 +101,9 @@ export default function ServiciosPage() {
     if (success) handleCloseServiceDrawer();
   };
 
-  const handleDeleteService = async (id: number) => {
-    await deleteService(id);
-  };
-
-  const handleToggleServiceActive = async (id: number, isActive: boolean) => {
+  const handleToggleServiceActive = useCallback(async (id: number, isActive: boolean) => {
     await toggleServiceActive(id, isActive);
-  };
+  }, [toggleServiceActive]);
 
   // Handlers tipos
   const handleCreateType = () => {
@@ -96,9 +111,19 @@ export default function ServiciosPage() {
     setIsTypeDrawerOpen(true);
   };
 
-  const handleEditType = (type: ServiceType) => {
+  const handleEditType = useCallback((type: ServiceType) => {
     setSelectedType(type);
     setIsTypeDrawerOpen(true);
+  }, []);
+
+  const handleDeleteType = useCallback((type: ServiceType) => {
+    setTypeToDelete(type);
+  }, []);
+
+  const handleConfirmDeleteType = async () => {
+    if (!typeToDelete) return;
+    await deleteServiceType(typeToDelete.id);
+    setTypeToDelete(null);
   };
 
   const handleCloseTypeDrawer = () => {
@@ -117,17 +142,30 @@ export default function ServiciosPage() {
     if (success) handleCloseTypeDrawer();
   };
 
-  const handleDeleteType = async (id: number) => {
-    await deleteServiceType(id);
-  };
-
-  const handleToggleTypeActive = async (id: number, isActive: boolean) => {
+  const handleToggleTypeActive = useCallback(async (id: number, isActive: boolean) => {
     await toggleTypeActive(id, isActive);
-  };
+  }, [toggleTypeActive]);
 
-  const getButtonText = () => {
-    return selectedTab === "servicios" ? "Nuevo servicio" : "Nuevo tipo";
-  };
+  // Columnas
+  const serviceColumns = useMemo(
+    () =>
+      getServiceColumns({
+        onEdit: handleEditService,
+        onDelete: handleDeleteService,
+        onToggleActive: handleToggleServiceActive,
+      }),
+    [handleEditService, handleDeleteService, handleToggleServiceActive],
+  );
+
+  const serviceTypeColumns = useMemo(
+    () =>
+      getServiceTypeColumns({
+        onEdit: handleEditType,
+        onDelete: handleDeleteType,
+        onToggleActive: handleToggleTypeActive,
+      }),
+    [handleEditType, handleDeleteType, handleToggleTypeActive],
+  );
 
   const handleCreate = () => {
     if (selectedTab === "servicios") {
@@ -140,88 +178,103 @@ export default function ServiciosPage() {
   return (
     <Container>
       <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }}>
-        {/* Header breadcrumb */}
-        <Text as="h3" variant="title" weight="bold">
-          <Text isAdmin={true} color="#678CC5" variant="title" weight="bold">
-            Gestión de Servicios
-          </Text>
-          <Text isAdmin={true} color="#265197" variant="title" weight="bold">
-            <span> {">"} </span> Servicios
-          </Text>
+        {/* Título */}
+        <Text as="h1" className="mb-4" isAdmin={true} color="#16305A" variant="title" weight="bold">
+          GESTIÓN DE SERVICIOS
         </Text>
 
-        {/* Barra de acciones con tabs */}
-        <div className="bg-[#265197] rounded-xl p-4 mt-4 mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <button
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                selectedTab === "tipos"
-                  ? "bg-white text-[#265197]"
-                  : "bg-transparent text-white border border-white/30 hover:bg-white/10"
-              }`}
-              onClick={() => setSelectedTab("tipos")}
-            >
-              Tipos de Servicio
-            </button>
-            <button
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                selectedTab === "servicios"
-                  ? "bg-white text-[#265197]"
-                  : "bg-transparent text-white border border-white/30 hover:bg-white/10"
-              }`}
-              onClick={() => setSelectedTab("servicios")}
-            >
-              Servicios
-            </button>
-          </div>
-
-          <Button
-            isAdmin
-            startContent={<Icon name="Plus" size={16} />}
-            variant="secondary"
-            onPress={handleCreate}
-          >
-            {getButtonText()}
-          </Button>
-        </div>
-
-        {/* Contenido según tab */}
-        {selectedTab === "servicios" && (
-          <>
-            <ServicesTable
-              isLoading={isLoadingServices}
-              services={services}
-              serviceTypes={serviceTypes}
-              onDelete={handleDeleteService}
-              onEdit={handleEditService}
-              onToggleActive={handleToggleServiceActive}
-            />
-            <ServiceDrawer
-              isOpen={isServiceDrawerOpen}
-              service={selectedService}
-              serviceTypes={serviceTypes}
-              onClose={handleCloseServiceDrawer}
-              onSave={handleSaveService}
-            />
-          </>
+        {/* Tabla según tab */}
+        {selectedTab === "servicios" ? (
+          <DataTable<Service>
+            data={services}
+            columns={serviceColumns}
+            isLoading={isLoadingServices}
+            searchFields={[]}
+            onAdd={handleCreate}
+            addButtonText="Nuevo servicio"
+            addButtonIcon={<Icon name="Plus" size={16} />}
+            emptyContent="No hay servicios creados"
+            headerColor="#265197"
+            headerTextColor="#ffffff"
+            paginationColor="#265197"
+            getRowKey={(service) => service.id}
+            customFilters={
+              <>
+                <div className="flex gap-3 pb-4">
+                  <FilterButtonGroup
+                    buttons={[
+                      { value: "tipos", label: "Tipos de Servicio" },
+                      { value: "servicios", label: "Servicios" },
+                    ]}
+                    selectedValue={selectedTab}
+                    onValueChange={(value) => setSelectedTab(value as TabKey)}
+                  />
+                </div>
+                <Divider className="bg-[#D4DEED]" />
+              </>
+            }
+          />
+        ) : (
+          <DataTable<ServiceType>
+            data={serviceTypes}
+            columns={serviceTypeColumns}
+            isLoading={isLoadingTypes}
+            searchFields={[]}
+            onAdd={handleCreate}
+            addButtonText="Nuevo tipo"
+            addButtonIcon={<Icon name="Plus" size={16} />}
+            emptyContent="No hay tipos de servicio creados"
+            headerColor="#265197"
+            headerTextColor="#ffffff"
+            paginationColor="#265197"
+            getRowKey={(type) => type.id}
+            customFilters={
+              <>
+                <div className="flex gap-3 pb-4">
+                  <FilterButtonGroup
+                    buttons={[
+                      { value: "tipos", label: "Tipos de Servicio" },
+                      { value: "servicios", label: "Servicios" },
+                    ]}
+                    selectedValue={selectedTab}
+                    onValueChange={(value) => setSelectedTab(value as TabKey)}
+                  />
+                </div>
+                <Divider className="bg-[#D4DEED]" />
+              </>
+            }
+          />
         )}
 
-        {selectedTab === "tipos" && (
-          <>
-            <ServiceTypesTable
-              isLoading={isLoadingTypes}
-              types={serviceTypes}
-              onDelete={handleDeleteType}
-              onEdit={handleEditType}
-              onToggleActive={handleToggleTypeActive}
-            />
-            <ServiceTypeDrawer
-              isOpen={isTypeDrawerOpen}
-              serviceType={selectedType}
-              onClose={handleCloseTypeDrawer}
-              onSave={handleSaveType}
-            />
-          </>
+        {/* Drawers */}
+        <ServiceDrawer
+          isOpen={isServiceDrawerOpen}
+          service={selectedService}
+          serviceTypes={serviceTypes}
+          onClose={handleCloseServiceDrawer}
+          onSave={handleSaveService}
+        />
+        <ServiceTypeDrawer
+          isOpen={isTypeDrawerOpen}
+          serviceType={selectedType}
+          onClose={handleCloseTypeDrawer}
+          onSave={handleSaveType}
+        />
+
+        {/* Delete modals */}
+        {serviceToDelete && (
+          <DeleteServiceModal
+            service={serviceToDelete}
+            onConfirm={handleConfirmDeleteService}
+            onCancel={() => setServiceToDelete(null)}
+          />
+        )}
+        {typeToDelete && (
+          <DeleteServiceTypeModal
+            serviceType={typeToDelete}
+            onConfirm={handleConfirmDeleteType}
+            onCancel={() => setTypeToDelete(null)}
+          />
         )}
       </Col>
     </Container>
