@@ -194,7 +194,7 @@ export default function PaymentHistoryDrawer({
                                 className="text-lg cursor-pointer active:opacity-50 text-default-400 hover:text-orange-500"
                                 onClick={() => handleRevert(payment.id)}
                               >
-                                <Icon name="Undo2" size={18} />
+                                <Icon name="Undo2" size={24} />
                               </button>
                             </Tooltip>
                           ) : (
@@ -208,7 +208,7 @@ export default function PaymentHistoryDrawer({
                                   })
                                 }
                               >
-                                <Icon name="CircleCheck" size={18} />
+                                <Icon name="CircleCheck" size={24} />
                               </button>
                             </Tooltip>
                           )}
