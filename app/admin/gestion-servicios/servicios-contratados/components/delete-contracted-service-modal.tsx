@@ -11,7 +11,7 @@ import { Divider } from "@heroui/divider";
 
 import { Text, Button, Icon } from "citrica-ui-toolkit";
 
-import type { ContractedService } from "../types";
+import type { ContractedService } from "@/hooks/contracted-services/use-contracted-services";
 
 interface DeleteContractedServiceModalProps {
   contractedService: ContractedService;
@@ -40,7 +40,9 @@ export default function DeleteContractedServiceModal({
             ¿Estás seguro de que deseas eliminar el servicio{" "}
             <span className="font-semibold">{contractedService.service_name}</span>{" "}
             contratado por{" "}
-            <span className="font-semibold">{contractedService.contact_name}</span>?
+            <span className="font-semibold">
+              {`${contractedService.contact?.name || ""} ${contractedService.contact?.last_name || ""}`.trim()}
+            </span>?
           </Text>
           <Text as="p" className="mb-2" color="#1F1F1F" variant="label">
             Esta acción no se puede deshacer.

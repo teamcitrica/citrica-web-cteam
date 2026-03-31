@@ -4,7 +4,7 @@ import { Chip } from "@heroui/chip";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { Text, Icon } from "citrica-ui-toolkit";
 
-import type { ContractedService } from "../types";
+import type { ContractedService } from "@/hooks/contracted-services/use-contracted-services";
 import { RECURRENCE_LABELS, STATUS_LABELS } from "../types";
 
 type ContractedServiceColumnsConfig = {
@@ -35,10 +35,10 @@ export const getContractedServiceColumns = ({
     render: (item) => (
       <div className="flex flex-col gap-0.5">
         <Text color="#1F2937" variant="label" weight="bold">
-          {item.contact_name}
+          {`${item.contact?.name || ""} ${item.contact?.last_name || ""}`.trim() || "Sin contacto"}
         </Text>
         <Text color="#678CC5" variant="label">
-          {item.company_name}
+          {item.company?.name || "Sin empresa"}
         </Text>
       </div>
     ),

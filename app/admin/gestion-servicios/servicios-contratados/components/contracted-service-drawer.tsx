@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Drawer,
   DrawerContent,
@@ -14,24 +14,17 @@ import { Text, Button, Input, Select, Autocomplete } from "citrica-ui-toolkit";
 import { RECURRENCE_LABELS } from "../types";
 
 import type { Recurrence, PaymentStatus } from "../types";
+import type { ContractedService, ContractedServiceInput } from "@/hooks/contracted-services/use-contracted-services";
+import type { Contact } from "@/hooks/contact/use-contact";
+import type { Company } from "@/hooks/companies/use-companies";
+import type { Service } from "@/hooks/services/use-services";
 
-const MOCK_CONTACTS = [
-  { value: "c1", label: "Carlos Ramírez", company: "Tech Solutions SAC" },
-  { value: "c2", label: "María López", company: "Innovatech EIRL" },
-  { value: "c3", label: "Jorge Mendoza", company: "Digital Corp SA" },
-  { value: "c4", label: "Ana Torres", company: "Tech Solutions SAC" },
-  { value: "c5", label: "Pedro García", company: "StartUp Labs SAC" },
-  { value: "c6", label: "Lucía Fernández", company: "Innovatech EIRL" },
-];
-
-const MOCK_SERVICES = [
-  { value: "1", label: "Hosting Premium", amount: 1500 },
-  { value: "2", label: "Mantenimiento Web", amount: 800 },
-  { value: "3", label: "Diseño UX/UI", amount: 3500 },
-  { value: "4", label: "SEO Avanzado", amount: 1200 },
-  { value: "5", label: "Soporte Técnico", amount: 600 },
-  { value: "6", label: "Community Manager", amount: 950 },
-];
+const RECURRENCE_MONTHS: Record<Recurrence, number> = {
+  mensual: 1,
+  trimestral: 3,
+  semestral: 6,
+  anual: 12,
+};
 
 const recurrenceOptions = Object.entries(RECURRENCE_LABELS).map(([value, label]) => ({
   value,
@@ -50,42 +43,163 @@ const autocompleteClassNames = {
   popoverContent: "[&_li]:!text-[#265197]",
 };
 
+function calculateEndDate(startDate: string, recurrence: Recurrence, periods: number): string {
+  if (!startDate || !periods) return "";
+  const date = new Date(startDate + "T00:00:00");
+  const months = RECURRENCE_MONTHS[recurrence] * periods;
+
+  date.setMonth(date.getMonth() + months);
+
+  return date.toISOString().split("T")[0];
+}
+
 interface ContractedServiceDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  onSave: (data: ContractedServiceInput) => void;
+  contractedService: ContractedService | null;
+  contacts: Contact[];
+  companies: Company[];
+  services: Service[];
 }
 
 export default function ContractedServiceDrawer({
   isOpen,
   onClose,
+  onSave,
+  contractedService,
+  contacts,
+  companies,
+  services,
 }: ContractedServiceDrawerProps) {
   const [contactId, setContactId] = useState<string>("");
   const [contactInput, setContactInput] = useState("");
+  const [companyId, setCompanyId] = useState<number>(0);
   const [companyName, setCompanyName] = useState("");
   const [serviceId, setServiceId] = useState<string>("");
+  const [serviceName, setServiceName] = useState("");
+  const [serviceTypeName, setServiceTypeName] = useState("");
   const [amount, setAmount] = useState("");
   const [startDate, setStartDate] = useState("");
   const [recurrence, setRecurrence] = useState<Recurrence>("mensual");
   const [periods, setPeriods] = useState("");
   const [status, setStatus] = useState<PaymentStatus>("al_dia");
 
+  // Reset form on open
+  useEffect(() => {
+    if (isOpen) {
+      if (contractedService) {
+        setContactId(contractedService.contact_id);
+        const contact = contacts.find((c) => c.id === contractedService.contact_id);
+
+        setContactInput(
+          contact ? `${contact.name || ""} ${contact.last_name || ""}`.trim() : "",
+        );
+        setCompanyId(contractedService.company_id);
+        const company = companies.find((c) => c.id === contractedService.company_id);
+
+        setCompanyName(company?.name || "");
+        const matchedService = services.find((s) => s.name === contractedService.service_name);
+
+        setServiceId(matchedService ? matchedService.id.toString() : "");
+        setServiceName(contractedService.service_name);
+        setServiceTypeName(contractedService.service_type_name);
+        setAmount(contractedService.amount.toString());
+        setStartDate(contractedService.start_date);
+        setRecurrence(contractedService.recurrence);
+        setPeriods(contractedService.periods.toString());
+        setStatus(contractedService.status);
+      } else {
+        setContactId("");
+        setContactInput("");
+        setCompanyId(0);
+        setCompanyName("");
+        setServiceId("");
+        setServiceName("");
+        setServiceTypeName("");
+        setAmount("");
+        setStartDate("");
+        setRecurrence("mensual");
+        setPeriods("");
+        setStatus("al_dia");
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, contractedService]);
+
+  // Contact options
+  const contactOptions = useMemo(
+    () =>
+      contacts.map((c) => ({
+        value: c.id,
+        label: `${c.name || ""} ${c.last_name || ""}`.trim() || c.email || "Sin nombre",
+      })),
+    [contacts],
+  );
+
+  // Service options (only active)
+  const serviceOptions = useMemo(
+    () =>
+      services
+        .filter((s) => s.is_active)
+        .map((s) => ({
+          value: s.id.toString(),
+          label: s.name,
+        })),
+    [services],
+  );
+
   const handleContactChange = (key: string | number | null) => {
     const id = key?.toString() || "";
 
     setContactId(id);
-    const contact = MOCK_CONTACTS.find((c) => c.value === id);
+    const contact = contacts.find((c) => c.id === id);
 
-    setContactInput(contact?.label || "");
-    setCompanyName(contact?.company || "");
+    setContactInput(
+      contact ? `${contact.name || ""} ${contact.last_name || ""}`.trim() : "",
+    );
+
+    if (contact?.company_id) {
+      setCompanyId(contact.company_id);
+      const company = companies.find((c) => c.id === contact.company_id);
+
+      setCompanyName(company?.name || "");
+    } else {
+      setCompanyId(0);
+      setCompanyName("");
+    }
   };
 
   const handleServiceChange = (keys: Set<string> | Set<number>) => {
     const selected = Array.from(keys)[0] as string;
 
     setServiceId(selected || "");
-    const service = MOCK_SERVICES.find((s) => s.value === selected);
+    const service = services.find((s) => s.id.toString() === selected);
 
-    if (service) setAmount(service.amount.toString());
+    if (service) {
+      setServiceName(service.name);
+      setServiceTypeName(service.service_type?.name || "");
+      setAmount(service.reference_amount.toString());
+    }
+  };
+
+  const endDate = calculateEndDate(startDate, recurrence, parseInt(periods) || 0);
+
+  const handleSubmit = () => {
+    if (!contactId || !companyId || !serviceName || !amount || !startDate || !periods) return;
+
+    onSave({
+      contact_id: contactId,
+      company_id: companyId,
+      service_name: serviceName,
+      service_type_name: serviceTypeName,
+      amount: parseFloat(amount) || 0,
+      start_date: startDate,
+      end_date: endDate,
+      recurrence,
+      periods: parseInt(periods) || 0,
+      status,
+    });
   };
 
   return (
@@ -99,7 +213,7 @@ export default function ContractedServiceDrawer({
         <DrawerHeader>
           <div className="bg-[#265197] p-3 flex w-full rounded-[8px]">
             <Text color="#FFFFFF" variant="label">
-              Nuevo servicio contratado
+              {contractedService ? "Editar servicio contratado" : "Nuevo servicio contratado"}
             </Text>
           </div>
         </DrawerHeader>
@@ -116,7 +230,7 @@ export default function ContractedServiceDrawer({
               label="Contacto"
               required
               menuTrigger="input"
-              options={MOCK_CONTACTS.map((c) => ({ value: c.value, label: c.label }))}
+              options={contactOptions}
               placeholder="Buscar contacto..."
               selectedKey={contactId}
               variant="bordered"
@@ -135,7 +249,7 @@ export default function ContractedServiceDrawer({
             <Select
               className="[&_button]:bg-white"
               label="Servicio"
-              options={MOCK_SERVICES.map((s) => ({ value: s.value, label: s.label }))}
+              options={serviceOptions}
               placeholder="Selecciona un servicio"
               required
               selectedKeys={serviceId ? [serviceId] : []}
@@ -192,6 +306,12 @@ export default function ContractedServiceDrawer({
               }}
             />
 
+            {endDate && (
+              <Text color="#678CC5" variant="label">
+                Fecha fin calculada: {new Date(endDate + "T00:00:00").toLocaleDateString("es-PE")}
+              </Text>
+            )}
+
             <Select
               className="[&_button]:bg-white"
               label="Estado"
@@ -214,10 +334,11 @@ export default function ContractedServiceDrawer({
           </Button>
           <Button
             isAdmin
-            isDisabled={!contactId || !serviceId || !amount || !startDate || !periods}
+            isDisabled={!contactId || !serviceName || !amount || !startDate || !periods}
             variant="primary"
+            onPress={handleSubmit}
           >
-            Crear servicio contratado
+            {contractedService ? "Guardar cambios" : "Crear servicio contratado"}
           </Button>
         </DrawerFooter>
       </DrawerContent>
