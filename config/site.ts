@@ -1,5 +1,5 @@
 export type SiteConfig = typeof siteConfig;
-import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck, Calendar, UserStar, Sparkles, Folder } from "lucide-react"
+import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck, Calendar, UserStar, Sparkles, Folder, Briefcase } from "lucide-react"
 
 const ROL_ADMIN = 1;
 const ROL_USER = 2;
@@ -137,6 +137,22 @@ export const siteConfig = {
 				// 	title: "Configuración",
 				// 	href: "/admin/CMS/configuracion",
 				// },
+			],
+		},
+		{
+			title: "GESTIÓN DE SERVICIOS",
+			icon: "Briefcase",
+			href: "/admin/gestion-servicios",
+			allowedRoles: [ROL_ADMIN],
+			subItems: [
+				{
+					title: "Servicios",
+					href: "/admin/gestion-servicios/servicios",
+				},
+				{
+					title: "Servicios Contratados",
+					href: "/admin/gestion-servicios/servicios-contratados",
+				},
 			],
 		},
 
