@@ -16,7 +16,7 @@ import FilterButtonGroup from "@/shared/components/citrica-ui/molecules/filter-b
 import { getContractedServiceColumns } from "./columns/contracted-service-columns";
 import ContractedServiceDrawer from "./components/contracted-service-drawer";
 import DeleteContractedServiceModal from "./components/delete-contracted-service-modal";
-import PaymentHistoryDrawer from "./components/payment-history-drawer";
+import PaymentHistoryModal from "./components/payment-history-modal";
 
 import type { ContractedService, ContractedServiceInput } from "@/hooks/contracted-services/use-contracted-services";
 
@@ -223,8 +223,8 @@ export default function ServiciosContratadosPage() {
           onSave={handleSave}
         />
 
-        {/* Drawer historial de pagos */}
-        <PaymentHistoryDrawer
+        {/* Modal historial de pagos */}
+        <PaymentHistoryModal
           isOpen={isHistoryOpen}
           contractedService={historyItem}
           onClose={() => {
