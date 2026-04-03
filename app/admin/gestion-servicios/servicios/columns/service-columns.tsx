@@ -1,8 +1,7 @@
-import { Tooltip } from "@heroui/tooltip";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { Switch } from "@heroui/switch";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
-import { Text, Icon } from "citrica-ui-toolkit";
+import { Text, Button, Icon } from "citrica-ui-toolkit";
 import type { Service } from "@/hooks/services/use-services";
 
 type ServiceColumnsConfig = {
@@ -71,32 +70,36 @@ export const getServiceColumns = ({
     uid: "actions",
     align: "end",
     render: (service) => (
-      <div className="relative flex justify-end items-center gap-2">
-        <Tooltip content="Editar">
-          <button
-            className="text-lg cursor-pointer active:opacity-50 text-default-400 hover:text-blue-500"
-            onClick={() => onEdit(service)}
-          >
-            <Icon name="Edit" size={20} />
-          </button>
-        </Tooltip>
-        <Dropdown shouldBlockScroll={false}>
+      <div
+        className="relative flex justify-end items-center gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Dropdown>
           <DropdownTrigger>
-            <button className="text-lg cursor-pointer active:opacity-50 text-default-400">
-              <Icon name="MoreVertical" size={20} />
-            </button>
+            <Button isAdmin={true} isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0 hover:!bg-transparent">
+              <Icon className="text-[#265197] w-5 h-5" name="EllipsisVertical" />
+            </Button>
           </DropdownTrigger>
           <DropdownMenu
             aria-label="Acciones servicio"
             onAction={(key) => {
-              if (key === "delete") onDelete(service);
+              switch (key) {
+                case "edit":
+                  onEdit(service);
+                  break;
+                case "delete":
+                  onDelete(service);
+                  break;
+              }
             }}
           >
+            <DropdownItem key="edit">
+              Editar
+            </DropdownItem>
             <DropdownItem
               key="delete"
               className="text-danger"
               color="danger"
-              startContent={<Icon name="Trash2" size={16} />}
             >
               Eliminar
             </DropdownItem>
