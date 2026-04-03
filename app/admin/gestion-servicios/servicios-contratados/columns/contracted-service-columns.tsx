@@ -7,6 +7,8 @@ import { Text, Icon } from "citrica-ui-toolkit";
 import type { ContractedService } from "@/hooks/contracted-services/use-contracted-services";
 import { RECURRENCE_LABELS, STATUS_LABELS } from "../types";
 
+import type { Recurrence, PaymentStatus } from "../types";
+
 type ContractedServiceColumnsConfig = {
   onEdit: (item: ContractedService) => void;
   onDelete: (item: ContractedService) => void;
@@ -68,7 +70,7 @@ export const getContractedServiceColumns = ({
           {formatAmount(item.amount)}
         </Text>
         <Text color="#678CC5" variant="label">
-          {RECURRENCE_LABELS[item.recurrence]} x {item.periods}
+          {RECURRENCE_LABELS[item.recurrence as Recurrence]} x {item.periods}
         </Text>
       </div>
     ),
@@ -96,7 +98,7 @@ export const getContractedServiceColumns = ({
         size="sm"
         variant="flat"
       >
-        {STATUS_LABELS[item.status]}
+        {STATUS_LABELS[item.status as PaymentStatus]}
       </Chip>
     ),
   },
