@@ -1,16 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-  DrawerFooter,
-} from "@heroui/drawer";
 import { Switch } from "@heroui/switch";
 
-import { Text, Button, Input, Textarea } from "citrica-ui-toolkit";
+import { Button, Input } from "citrica-ui-toolkit";
+import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 
 import type { ServiceType, ServiceTypeInput } from "@/hooks/services/use-service-types";
 
@@ -57,66 +51,12 @@ export default function ServiceTypeDrawer({
   };
 
   return (
-    <Drawer
-      className="bg-[#F4F4F5] rounded-tl-[40px] rounded-bl-[40px]"
+    <DrawerCitricaAdmin
       isOpen={isOpen}
-      size="lg"
+      title={serviceType ? "Editar tipo de servicio" : "Nuevo tipo de servicio"}
       onClose={onClose}
-    >
-      <DrawerContent>
-        <DrawerHeader>
-          <div className="bg-[#265197] p-3 flex w-full rounded-[8px]">
-            <Text color="#FFFFFF" variant="label">
-              {serviceType ? "Editar tipo de servicio" : "Nuevo tipo de servicio"}
-            </Text>
-          </div>
-        </DrawerHeader>
-
-        <DrawerBody>
-          <div className="flex flex-col gap-4">
-            <Input
-              label="Nombre"
-              placeholder="Ej: Hosting, Mantenimiento, Diseño Web"
-              required
-              value={formData.name}
-              variant="primary"
-              onValueChange={(value) =>
-                setFormData({ ...formData, name: value })
-              }
-            />
-
-            <Input
-              label="Descripción (opcional)"
-              placeholder="Describe brevemente este tipo de servicio"
-              value={formData.description}
-              variant="primary"
-              onValueChange={(value) =>
-                setFormData({ ...formData, description: value })
-              }
-            />
-
-            <div className="flex items-center gap-2">
-              <Text color="#A1A1AA" variant="label">
-                Tipo activo
-              </Text>
-              <Switch
-                classNames={{
-                  base: "group !bg-transparent transition-colors scale-75",
-                  wrapper:
-                    "bg-gray-300 group-data-[selected=true]:bg-[#265197] rounded-full transition-colors",
-                  thumb: "!bg-white",
-                }}
-                color="default"
-                isSelected={formData.is_active}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, is_active: value })
-                }
-              />
-            </div>
-          </div>
-        </DrawerBody>
-
-        <DrawerFooter className="justify-end gap-2">
+      footer={
+        <div className="flex justify-end gap-2 w-full">
           <Button isAdmin variant="flat" onPress={onClose}>
             Cancelar
           </Button>
@@ -128,8 +68,47 @@ export default function ServiceTypeDrawer({
           >
             {serviceType ? "Guardar cambios" : "Crear tipo"}
           </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </div>
+      }
+    >
+      <div className="flex flex-col gap-4">
+        <Input
+          label="Nombre"
+          placeholder="Ej: Hosting, Mantenimiento, Diseño Web"
+          required
+          value={formData.name}
+          variant="primary"
+          onValueChange={(value) =>
+            setFormData({ ...formData, name: value })
+          }
+        />
+
+        <Input
+          label="Descripción (opcional)"
+          placeholder="Describe brevemente este tipo de servicio"
+          value={formData.description}
+          variant="primary"
+          onValueChange={(value) =>
+            setFormData({ ...formData, description: value })
+          }
+        />
+
+        <div className="flex items-center gap-2">
+          <Switch
+            classNames={{
+              base: "group !bg-transparent transition-colors scale-75",
+              wrapper:
+                "bg-gray-300 group-data-[selected=true]:bg-[#265197] rounded-full transition-colors",
+              thumb: "!bg-white",
+            }}
+            color="default"
+            isSelected={formData.is_active}
+            onValueChange={(value) =>
+              setFormData({ ...formData, is_active: value })
+            }
+          />
+        </div>
+      </div>
+    </DrawerCitricaAdmin>
   );
 }

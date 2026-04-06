@@ -1,16 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-  DrawerFooter,
-} from "@heroui/drawer";
 import { Switch } from "@heroui/switch";
 
 import { Text, Button, Input, Select } from "citrica-ui-toolkit";
+import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 
 import type { Service, ServiceInput } from "@/hooks/services/use-services";
 import type { ServiceType } from "@/hooks/services/use-service-types";
@@ -70,85 +64,12 @@ export default function ServiceDrawer({
   }));
 
   return (
-    <Drawer
-      className="bg-[#F4F4F5] rounded-tl-[40px] rounded-bl-[40px]"
+    <DrawerCitricaAdmin
       isOpen={isOpen}
-      size="lg"
+      title={service ? "Editar servicio" : "Nuevo servicio"}
       onClose={onClose}
-    >
-      <DrawerContent>
-        <DrawerHeader>
-          <div className="bg-[#265197] p-3 flex w-full rounded-[8px]">
-            <Text color="#FFFFFF" variant="label">
-              {service ? "Editar servicio" : "Nuevo servicio"}
-            </Text>
-          </div>
-        </DrawerHeader>
-
-        <DrawerBody>
-          <div className="flex flex-col gap-4">
-            <Input
-              label="Nombre"
-              placeholder="Ej: Hosting básico"
-              required
-              value={formData.name}
-              variant="primary"
-              onValueChange={(value) =>
-                setFormData({ ...formData, name: value })
-              }
-            />
-
-            <Select
-              className="[&_button]:bg-white"
-              label="Tipo de servicio"
-              options={selectOptions}
-              placeholder="Selecciona un tipo"
-              required
-              selectedKeys={formData.type_id ? [formData.type_id.toString()] : []}
-              variant="bordered"
-              onSelectionChange={(keys) => {
-                const selected = Array.from(keys)[0] as string;
-
-                setFormData({ ...formData, type_id: parseInt(selected) || 0 });
-              }}
-            />
-
-            <Input
-              label="Monto referencial (S/.)"
-              placeholder="Ej: 50"
-              type="number"
-              value={formData.reference_amount.toString()}
-              variant="primary"
-              onValueChange={(value) =>
-                setFormData({
-                  ...formData,
-                  reference_amount: parseFloat(value) || 0,
-                })
-              }
-            />
-
-            <div className="flex items-center gap-2">
-              <Text color="#A1A1AA" variant="label">
-                Servicio activo
-              </Text>
-              <Switch
-                classNames={{
-                  base: "group !bg-transparent transition-colors scale-75",
-                  wrapper:
-                    "bg-gray-300 group-data-[selected=true]:bg-[#265197] rounded-full transition-colors",
-                  thumb: "!bg-white",
-                }}
-                color="default"
-                isSelected={formData.is_active}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, is_active: value })
-                }
-              />
-            </div>
-          </div>
-        </DrawerBody>
-
-        <DrawerFooter className="justify-end gap-2">
+      footer={
+        <div className="flex justify-end gap-2 w-full">
           <Button isAdmin variant="flat" onPress={onClose}>
             Cancelar
           </Button>
@@ -160,8 +81,69 @@ export default function ServiceDrawer({
           >
             {service ? "Guardar cambios" : "Crear servicio"}
           </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </div>
+      }
+    >
+      <div className="flex flex-col gap-4">
+        <Input
+          label="Nombre"
+          placeholder="Ej: Hosting básico"
+          required
+          value={formData.name}
+          variant="primary"
+          onValueChange={(value) =>
+            setFormData({ ...formData, name: value })
+          }
+        />
+
+        <Select
+          className="[&_button]:bg-white"
+          label="Tipo de servicio"
+          options={selectOptions}
+          placeholder="Selecciona un tipo"
+          required
+          selectedKeys={formData.type_id ? [formData.type_id.toString()] : []}
+          variant="bordered"
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0] as string;
+
+            setFormData({ ...formData, type_id: parseInt(selected) || 0 });
+          }}
+        />
+
+        <Input
+          label="Monto referencial (S/.)"
+          placeholder="Ej: 50"
+          type="number"
+          value={formData.reference_amount.toString()}
+          variant="primary"
+          onValueChange={(value) =>
+            setFormData({
+              ...formData,
+              reference_amount: parseFloat(value) || 0,
+            })
+          }
+        />
+
+        <div className="flex items-center gap-2">
+          <Text color="#A1A1AA" variant="label">
+            Servicio activo
+          </Text>
+          <Switch
+            classNames={{
+              base: "group !bg-transparent transition-colors scale-75",
+              wrapper:
+                "bg-gray-300 group-data-[selected=true]:bg-[#265197] rounded-full transition-colors",
+              thumb: "!bg-white",
+            }}
+            color="default"
+            isSelected={formData.is_active}
+            onValueChange={(value) =>
+              setFormData({ ...formData, is_active: value })
+            }
+          />
+        </div>
+      </div>
+    </DrawerCitricaAdmin>
   );
 }

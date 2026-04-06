@@ -1,11 +1,12 @@
-import { Tooltip } from "@heroui/tooltip";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
 import { Chip } from "@heroui/chip";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
-import { Text, Icon } from "citrica-ui-toolkit";
+import { Text, Button, Icon } from "citrica-ui-toolkit";
 
 import type { ContractedService } from "@/hooks/contracted-services/use-contracted-services";
 import { RECURRENCE_LABELS, STATUS_LABELS } from "../types";
+
+import type { Recurrence, PaymentStatus } from "../types";
 
 type ContractedServiceColumnsConfig = {
   onEdit: (item: ContractedService) => void;
@@ -68,7 +69,7 @@ export const getContractedServiceColumns = ({
           {formatAmount(item.amount)}
         </Text>
         <Text color="#678CC5" variant="label">
-          {RECURRENCE_LABELS[item.recurrence]} x {item.periods}
+          {RECURRENCE_LABELS[item.recurrence as Recurrence]} x {item.periods}
         </Text>
       </div>
     ),
@@ -96,7 +97,7 @@ export const getContractedServiceColumns = ({
         size="sm"
         variant="flat"
       >
-        {STATUS_LABELS[item.status]}
+        {STATUS_LABELS[item.status as PaymentStatus]}
       </Chip>
     ),
   },
@@ -105,40 +106,46 @@ export const getContractedServiceColumns = ({
     uid: "actions",
     align: "end",
     render: (item) => (
-      <div className="relative flex justify-end items-center gap-2">
-        <Tooltip content="Ver detalle">
-          <button
-            className="text-lg cursor-pointer active:opacity-50 text-default-400 hover:text-blue-500"
-            onClick={() => onViewDetail(item)}
-          >
-            <Icon name="Eye" size={20} />
-          </button>
-        </Tooltip>
-        <Tooltip content="Editar">
-          <button
-            className="text-lg cursor-pointer active:opacity-50 text-default-400 hover:text-blue-500"
-            onClick={() => onEdit(item)}
-          >
-            <Icon name="Edit" size={20} />
-          </button>
-        </Tooltip>
-        <Dropdown shouldBlockScroll={false}>
+      <div
+        className="relative flex justify-end items-center gap-2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Button
+          isAdmin={true}
+          isIconOnly
+          variant="flat"
+          className="hover:!bg-transparent !p-1 !min-w-0"
+          onPress={() => onViewDetail(item)}
+        >
+          <Icon className="w-5 h-5 text-[#265197]" name="Eye" />
+        </Button>
+
+        <Dropdown>
           <DropdownTrigger>
-            <button className="text-lg cursor-pointer active:opacity-50 text-default-400">
-              <Icon name="MoreVertical" size={20} />
-            </button>
+            <Button isAdmin={true} isIconOnly variant="flat" size="sm" className="!p-1 !min-w-0 hover:!bg-transparent">
+              <Icon className="text-[#265197] w-5 h-5" name="EllipsisVertical" />
+            </Button>
           </DropdownTrigger>
           <DropdownMenu
             aria-label="Acciones servicio contratado"
             onAction={(key) => {
-              if (key === "delete") onDelete(item);
+              switch (key) {
+                case "edit":
+                  onEdit(item);
+                  break;
+                case "delete":
+                  onDelete(item);
+                  break;
+              }
             }}
           >
+            <DropdownItem key="edit">
+              Editar
+            </DropdownItem>
             <DropdownItem
               key="delete"
               className="text-danger"
               color="danger"
-              startContent={<Icon name="Trash2" size={16} />}
             >
               Eliminar
             </DropdownItem>

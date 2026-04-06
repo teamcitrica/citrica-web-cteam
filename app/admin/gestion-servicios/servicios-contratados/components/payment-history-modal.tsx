@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-} from "@heroui/drawer";
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+} from "@heroui/modal";
+import { Divider } from "@heroui/divider";
 import { Chip } from "@heroui/chip";
 import {
   Table,
@@ -17,7 +18,6 @@ import {
   TableCell,
 } from "@heroui/table";
 import { Spinner } from "@heroui/spinner";
-
 import { Tooltip } from "@heroui/tooltip";
 
 import { Text, Icon } from "citrica-ui-toolkit";
@@ -55,19 +55,19 @@ const STATUS_CHIP_CONFIG: Record<VisualStatus, { color: "success" | "danger" | "
   programado: { color: "default", label: "Programado" },
 };
 
-interface PaymentHistoryDrawerProps {
+interface PaymentHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
   contractedService: ContractedService | null;
   onStatusUpdated?: () => void;
 }
 
-export default function PaymentHistoryDrawer({
+export default function PaymentHistoryModal({
   isOpen,
   onClose,
   contractedService,
   onStatusUpdated,
-}: PaymentHistoryDrawerProps) {
+}: PaymentHistoryModalProps) {
   const {
     payments,
     isLoading,
@@ -106,25 +106,23 @@ export default function PaymentHistoryDrawer({
 
   return (
     <>
-      <Drawer
-        className="bg-[#F4F4F5] rounded-tl-[40px] rounded-bl-[40px]"
+      <Modal
         isOpen={isOpen}
-        size="xl"
+        scrollBehavior="inside"
+        size="4xl"
         onClose={onClose}
       >
-        <DrawerContent>
-          <DrawerHeader>
-            <div className="bg-[#265197] p-3 flex flex-col w-full rounded-[8px]">
-              <Text color="#FFFFFF" variant="label" weight="bold">
-                Historial de Pagos
-              </Text>
-              <Text color="#D4DEED" variant="label">
-                {contractedService?.service_name} — {contactName}
-              </Text>
-            </div>
-          </DrawerHeader>
-
-          <DrawerBody>
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1 pb-2">
+            <Text color="#265197" variant="body" weight="bold">
+              Historial de Pagos
+            </Text>
+            <Text color="#678CC5" variant="label">
+              {contractedService?.service_name} — {contactName}
+            </Text>
+          </ModalHeader>
+          <Divider className="bg-[#A7BDE2]" />
+          <ModalBody className="py-4">
             {isLoading ? (
               <div className="flex justify-center py-8">
                 <Spinner color="primary" />
@@ -219,9 +217,9 @@ export default function PaymentHistoryDrawer({
                 </TableBody>
               </Table>
             )}
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
 
       {paymentToMark && (
         <MarkPaidModal

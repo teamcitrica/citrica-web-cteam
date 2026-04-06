@@ -1,17 +1,11 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-  DrawerFooter,
-} from "@heroui/drawer";
 
 import { addToast } from "@heroui/toast";
 
 import { Text, Button, Input, Select, Autocomplete } from "citrica-ui-toolkit";
+import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 
 import { RECURRENCE_LABELS } from "../types";
 
@@ -213,132 +207,12 @@ export default function ContractedServiceDrawer({
   };
 
   return (
-    <Drawer
-      className="bg-[#F4F4F5] rounded-tl-[40px] rounded-bl-[40px]"
+    <DrawerCitricaAdmin
       isOpen={isOpen}
-      size="lg"
+      title={contractedService ? "Editar servicio contratado" : "Nuevo servicio contratado"}
       onClose={onClose}
-    >
-      <DrawerContent>
-        <DrawerHeader>
-          <div className="bg-[#265197] p-3 flex w-full rounded-[8px]">
-            <Text color="#FFFFFF" variant="label">
-              {contractedService ? "Editar servicio contratado" : "Nuevo servicio contratado"}
-            </Text>
-          </div>
-        </DrawerHeader>
-
-        <DrawerBody>
-          <div className="flex flex-col gap-4">
-            <Autocomplete
-              className="[&>div>div]:bg-white [&>div>div]:!border-[#D4DEED]"
-              classNames={autocompleteClassNames}
-              allowsCustomValue={false}
-              fullWidth
-              isClearable
-              inputValue={contactInput}
-              label="Contacto"
-              required
-              menuTrigger="input"
-              options={contactOptions}
-              placeholder="Buscar contacto..."
-              selectedKey={contactId}
-              variant="bordered"
-              onInputChange={setContactInput}
-              onSelectionChange={handleContactChange}
-            />
-
-            <Input
-              isReadOnly
-              label="Empresa"
-              placeholder="Se completa al seleccionar contacto"
-              value={companyName}
-              variant="primary"
-            />
-
-            <Select
-              className="[&_button]:bg-white"
-              label="Servicio"
-              options={serviceOptions}
-              placeholder="Selecciona un servicio"
-              required
-              selectedKeys={serviceId ? [serviceId] : []}
-              variant="bordered"
-              onSelectionChange={handleServiceChange}
-            />
-
-            <Input
-              label="Monto (S/.)"
-              placeholder="Ej: 1500.00"
-              required
-              type="number"
-              value={amount}
-              variant="primary"
-              onValueChange={setAmount}
-            />
-
-            <Input
-              label="Fecha de inicio"
-              placeholder="dd/mm/aaaa"
-              required
-              type="date"
-              value={startDate}
-              variant="primary"
-              onValueChange={setStartDate}
-            />
-
-            <Select
-              className="[&_button]:bg-white"
-              label="Recurrencia"
-              options={recurrenceOptions}
-              placeholder="Selecciona recurrencia"
-              required
-              selectedKeys={[recurrence]}
-              variant="bordered"
-              onSelectionChange={(keys) => {
-                const selected = Array.from(keys)[0] as string;
-
-                if (selected) setRecurrence(selected as Recurrence);
-              }}
-            />
-
-            <Input
-              label="Cantidad de periodos"
-              placeholder="Ej: 12"
-              required
-              type="number"
-              value={periods}
-              variant="primary"
-              onValueChange={(value) => {
-                const num = value.replace(/[^0-9]/g, "");
-
-                setPeriods(num);
-              }}
-            />
-
-            {endDate && (
-              <Text color="#678CC5" variant="label">
-                Fecha fin calculada: {new Date(endDate + "T00:00:00").toLocaleDateString("es-PE")}
-              </Text>
-            )}
-
-            <Select
-              className="[&_button]:bg-white"
-              label="Estado"
-              options={statusOptions}
-              placeholder="Selecciona estado"
-              selectedKeys={[status]}
-              variant="bordered"
-              onSelectionChange={(keys) => {
-                const selected = Array.from(keys)[0] as string;
-
-                if (selected) setStatus(selected as PaymentStatus);
-              }}
-            />
-          </div>
-        </DrawerBody>
-
-        <DrawerFooter className="justify-end gap-2">
+      footer={
+        <div className="flex justify-end gap-2 w-full">
           <Button isAdmin variant="flat" onPress={onClose}>
             Cancelar
           </Button>
@@ -350,8 +224,116 @@ export default function ContractedServiceDrawer({
           >
             {contractedService ? "Guardar cambios" : "Crear servicio contratado"}
           </Button>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </div>
+      }
+    >
+      <div className="flex flex-col gap-4">
+        <Autocomplete
+          className="[&>div>div]:bg-white [&>div>div]:!border-[#D4DEED]"
+          classNames={autocompleteClassNames}
+          allowsCustomValue={false}
+          fullWidth
+          isClearable
+          inputValue={contactInput}
+          label="Contacto"
+          required
+          menuTrigger="input"
+          options={contactOptions}
+          placeholder="Buscar contacto..."
+          selectedKey={contactId}
+          variant="bordered"
+          onInputChange={setContactInput}
+          onSelectionChange={handleContactChange}
+        />
+
+        <Input
+          isReadOnly
+          label="Empresa"
+          placeholder="Se completa al seleccionar contacto"
+          value={companyName}
+          variant="primary"
+        />
+
+        <Select
+          className="[&_button]:bg-white"
+          label="Servicio"
+          options={serviceOptions}
+          placeholder="Selecciona un servicio"
+          required
+          selectedKeys={serviceId ? [serviceId] : []}
+          variant="bordered"
+          onSelectionChange={handleServiceChange}
+        />
+
+        <Input
+          label="Monto (S/.)"
+          placeholder="Ej: 1500.00"
+          required
+          type="number"
+          value={amount}
+          variant="primary"
+          onValueChange={setAmount}
+        />
+
+        <Input
+          label="Fecha de inicio"
+          placeholder="dd/mm/aaaa"
+          required
+          type="date"
+          value={startDate}
+          variant="primary"
+          onValueChange={setStartDate}
+        />
+
+        <Select
+          className="[&_button]:bg-white"
+          label="Recurrencia"
+          options={recurrenceOptions}
+          placeholder="Selecciona recurrencia"
+          required
+          selectedKeys={[recurrence]}
+          variant="bordered"
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0] as string;
+
+            if (selected) setRecurrence(selected as Recurrence);
+          }}
+        />
+
+        <Input
+          label="Cantidad de periodos"
+          placeholder="Ej: 12"
+          required
+          type="number"
+          value={periods}
+          variant="primary"
+          onValueChange={(value) => {
+            const num = value.replace(/[^0-9]/g, "");
+
+            setPeriods(num);
+          }}
+        />
+
+        {endDate && (
+          <Text color="#678CC5" variant="label">
+            Fecha fin calculada: {new Date(endDate + "T00:00:00").toLocaleDateString("es-PE")}
+          </Text>
+        )}
+
+        <Select
+          className="[&_button]:bg-white"
+          label="Estado"
+          options={statusOptions}
+          placeholder="Selecciona estado"
+          selectedKeys={[status]}
+          variant="bordered"
+          onSelectionChange={(keys) => {
+            const selected = Array.from(keys)[0] as string;
+
+            if (selected) setStatus(selected as PaymentStatus);
+          }}
+        />
+      </div>
+    </DrawerCitricaAdmin>
   );
 }
