@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 
 import { addToast } from "@heroui/toast";
+import { Switch } from "@heroui/switch";
 
 import { Text, Button, Input, Select, Autocomplete } from "citrica-ui-toolkit";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
@@ -79,6 +80,7 @@ export default function ContractedServiceDrawer({
   const [startDate, setStartDate] = useState("");
   const [recurrence, setRecurrence] = useState<Recurrence>("mensual");
   const [periods, setPeriods] = useState("");
+  const [isIndefinite, setIsIndefinite] = useState(false);
   const [status, setStatus] = useState<PaymentStatus>("al_dia");
 
   // Reset form on open
@@ -103,7 +105,8 @@ export default function ContractedServiceDrawer({
         setAmount(contractedService.amount.toString());
         setStartDate(contractedService.start_date);
         setRecurrence(contractedService.recurrence);
-        setPeriods(contractedService.periods.toString());
+        setIsIndefinite(contractedService.is_indefinite);
+        setPeriods(contractedService.is_indefinite ? "" : contractedService.periods.toString());
         setStatus(contractedService.status);
       } else {
         setContactId("");
@@ -117,6 +120,7 @@ export default function ContractedServiceDrawer({
         setStartDate("");
         setRecurrence("mensual");
         setPeriods("");
+        setIsIndefinite(false);
         setStatus("al_dia");
       }
     }
@@ -182,7 +186,7 @@ export default function ContractedServiceDrawer({
   const endDate = calculateEndDate(startDate, recurrence, parseInt(periods) || 0);
 
   const handleSubmit = () => {
-    if (!contactId || !companyId || !serviceName || !amount || !startDate || !periods) {
+    if (!contactId || !companyId || !serviceName || !amount || !startDate || (!isIndefinite && !periods)) {
       addToast({
         title: "Faltan datos",
         description: "Por favor completa todos los campos obligatorios",
@@ -199,9 +203,10 @@ export default function ContractedServiceDrawer({
       service_type_name: serviceTypeName,
       amount: parseFloat(amount) || 0,
       start_date: startDate,
-      end_date: endDate,
+      end_date: isIndefinite ? null : endDate,
       recurrence,
-      periods: parseInt(periods) || 0,
+      periods: isIndefinite ? 0 : parseInt(periods) || 0,
+      is_indefinite: isIndefinite,
       status,
     });
   };
@@ -218,7 +223,7 @@ export default function ContractedServiceDrawer({
           </Button>
           <Button
             isAdmin
-            isDisabled={!contactId || !serviceName || !amount || !startDate || !periods}
+            isDisabled={!contactId || !serviceName || !amount || !startDate || (!isIndefinite && !periods)}
             variant="primary"
             onPress={handleSubmit}
           >
@@ -300,25 +305,48 @@ export default function ContractedServiceDrawer({
           }}
         />
 
-        <Input
-          label="Cantidad de periodos"
-          placeholder="Ej: 12"
-          required
-          type="number"
-          value={periods}
-          variant="primary"
-          onValueChange={(value) => {
-            const num = value.replace(/[^0-9]/g, "");
+        <div className="flex items-end gap-3">
+          <Input
+            className="flex-1"
+            label="Cantidad de periodos"
+            placeholder="Ej: 12"
+            readOnly={isIndefinite}
+            required={!isIndefinite}
+            type="number"
+            value={isIndefinite ? "" : periods}
+            variant="primary"
+            onValueChange={(value) => {
+              const num = value.replace(/[^0-9]/g, "");
 
-            setPeriods(num);
-          }}
-        />
+              setPeriods(num);
+            }}
+          />
+          <div className="flex items-center gap-2 pb-2">
+            <Switch
+              classNames={{
+                base: "group !bg-transparent transition-colors scale-75",
+                wrapper:
+                  "bg-gray-300 group-data-[selected=true]:bg-[#265197] rounded-full transition-colors",
+                thumb: "!bg-white",
+              }}
+              color="default"
+              isSelected={isIndefinite}
+              onValueChange={(value) => {
+                setIsIndefinite(value);
+                if (value) setPeriods("");
+              }}
+            />
+            <Text color="#265197" variant="label">Indefinido</Text>
+          </div>
+        </div>
 
-        {endDate && (
+        {isIndefinite ? (
+          <Text color="#678CC5" variant="label">Vigencia indefinida</Text>
+        ) : endDate ? (
           <Text color="#678CC5" variant="label">
             Fecha fin calculada: {new Date(endDate + "T00:00:00").toLocaleDateString("es-PE")}
           </Text>
-        )}
+        ) : null}
 
         <Select
           className="[&_button]:bg-white"

@@ -17,9 +17,10 @@ export interface ContractedService {
   service_type_name: string;
   amount: number;
   start_date: string;
-  end_date: string;
+  end_date: string | null;
   recurrence: Recurrence;
   periods: number;
+  is_indefinite: boolean;
   status: PaymentStatus;
   created_at: string;
   updated_at: string;
@@ -41,9 +42,10 @@ export interface ContractedServiceInput {
   service_type_name: string;
   amount: number;
   start_date: string;
-  end_date: string;
+  end_date: string | null;
   recurrence: Recurrence;
   periods: number;
+  is_indefinite: boolean;
   status: PaymentStatus;
 }
 
@@ -97,6 +99,7 @@ export function useContractedServices() {
             end_date: data.end_date,
             recurrence: data.recurrence,
             periods: data.periods,
+            is_indefinite: data.is_indefinite,
             status: data.status,
           }])
           .select("id")
@@ -145,6 +148,7 @@ export function useContractedServices() {
             end_date: data.end_date,
             recurrence: data.recurrence,
             periods: data.periods,
+            is_indefinite: data.is_indefinite,
             status: data.status,
             updated_at: new Date().toISOString(),
           })

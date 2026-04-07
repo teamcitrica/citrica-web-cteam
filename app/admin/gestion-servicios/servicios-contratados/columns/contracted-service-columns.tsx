@@ -69,7 +69,7 @@ export const getContractedServiceColumns = ({
           {formatAmount(item.amount)}
         </Text>
         <Text color="#678CC5" variant="label">
-          {RECURRENCE_LABELS[item.recurrence as Recurrence]} x {item.periods}
+          {RECURRENCE_LABELS[item.recurrence as Recurrence]} {item.is_indefinite ? "· Indefinido" : `x ${item.periods}`}
         </Text>
       </div>
     ),
@@ -83,7 +83,7 @@ export const getContractedServiceColumns = ({
           {formatDate(item.start_date)}
         </Text>
         <Text color="#678CC5" variant="label">
-          {formatDate(item.end_date)}
+          {item.is_indefinite || !item.end_date ? "Indefinido" : formatDate(item.end_date)}
         </Text>
       </div>
     ),

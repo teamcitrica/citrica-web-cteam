@@ -182,12 +182,14 @@ export function useServicePayments() {
       recurrence: Recurrence,
       periods: number,
       amount: number,
+      isIndefinite: boolean = false,
     ): Promise<boolean> => {
       try {
         const monthsPerPeriod = RECURRENCE_MONTHS[recurrence];
+        const effectivePeriods = isIndefinite ? 12 : periods;
         const paymentsToInsert = [];
 
-        for (let i = 0; i < periods; i++) {
+        for (let i = 0; i < effectivePeriods; i++) {
           const dueDate = new Date(startDate + "T00:00:00");
 
           dueDate.setMonth(dueDate.getMonth() + monthsPerPeriod * (i + 1));
@@ -229,6 +231,7 @@ export function useServicePayments() {
       recurrence: Recurrence,
       periods: number,
       amount: number,
+      isIndefinite: boolean = false,
     ): Promise<boolean> => {
       try {
         // Verificar si hay pagos pagados
@@ -267,6 +270,7 @@ export function useServicePayments() {
           recurrence,
           periods,
           amount,
+          isIndefinite,
         );
 
         return true;

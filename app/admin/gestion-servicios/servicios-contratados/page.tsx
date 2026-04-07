@@ -97,7 +97,8 @@ export default function ServiciosContratadosPage() {
       const dateChanged =
         data.start_date !== selectedItem.start_date ||
         data.recurrence !== selectedItem.recurrence ||
-        data.periods !== selectedItem.periods;
+        data.periods !== selectedItem.periods ||
+        data.is_indefinite !== selectedItem.is_indefinite;
 
       if (dateChanged) {
         const canRegenerate = await regeneratePayments(
@@ -106,6 +107,7 @@ export default function ServiciosContratadosPage() {
           data.recurrence,
           data.periods,
           data.amount,
+          data.is_indefinite,
         );
 
         if (!canRegenerate) return;
@@ -124,6 +126,7 @@ export default function ServiciosContratadosPage() {
           data.recurrence,
           data.periods,
           data.amount,
+          data.is_indefinite,
         );
         handleCloseDrawer();
       }
