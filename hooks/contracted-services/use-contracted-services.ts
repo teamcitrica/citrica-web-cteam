@@ -28,6 +28,8 @@ export interface ContractedService {
     id: string;
     name: string | null;
     last_name: string | null;
+    email: string | null;
+    phone: string | null;
   };
   company?: {
     id: number;
@@ -62,7 +64,7 @@ export function useContractedServices() {
         .from("contracted_services")
         .select(`
           *,
-          contact:contact(id, name, last_name),
+          contact:contact(id, name, last_name, email, phone),
           company:company(id, name)
         `)
         .order("created_at", { ascending: false });

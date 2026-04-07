@@ -8,6 +8,7 @@ import {
   ModalBody,
 } from "@heroui/modal";
 import { Divider } from "@heroui/divider";
+import { addToast } from "@heroui/toast";
 import { Chip } from "@heroui/chip";
 import {
   Table,
@@ -120,6 +121,34 @@ export default function PaymentHistoryModal({
             <Text color="#678CC5" variant="label">
               {contractedService?.service_name} — {contactName}
             </Text>
+            <div className="flex gap-4 mt-1">
+              {contractedService?.contact?.email && (
+                <button
+                  className="flex items-center gap-1 cursor-pointer hover:opacity-70"
+                  onClick={() => {
+                    navigator.clipboard.writeText(contractedService.contact?.email || "");
+                    addToast({ title: "Copiado", description: "Email copiado al portapapeles", color: "success" });
+                  }}
+                >
+                  <Icon name="Mail" size={12} />
+                  <Text color="#678CC5" variant="label">{contractedService.contact.email}</Text>
+                  <Icon name="Copy" size={12} />
+                </button>
+              )}
+              {contractedService?.contact?.phone && (
+                <button
+                  className="flex items-center gap-1 cursor-pointer hover:opacity-70"
+                  onClick={() => {
+                    navigator.clipboard.writeText(contractedService.contact?.phone || "");
+                    addToast({ title: "Copiado", description: "Teléfono copiado al portapapeles", color: "success" });
+                  }}
+                >
+                  <Icon name="Phone" size={12} />
+                  <Text color="#678CC5" variant="label">{contractedService.contact.phone}</Text>
+                  <Icon name="Copy" size={12} />
+                </button>
+              )}
+            </div>
           </ModalHeader>
           <Divider className="bg-[#A7BDE2]" />
           <ModalBody className="py-4">
