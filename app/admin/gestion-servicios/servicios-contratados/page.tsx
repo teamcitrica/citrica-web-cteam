@@ -157,7 +157,7 @@ export default function ServiciosContratadosPage() {
 
   // Opciones de filtro empresa
   const companyOptions = useMemo(() => {
-    const uniqueIds = [...new Set(contractedServices.map((d) => d.company_id))];
+    const uniqueIds = Array.from(new Set(contractedServices.map((d) => d.company_id)));
 
     return [
       { id: "all", name: "Todas las empresas" },

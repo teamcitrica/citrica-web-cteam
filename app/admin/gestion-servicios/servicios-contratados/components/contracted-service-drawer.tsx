@@ -166,8 +166,8 @@ export default function ContractedServiceDrawer({
     }
   };
 
-  const handleServiceChange = (keys: Set<string> | Set<number>) => {
-    const selected = Array.from(keys)[0] as string;
+  const handleServiceChange = (keys: unknown) => {
+    const selected = Array.from(keys as Iterable<string>)[0] as string;
 
     setServiceId(selected || "");
     const service = services.find((s) => s.id.toString() === selected);
@@ -247,7 +247,7 @@ export default function ContractedServiceDrawer({
         />
 
         <Input
-          isReadOnly
+          readOnly
           label="Empresa"
           placeholder="Se completa al seleccionar contacto"
           value={companyName}
