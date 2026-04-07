@@ -5,7 +5,9 @@ import { addToast } from "@heroui/toast";
 
 import { useSupabase } from "@/shared/context/supabase-context";
 
-export type { Recurrence, PaymentStatus } from "@/app/admin/gestion-servicios/servicios-contratados/types";
+import type { Recurrence, PaymentStatus } from "@/app/admin/gestion-servicios/servicios-contratados/types";
+
+export type { Recurrence, PaymentStatus };
 
 export interface ContractedService {
   id: number;
