@@ -46,6 +46,7 @@ function calculateEndDate(startDate: string, recurrence: Recurrence, periods: nu
   const months = RECURRENCE_MONTHS[recurrence] * periods;
 
   date.setMonth(date.getMonth() + months);
+  date.setDate(date.getDate() - 1);
 
   return date.toISOString().split("T")[0];
 }
