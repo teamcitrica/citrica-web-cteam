@@ -192,7 +192,7 @@ export function useServicePayments() {
         for (let i = 0; i < effectivePeriods; i++) {
           const dueDate = new Date(startDate + "T00:00:00");
 
-          dueDate.setMonth(dueDate.getMonth() + monthsPerPeriod * (i + 1));
+          dueDate.setMonth(dueDate.getMonth() + monthsPerPeriod * i);
 
           paymentsToInsert.push({
             contracted_service_id: contractedServiceId,
