@@ -92,13 +92,20 @@ export const getContractedServiceColumns = ({
     name: "ESTADO",
     uid: "status",
     render: (item) => (
-      <Chip
-        color={item.status === "al_dia" ? "success" : "danger"}
-        size="sm"
-        variant="flat"
-      >
-        {STATUS_LABELS[item.status as PaymentStatus]}
-      </Chip>
+      <div className="flex flex-col gap-0.5">
+        <Chip
+          color={item.status === "al_dia" ? "success" : "danger"}
+          size="sm"
+          variant="flat"
+        >
+          {STATUS_LABELS[item.status as PaymentStatus]}
+        </Chip>
+        {item.next_payment_date && (
+          <Text color="#678CC5" variant="label">
+            Próx: {formatDate(item.next_payment_date)}
+          </Text>
+        )}
+      </div>
     ),
   },
   {

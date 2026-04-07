@@ -24,6 +24,7 @@ export interface ContractedService {
   status: PaymentStatus;
   created_at: string;
   updated_at: string;
+  next_payment_date?: string | null;
   contact?: {
     id: string;
     name: string | null;
@@ -71,7 +72,22 @@ export function useContractedServices() {
 
       if (error) throw error;
 
-      setContractedServices(data || []);
+      // Traer próximo pago pendiente de cada servicio
+      const { data: nextPayments } = await supabase
+        .from("service_payments")
+        .select("contracted_service_id, due_date")
+        .eq("status", "pendiente")
+        .order("due_date", { ascending: true });
+
+      const servicesWithNextPayment = (data || []).map((s: ContractedService) => {
+        const next = (nextPayments || []).find(
+          (p: { contracted_service_id: number; due_date: string }) => p.contracted_service_id === s.id,
+        );
+
+        return { ...s, next_payment_date: next?.due_date || null };
+      });
+
+      setContractedServices(servicesWithNextPayment);
     } catch (err: any) {
       console.error("Error fetching contracted services:", err);
       addToast({
