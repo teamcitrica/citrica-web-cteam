@@ -57,7 +57,7 @@ export default function ServiceTypeDrawer({
       onClose={onClose}
       footer={
         <div className="flex justify-end gap-2 w-full">
-          <Button isAdmin variant="flat" onPress={onClose}>
+          <Button isAdmin={true} variant="secondary" className="border-[#42668A] text-[#42668A] rounded-[8px]" onPress={onClose}>
             Cancelar
           </Button>
           <Button
