@@ -28,11 +28,6 @@ const recurrenceOptions = Object.entries(RECURRENCE_LABELS).map(([value, label])
   label,
 }));
 
-const statusOptions = [
-  { value: "al_dia", label: "Al día" },
-  { value: "pendiente_pago", label: "Pendiente de pago" },
-];
-
 const autocompleteClassNames = {
   base: "w-full [&_label]:!text-[#265197] [&_input]:!text-[#265197] [&_input::placeholder]:!text-[#A7BDE2]",
   selectorButton: "!text-[#678CC5]",
@@ -82,7 +77,6 @@ export default function ContractedServiceDrawer({
   const [recurrence, setRecurrence] = useState<Recurrence>("mensual");
   const [periods, setPeriods] = useState("");
   const [isIndefinite, setIsIndefinite] = useState(false);
-  const [status, setStatus] = useState<PaymentStatus>("al_dia");
 
   // Reset form on open
   useEffect(() => {
@@ -108,7 +102,6 @@ export default function ContractedServiceDrawer({
         setRecurrence(contractedService.recurrence);
         setIsIndefinite(contractedService.is_indefinite);
         setPeriods(contractedService.is_indefinite ? "" : contractedService.periods.toString());
-        setStatus(contractedService.status);
       } else {
         setContactId("");
         setContactInput("");
@@ -122,7 +115,6 @@ export default function ContractedServiceDrawer({
         setRecurrence("mensual");
         setPeriods("");
         setIsIndefinite(false);
-        setStatus("al_dia");
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -197,6 +189,11 @@ export default function ContractedServiceDrawer({
       return;
     }
 
+    const today = new Date().toISOString().split("T")[0];
+    const calculatedStatus: PaymentStatus = contractedService
+      ? contractedService.status
+      : startDate <= today ? "pendiente_pago" : "al_dia";
+
     onSave({
       contact_id: contactId,
       company_id: companyId,
@@ -208,7 +205,7 @@ export default function ContractedServiceDrawer({
       recurrence,
       periods: isIndefinite ? 0 : parseInt(periods) || 0,
       is_indefinite: isIndefinite,
-      status,
+      status: calculatedStatus,
     });
   };
 
@@ -348,20 +345,6 @@ export default function ContractedServiceDrawer({
             Fecha fin calculada: {new Date(endDate + "T00:00:00").toLocaleDateString("es-PE")}
           </Text>
         ) : null}
-
-        <Select
-          className="[&_button]:bg-white"
-          label="Estado"
-          options={statusOptions}
-          placeholder="Selecciona estado"
-          selectedKeys={[status]}
-          variant="bordered"
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0] as string;
-
-            if (selected) setStatus(selected as PaymentStatus);
-          }}
-        />
       </div>
     </DrawerCitricaAdmin>
   );
