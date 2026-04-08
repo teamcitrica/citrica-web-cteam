@@ -75,7 +75,7 @@ export const getContractedServiceColumns = ({
     ),
   },
   {
-    name: "VIGENCIA",
+    name: "VIGENCIA DEL SERVICIO",
     uid: "dates",
     render: (item) => (
       <div className="flex flex-col gap-0.5">
