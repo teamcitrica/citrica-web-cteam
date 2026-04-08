@@ -8,20 +8,13 @@ import { Switch } from "@heroui/switch";
 import { Text, Button, Input, Select, Autocomplete } from "citrica-ui-toolkit";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
 
-import { RECURRENCE_LABELS } from "../types";
+import { RECURRENCE_LABELS, RECURRENCE_MONTHS } from "../types";
 
 import type { Recurrence, PaymentStatus } from "../types";
 import type { ContractedService, ContractedServiceInput } from "@/hooks/contracted-services/use-contracted-services";
 import type { Contact } from "@/hooks/contact/use-contact";
 import type { Company } from "@/hooks/companies/use-companies";
 import type { Service } from "@/hooks/services/use-services";
-
-const RECURRENCE_MONTHS: Record<Recurrence, number> = {
-  mensual: 1,
-  trimestral: 3,
-  semestral: 6,
-  anual: 12,
-};
 
 const recurrenceOptions = Object.entries(RECURRENCE_LABELS).map(([value, label]) => ({
   value,

@@ -5,6 +5,8 @@ import { addToast } from "@heroui/toast";
 
 import { useSupabase } from "@/shared/context/supabase-context";
 
+import { RECURRENCE_MONTHS } from "@/app/admin/gestion-servicios/servicios-contratados/types";
+
 import type { Recurrence } from "@/app/admin/gestion-servicios/servicios-contratados/types";
 
 export interface ServicePayment {
@@ -18,13 +20,6 @@ export interface ServicePayment {
   created_at: string;
   updated_at: string;
 }
-
-const RECURRENCE_MONTHS: Record<Recurrence, number> = {
-  mensual: 1,
-  trimestral: 3,
-  semestral: 6,
-  anual: 12,
-};
 
 export function useServicePayments() {
   const { supabase } = useSupabase();
