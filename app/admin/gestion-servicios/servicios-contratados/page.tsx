@@ -20,7 +20,7 @@ import PaymentHistoryModal from "./components/payment-history-modal";
 
 import type { ContractedService, ContractedServiceInput } from "@/hooks/contracted-services/use-contracted-services";
 
-type StatusFilter = "todos" | "al_dia" | "pendiente_pago" | "finalizado";
+type StatusFilter = "todos" | "al_dia" | "pendiente_pago" | "finalizado" | "proximos_10";
 
 export default function ServiciosContratadosPage() {
   // Hooks
@@ -128,7 +128,10 @@ export default function ServiciosContratadosPage() {
 
       const success = await updateContractedService(selectedItem.id, data);
 
-      if (success) handleCloseDrawer();
+      if (success) {
+        if (dateChanged) await fetchContractedServices();
+        handleCloseDrawer();
+      }
     } else {
       const newId = await createContractedService(data);
 
@@ -141,6 +144,7 @@ export default function ServiciosContratadosPage() {
           data.amount,
           data.is_indefinite,
         );
+        await fetchContractedServices();
         handleCloseDrawer();
       }
     }
@@ -150,7 +154,15 @@ export default function ServiciosContratadosPage() {
   const filteredData = useMemo(() => {
     let data = contractedServices;
 
-    if (statusFilter !== "todos") {
+    if (statusFilter === "proximos_10") {
+      const today = new Date().toISOString().split("T")[0];
+      const in10Days = new Date();
+
+      in10Days.setDate(in10Days.getDate() + 9);
+      const limit = in10Days.toISOString().split("T")[0];
+
+      data = data.filter((d) => d.next_payment_date && d.next_payment_date > today && d.next_payment_date <= limit && d.status !== "finalizado");
+    } else if (statusFilter !== "todos") {
       data = data.filter((d) => d.status === statusFilter);
     }
     if (companyFilter !== "all") {
@@ -218,6 +230,7 @@ export default function ServiciosContratadosPage() {
                     { value: "todos", label: "Todos" },
                     { value: "al_dia", label: "Al día" },
                     { value: "pendiente_pago", label: "Pendiente" },
+                    { value: "proximos_10", label: "Próx. 10 días" },
                     { value: "finalizado", label: "Finalizado" },
                   ]}
                   selectedValue={statusFilter}
