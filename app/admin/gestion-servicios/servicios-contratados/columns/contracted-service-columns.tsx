@@ -94,7 +94,7 @@ export const getContractedServiceColumns = ({
     render: (item) => (
       <div className="flex flex-col gap-0.5">
         <Chip
-          color={item.status === "al_dia" ? "success" : "danger"}
+          color={item.status === "al_dia" ? "success" : item.status === "finalizado" ? "default" : "danger"}
           size="sm"
           variant="flat"
         >

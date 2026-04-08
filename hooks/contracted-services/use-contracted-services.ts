@@ -234,6 +234,85 @@ export function useContractedServices() {
     [supabase, fetchContractedServices],
   );
 
+  const finalizeService = useCallback(
+    async (id: number): Promise<boolean> => {
+      try {
+        const { error } = await supabase
+          .from("contracted_services")
+          .update({ status: "finalizado", updated_at: new Date().toISOString() })
+          .eq("id", id);
+
+        if (error) throw error;
+
+        addToast({
+          title: "Servicio finalizado",
+          description: "El servicio ha sido marcado como finalizado",
+          color: "success",
+        });
+        await fetchContractedServices();
+
+        return true;
+      } catch (err: any) {
+        console.error("Error finalizing service:", err);
+        addToast({
+          title: "Error",
+          description: "Error al finalizar servicio",
+          color: "danger",
+        });
+
+        return false;
+      }
+    },
+    [supabase, fetchContractedServices],
+  );
+
+  const reactivateService = useCallback(
+    async (id: number): Promise<boolean> => {
+      try {
+        // Recalcular status basado en pagos
+        const { data: payments, error: fetchError } = await supabase
+          .from("service_payments")
+          .select("due_date, status")
+          .eq("contracted_service_id", id);
+
+        if (fetchError) throw fetchError;
+
+        const today = new Date().toISOString().split("T")[0];
+        const hasOverdue = (payments || []).some(
+          (p: { due_date: string; status: string }) => p.due_date <= today && p.status === "pendiente",
+        );
+
+        const newStatus = hasOverdue ? "pendiente_pago" : "al_dia";
+
+        const { error } = await supabase
+          .from("contracted_services")
+          .update({ status: newStatus, updated_at: new Date().toISOString() })
+          .eq("id", id);
+
+        if (error) throw error;
+
+        addToast({
+          title: "Servicio reactivado",
+          description: "El servicio ha sido reactivado",
+          color: "success",
+        });
+        await fetchContractedServices();
+
+        return true;
+      } catch (err: any) {
+        console.error("Error reactivating service:", err);
+        addToast({
+          title: "Error",
+          description: "Error al reactivar servicio",
+          color: "danger",
+        });
+
+        return false;
+      }
+    },
+    [supabase, fetchContractedServices],
+  );
+
   return {
     contractedServices,
     isLoading,
@@ -241,5 +320,7 @@ export function useContractedServices() {
     createContractedService,
     updateContractedService,
     deleteContractedService,
+    finalizeService,
+    reactivateService,
   };
 }

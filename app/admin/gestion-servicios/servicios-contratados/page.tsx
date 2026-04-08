@@ -20,7 +20,7 @@ import PaymentHistoryModal from "./components/payment-history-modal";
 
 import type { ContractedService, ContractedServiceInput } from "@/hooks/contracted-services/use-contracted-services";
 
-type StatusFilter = "todos" | "al_dia" | "pendiente_pago";
+type StatusFilter = "todos" | "al_dia" | "pendiente_pago" | "finalizado";
 
 export default function ServiciosContratadosPage() {
   // Hooks
@@ -31,6 +31,8 @@ export default function ServiciosContratadosPage() {
     createContractedService,
     updateContractedService,
     deleteContractedService,
+    finalizeService,
+    reactivateService,
   } = useContractedServices();
 
   const { generatePayments, regeneratePayments } = useServicePayments();
@@ -60,6 +62,17 @@ export default function ServiciosContratadosPage() {
     fetchContacts();
     fetchServices();
   }, [fetchContractedServices, fetchCompanies, fetchContacts, fetchServices]);
+
+  // Sincronizar historyItem cuando contractedServices se actualiza
+  useEffect(() => {
+    if (historyItem) {
+      const updated = contractedServices.find((s) => s.id === historyItem.id);
+
+      if (updated && updated.status !== historyItem.status) {
+        setHistoryItem(updated);
+      }
+    }
+  }, [contractedServices, historyItem]);
 
   // Handlers
   const handleCreate = () => {
@@ -205,6 +218,7 @@ export default function ServiciosContratadosPage() {
                     { value: "todos", label: "Todos" },
                     { value: "al_dia", label: "Al día" },
                     { value: "pendiente_pago", label: "Pendiente" },
+                    { value: "finalizado", label: "Finalizado" },
                   ]}
                   selectedValue={statusFilter}
                   onValueChange={(value) => setStatusFilter(value as StatusFilter)}
@@ -235,6 +249,8 @@ export default function ServiciosContratadosPage() {
             setHistoryItem(null);
           }}
           onStatusUpdated={fetchContractedServices}
+          onFinalize={finalizeService}
+          onReactivate={reactivateService}
         />
 
         {/* Delete modal */}
