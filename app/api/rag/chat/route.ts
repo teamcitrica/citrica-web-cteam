@@ -1,18 +1,24 @@
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
-import {
-  generateChatResponse,
-  generateChatResponseWithFiles,
-} from "@/lib/ai/gemini-service";
+import { google } from "@ai-sdk/google";
+import { streamText } from "ai";
+import { GoogleGenerativeAI, FileDataPart } from "@google/generative-ai";
+
+// Perfiles de configuración
+const RESPONSE_PROFILES: Record<string, { temperature: number; maxTokens: number }> = {
+  concise: { temperature: 0.3, maxTokens: 512 },
+  balanced: { temperature: 0.7, maxTokens: 2048 },
+  detailed: { temperature: 0.8, maxTokens: 4096 },
+  comprehensive: { temperature: 0.9, maxTokens: 8192 },
+};
 
 /**
- * POST - Generar respuesta de chat usando Gemini File Search (RAG nativo)
+ * POST - Generar respuesta de chat usando Gemini File Search (RAG nativo) con STREAMING
  * Flujo:
  * 1. Obtener archivos del storage seleccionado (gemini_file_uri)
- * 2. Llamar a Gemini con los archivos como contexto
- * 3. Gemini hace la búsqueda vectorial internamente
- * 4. Guardar conversación y tracking de tokens
+ * 2. Construir mensajes con archivos como contexto
+ * 3. Streamear respuesta de Gemini en tiempo real
+ * 4. Guardar conversación completa al finalizar (mediante callback)
  */
 export async function POST(request: Request) {
   try {
@@ -20,28 +26,65 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     const {
-      message,
+      messages = [], // Historial de mensajes (para memoria conversacional)
       storageId,
-      temperature,
-      maxOutputTokens,
-      profile = "balanced", // Perfil por defecto: balanced
+      profile = "balanced",
+      modelId, // ID del modelo a usar (opcional, usa el default si no se especifica)
     } = body;
 
-    if (!message) {
-      return NextResponse.json(
-        { error: "Message is required" },
-        { status: 400 }
+    if (!messages || messages.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "Messages are required" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    console.log("💬 Procesando chat request...");
-    console.log("📦 Storage ID:", storageId || "TODOS");
-    console.log("🔍 Mensaje:", message);
+    // ================================================================
+    // 0. OBTENER API KEY Y MODELO A USAR
+    // ================================================================
+    // Obtener API key de la BD (prioridad) o del .env (fallback)
+    const { data: apiConfig } = await supabase
+      .from("api_config")
+      .select("api_key")
+      .eq("provider", "gemini")
+      .eq("is_active", true)
+      .eq("verification_status", "valid")
+      .single();
 
-    let response: string;
+    const apiKey = apiConfig?.api_key || process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return new Response(
+        JSON.stringify({ error: "No hay API key configurada. Configura una en /admin/ia/config" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    let selectedModel = modelId || "gemini-2.5-flash"; // Default fallback
+
+    // Si no se especifica modelo, obtener el modelo por defecto de la BD
+    if (!modelId) {
+      const { data: defaultModel } = await supabase
+        .from("ai_model_config")
+        .select("model_id")
+        .eq("is_default", true)
+        .eq("is_active", true)
+        .single();
+
+      if (defaultModel) {
+        selectedModel = defaultModel.model_id;
+      }
+    }
+
+    console.log("💬 Procesando chat request con streaming...");
+    console.log("📦 Storage ID:", storageId || "TODOS");
+    console.log("🔍 Mensajes:", messages.length);
+    console.log("🤖 Modelo:", selectedModel);
+    console.log("🔑 API Key:", apiKey ? "Configurada" : "No configurada");
+
+    const profileConfig = RESPONSE_PROFILES[profile] || RESPONSE_PROFILES.balanced;
     let sources: any[] = [];
-    let usage: any;
-    let hasContext = false;
+    let fileUris: string[] = [];
 
     // ================================================================
     // 1. OBTENER ARCHIVOS GEMINI DEL STORAGE SELECCIONADO
@@ -64,39 +107,12 @@ export async function POST(request: Request) {
       console.log(`📚 Archivos encontrados: ${files?.length || 0}`);
 
       if (files && files.length > 0) {
-        // ✅ HAY ARCHIVOS - Usar Gemini File API directamente
-        hasContext = true;
-
-        const fileUris = files.map(f => f.gemini_file_uri!);
-        console.log(`📚 Usando ${fileUris.length} archivos de Gemini File API...`);
-
-        const result = await generateChatResponseWithFiles(
-          `Basándote en los documentos proporcionados, responde la siguiente pregunta: ${message}`,
-          fileUris,
-          { temperature, maxOutputTokens, profile }
-        );
-
-        response = result.response;
-        usage = result.usage;
-
-        // Preparar fuentes
+        fileUris = files.map(f => f.gemini_file_uri!);
         sources = files.map((file) => ({
           document: file.file_name,
           geminiUri: file.gemini_file_uri,
         }));
-
-        console.log("✅ Respuesta RAG generada con Gemini File API");
-      } else {
-        // ❌ NO HAY ARCHIVOS EN EL STORAGE
-        console.log("⚠️ No hay archivos ACTIVE en el storage seleccionado");
-
-        const result = await generateChatResponse(
-          `${message}\n\nNota: El storage seleccionado no tiene documentos procesados. Responde con tu conocimiento general.`,
-          { temperature, maxOutputTokens, profile }
-        );
-
-        response = result.response;
-        usage = result.usage;
+        console.log(`📚 Usando ${fileUris.length} archivos de Gemini File API...`);
       }
     } else {
       // storageId === "all" o no hay storage - Buscar todos los archivos ACTIVE
@@ -114,99 +130,287 @@ export async function POST(request: Request) {
       console.log(`📚 Total de archivos ACTIVE: ${allFiles?.length || 0}`);
 
       if (allFiles && allFiles.length > 0) {
-        // ✅ HAY ARCHIVOS - Usar Gemini File API directamente
-        hasContext = true;
-
-        const fileUris = allFiles.map(f => f.gemini_file_uri!);
-        console.log(`📚 Usando ${fileUris.length} archivos de Gemini File API...`);
-
-        const result = await generateChatResponseWithFiles(
-          `Basándote en los documentos proporcionados, responde la siguiente pregunta: ${message}`,
-          fileUris,
-          { temperature, maxOutputTokens, profile }
-        );
-
-        response = result.response;
-        usage = result.usage;
-
+        fileUris = allFiles.map(f => f.gemini_file_uri!);
         sources = allFiles.map((file) => ({
           document: file.file_name,
           geminiUri: file.gemini_file_uri,
         }));
-
-        console.log("✅ Respuesta RAG generada con todos los archivos");
-      } else {
-        // ❌ NO HAY ARCHIVOS EN NINGÚN STORAGE
-        console.log("⚠️ No hay archivos procesados en ningún storage");
-
-        const result = await generateChatResponse(
-          `${message}\n\nNota: No hay documentos procesados. Responde con tu conocimiento general.`,
-          { temperature, maxOutputTokens, profile }
-        );
-
-        response = result.response;
-        usage = result.usage;
+        console.log(`📚 Usando ${fileUris.length} archivos de Gemini File API...`);
       }
     }
 
     // ================================================================
-    // 2. GUARDAR CONVERSACIÓN PARA TRACKING
+    // 2. DECIDIR QUÉ SDK USAR SEGÚN SI HAY ARCHIVOS O NO
     // ================================================================
 
-    const targetStorageId =
-      !storageId || storageId === "all" ? null : storageId;
+    // Si NO hay archivos, usar Vercel AI SDK (mejor streaming)
+    // Si HAY archivos, usar Google SDK nativo (soporta fileUris correctamente)
 
-    const { error: insertError } = await supabase
-      .from("chat_conversations")
-      .insert({
-        storage_id: targetStorageId,
-        user_message: message,
-        assistant_response: response,
-        prompt_tokens: usage.promptTokens,
-        completion_tokens: usage.completionTokens,
-        total_tokens: usage.totalTokens,
-        cost_usd: usage.estimatedCost,
-        model: "gemini-2.5-flash",
-        sources_used: sources,
+    // ================================================================
+    // 3. STREAMEAR RESPUESTA
+    // ================================================================
+
+    if (fileUris.length > 0) {
+      // ✅ CASO CON ARCHIVOS: Usar Google SDK nativo
+      const genAI = new GoogleGenerativeAI(apiKey);
+
+      // Construir partes del mensaje con archivos
+      const lastUserMessage = messages[messages.length - 1]?.content || "";
+      const parts: any[] = [];
+
+      // Agregar archivos como FileDataPart
+      for (const uri of fileUris) {
+        parts.push({
+          fileData: {
+            fileUri: uri,
+            mimeType: "application/pdf",
+          },
+        });
+      }
+
+      // Agregar texto
+      parts.push({
+        text: `Basándote en los documentos proporcionados, responde: ${lastUserMessage}`,
       });
 
-    if (insertError) {
-      console.error("⚠️ Error guardando conversación:", insertError);
-    }
+      // Intentar generar con el modelo seleccionado, con fallback si falla
+      let result;
+      let usedModel = selectedModel;
 
-    // Actualizar contadores del storage
-    if (targetStorageId) {
-      await supabase.rpc("increment_storage_usage", {
-        p_storage_id: targetStorageId,
-        p_tokens: usage.totalTokens,
-        p_cost: usage.estimatedCost,
+      try {
+        const model = genAI.getGenerativeModel({
+          model: selectedModel,
+          generationConfig: {
+            temperature: profileConfig.temperature,
+            maxOutputTokens: profileConfig.maxTokens,
+          },
+        });
+        result = await model.generateContentStream(parts);
+      } catch (error: any) {
+        // Si falla por cuota (429), intentar con el modelo default
+        if (error.status === 429 || error.message?.includes("quota") || error.message?.includes("limit")) {
+          console.log(`⚠️ Modelo ${selectedModel} agotó su cuota. Intentando con modelo default...`);
+
+          const { data: fallbackModel } = await supabase
+            .from("ai_model_config")
+            .select("model_id")
+            .eq("is_default", true)
+            .eq("is_active", true)
+            .neq("model_id", selectedModel) // Que no sea el mismo que falló
+            .single();
+
+          if (fallbackModel) {
+            usedModel = fallbackModel.model_id;
+            const modelFallback = genAI.getGenerativeModel({
+              model: usedModel,
+              generationConfig: {
+                temperature: profileConfig.temperature,
+                maxOutputTokens: profileConfig.maxTokens,
+              },
+            });
+            result = await modelFallback.generateContentStream(parts);
+          } else {
+            throw error; // No hay fallback disponible
+          }
+        } else {
+          throw error; // Otro tipo de error
+        }
+      }
+
+      // Crear stream personalizado
+      const encoder = new TextEncoder();
+      let fullText = "";
+
+      const stream = new ReadableStream({
+        async start(controller) {
+          try {
+            for await (const chunk of result.stream) {
+              const chunkText = chunk.text();
+              fullText += chunkText;
+              controller.enqueue(encoder.encode(chunkText));
+            }
+
+            // Obtener usage metadata
+            const finalResponse = await result.response;
+            const usageMetadata = (finalResponse as any).usageMetadata;
+
+            // Guardar en DB
+            const targetStorageId = !storageId || storageId === "all" ? null : storageId;
+            const promptTokens = usageMetadata?.promptTokenCount || 0;
+            const completionTokens = usageMetadata?.candidatesTokenCount || 0;
+            const totalTokens = usageMetadata?.totalTokenCount || promptTokens + completionTokens;
+            const estimatedCost = (promptTokens / 1_000_000) * 0.075 + (completionTokens / 1_000_000) * 0.30;
+
+            await supabase.from("chat_conversations").insert({
+              storage_id: targetStorageId,
+              user_message: lastUserMessage,
+              assistant_response: fullText,
+              prompt_tokens: promptTokens,
+              completion_tokens: completionTokens,
+              total_tokens: totalTokens,
+              cost_usd: estimatedCost,
+              model: selectedModel,
+              sources_used: sources,
+            });
+
+            if (targetStorageId) {
+              await supabase.rpc("increment_storage_usage", {
+                p_storage_id: targetStorageId,
+                p_tokens: totalTokens,
+                p_cost: estimatedCost,
+              });
+            }
+
+            console.log("💬 Chat con archivos completado");
+            console.log(`📊 Tokens: ${totalTokens} | Costo: $${estimatedCost.toFixed(6)}`);
+
+            controller.close();
+          } catch (error) {
+            console.error("Error en streaming:", error);
+            controller.error(error);
+          }
+        },
+      });
+
+      return new Response(stream, {
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+          "X-Sources": JSON.stringify(sources),
+          "X-Has-Context": "true",
+          "X-Storage-Id": storageId || "all",
+        },
+      });
+
+    } else {
+      // ✅ CASO SIN ARCHIVOS: Usar Vercel AI SDK (mejor para chat simple)
+      let usedModel = selectedModel;
+      let result;
+
+      try {
+        result = await streamText({
+          model: google(selectedModel),
+          messages: messages.map((msg: any) => ({
+            role: msg.role,
+            content: msg.content,
+          })),
+          temperature: profileConfig.temperature,
+          maxOutputTokens: profileConfig.maxTokens,
+
+          onFinish: async ({ text, usage }: { text: string; usage: any }) => {
+            const targetStorageId = !storageId || storageId === "all" ? null : storageId;
+            const userMessage = messages[messages.length - 1]?.content || "";
+
+            const promptTokens = usage?.promptTokens || usage?.inputTokens || 0;
+            const completionTokens = usage?.completionTokens || usage?.outputTokens || 0;
+            const totalTokens = usage?.totalTokens || promptTokens + completionTokens;
+            const estimatedCost = (promptTokens / 1_000_000) * 0.075 + (completionTokens / 1_000_000) * 0.30;
+
+            await supabase.from("chat_conversations").insert({
+              storage_id: targetStorageId,
+              user_message: userMessage,
+              assistant_response: text,
+              prompt_tokens: promptTokens,
+              completion_tokens: completionTokens,
+              total_tokens: totalTokens,
+              cost_usd: estimatedCost,
+              model: usedModel,
+              sources_used: sources,
+            });
+
+            if (targetStorageId) {
+              await supabase.rpc("increment_storage_usage", {
+                p_storage_id: targetStorageId,
+                p_tokens: totalTokens,
+                p_cost: estimatedCost,
+              });
+            }
+
+            console.log("💬 Chat sin archivos completado");
+            console.log(`📊 Tokens: ${totalTokens} | Costo: $${estimatedCost.toFixed(6)}`);
+          },
+        });
+      } catch (error: any) {
+        // Si falla por cuota (429), intentar con el modelo default
+        if (error.status === 429 || error.message?.includes("quota") || error.message?.includes("limit")) {
+          console.log(`⚠️ Modelo ${selectedModel} agotó su cuota. Intentando con modelo default...`);
+
+          const { data: fallbackModel } = await supabase
+            .from("ai_model_config")
+            .select("model_id")
+            .eq("is_default", true)
+            .eq("is_active", true)
+            .neq("model_id", selectedModel)
+            .single();
+
+          if (fallbackModel) {
+            usedModel = fallbackModel.model_id;
+            result = await streamText({
+              model: google(usedModel),
+              messages: messages.map((msg: any) => ({
+                role: msg.role,
+                content: msg.content,
+              })),
+              temperature: profileConfig.temperature,
+              maxOutputTokens: profileConfig.maxTokens,
+
+              onFinish: async ({ text, usage }: { text: string; usage: any }) => {
+                const targetStorageId = !storageId || storageId === "all" ? null : storageId;
+                const userMessage = messages[messages.length - 1]?.content || "";
+
+                const promptTokens = usage?.promptTokens || usage?.inputTokens || 0;
+                const completionTokens = usage?.completionTokens || usage?.outputTokens || 0;
+                const totalTokens = usage?.totalTokens || promptTokens + completionTokens;
+                const estimatedCost = (promptTokens / 1_000_000) * 0.075 + (completionTokens / 1_000_000) * 0.30;
+
+                await supabase.from("chat_conversations").insert({
+                  storage_id: targetStorageId,
+                  user_message: userMessage,
+                  assistant_response: text,
+                  prompt_tokens: promptTokens,
+                  completion_tokens: completionTokens,
+                  total_tokens: totalTokens,
+                  cost_usd: estimatedCost,
+                  model: usedModel,
+                  sources_used: sources,
+                });
+
+                if (targetStorageId) {
+                  await supabase.rpc("increment_storage_usage", {
+                    p_storage_id: targetStorageId,
+                    p_tokens: totalTokens,
+                    p_cost: estimatedCost,
+                  });
+                }
+
+                console.log(`💬 Chat sin archivos completado (fallback a ${usedModel})`);
+                console.log(`📊 Tokens: ${totalTokens} | Costo: $${estimatedCost.toFixed(6)}`);
+              },
+            });
+          } else {
+            throw error; // No hay fallback disponible
+          }
+        } else {
+          throw error; // Otro tipo de error
+        }
+      }
+
+      return result.toTextStreamResponse({
+        headers: {
+          "X-Sources": JSON.stringify(sources),
+          "X-Has-Context": "false",
+          "X-Storage-Id": storageId || "all",
+        },
       });
     }
 
-    console.log("💬 Chat completado exitosamente");
-    console.log(
-      `📊 Tokens: ${usage.totalTokens} | Costo: $${usage.estimatedCost.toFixed(6)}`
-    );
-
-    return NextResponse.json({
-      response,
-      sources,
-      hasContext,
-      usage,
-      debug: {
-        storageId: targetStorageId,
-        filesUsed: sources.length,
-        model: "gemini-2.5-flash",
-      },
-    });
   } catch (error: any) {
     console.error("❌ Error generating chat response:", error);
-    return NextResponse.json(
-      {
+    return new Response(
+      JSON.stringify({
         error: error.message,
         details: error.toString(),
-      },
-      { status: 500 }
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 }

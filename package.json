@@ -9,6 +9,7 @@
     "lint": "eslint . --ext .ts,.tsx -c .eslintrc.json --fix"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.61",
     "@google/generative-ai": "^0.24.1",
     "@heroui/autocomplete": "2.3.31",
     "@heroui/avatar": "2.2.24",
@@ -43,6 +44,7 @@
     "@react-aria/visually-hidden": "3.8.29",
     "@supabase/auth-helpers-nextjs": "0.8.1",
     "@supabase/supabase-js": "2.45.4",
+    "ai": "^6.0.158",
     "aos": "^2.3.4",
     "citrica-ui-toolkit": "^0.0.12",
     "classnames": "^2.3.2",
@@ -74,7 +76,8 @@
     "tailwindcss": "3.4.17",
     "tailwindcss-animated": "2.0.0",
     "video.js": "^8.5.2",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/aos": "^3.0.7",
