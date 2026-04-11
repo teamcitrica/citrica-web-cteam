@@ -174,7 +174,7 @@ export async function POST(request: Request) {
       });
 
       // Intentar generar con el modelo seleccionado, con fallback si falla
-      let result;
+      let result: any;
       let usedModel = selectedModel;
 
       try {
@@ -284,7 +284,7 @@ export async function POST(request: Request) {
     } else {
       // ✅ CASO SIN ARCHIVOS: Usar Vercel AI SDK (mejor para chat simple)
       let usedModel = selectedModel;
-      let result;
+      let result: any;
 
       try {
         result = await streamText({
