@@ -7,8 +7,7 @@ import { NextResponse } from "next/server";
  */
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = createRouteHandlerClient({ cookies });
 
     const { data: config, error } = await supabase
       .from("api_config")
@@ -42,8 +41,7 @@ export async function GET() {
  */
 export async function POST(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = createRouteHandlerClient({ cookies });
     const body = await request.json();
 
     const { api_key } = body;

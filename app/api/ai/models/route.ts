@@ -9,8 +9,7 @@ import { NextResponse } from "next/server";
  */
 export async function GET(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = createRouteHandlerClient({ cookies });
     const { searchParams } = new URL(request.url);
     const activeOnly = searchParams.get("active_only") === "true";
 
@@ -40,8 +39,7 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = createRouteHandlerClient({ cookies });
     const body = await request.json();
 
     const {
@@ -109,8 +107,7 @@ export async function POST(request: Request) {
  */
 export async function PATCH(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = createRouteHandlerClient({ cookies });
     const body = await request.json();
     const { id, ...updates } = body;
 
@@ -156,8 +153,7 @@ export async function PATCH(request: Request) {
  */
 export async function DELETE(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = createRouteHandlerClient({ cookies });
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
