@@ -8,8 +8,7 @@ import { NextResponse } from "next/server";
  */
 export async function POST() {
   try {
-    const cookieStore = await cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const supabase = createRouteHandlerClient({ cookies });
 
     // Obtener API key configurada
     const { data: apiConfig } = await supabase
