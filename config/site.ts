@@ -45,13 +45,17 @@ export const siteConfig = {
 			href: "/admin/ia",
 			allowedRoles: [ROL_ADMIN],
 			subItems: [
-				{ 
+				{
 					title: "Databases RAG",
 					href: "/admin/ia/databases_rag",
 				},
 				{
 					title: "Chat",
 					href: "/admin/ia/chat",
+				},
+				{
+					title: "Configuración",
+					href: "/admin/ia/config",
 				},
 
 			],

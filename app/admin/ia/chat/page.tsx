@@ -1,120 +1,160 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button, Select, Col, Container, Text, Icon } from "citrica-ui-toolkit";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
-import {
-  Send,
-  Bot,
-  User,
-  Loader2,
-  MessageSquare,
-  Sparkles,
-  Trash2,
-  RefreshCw,
-} from "lucide-react";
 
 interface Message {
   id: string;
-  content: string;
   role: "user" | "assistant";
-  timestamp: Date;
-  isError?: boolean;
-  retryMessage?: string;
-  sources?: {
-    document: string;
-    geminiUri?: string;
-  }[];
-  usage?: {
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-    estimatedCost: number;
-  };
+  content: string;
+  timestamp?: Date;
 }
 
 export default function ChatPage() {
-  const getInitialMessage = (): Message => ({
-    id: "1",
-    content:
-      "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?",
-    role: "assistant",
-    timestamp: new Date(),
-  });
-
-  const [messages, setMessages] = useState<Message[]>([getInitialMessage()]);
-  const [inputMessage, setInputMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [selectedDatabase, setSelectedDatabase] = useState<string>("all");
   const [storages, setStorages] = useState<any[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [responseProfile, setResponseProfile] = useState<string>("balanced");
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [tokensUsed, setTokensUsed] = useState<number>(0);
+  const [costUsed, setCostUsed] = useState<number>(0);
+  const [selectedModel, setSelectedModel] = useState<string>("");
+  const [availableModels, setAvailableModels] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "initial",
+      role: "assistant",
+      content:
+        "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?",
+      timestamp: new Date(),
+    },
+  ]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Cargar storages al montar (sin historial inicial)
-  useEffect(() => {
-    fetchStorages();
-  }, []);
-
-  const fetchStorages = async () => {
+  const fetchStorages = useCallback(async () => {
     try {
       const response = await fetch("/api/rag/storage");
       const data = await response.json();
       if (data.storages) {
         setStorages(data.storages);
+
+        // Si hay un storage seleccionado, actualizar sus tokens/costo
+        if (selectedDatabase && selectedDatabase !== "all") {
+          const currentStorage = data.storages.find((s: any) => s.id === selectedDatabase);
+          if (currentStorage) {
+            setTokensUsed(currentStorage.total_tokens_used || 0);
+            setCostUsed(currentStorage.total_cost_usd || 0);
+          }
+        } else {
+          // Si es "all", sumar todos los tokens
+          const totalTokens = data.storages.reduce((sum: number, s: any) => sum + (s.total_tokens_used || 0), 0);
+          const totalCost = data.storages.reduce((sum: number, s: any) => sum + (s.total_cost_usd || 0), 0);
+          setTokensUsed(totalTokens);
+          setCostUsed(totalCost);
+        }
       }
     } catch (error) {
       console.error("Error fetching storages:", error);
     }
-  };
+  }, [selectedDatabase]);
 
-  const fetchChatHistory = async (storageId: string) => {
+  const fetchModels = useCallback(async () => {
+    try {
+      const response = await fetch("/api/ai/models?active_only=true");
+      const data = await response.json();
+      if (data.models) {
+        setAvailableModels(data.models);
+
+        // Establecer el modelo por defecto
+        const defaultModel = data.models.find((m: any) => m.is_default);
+        if (defaultModel && !selectedModel) {
+          setSelectedModel(defaultModel.model_id);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching models:", error);
+    }
+  }, [selectedModel]);
+
+  // Cargar storages y modelos al montar
+  useEffect(() => {
+    fetchStorages();
+    fetchModels();
+  }, [fetchStorages, fetchModels]);
+
+  const fetchChatHistory = useCallback(async (storageId: string) => {
     try {
       setIsLoadingHistory(true);
       const response = await fetch(`/api/rag/chat/history?storageId=${storageId}`);
       const data = await response.json();
 
       if (data.messages && data.messages.length > 0) {
-        // Convertir timestamps de string a Date
-        const messagesWithDates = data.messages.map((msg: any) => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp),
+        // Convertir al formato de useChat
+        const formattedMessages = data.messages.map((msg: any) => ({
+          id: msg.id,
+          role: msg.role,
+          content: msg.content,
         }));
-        setMessages([getInitialMessage(), ...messagesWithDates]);
+        setMessages([
+          {
+            id: "initial",
+            role: "assistant",
+            content:
+              "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?",
+          },
+          ...formattedMessages,
+        ]);
       } else {
-        setMessages([getInitialMessage()]);
+        setMessages([
+          {
+            id: "initial",
+            role: "assistant",
+            content:
+              "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?",
+          },
+        ]);
       }
     } catch (error) {
       console.error("Error fetching chat history:", error);
-      setMessages([getInitialMessage()]);
     } finally {
       setIsLoadingHistory(false);
     }
-  };
+  }, [setMessages]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
   // Cambiar historial cuando se selecciona otra base de datos
-  const handleDatabaseChange = (dbId: string) => {
+  const handleDatabaseChange = useCallback((dbId: string) => {
     setSelectedDatabase(dbId);
 
     // Si es "all", no cargar historial, empezar limpio
     if (dbId === "all") {
-      setMessages([getInitialMessage()]);
+      setMessages([
+        {
+          id: "initial",
+          role: "assistant",
+          content:
+            "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?",
+        },
+      ]);
     } else {
       // Para bases de datos específicas, cargar su historial
       fetchChatHistory(dbId);
     }
-  };
+  }, [fetchChatHistory, setMessages]);
 
   // Limpiar historial del chat actual
-  const handleClearHistory = async () => {
+  const handleClearHistory = useCallback(async () => {
     try {
       // Llamar al endpoint para eliminar conversaciones
       const storageParam = selectedDatabase === "all" ? "all" : selectedDatabase;
@@ -123,7 +163,14 @@ export default function ChatPage() {
       });
 
       if (response.ok) {
-        setMessages([getInitialMessage()]);
+        setMessages([
+          {
+            id: "initial",
+            role: "assistant",
+            content:
+              "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?",
+          },
+        ]);
         setIsDeleteModalOpen(false);
       } else {
         alert("Error al eliminar el historial");
@@ -132,112 +179,148 @@ export default function ChatPage() {
       console.error("Error clearing history:", error);
       alert("Error al eliminar el historial");
     }
-  };
+  }, [selectedDatabase, setMessages]);
 
-  const handleSendMessage = async (retryMessage?: string) => {
-    const messageToSend = retryMessage || inputMessage.trim();
-    if (!messageToSend || isLoading) return;
+  // Función para enviar mensaje con streaming
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
 
-    // Si es un retry, obtener el mensaje del usuario anterior
-    let userMessageContent = messageToSend;
-    if (retryMessage) {
-      // Buscar el mensaje del usuario antes del error
-      const messagesReversed = [...messages].reverse();
-      const errorIndex = messagesReversed.findIndex(m => m.isError);
-      if (errorIndex !== -1) {
-        const userMsg = messagesReversed[errorIndex + 1];
-        if (userMsg && userMsg.role === "user") {
-          userMessageContent = userMsg.content;
-        }
-      }
+    if (!input.trim() || isLoading) {
+      return;
     }
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: userMessageContent,
       role: "user",
+      content: input.trim(),
       timestamp: new Date(),
     };
 
-    // Solo agregar el mensaje del usuario si no es un retry
-    if (!retryMessage) {
-      setMessages((prev) => [...prev, userMessage]);
-      setInputMessage("");
-    }
-
+    // Agregar mensaje del usuario
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
     setIsLoading(true);
+    setError(null);
+
+    // Crear mensaje del asistente vacío que se irá llenando
+    const assistantMessageId = (Date.now() + 1).toString();
+    const assistantMessage: Message = {
+      id: assistantMessageId,
+      role: "assistant",
+      content: "",
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, assistantMessage]);
 
     try {
+      // Crear AbortController para cancelar si es necesario
+      abortControllerRef.current = new AbortController();
+
       const response = await fetch("/api/rag/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          message: messageToSend,
+          messages: [...messages, userMessage],
           storageId: selectedDatabase,
           profile: responseProfile,
+          modelId: selectedModel || undefined,
         }),
+        signal: abortControllerRef.current.signal,
       });
 
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error: ${response.statusText}`);
       }
 
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: data.response,
-        role: "assistant",
-        timestamp: new Date(),
-        sources: data.sources || [],
-        usage: data.usage,
-      };
+      // Leer el stream
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
 
-      setMessages((prev) => [...prev, assistantMessage]);
-
-      // Recargar historial desde la base de datos solo si NO es "all"
-      if (selectedDatabase !== "all") {
-        setTimeout(() => fetchChatHistory(selectedDatabase), 500);
-      }
-    } catch (error: any) {
-      console.error("Error sending message:", error?.message || error);
-
-      // Detectar error 503 (modelo sobrecargado)
-      const is503Error = error?.message?.includes("overloaded") ||
-        error?.message?.includes("503");
-
-      let errorContent = "❌ Lo siento, ocurrió un error al procesar tu mensaje. Por favor intenta de nuevo.";
-
-      if (is503Error) {
-        errorContent = `⚠️ El modelo de IA está experimentando alta demanda en este momento.\n\n💡 Sugerencias:\n• Espera unos segundos e intenta de nuevo\n• El sistema reintentará automáticamente en breve\n\nPuedes hacer clic en "Reintentar" cuando estés listo.`;
+      if (!reader) {
+        throw new Error("No se pudo obtener el stream");
       }
 
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: errorContent,
-        role: "assistant",
-        timestamp: new Date(),
-        isError: true,
-        retryMessage: messageToSend,
-      };
-      setMessages((prev) => {
-        // Si es un retry, reemplazar el último mensaje de error
-        if (retryMessage) {
-          return [...prev.slice(0, -1), errorMessage];
+      let accumulatedText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          break;
         }
-        return [...prev, errorMessage];
-      });
+
+        const chunk = decoder.decode(value, { stream: true });
+        accumulatedText += chunk;
+
+        // Actualizar el mensaje del asistente con el texto acumulado
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantMessageId
+              ? { ...msg, content: accumulatedText }
+              : msg
+          )
+        );
+      }
+
+    } catch (error: any) {
+      if (error.name === "AbortError") {
+        return;
+      }
+
+      setError(error);
+
+      // Actualizar el mensaje del asistente con error
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === assistantMessageId
+            ? {
+                ...msg,
+                content: `❌ Lo siento, ocurrió un error al procesar tu mensaje. ${error.message || "Por favor intenta de nuevo."}`,
+              }
+            : msg
+        )
+      );
     } finally {
       setIsLoading(false);
-    }
-  };
+      abortControllerRef.current = null;
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      // Recargar tokens después del mensaje
+      setTimeout(() => {
+        fetchStorages();
+      }, 500);
+    }
+  }, [input, isLoading, messages, selectedDatabase, responseProfile, fetchStorages]);
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  }, []);
+
+  const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSubmit(e);
     }
-  };
+  }, [handleSubmit]);
+
+  const reload = useCallback(async () => {
+    if (messages.length < 2) return;
+
+    // Obtener el último mensaje del usuario
+    const lastUserMessageIndex = messages.findLastIndex((m) => m.role === "user");
+    if (lastUserMessageIndex === -1) return;
+
+    const lastUserMessage = messages[lastUserMessageIndex];
+
+    // Simular el submit con el último mensaje
+    setInput(lastUserMessage.content);
+
+    // Esperar un tick para que el input se actualice
+    setTimeout(() => {
+      handleSubmit(new Event("submit") as any);
+    }, 0);
+  }, [messages, handleSubmit]);
 
   return (
     <Container>
@@ -248,9 +331,9 @@ export default function ChatPage() {
           </h1>
 
           {/* Selectores */}
-          <div className="mb-4 flex flex-col md:flex-row gap-3">
+          <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
             {/* Selector de Base de Datos */}
-            <div className="flex-1">
+            <div>
               <Select
                 label="Base de Datos"
                 selectedKeys={[selectedDatabase]}
@@ -276,8 +359,32 @@ export default function ChatPage() {
               />
             </div>
 
+            {/* Selector de Modelo IA */}
+            <div>
+              <Select
+                label="Modelo IA"
+                selectedKeys={selectedModel ? [selectedModel] : []}
+                onSelectionChange={(keys: any) => {
+                  const selected = Array.from(keys)[0] as string;
+                  setSelectedModel(selected);
+                }}
+                className="w-full"
+                variant="faded"
+                classNames={{
+                  trigger: "bg-white !border-[#D4DEED] !rounded-[12px]",
+                  label: "!text-[#265197]",
+                  value: "!text-[#265197]",
+                  selectorIcon: "text-[#678CC5]",
+                }}
+                options={availableModels.map((model) => ({
+                  value: model.model_id,
+                  label: model.display_name,
+                }))}
+              />
+            </div>
+
             {/* Selector de Perfil de Respuesta */}
-            <div className="flex-1">
+            <div>
               <Select
                 label="Calidad de Respuesta"
                 selectedKeys={[responseProfile]}
@@ -315,6 +422,70 @@ export default function ChatPage() {
             </div>
           </div>
 
+          {/* Estadísticas de Uso */}
+          <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+            {/* Tokens Usados */}
+            <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon name="Zap" size={18} color="#2563eb" />
+                <Text isAdmin={true} variant="label" color="#1e40af">
+                  Tokens Usados
+                </Text>
+              </div>
+              <div className="text-2xl font-bold text-blue-600">
+                {tokensUsed.toLocaleString()}
+              </div>
+              <div className="text-xs text-gray-600 mt-1">
+                Entrada + Salida
+              </div>
+            </div>
+
+            {/* Costo Total */}
+            <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon name="DollarSign" size={18} color="#16a34a" />
+                <Text isAdmin={true} variant="label" color="#15803d">
+                  Costo Total
+                </Text>
+              </div>
+              <div className="text-2xl font-bold text-green-600">
+                ${costUsed.toFixed(4)}
+              </div>
+              <div className="text-xs text-gray-600 mt-1">
+                USD acumulado
+              </div>
+            </div>
+
+            {/* Costo Promedio por Mensaje */}
+            <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon name="TrendingUp" size={18} color="#9333ea" />
+                <Text isAdmin={true} variant="label" color="#7e22ce">
+                  Promedio/Mensaje
+                </Text>
+              </div>
+              <div className="text-2xl font-bold text-purple-600">
+                ${messages.length > 1 ? (costUsed / Math.max(1, Math.floor(messages.length / 2))).toFixed(4) : "0.0000"}
+              </div>
+              <div className="text-xs text-gray-600 mt-1">
+                ~{messages.length > 1 ? Math.floor(tokensUsed / Math.max(1, Math.floor(messages.length / 2))).toLocaleString() : "0"} tokens
+              </div>
+            </div>
+          </div>
+
+          {/* Info sobre límites */}
+          <div className="mb-4 px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg">
+            <div className="flex items-start gap-2">
+              <Icon name="Info" size={16} color="#d97706" className="mt-0.5" />
+              <div className="text-xs text-amber-800">
+                <strong>Nota:</strong> Gemini no tiene un límite público fijo de tokens. Los límites son dinámicos según tu tier de cuenta.
+                {selectedDatabase === "all"
+                  ? " Mostrando uso total de todas las bases de datos."
+                  : " Mostrando uso de la base de datos seleccionada."}
+              </div>
+            </div>
+          </div>
+
           {/* Área de Mensajes */}
           <div className="flex-1 overflow-y-auto bg-white border border-gray-200 rounded-lg p-4 mb-4 space-y-4">
             {isLoadingHistory ? (
@@ -326,11 +497,10 @@ export default function ChatPage() {
               </div>
             ) : (
               <>
-                {messages.map((message) => (
+                {messages.map((message, index) => (
                   <div
                     key={message.id}
-                    className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"
-                      }`}
+                    className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     {message.role === "assistant" && (
                       <div className="w-8 h-8 rounded-full bg-[#265197] flex items-center justify-center flex-shrink-0">
@@ -339,17 +509,22 @@ export default function ChatPage() {
                     )}
 
                     <div
-                      className={`max-w-[70%] rounded-lg p-4 ${message.role === "user"
+                      className={`max-w-[70%] rounded-lg p-4 ${
+                        message.role === "user"
                           ? "bg-[#265197] text-white"
                           : "bg-gray-100 text-gray-800"
-                        }`}
+                      }`}
                     >
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
 
-                      {message.isError && message.retryMessage && (
-                        <div className="mt-3 pt-3 border-t border-gray-300">
+                      {/* Mostrar error si existe */}
+                      {error && index === messages.length - 1 && message.role === "assistant" && (
+                        <div className="mt-3 pt-3 border-t border-red-300">
+                          <p className="text-xs text-red-600 mb-2">
+                            ❌ Error: {error.message || "Ocurrió un error al procesar tu mensaje"}
+                          </p>
                           <button
-                            onClick={() => handleSendMessage(message.retryMessage)}
+                            onClick={() => reload()}
                             disabled={isLoading}
                             className="flex items-center gap-2 px-4 py-2 bg-[#265197] text-white rounded-lg hover:bg-[#1e3f73] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                           >
@@ -359,43 +534,15 @@ export default function ChatPage() {
                         </div>
                       )}
 
-                      {message.sources && message.sources.length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-gray-300">
-                          <div className="flex items-center gap-1 mb-2">
-                            <Icon name="Sparkles" size={12} color="#265197" />
-                            <span className="text-xs font-semibold text-[#265197]">
-                              Fuentes consultadas:
-                            </span>
-                          </div>
-                          {message.sources.map((source, idx) => (
-                            <div
-                              key={idx}
-                              className="text-xs text-gray-600 flex items-center gap-2 mt-1"
-                            >
-                              <span>📄 {source.document}</span>
-                              <span className="text-green-600 font-semibold">
-                                ✓ Usado como contexto
-                              </span>
-                            </div>
-                          ))}
-                        </div>
+                      {/* Timestamp */}
+                      {message.timestamp && (
+                        <span className="text-xs opacity-70 mt-2 block">
+                          {message.timestamp.toLocaleTimeString("es-ES", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
                       )}
-
-                      {message.usage && (
-                        <div className="mt-2 pt-2 border-t border-gray-300">
-                          <div className="flex items-center gap-3 text-xs text-gray-600">
-                            <span>🔢 {message.usage.totalTokens} tokens</span>
-                            <span>💰 ${message.usage.estimatedCost.toFixed(6)}</span>
-                          </div>
-                        </div>
-                      )}
-
-                      <span className="text-xs opacity-70 mt-2 block">
-                        {message.timestamp.toLocaleTimeString("es-ES", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
                     </div>
 
                     {message.role === "user" && (
@@ -413,6 +560,7 @@ export default function ChatPage() {
                     </div>
                     <div className="bg-gray-100 rounded-lg p-4">
                       <Icon name="Loader2" size={20} color="#265197" className="animate-spin" />
+                      <span className="text-xs text-gray-500 ml-2">Escribiendo...</span>
                     </div>
                   </div>
                 )}
@@ -423,12 +571,12 @@ export default function ChatPage() {
           </div>
 
           {/* Input de Mensaje */}
-          <div className="flex gap-2 items-center">
+          <form onSubmit={handleSubmit} className="flex gap-2 items-center">
             <div className="flex-1 relative">
               <input
                 type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
+                value={input}
+                onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
                 placeholder="Escribe tu pregunta aquí..."
                 disabled={isLoading}
@@ -439,11 +587,15 @@ export default function ChatPage() {
             <Button
               isAdmin
               variant="primary"
-              onClick={() => handleSendMessage()}
-              disabled={!inputMessage.trim() || isLoading}
+              type="submit"
+              disabled={!input.trim() || isLoading}
+              onClick={(e) => {
+                // Llamar explícitamente a handleSubmit porque citrica-ui-toolkit Button no propaga bien el submit
+                handleSubmit(e as any);
+              }}
             >
               {isLoading ? (
-                <Icon name="Loader2" size={20} color="#265197" className="animate-spin" />
+                <Icon name="Loader2" size={20} color="white" className="animate-spin" />
               ) : (
                 <>
                   <Icon name="Send" size={16} color="white" />
@@ -451,7 +603,7 @@ export default function ChatPage() {
                 </>
               )}
             </Button>
-          </div>
+          </form>
 
           {/* Información adicional */}
           <div className="mt-3 text-xs text-gray-500 text-center">
