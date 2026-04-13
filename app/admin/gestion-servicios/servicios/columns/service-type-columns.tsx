@@ -1,5 +1,4 @@
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/dropdown";
-import { Switch } from "@heroui/switch";
 import { Column } from "@/shared/components/citrica-ui/organism/data-table";
 import { Text, Button, Icon } from "citrica-ui-toolkit";
 import type { ServiceType } from "@/hooks/services/use-service-types";
@@ -7,13 +6,11 @@ import type { ServiceType } from "@/hooks/services/use-service-types";
 type ServiceTypeColumnsConfig = {
   onEdit: (type: ServiceType) => void;
   onDelete: (type: ServiceType) => void;
-  onToggleActive: (id: number, isActive: boolean) => void;
 };
 
 export const getServiceTypeColumns = ({
   onEdit,
   onDelete,
-  onToggleActive,
 }: ServiceTypeColumnsConfig): Column<ServiceType>[] => [
   {
     name: "NOMBRE",
@@ -28,28 +25,11 @@ export const getServiceTypeColumns = ({
   {
     name: "DESCRIPCIÓN",
     uid: "description",
+    align: "center",
     render: (type) => (
       <Text color="#4B5563" variant="label">
         {type.description || "-"}
       </Text>
-    ),
-  },
-  {
-    name: "ESTADO",
-    uid: "is_active",
-    render: (type) => (
-      <Switch
-        classNames={{
-          base: "group !bg-transparent transition-colors",
-          wrapper:
-            "bg-gray-300 group-data-[selected=true]:bg-[#265197] rounded-full transition-colors",
-          thumb: "!bg-white",
-        }}
-        color="default"
-        isSelected={type.is_active}
-        size="sm"
-        onChange={() => onToggleActive(type.id, !type.is_active)}
-      />
     ),
   },
   {

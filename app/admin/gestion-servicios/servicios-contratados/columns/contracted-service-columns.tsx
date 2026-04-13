@@ -69,13 +69,13 @@ export const getContractedServiceColumns = ({
           {formatAmount(item.amount)}
         </Text>
         <Text color="#678CC5" variant="label">
-          {RECURRENCE_LABELS[item.recurrence as Recurrence]} x {item.periods}
+          {RECURRENCE_LABELS[item.recurrence as Recurrence]} {item.is_indefinite ? "· Indefinido" : `x ${item.periods}`}
         </Text>
       </div>
     ),
   },
   {
-    name: "VIGENCIA",
+    name: "VIGENCIA DEL SERVICIO",
     uid: "dates",
     render: (item) => (
       <div className="flex flex-col gap-0.5">
@@ -83,7 +83,7 @@ export const getContractedServiceColumns = ({
           {formatDate(item.start_date)}
         </Text>
         <Text color="#678CC5" variant="label">
-          {formatDate(item.end_date)}
+          {item.is_indefinite || !item.end_date ? "Indefinido" : formatDate(item.end_date)}
         </Text>
       </div>
     ),
@@ -92,13 +92,20 @@ export const getContractedServiceColumns = ({
     name: "ESTADO",
     uid: "status",
     render: (item) => (
-      <Chip
-        color={item.status === "al_dia" ? "success" : "danger"}
-        size="sm"
-        variant="flat"
-      >
-        {STATUS_LABELS[item.status as PaymentStatus]}
-      </Chip>
+      <div className="flex flex-col gap-0.5">
+        <Chip
+          color={item.status === "al_dia" ? "success" : item.status === "finalizado" ? "default" : "danger"}
+          size="sm"
+          variant="flat"
+        >
+          {STATUS_LABELS[item.status as PaymentStatus]}
+        </Chip>
+        {item.next_payment_date && (
+          <Text color="#678CC5" variant="label">
+            Próx: {formatDate(item.next_payment_date)}
+          </Text>
+        )}
+      </div>
     ),
   },
   {

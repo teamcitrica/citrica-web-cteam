@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Switch } from "@heroui/switch";
 
 import { Button, Input } from "citrica-ui-toolkit";
 import { DrawerCitricaAdmin } from "@/shared/components/citrica-ui/admin/drawer-citrica-admin";
@@ -24,7 +23,6 @@ export default function ServiceTypeDrawer({
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    is_active: true,
   });
 
   useEffect(() => {
@@ -33,13 +31,11 @@ export default function ServiceTypeDrawer({
         setFormData({
           name: serviceType.name,
           description: serviceType.description || "",
-          is_active: serviceType.is_active,
         });
       } else {
         setFormData({
           name: "",
           description: "",
-          is_active: true,
         });
       }
     }
@@ -57,7 +53,7 @@ export default function ServiceTypeDrawer({
       onClose={onClose}
       footer={
         <div className="flex justify-end gap-2 w-full">
-          <Button isAdmin variant="flat" onPress={onClose}>
+          <Button isAdmin={true} variant="secondary" className="border-[#42668A] text-[#42668A] rounded-[8px]" onPress={onClose}>
             Cancelar
           </Button>
           <Button
@@ -93,21 +89,6 @@ export default function ServiceTypeDrawer({
           }
         />
 
-        <div className="flex items-center gap-2">
-          <Switch
-            classNames={{
-              base: "group !bg-transparent transition-colors scale-75",
-              wrapper:
-                "bg-gray-300 group-data-[selected=true]:bg-[#265197] rounded-full transition-colors",
-              thumb: "!bg-white",
-            }}
-            color="default"
-            isSelected={formData.is_active}
-            onValueChange={(value) =>
-              setFormData({ ...formData, is_active: value })
-            }
-          />
-        </div>
       </div>
     </DrawerCitricaAdmin>
   );

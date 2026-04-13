@@ -20,7 +20,7 @@ import PaymentHistoryModal from "./components/payment-history-modal";
 
 import type { ContractedService, ContractedServiceInput } from "@/hooks/contracted-services/use-contracted-services";
 
-type StatusFilter = "todos" | "al_dia" | "pendiente_pago";
+type StatusFilter = "todos" | "al_dia" | "pendiente_pago" | "finalizado" | "proximos_10";
 
 export default function ServiciosContratadosPage() {
   // Hooks
@@ -31,6 +31,8 @@ export default function ServiciosContratadosPage() {
     createContractedService,
     updateContractedService,
     deleteContractedService,
+    finalizeService,
+    reactivateService,
   } = useContractedServices();
 
   const { generatePayments, regeneratePayments } = useServicePayments();
@@ -60,6 +62,17 @@ export default function ServiciosContratadosPage() {
     fetchContacts();
     fetchServices();
   }, [fetchContractedServices, fetchCompanies, fetchContacts, fetchServices]);
+
+  // Sincronizar historyItem cuando contractedServices se actualiza
+  useEffect(() => {
+    if (historyItem) {
+      const updated = contractedServices.find((s) => s.id === historyItem.id);
+
+      if (updated && updated.status !== historyItem.status) {
+        setHistoryItem(updated);
+      }
+    }
+  }, [contractedServices, historyItem]);
 
   // Handlers
   const handleCreate = () => {
@@ -97,7 +110,8 @@ export default function ServiciosContratadosPage() {
       const dateChanged =
         data.start_date !== selectedItem.start_date ||
         data.recurrence !== selectedItem.recurrence ||
-        data.periods !== selectedItem.periods;
+        data.periods !== selectedItem.periods ||
+        data.is_indefinite !== selectedItem.is_indefinite;
 
       if (dateChanged) {
         const canRegenerate = await regeneratePayments(
@@ -106,6 +120,7 @@ export default function ServiciosContratadosPage() {
           data.recurrence,
           data.periods,
           data.amount,
+          data.is_indefinite,
         );
 
         if (!canRegenerate) return;
@@ -113,7 +128,10 @@ export default function ServiciosContratadosPage() {
 
       const success = await updateContractedService(selectedItem.id, data);
 
-      if (success) handleCloseDrawer();
+      if (success) {
+        if (dateChanged) await fetchContractedServices();
+        handleCloseDrawer();
+      }
     } else {
       const newId = await createContractedService(data);
 
@@ -124,7 +142,9 @@ export default function ServiciosContratadosPage() {
           data.recurrence,
           data.periods,
           data.amount,
+          data.is_indefinite,
         );
+        await fetchContractedServices();
         handleCloseDrawer();
       }
     }
@@ -134,7 +154,15 @@ export default function ServiciosContratadosPage() {
   const filteredData = useMemo(() => {
     let data = contractedServices;
 
-    if (statusFilter !== "todos") {
+    if (statusFilter === "proximos_10") {
+      const today = new Date().toISOString().split("T")[0];
+      const in10Days = new Date();
+
+      in10Days.setDate(in10Days.getDate() + 9);
+      const limit = in10Days.toISOString().split("T")[0];
+
+      data = data.filter((d) => d.next_payment_date && d.next_payment_date > today && d.next_payment_date <= limit && d.status !== "finalizado");
+    } else if (statusFilter !== "todos") {
       data = data.filter((d) => d.status === statusFilter);
     }
     if (companyFilter !== "all") {
@@ -202,6 +230,8 @@ export default function ServiciosContratadosPage() {
                     { value: "todos", label: "Todos" },
                     { value: "al_dia", label: "Al día" },
                     { value: "pendiente_pago", label: "Pendiente" },
+                    { value: "proximos_10", label: "Próx. 10 días" },
+                    { value: "finalizado", label: "Finalizado" },
                   ]}
                   selectedValue={statusFilter}
                   onValueChange={(value) => setStatusFilter(value as StatusFilter)}
@@ -232,6 +262,8 @@ export default function ServiciosContratadosPage() {
             setHistoryItem(null);
           }}
           onStatusUpdated={fetchContractedServices}
+          onFinalize={finalizeService}
+          onReactivate={reactivateService}
         />
 
         {/* Delete modal */}
