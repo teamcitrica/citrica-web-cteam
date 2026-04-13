@@ -1,5 +1,5 @@
 export type SiteConfig = typeof siteConfig;
-import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck, Calendar, UserStar, Sparkles, Folder, Briefcase } from "lucide-react"
+import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck, Calendar, UserStar, Sparkles, Folder, Briefcase, BarChart } from "lucide-react"
 
 const ROL_ADMIN = 1;
 const ROL_USER = 2;
@@ -56,6 +56,27 @@ export const siteConfig = {
 				{
 					title: "Configuración",
 					href: "/admin/ia/config",
+				},
+
+			],
+		},
+		{
+			title: "SALES ANALYTICS",
+			icon: "BarChart",
+			href: "/admin/sales-analytics",
+			allowedRoles: [ROL_ADMIN],
+			subItems: [
+				{
+					title: "Proyectos",
+					href: "/admin/sales-analytics/projects",
+				},
+				{
+					title: "Nuevo Proyecto",
+					href: "/admin/sales-analytics/projects/new",
+				},
+				{
+					title: "Configuración",
+					href: "/admin/sales-analytics/config",
 				},
 
 			],
