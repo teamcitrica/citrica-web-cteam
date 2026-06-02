@@ -130,7 +130,7 @@ export default function ProjectReportsPage() {
                     <p className="text-sm text-gray-600">Costo Total IA</p>
                     <p className="text-xl font-bold text-gray-900">
                       {formatCurrency(
-                        reports.reduce((sum, r) => sum + (r.total_cost || 0), 0)
+                        reports.reduce((sum: number, r) => sum + (r.total_cost || 0), 0)
                       )}
                     </p>
                   </div>
