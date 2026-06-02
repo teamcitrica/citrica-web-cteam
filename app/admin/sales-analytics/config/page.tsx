@@ -247,7 +247,7 @@ export default function SalesAnalyticsConfigPage() {
                 <div>
                   <p className="text-sm text-gray-600">Modelos Activos</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {models.filter((m: import('@/types/sales-analytics').SalesModelConfig) => m.is_active).length}
+                    {models.filter((m) => m.is_active).length}
                   </p>
                 </div>
                 <Sparkles className="w-8 h-8 text-primary" />
@@ -275,7 +275,7 @@ export default function SalesAnalyticsConfigPage() {
                 <div>
                   <p className="text-sm text-gray-600">Proveedores</p>
                   <p className="text-2xl font-bold text-gray-900">
-                    {new Set(models.map((m: import('@/types/sales-analytics').SalesModelConfig) => m.provider)).size}
+                    {new Set(models.map((m) => m.provider)).size}
                   </p>
                 </div>
                 <Activity className="w-8 h-8 text-blue-600" />
@@ -330,7 +330,7 @@ export default function SalesAnalyticsConfigPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {apiConfigs.map((api: import('@/types/sales-analytics').SalesApiConfig) => (
+                {apiConfigs.map((api) => (
                   <div
                     key={api.id}
                     className={`p-4 rounded-lg border-2 ${
@@ -427,7 +427,7 @@ export default function SalesAnalyticsConfigPage() {
                 </p>
               ) : (
               <div className="space-y-4">
-                {models.map((model: import('@/types/sales-analytics').SalesModelConfig) => (
+                {models.map((model) => (
                   <Card key={model.id} className={model.is_active ? 'border-2 border-green-200' : ''}>
                     <CardBody className="p-4">
                       <div className="flex justify-between items-start">
