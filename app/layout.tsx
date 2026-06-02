@@ -6,6 +6,7 @@ import { Providers } from "../shared/providers";
 import SupabaseProvider from "@/shared/context/supabase-context"
 import { AuthContextProvider } from "@/shared/context/auth-context";
 import { AvailabilityProvider } from "@/app/contexts/AvailabilityContext";
+import { QueryProvider } from "@/shared/providers/query-provider";
 import Navbar from "@ui/organism/navbar";
 import { FooterCitrica } from "@/shared/components/project-components/footer-citrica";
 import { DynamicNavbar } from "@/shared/components/project-components/dynamic-navbar";
@@ -36,17 +37,19 @@ export default function RootLayout({
 			<body
 			>
 				{/* <Toaster/>  SE CAMBIÓ POR HEROUI TOAST*/}
-				<SupabaseProvider>
-					<AuthContextProvider>
-						<AvailabilityProvider>
-							<Providers themeProps={{ attribute: "data-theme", defaultTheme: "light" }}>
-								{/* <Navbar /> */}
-								{children}
-								<FooterCitrica />
-							</Providers>
-						</AvailabilityProvider>
-					</AuthContextProvider>
-				</SupabaseProvider>
+				<QueryProvider>
+					<SupabaseProvider>
+						<AuthContextProvider>
+							<AvailabilityProvider>
+								<Providers themeProps={{ attribute: "data-theme", defaultTheme: "light" }}>
+									{/* <Navbar /> */}
+									{children}
+									<FooterCitrica />
+								</Providers>
+							</AvailabilityProvider>
+						</AuthContextProvider>
+					</SupabaseProvider>
+				</QueryProvider>
 
 			</body>
 		</html>
