@@ -157,7 +157,7 @@ export function useSalesPrompts(projectId: string) {
     // State
     prompts,
     isLoading,
-    activePrompt: prompts.find((p) => p.is_active),
+    activePrompt: prompts.find((p: SalesPrompt) => p.is_active),
 
     // Actions
     refetch,
