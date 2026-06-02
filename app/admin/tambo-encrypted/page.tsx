@@ -33,14 +33,14 @@ interface Sorteo {
 const columns = [
   { name: "ID", uid: "id", sortable: true },
   { name: "FECHA CREACIÓN", uid: "created_at", sortable: true },
-  { name: "NOMBRE", uid: "first_name", sortable: true },
-  { name: "APELLIDO", uid: "last_name", sortable: true },
-  { name: "EMAIL", uid: "email", sortable: true },
-  { name: "TELÉFONO", uid: "phone", sortable: false },
+  { name: "🔐 NOMBRE", uid: "first_name", sortable: true },
+  { name: "🔐 APELLIDO", uid: "last_name", sortable: true },
+  { name: "🔐 EMAIL", uid: "email", sortable: true },
+  { name: "🔐 TELÉFONO", uid: "phone", sortable: false },
   { name: "TIPO DOC", uid: "doc_type", sortable: false },
-  { name: "NRO DOC", uid: "doc_number", sortable: false },
-  { name: "CUMPLEAÑOS", uid: "bday", sortable: true },
-  { name: "DIRECCIÓN", uid: "address", sortable: false },
+  { name: "🔐 NRO DOC", uid: "doc_number", sortable: false },
+  { name: "🔐 CUMPLEAÑOS", uid: "bday", sortable: true },
+  { name: "🔐 DIRECCIÓN", uid: "address", sortable: false },
   { name: "PACK", uid: "pack_option", sortable: true },
   { name: "TRANSFER DIAGEO", uid: "transfer_diageo", sortable: true },
   { name: "CAMPAÑA", uid: "campaign", sortable: false },
@@ -88,7 +88,7 @@ const getOperatorsForColumn = (columnName: string) => {
   }
 };
 
-export default function TamboPage() {
+export default function TamboEncryptedPage() {
   const { userSession } = UserAuth();
   const { exportToExcel } = useExcelExport();
   const [sorteos, setSorteos] = useState<Sorteo[]>([]);
@@ -139,7 +139,7 @@ export default function TamboPage() {
       // 3️⃣ Preparar el orden
       const orderBy = {
         column: sortDescriptor.column,
-        direction: sortDescriptor.direction === "ascending" ? "asc" : "desc"
+        ascending: sortDescriptor.direction === "ascending"
       };
 
       // 4️⃣ Hacer la petición a la Edge Function (siempre POST con filtros)
@@ -147,11 +147,11 @@ export default function TamboPage() {
       const body = JSON.stringify({ filters: filtersToSend, orderBy });
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/get-tambo-data`,
+        `https://axndntqikmbldyodiwal.supabase.co/functions/v1/get-tambo-encrypted-data`,
         {
           method,
           headers: {
-            Authorization: `Bearer ${userSession.access_token}`,
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TAMBO_SUPABASE_ANON_KEY}`,
             "Content-Type": "application/json",
           },
           body,
@@ -328,8 +328,8 @@ export default function TamboPage() {
   const handleExportToExcel = () => {
     exportToExcel({
       data: sortedItems,
-      fileName: "registros_tambo",
-      sheetName: "Registros Tambo",
+      fileName: "registros_tambo_encriptados",
+      sheetName: "Registros Tambo Encriptados",
       columnMapping: {
         id: "ID",
         created_at: "FECHA CREACIÓN",
@@ -593,7 +593,7 @@ export default function TamboPage() {
                   ¡Comienza tu búsqueda!
                 </h3>
                 <p className="text-white/90 text-lg mb-5 font-medium">
-                  Para visualizar los registros de Tambo:
+                  🔐 Para visualizar los registros encriptados de Tambo:
                 </p>
                 <div className="bg-[#ff5b00] rounded-lg p-5 inline-block shadow-xl transform hover:scale-105 transition-transform">
                   <p className="text-white font-bold text-lg leading-relaxed">
@@ -622,7 +622,7 @@ export default function TamboPage() {
 
           {hasSearched && !loading && (
             <Table
-            aria-label="Tabla de Registros de Tambo"
+            aria-label="Tabla de Registros Encriptados de Tambo"
             selectionMode="none"
             sortDescriptor={sortDescriptor}
             onSortChange={(descriptor) =>

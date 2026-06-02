@@ -131,6 +131,10 @@ export const siteConfig = {
 					title: "Proyectos",
 					href: "/admin/crm/proyectos",
 				},
+				{
+					title: "🔐 Tambo Encriptado",
+					href: "/admin/tambo-encrypted",
+				},
 				// {
 				// 	title: "Configuración",
 				// 	href: "/admin/crm/configuracion",

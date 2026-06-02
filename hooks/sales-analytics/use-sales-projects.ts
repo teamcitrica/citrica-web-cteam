@@ -231,6 +231,37 @@ export function useSalesProjects() {
     };
   };
 
+  // =============================================
+  // Generate manual report
+  // =============================================
+
+  const generateManualReportMutation = useMutation({
+    mutationFn: async (projectId: string) => {
+      const response = await fetch(
+        `/api/sales-analytics/projects/${projectId}/generate-manual-report`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error);
+      }
+
+      return data;
+    },
+    onSuccess: async () => {
+      // Refetch reports para mostrar el nuevo reporte
+      await queryClient.refetchQueries({ queryKey: ['sales-reports'] });
+    },
+    onError: (error: Error) => {
+      console.error('Error generando reporte manual:', error.message);
+    },
+  });
+
   return {
     // State
     projects,
@@ -245,10 +276,12 @@ export function useSalesProjects() {
     detectSchema,
     generateSetupScript,
     verifySetup,
+    generateManualReport: generateManualReportMutation.mutateAsync,
 
     // Loading states
     isCreating: createProjectMutation.isPending,
     isUpdating: updateProjectMutation.isPending,
     isDeleting: deleteProjectMutation.isPending,
+    isGeneratingReport: generateManualReportMutation.isPending,
   };
 }

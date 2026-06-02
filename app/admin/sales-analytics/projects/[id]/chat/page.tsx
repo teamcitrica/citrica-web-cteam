@@ -144,7 +144,7 @@ export default function ProjectChatPage() {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {conversations.map((conv) => (
+                    {conversations.map((conv: import('@/types/sales-analytics').SalesChatConversation) => (
                       <div
                         key={conv.id}
                         className={`p-3 rounded-lg cursor-pointer transition-colors ${
