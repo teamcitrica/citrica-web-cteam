@@ -5,6 +5,8 @@ import { addToast } from "@heroui/toast";
 
 import { useSupabase } from "@/shared/context/supabase-context";
 
+import { RECURRENCE_MONTHS } from "@/app/admin/gestion-servicios/servicios-contratados/types";
+
 import type { Recurrence } from "@/app/admin/gestion-servicios/servicios-contratados/types";
 
 export interface ServicePayment {
@@ -18,13 +20,6 @@ export interface ServicePayment {
   created_at: string;
   updated_at: string;
 }
-
-const RECURRENCE_MONTHS: Record<Recurrence, number> = {
-  mensual: 1,
-  trimestral: 3,
-  semestral: 6,
-  anual: 12,
-};
 
 export function useServicePayments() {
   const { supabase } = useSupabase();
@@ -182,15 +177,17 @@ export function useServicePayments() {
       recurrence: Recurrence,
       periods: number,
       amount: number,
+      isIndefinite: boolean = false,
     ): Promise<boolean> => {
       try {
         const monthsPerPeriod = RECURRENCE_MONTHS[recurrence];
+        const effectivePeriods = isIndefinite ? 12 : periods;
         const paymentsToInsert = [];
 
-        for (let i = 0; i < periods; i++) {
+        for (let i = 0; i < effectivePeriods; i++) {
           const dueDate = new Date(startDate + "T00:00:00");
 
-          dueDate.setMonth(dueDate.getMonth() + monthsPerPeriod * (i + 1));
+          dueDate.setMonth(dueDate.getMonth() + monthsPerPeriod * i);
 
           paymentsToInsert.push({
             contracted_service_id: contractedServiceId,
@@ -229,6 +226,7 @@ export function useServicePayments() {
       recurrence: Recurrence,
       periods: number,
       amount: number,
+      isIndefinite: boolean = false,
     ): Promise<boolean> => {
       try {
         // Verificar si hay pagos pagados
@@ -267,6 +265,7 @@ export function useServicePayments() {
           recurrence,
           periods,
           amount,
+          isIndefinite,
         );
 
         return true;

@@ -35,7 +35,6 @@ export default function ServiciosPage() {
     createServiceType,
     updateServiceType,
     deleteServiceType,
-    toggleActive: toggleTypeActive,
   } = useServiceTypes();
 
   const {
@@ -145,10 +144,6 @@ export default function ServiciosPage() {
     if (success) handleCloseTypeDrawer();
   };
 
-  const handleToggleTypeActive = useCallback(async (id: number, isActive: boolean) => {
-    await toggleTypeActive(id, isActive);
-  }, [toggleTypeActive]);
-
   // Servicios filtrados por tipo
   const filteredServices = useMemo(() => {
     if (selectedTypeFilter === "all") return services;
@@ -174,9 +169,8 @@ export default function ServiciosPage() {
       getServiceTypeColumns({
         onEdit: handleEditType,
         onDelete: handleDeleteType,
-        onToggleActive: handleToggleTypeActive,
       }),
-    [handleEditType, handleDeleteType, handleToggleTypeActive],
+    [handleEditType, handleDeleteType],
   );
 
   const handleCreate = () => {

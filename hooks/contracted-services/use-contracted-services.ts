@@ -17,16 +17,20 @@ export interface ContractedService {
   service_type_name: string;
   amount: number;
   start_date: string;
-  end_date: string;
+  end_date: string | null;
   recurrence: Recurrence;
   periods: number;
+  is_indefinite: boolean;
   status: PaymentStatus;
   created_at: string;
   updated_at: string;
+  next_payment_date?: string | null;
   contact?: {
     id: string;
     name: string | null;
     last_name: string | null;
+    email: string | null;
+    phone: string | null;
   };
   company?: {
     id: number;
@@ -41,9 +45,10 @@ export interface ContractedServiceInput {
   service_type_name: string;
   amount: number;
   start_date: string;
-  end_date: string;
+  end_date: string | null;
   recurrence: Recurrence;
   periods: number;
+  is_indefinite: boolean;
   status: PaymentStatus;
 }
 
@@ -60,14 +65,29 @@ export function useContractedServices() {
         .from("contracted_services")
         .select(`
           *,
-          contact:contact(id, name, last_name),
+          contact:contact(id, name, last_name, email, phone),
           company:company(id, name)
         `)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      setContractedServices(data || []);
+      // Traer próximo pago pendiente de cada servicio
+      const { data: nextPayments } = await supabase
+        .from("service_payments")
+        .select("contracted_service_id, due_date")
+        .eq("status", "pendiente")
+        .order("due_date", { ascending: true });
+
+      const servicesWithNextPayment = (data || []).map((s: ContractedService) => {
+        const next = (nextPayments || []).find(
+          (p: { contracted_service_id: number; due_date: string }) => p.contracted_service_id === s.id,
+        );
+
+        return { ...s, next_payment_date: next?.due_date || null };
+      });
+
+      setContractedServices(servicesWithNextPayment);
     } catch (err: any) {
       console.error("Error fetching contracted services:", err);
       addToast({
@@ -97,6 +117,7 @@ export function useContractedServices() {
             end_date: data.end_date,
             recurrence: data.recurrence,
             periods: data.periods,
+            is_indefinite: data.is_indefinite,
             status: data.status,
           }])
           .select("id")
@@ -145,6 +166,7 @@ export function useContractedServices() {
             end_date: data.end_date,
             recurrence: data.recurrence,
             periods: data.periods,
+            is_indefinite: data.is_indefinite,
             status: data.status,
             updated_at: new Date().toISOString(),
           })
@@ -212,6 +234,85 @@ export function useContractedServices() {
     [supabase, fetchContractedServices],
   );
 
+  const finalizeService = useCallback(
+    async (id: number): Promise<boolean> => {
+      try {
+        const { error } = await supabase
+          .from("contracted_services")
+          .update({ status: "finalizado", updated_at: new Date().toISOString() })
+          .eq("id", id);
+
+        if (error) throw error;
+
+        addToast({
+          title: "Servicio finalizado",
+          description: "El servicio ha sido marcado como finalizado",
+          color: "success",
+        });
+        await fetchContractedServices();
+
+        return true;
+      } catch (err: any) {
+        console.error("Error finalizing service:", err);
+        addToast({
+          title: "Error",
+          description: "Error al finalizar servicio",
+          color: "danger",
+        });
+
+        return false;
+      }
+    },
+    [supabase, fetchContractedServices],
+  );
+
+  const reactivateService = useCallback(
+    async (id: number): Promise<boolean> => {
+      try {
+        // Recalcular status basado en pagos
+        const { data: payments, error: fetchError } = await supabase
+          .from("service_payments")
+          .select("due_date, status")
+          .eq("contracted_service_id", id);
+
+        if (fetchError) throw fetchError;
+
+        const today = new Date().toISOString().split("T")[0];
+        const hasOverdue = (payments || []).some(
+          (p: { due_date: string; status: string }) => p.due_date <= today && p.status === "pendiente",
+        );
+
+        const newStatus = hasOverdue ? "pendiente_pago" : "al_dia";
+
+        const { error } = await supabase
+          .from("contracted_services")
+          .update({ status: newStatus, updated_at: new Date().toISOString() })
+          .eq("id", id);
+
+        if (error) throw error;
+
+        addToast({
+          title: "Servicio reactivado",
+          description: "El servicio ha sido reactivado",
+          color: "success",
+        });
+        await fetchContractedServices();
+
+        return true;
+      } catch (err: any) {
+        console.error("Error reactivating service:", err);
+        addToast({
+          title: "Error",
+          description: "Error al reactivar servicio",
+          color: "danger",
+        });
+
+        return false;
+      }
+    },
+    [supabase, fetchContractedServices],
+  );
+
   return {
     contractedServices,
     isLoading,
@@ -219,5 +320,7 @@ export function useContractedServices() {
     createContractedService,
     updateContractedService,
     deleteContractedService,
+    finalizeService,
+    reactivateService,
   };
 }
