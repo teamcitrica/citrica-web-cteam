@@ -400,7 +400,7 @@ export function ProjectOnboardingWizard({
                   No hay modelos disponibles
                 </SelectItem>
               ) : (
-                aiModels.map((model: import('@/types/sales-analytics').SalesModelConfig) => (
+                aiModels.map((model) => (
                   <SelectItem key={model.id} textValue={model.model_name}>
                     {model.model_name}
                   </SelectItem>
