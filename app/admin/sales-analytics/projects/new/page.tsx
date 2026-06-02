@@ -71,7 +71,7 @@ export default function NewSalesAnalyticsProjectPage() {
 
             {/* Steps indicator */}
             <div className="flex justify-between mt-4">
-              {steps.map((step, index) => (
+              {steps.map((step: { title: string; description: string }, index: number) => (
                 <div
                   key={index}
                   className={`flex flex-col items-center ${
