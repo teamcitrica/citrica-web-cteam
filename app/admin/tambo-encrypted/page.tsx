@@ -1,7 +1,7 @@
 "use client";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback } from "react";
 import { Text, Col, Container, Select, Input, Button, Icon } from "citrica-ui-toolkit";
 import { UserAuth } from "@/shared/context/auth-context";
 import { useExcelExport } from "@/hooks/use-excel-export";
@@ -75,6 +75,10 @@ const ALL_OPERATORS = [
 // Columnas numéricas que permiten operadores de comparación
 const NUMERIC_COLUMNS = ["id", "pack_option"];
 
+// Columnas por las que SÍ se puede filtrar en el servidor (deben ser columnas
+// planas, no encriptadas, porque el filtro se aplica en la consulta SQL).
+const FILTERABLE_COLUMNS = ["id", "campaign"];
+
 // Función para obtener operadores disponibles según el tipo de columna
 const getOperatorsForColumn = (columnName: string) => {
   const isNumeric = NUMERIC_COLUMNS.includes(columnName);
@@ -98,6 +102,7 @@ export default function TamboEncryptedPage() {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   // Sistema de filtros dinámicos estilo Supabase
   type Filter = {
@@ -108,6 +113,8 @@ export default function TamboEncryptedPage() {
   };
 
   const [filters, setFilters] = useState<Filter[]>([]);
+  // Filtros actualmente aplicados en el servidor (para re-usar al cambiar de página/orden)
+  const [appliedFilters, setAppliedFilters] = useState<Filter[]>([]);
 
   type LocalSortDescriptor = {
     column: string;
@@ -120,7 +127,11 @@ export default function TamboEncryptedPage() {
   });
 
   // Función para traer datos del servidor con filtros
-  const fetchSorteos = async (applyFilters = false) => {
+  const fetchSorteos = async (
+    filtersToApply: Filter[] = [],
+    targetPage = 1,
+    sort: LocalSortDescriptor = sortDescriptor
+  ) => {
     try {
       setLoading(true);
       setError(null);
@@ -133,23 +144,29 @@ export default function TamboEncryptedPage() {
         return;
       }
 
-      // 2️⃣ Preparar los filtros para enviar al servidor (solo si applyFilters es true)
-      const filtersToSend = applyFilters ? filters.filter(f => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null") : [];
+      // 2️⃣ Limpiar filtros vacíos antes de enviar
+      const filtersToSend = filtersToApply.filter(
+        (f) => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null"
+      );
 
       // 3️⃣ Preparar el orden
       const orderBy = {
-        column: sortDescriptor.column,
-        ascending: sortDescriptor.direction === "ascending"
+        column: sort.column,
+        ascending: sort.direction === "ascending",
       };
 
-      // 4️⃣ Hacer la petición a la Edge Function (siempre POST con filtros)
-      const method = "POST";
-      const body = JSON.stringify({ filters: filtersToSend, orderBy });
+      // 4️⃣ Pedir SOLO la página actual (paginación del servidor)
+      const body = JSON.stringify({
+        filters: filtersToSend,
+        orderBy,
+        page: targetPage,
+        pageSize: ITEMS_PER_PAGE,
+      });
 
       const res = await fetch(
         `https://axndntqikmbldyodiwal.supabase.co/functions/v1/get-tambo-encrypted-data`,
         {
-          method,
+          method: "POST",
           headers: {
             Authorization: `Bearer ${process.env.NEXT_PUBLIC_TAMBO_SUPABASE_ANON_KEY}`,
             "Content-Type": "application/json",
@@ -168,11 +185,9 @@ export default function TamboEncryptedPage() {
 
       if (!res.ok) throw new Error(json.error || "Error al obtener datos");
 
-      console.log("Respuesta de la API:", json);
-      console.log("Datos de sorteos:", json.data);
-
       setSorteos(json.data || []);
-      setPage(1); // Resetear a la primera página
+      setTotalRecords(json.count || 0);
+      setPage(targetPage);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -180,95 +195,9 @@ export default function TamboEncryptedPage() {
     }
   };
 
-  // Filtrado local solo para búsqueda general (searchTerm)
-  // Los filtros dinámicos ahora se aplican en el servidor
-  const filteredSorteos = useMemo(() => {
-    let filtered = sorteos;
-
-    // Filtro por búsqueda general en el input (búsqueda rápida local)
-    if (searchTerm.trim()) {
-      filtered = filtered.filter((sorteo) => {
-        const firstName = sorteo.first_name || "";
-        const lastName = sorteo.last_name || "";
-        const email = sorteo.email || "";
-        const phone = sorteo.phone || "";
-        const docNumber = sorteo.doc_number || "";
-        const campaign = sorteo.campaign || "";
-        const id = String(sorteo.id || "");
-        const searchLower = searchTerm.toLowerCase();
-
-        return (
-          firstName.toLowerCase().includes(searchLower) ||
-          lastName.toLowerCase().includes(searchLower) ||
-          email.toLowerCase().includes(searchLower) ||
-          phone.toLowerCase().includes(searchLower) ||
-          docNumber.toLowerCase().includes(searchLower) ||
-          campaign.toLowerCase().includes(searchLower) ||
-          id.toLowerCase().includes(searchLower)
-        );
-      });
-    }
-
-    return filtered;
-  }, [sorteos, searchTerm]);
-
-  // Ordenar sorteos
-  const sortedItems = useMemo(() => {
-    return [...filteredSorteos].sort((a, b) => {
-      let first: any;
-      let second: any;
-
-      switch (sortDescriptor.column) {
-        case "id":
-          first = a.id || 0;
-          second = b.id || 0;
-          break;
-        case "created_at":
-          first = a.created_at ? new Date(a.created_at).getTime() : 0;
-          second = b.created_at ? new Date(b.created_at).getTime() : 0;
-          break;
-        case "first_name":
-          first = (a.first_name || "").toLowerCase();
-          second = (b.first_name || "").toLowerCase();
-          break;
-        case "last_name":
-          first = (a.last_name || "").toLowerCase();
-          second = (b.last_name || "").toLowerCase();
-          break;
-        case "email":
-          first = (a.email || "").toLowerCase();
-          second = (b.email || "").toLowerCase();
-          break;
-        case "bday":
-          first = a.bday ? new Date(a.bday).getTime() : 0;
-          second = b.bday ? new Date(b.bday).getTime() : 0;
-          break;
-        case "pack_option":
-          first = a.pack_option || 0;
-          second = b.pack_option || 0;
-          break;
-        case "transfer_diageo":
-          first = a.transfer_diageo ? 1 : 0;
-          second = b.transfer_diageo ? 1 : 0;
-          break;
-        default:
-          return 0;
-      }
-
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
-    });
-  }, [filteredSorteos, sortDescriptor]);
-
-  // Calcular cantidad de páginas
-  const totalPages = Math.ceil(sortedItems.length / ITEMS_PER_PAGE);
-
-  // Obtener sorteos para la página actual
-  const paginatedItems = useMemo(() => {
-    const startIndex = (page - 1) * ITEMS_PER_PAGE;
-    return sortedItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [sortedItems, page]);
+  // Paginación del servidor: el filtrado, orden y corte por página los hace la edge function.
+  // El total de páginas se calcula con el conteo total que devuelve la API.
+  const totalPages = Math.ceil(totalRecords / ITEMS_PER_PAGE);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -300,14 +229,17 @@ export default function TamboEncryptedPage() {
   const clearAllFilters = () => {
     setSearchTerm("");
     setFilters([]);
+    setAppliedFilters([]);
     setPage(1);
     setSorteos([]);
+    setTotalRecords(0);
     setHasSearched(false);
   };
 
-  // Función para aplicar filtros (consulta al servidor)
+  // Función para aplicar filtros (consulta al servidor, desde la página 1)
   const applyFiltersToServer = () => {
-    fetchSorteos(true);
+    setAppliedFilters(filters);
+    fetchSorteos(filters, 1);
   };
 
   const formatDate = (dateString: string | null) => {
@@ -324,13 +256,47 @@ export default function TamboEncryptedPage() {
     }
   };
 
-  // Función para exportar a Excel usando el hook reutilizable
-  const handleExportToExcel = () => {
-    exportToExcel({
-      data: sortedItems,
-      fileName: "registros_tambo_encriptados",
-      sheetName: "Registros Tambo Encriptados",
-      columnMapping: {
+  // Exportar a Excel: hace su PROPIA consulta SIN paginación (page/pageSize)
+  // para que la edge function devuelva TODOS los registros filtrados, no solo la página visible.
+  const handleExportToExcel = async () => {
+    try {
+      if (!userSession) {
+        setError("Debes iniciar sesión para exportar");
+        return;
+      }
+
+      const filtersToSend = appliedFilters.filter(
+        (f) => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null"
+      );
+
+      const orderBy = {
+        column: sortDescriptor.column,
+        ascending: sortDescriptor.direction === "ascending",
+      };
+
+      // Sin page/pageSize → trae todo lo filtrado
+      const body = JSON.stringify({ filters: filtersToSend, orderBy });
+
+      const res = await fetch(
+        `https://axndntqikmbldyodiwal.supabase.co/functions/v1/get-tambo-encrypted-data`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TAMBO_SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body,
+        }
+      );
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Error al exportar");
+
+      exportToExcel({
+        data: json.data || [],
+        fileName: "registros_tambo_encriptados",
+        sheetName: "Registros Tambo Encriptados",
+        columnMapping: {
         id: "ID",
         created_at: "FECHA CREACIÓN",
         campaign: "CAMPAÑA",
@@ -360,7 +326,10 @@ export default function TamboEncryptedPage() {
         }
         return value;
       },
-    });
+      });
+    } catch (err: any) {
+      setError(err.message);
+    }
   };
 
   const renderCell = useCallback((sorteo: Sorteo, columnKey: React.Key) => {
@@ -480,7 +449,7 @@ export default function TamboEncryptedPage() {
               )}
               <Button
                 isAdmin
-                onPress={() => fetchSorteos(false)}
+                onPress={() => { setAppliedFilters([]); fetchSorteos([], 1); }}
                 isDisabled={loading}
                 className="!bg-[#265197] hover:!bg-[#16305A] !text-white"
               >
@@ -498,7 +467,7 @@ export default function TamboEncryptedPage() {
                   Limpiar todo
                 </Button>
               )}
-              {sortedItems.length > 0 && (
+              {totalRecords > 0 && (
                 <Button
                   isAdmin
                   onPress={handleExportToExcel}
@@ -517,7 +486,7 @@ export default function TamboEncryptedPage() {
               <div className="flex items-center justify-between gap-4 my-0">
                 {hasSearched ? (
                   <Text isAdmin color="#265197" variant="body" weight="bold">
-                    Total de registros: {sortedItems.length}
+                    Total de registros: {totalRecords}
                   </Text>
                 ) : (
                   <span />
@@ -535,7 +504,7 @@ export default function TamboEncryptedPage() {
                       }}
                       selectedKeys={filter.column ? [filter.column] : []}
                       variant="faded"
-                      options={columns.filter((col) => col.uid === "id").map((col) => ({ value: col.uid, label: col.name }))}
+                      options={columns.filter((col) => FILTERABLE_COLUMNS.includes(col.uid)).map((col) => ({ value: col.uid, label: col.name }))}
                       onSelectionChange={(keys) => {
                         const selected = Array.from(keys)[0] as string;
                         updateFilter(filter.id, "column", selected);
@@ -646,9 +615,12 @@ export default function TamboEncryptedPage() {
             aria-label="Tabla de Registros Encriptados de Tambo"
             selectionMode="none"
             sortDescriptor={sortDescriptor}
-            onSortChange={(descriptor) =>
-              setSortDescriptor(descriptor as LocalSortDescriptor)
-            }
+            onSortChange={(descriptor) => {
+              const newSort = descriptor as LocalSortDescriptor;
+              setSortDescriptor(newSort);
+              // Re-consultar al servidor con el nuevo orden, desde la página 1
+              fetchSorteos(appliedFilters, 1, newSort);
+            }}
             classNames={{
               wrapper: "bg-transparent overflow-x-auto !p-0",
               tr: "data-[odd=true]:bg-[#EEF1F7]",
@@ -669,7 +641,7 @@ export default function TamboEncryptedPage() {
             </TableHeader>
             <TableBody
               emptyContent={"No se encontraron registros"}
-              items={paginatedItems}
+              items={sorteos}
             >
               {(item) => (
                 <TableRow key={item.id} className="items-center">
@@ -697,7 +669,7 @@ export default function TamboEncryptedPage() {
                 }}
                 page={page}
                 total={totalPages}
-                onChange={setPage}
+                onChange={(p) => fetchSorteos(appliedFilters, p)}
               />
             </div>
           )}
