@@ -135,6 +135,10 @@ export const siteConfig = {
 					title: "🔐 Tambo Encriptado",
 					href: "/admin/tambo-encrypted",
 				},
+				{
+					title: "🔐 Polla Encriptada",
+					href: "/admin/polla-encrypted",
+				},
 				// {
 				// 	title: "Configuración",
 				// 	href: "/admin/crm/configuracion",
