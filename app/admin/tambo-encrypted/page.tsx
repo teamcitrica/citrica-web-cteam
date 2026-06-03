@@ -199,6 +199,12 @@ export default function TamboEncryptedPage() {
   // El total de páginas se calcula con el conteo total que devuelve la API.
   const totalPages = Math.ceil(totalRecords / ITEMS_PER_PAGE);
 
+  // Hay al menos un filtro válido (con valor, o un operador que no necesita valor).
+  // Se exige para poder aplicar filtros (no se permite traer todo sin filtrar).
+  const hasValidFilter = filters.some(
+    (f) => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null"
+  );
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setPage(1);
@@ -238,6 +244,13 @@ export default function TamboEncryptedPage() {
 
   // Función para aplicar filtros (consulta al servidor, desde la página 1)
   const applyFiltersToServer = () => {
+    // Guarda de seguridad: no aplicar sin al menos un filtro con valor.
+    // (El botón ya está deshabilitado en ese caso; esto es por si acaso.)
+    const valid = filters.some(
+      (f) => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null"
+    );
+    if (!valid) return;
+
     setAppliedFilters(filters);
     fetchSorteos(filters, 1);
   };
@@ -437,9 +450,13 @@ export default function TamboEncryptedPage() {
               {filters.length > 0 && (
                 <Button
                   isAdmin
+                  title={!hasValidFilter ? "Ingresa un valor en al menos un filtro" : undefined}
                   onPress={applyFiltersToServer}
-                  isDisabled={loading}
-                  className="!bg-[#265197] hover:!bg-[#16305A] !text-white"
+                  className={
+                    hasValidFilter && !loading
+                      ? "!bg-[#265197] hover:!bg-[#16305A] !text-white"
+                      : "!bg-[#A7BDE2] !text-white !cursor-not-allowed"
+                  }
                 >
                   <span className="flex items-center gap-2">
                     <span>🔍</span>
@@ -447,17 +464,6 @@ export default function TamboEncryptedPage() {
                   </span>
                 </Button>
               )}
-              <Button
-                isAdmin
-                onPress={() => { setAppliedFilters([]); fetchSorteos([], 1); }}
-                isDisabled={loading}
-                className="!bg-[#265197] hover:!bg-[#16305A] !text-white"
-              >
-                <span className="flex items-center gap-2">
-                  <span>📋</span>
-                  <span>{loading ? "Cargando..." : "Buscar Todos"}</span>
-                </span>
-              </Button>
               {(filters.length > 0 || searchTerm || hasSearched) && (
                 <Button
                   isAdmin
