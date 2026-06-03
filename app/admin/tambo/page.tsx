@@ -1,8 +1,22 @@
 "use client";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+} from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { useState, useCallback, useMemo } from "react";
-import { Text, Col, Container, Select, Input, Button } from "citrica-ui-toolkit";
+import {
+  Text,
+  Col,
+  Container,
+  Select,
+  Input,
+  Button,
+} from "citrica-ui-toolkit";
 import { UserAuth } from "@/shared/context/auth-context";
 import { useExcelExport } from "@/hooks/use-excel-export";
 
@@ -126,23 +140,30 @@ export default function TamboPage() {
       setError(null);
       setHasSearched(true);
 
-      // 1️⃣ Verificar que haya sesión activa
+      // 1️ Verificar que haya sesión activa
       if (!userSession) {
         setError("Debes iniciar sesión para ver esta información");
         setLoading(false);
         return;
       }
 
-      // 2️⃣ Preparar los filtros para enviar al servidor (solo si applyFilters es true)
-      const filtersToSend = applyFilters ? filters.filter(f => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null") : [];
+      // 2️Preparar los filtros para enviar al servidor (solo si applyFilters es true)
+      const filtersToSend = applyFilters
+        ? filters.filter(
+            (f) =>
+              f.value.trim() !== "" ||
+              f.operator === "is_null" ||
+              f.operator === "is_not_null",
+          )
+        : [];
 
-      // 3️⃣ Preparar el orden
+      // 3️Preparar el orden
       const orderBy = {
         column: sortDescriptor.column,
-        direction: sortDescriptor.direction === "ascending" ? "asc" : "desc"
+        direction: sortDescriptor.direction === "ascending" ? "asc" : "desc",
       };
 
-      // 4️⃣ Hacer la petición a la Edge Function (siempre POST con filtros)
+      // 4️Hacer la petición a la Edge Function (siempre POST con filtros)
       const method = "POST";
       const body = JSON.stringify({ filters: filtersToSend, orderBy });
 
@@ -155,7 +176,7 @@ export default function TamboPage() {
             "Content-Type": "application/json",
           },
           body,
-        }
+        },
       );
 
       if (res.status === 403) {
@@ -290,9 +311,13 @@ export default function TamboPage() {
     setPage(1);
   };
 
-  const updateFilter = (filterId: string, field: keyof Filter, value: string) => {
+  const updateFilter = (
+    filterId: string,
+    field: keyof Filter,
+    value: string,
+  ) => {
     setFilters(
-      filters.map((f) => (f.id === filterId ? { ...f, [field]: value } : f))
+      filters.map((f) => (f.id === filterId ? { ...f, [field]: value } : f)),
     );
     setPage(1);
   };
@@ -371,7 +396,11 @@ export default function TamboPage() {
         return <p className="text-sm text-black">{sorteo.id}</p>;
 
       case "created_at":
-        return <span className="text-sm text-black">{formatDate(sorteo.created_at)}</span>;
+        return (
+          <span className="text-sm text-black">
+            {formatDate(sorteo.created_at)}
+          </span>
+        );
 
       case "first_name":
         return <p className="text-sm text-black">{sorteo.first_name || "-"}</p>;
@@ -395,15 +424,28 @@ export default function TamboPage() {
         return <p className="text-sm text-black">{sorteo.bday || "-"}</p>;
 
       case "address":
-        return <p className="text-sm text-black truncate max-w-xs" title={sorteo.address || "-"}>{sorteo.address || "-"}</p>;
+        return (
+          <p
+            className="text-sm text-black truncate max-w-xs"
+            title={sorteo.address || "-"}
+          >
+            {sorteo.address || "-"}
+          </p>
+        );
 
       case "pack_option":
-        return <p className="text-sm text-black">{sorteo.pack_option ?? "-"}</p>;
+        return (
+          <p className="text-sm text-black">{sorteo.pack_option ?? "-"}</p>
+        );
 
       case "transfer_diageo":
         return (
           <p className="text-sm text-black">
-            {sorteo.transfer_diageo === true ? "Sí" : sorteo.transfer_diageo === false ? "No" : "-"}
+            {sorteo.transfer_diageo === true
+              ? "Sí"
+              : sorteo.transfer_diageo === false
+                ? "No"
+                : "-"}
           </p>
         );
 
@@ -423,16 +465,22 @@ export default function TamboPage() {
         return <p className="text-sm text-black">{sorteo.inv_code || "-"}</p>;
 
       case "terms_accept":
-        return <p className="text-sm text-black">{sorteo.terms_accept || "-"}</p>;
+        return (
+          <p className="text-sm text-black">{sorteo.terms_accept || "-"}</p>
+        );
 
       case "ads_accept":
         return <p className="text-sm text-black">{sorteo.ads_accept || "-"}</p>;
 
       case "survey_accept":
-        return <p className="text-sm text-black">{sorteo.survey_accept || "-"}</p>;
+        return (
+          <p className="text-sm text-black">{sorteo.survey_accept || "-"}</p>
+        );
 
       case "publicity_accept":
-        return <p className="text-sm text-black">{sorteo.publicity_accept || "-"}</p>;
+        return (
+          <p className="text-sm text-black">{sorteo.publicity_accept || "-"}</p>
+        );
 
       default:
         return <p className="text-sm text-black">{String(cellValue || "-")}</p>;
@@ -440,7 +488,11 @@ export default function TamboPage() {
   }, []);
 
   if (forbidden) {
-    return <p className="text-yellow-600 text-center mt-10">No tienes permiso para ver esta información.</p>;
+    return (
+      <p className="text-yellow-600 text-center mt-10">
+        No tienes permiso para ver esta información.
+      </p>
+    );
   }
 
   if (error) {
@@ -452,7 +504,6 @@ export default function TamboPage() {
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="flex flex-col gap-4">
           <div className="container-blue-principal">
-
             {/* Botones de filtros */}
             <div className="flex items-center gap-3 mb-4 flex-wrap">
               <Button
@@ -516,7 +567,10 @@ export default function TamboPage() {
             {filters.length > 0 && (
               <div className="flex flex-col gap-3 mb-4">
                 {filters.map((filter) => (
-                  <div key={filter.id} className="flex items-center gap-2 bg-white/10 p-3 rounded-lg">
+                  <div
+                    key={filter.id}
+                    className="flex items-center gap-2 bg-white/10 p-3 rounded-lg"
+                  >
                     {/* Selector de columna */}
                     <Select
                       className="text-[#3E688E] w-[160px]"
@@ -526,7 +580,10 @@ export default function TamboPage() {
                       }}
                       selectedKeys={filter.column ? [filter.column] : []}
                       variant="faded"
-                      options={columns.map((col) => ({ value: col.uid, label: col.name }))}
+                      options={columns.map((col) => ({
+                        value: col.uid,
+                        label: col.name,
+                      }))}
                       onSelectionChange={(keys) => {
                         const selected = Array.from(keys)[0] as string;
                         updateFilter(filter.id, "column", selected);
@@ -542,7 +599,9 @@ export default function TamboPage() {
                       }}
                       selectedKeys={filter.operator ? [filter.operator] : []}
                       variant="faded"
-                      options={getOperatorsForColumn(filter.column).map((op) => ({ value: op.key, label: op.label }))}
+                      options={getOperatorsForColumn(filter.column).map(
+                        (op) => ({ value: op.key, label: op.label }),
+                      )}
                       onSelectionChange={(keys) => {
                         const selected = Array.from(keys)[0] as string;
                         updateFilter(filter.id, "operator", selected);
@@ -550,19 +609,24 @@ export default function TamboPage() {
                     />
 
                     {/* Input de valor (solo si no es is_null o is_not_null) */}
-                    {filter.operator !== "is_null" && filter.operator !== "is_not_null" && (
-                      <Input
-                        className="text-[#3E688E] flex-1"
-                        classNames={{
-                          inputWrapper: "!bg-[#F4F4F5] !border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
-                          input: "!text-[#3E688E] placeholder:!text-[#719BC1]",
-                        }}
-                        placeholder="Valor..."
-                        value={filter.value}
-                        variant="faded"
-                        onChange={(e) => updateFilter(filter.id, "value", e.target.value)}
-                      />
-                    )}
+                    {filter.operator !== "is_null" &&
+                      filter.operator !== "is_not_null" && (
+                        <Input
+                          className="text-[#3E688E] flex-1"
+                          classNames={{
+                            inputWrapper:
+                              "!bg-[#F4F4F5] !border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                            input:
+                              "!text-[#3E688E] placeholder:!text-[#719BC1]",
+                          }}
+                          placeholder="Valor..."
+                          value={filter.value}
+                          variant="faded"
+                          onChange={(e) =>
+                            updateFilter(filter.id, "value", e.target.value)
+                          }
+                        />
+                      )}
 
                     {/* Botón para eliminar filtro */}
                     <Button
@@ -597,9 +661,17 @@ export default function TamboPage() {
                 </p>
                 <div className="bg-[#ff5b00] rounded-lg p-5 inline-block shadow-xl transform hover:scale-105 transition-transform">
                   <p className="text-white font-bold text-lg leading-relaxed">
-                    1️⃣ Haz clic en <span className="bg-white/20 px-2 py-1 rounded">+ Agregar Filtro</span><br/>
-                    2️⃣ Selecciona tus criterios de búsqueda<br/>
-                    3️⃣ Presiona el botón <span className="bg-white/20 px-2 py-1 rounded">🔍 Aplicar Filtros</span>
+                    1️⃣ Haz clic en{" "}
+                    <span className="bg-white/20 px-2 py-1 rounded">
+                      + Agregar Filtro
+                    </span>
+                    <br />
+                    2️⃣ Selecciona tus criterios de búsqueda
+                    <br />
+                    3️⃣ Presiona el botón{" "}
+                    <span className="bg-white/20 px-2 py-1 rounded">
+                      🔍 Aplicar Filtros
+                    </span>
                   </p>
                 </div>
               </div>
@@ -622,42 +694,42 @@ export default function TamboPage() {
 
           {hasSearched && !loading && (
             <Table
-            aria-label="Tabla de Registros de Tambo"
-            selectionMode="none"
-            sortDescriptor={sortDescriptor}
-            onSortChange={(descriptor) =>
-              setSortDescriptor(descriptor as LocalSortDescriptor)
-            }
-            classNames={{
-              wrapper: "bg-transparent overflow-x-auto",
-              th: "bg-[#ff5b00] text-[#fff] font-semibold text-center whitespace-nowrap",
-              td: "text-gray-700 text-center whitespace-nowrap",
-            }}
-          >
-            <TableHeader columns={columns}>
-              {(column) => (
-                <TableColumn
-                  key={column.uid}
-                  align="center"
-                  allowsSorting={column.sortable}
-                >
-                  {column.name}
-                </TableColumn>
-              )}
-            </TableHeader>
-            <TableBody
-              emptyContent={"No se encontraron registros"}
-              items={paginatedItems}
+              aria-label="Tabla de Registros de Tambo"
+              selectionMode="none"
+              sortDescriptor={sortDescriptor}
+              onSortChange={(descriptor) =>
+                setSortDescriptor(descriptor as LocalSortDescriptor)
+              }
+              classNames={{
+                wrapper: "bg-transparent overflow-x-auto",
+                th: "bg-[#ff5b00] text-[#fff] font-semibold text-center whitespace-nowrap",
+                td: "text-gray-700 text-center whitespace-nowrap",
+              }}
             >
-              {(item) => (
-                <TableRow key={item.id} className="items-center">
-                  {(columnKey) => (
-                    <TableCell>{renderCell(item, columnKey)}</TableCell>
-                  )}
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              <TableHeader columns={columns}>
+                {(column) => (
+                  <TableColumn
+                    key={column.uid}
+                    align="center"
+                    allowsSorting={column.sortable}
+                  >
+                    {column.name}
+                  </TableColumn>
+                )}
+              </TableHeader>
+              <TableBody
+                emptyContent={"No se encontraron registros"}
+                items={paginatedItems}
+              >
+                {(item) => (
+                  <TableRow key={item.id} className="items-center">
+                    {(columnKey) => (
+                      <TableCell>{renderCell(item, columnKey)}</TableCell>
+                    )}
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           )}
 
           {/* Paginación */}
@@ -673,7 +745,7 @@ export default function TamboPage() {
                   cursor: "bg-[#ff5b00] text-white shadow-md",
                   item: "bg-transparent",
                   prev: "bg-white",
-                  next: "bg-white"
+                  next: "bg-white",
                 }}
                 page={page}
                 total={totalPages}
