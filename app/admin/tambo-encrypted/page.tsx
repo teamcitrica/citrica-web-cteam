@@ -2,7 +2,7 @@
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { useState, useCallback, useMemo } from "react";
-import { Text, Col, Container, Select, Input, Button } from "citrica-ui-toolkit";
+import { Text, Col, Container, Select, Input, Button, Icon } from "citrica-ui-toolkit";
 import { UserAuth } from "@/shared/context/auth-context";
 import { useExcelExport } from "@/hooks/use-excel-export";
 
@@ -33,17 +33,14 @@ interface Sorteo {
 const columns = [
   { name: "ID", uid: "id", sortable: true },
   { name: "FECHA CREACIÓN", uid: "created_at", sortable: true },
-  { name: "🔐 NOMBRE", uid: "first_name", sortable: true },
-  { name: "🔐 APELLIDO", uid: "last_name", sortable: true },
-  { name: "🔐 EMAIL", uid: "email", sortable: true },
+  { name: "CAMPAÑA", uid: "campaign", sortable: false },
+  { name: "🔐 APELLIDO", uid: "last_name", sortable: false },
+  { name: "🔐 CUMPLEAÑOS", uid: "bday", sortable: false },
+  { name: "🔐 DIRECCIÓN", uid: "address", sortable: false },
   { name: "🔐 TELÉFONO", uid: "phone", sortable: false },
+  { name: "🔐 EMAIL", uid: "email", sortable: false },
   { name: "TIPO DOC", uid: "doc_type", sortable: false },
   { name: "🔐 NRO DOC", uid: "doc_number", sortable: false },
-  { name: "🔐 CUMPLEAÑOS", uid: "bday", sortable: true },
-  { name: "🔐 DIRECCIÓN", uid: "address", sortable: false },
-  { name: "PACK", uid: "pack_option", sortable: true },
-  { name: "TRANSFER DIAGEO", uid: "transfer_diageo", sortable: true },
-  { name: "CAMPAÑA", uid: "campaign", sortable: false },
   { name: "TIPO INV", uid: "inv_type", sortable: false },
   { name: "SERIE INV", uid: "inv_serie", sortable: false },
   { name: "NRO INV", uid: "inv_number", sortable: false },
@@ -51,7 +48,10 @@ const columns = [
   { name: "TÉRMINOS", uid: "terms_accept", sortable: false },
   { name: "ADS", uid: "ads_accept", sortable: false },
   { name: "ENCUESTA", uid: "survey_accept", sortable: false },
+  { name: "🔐 NOMBRE", uid: "first_name", sortable: false },
+  { name: "PACK", uid: "pack_option", sortable: true },
   { name: "PUBLICIDAD", uid: "publicity_accept", sortable: false },
+  { name: "TRANSFER DIAGEO", uid: "transfer_diageo", sortable: true },
 ];
 
 const ITEMS_PER_PAGE = 15;
@@ -333,17 +333,14 @@ export default function TamboEncryptedPage() {
       columnMapping: {
         id: "ID",
         created_at: "FECHA CREACIÓN",
-        first_name: "NOMBRE",
+        campaign: "CAMPAÑA",
         last_name: "APELLIDO",
-        email: "EMAIL",
-        phone: "TELÉFONO",
-        doc_type: "TIPO DOC",
-        doc_number: "NRO DOC",
         bday: "CUMPLEAÑOS",
         address: "DIRECCIÓN",
-        pack_option: "PACK",
-        transfer_diageo: "TRANSFER DIAGEO",
-        campaign: "CAMPAÑA",
+        phone: "TELÉFONO",
+        email: "EMAIL",
+        doc_type: "TIPO DOC",
+        doc_number: "NRO DOC",
         inv_type: "TIPO INV",
         inv_serie: "SERIE INV",
         inv_number: "NRO INV",
@@ -351,7 +348,10 @@ export default function TamboEncryptedPage() {
         terms_accept: "TÉRMINOS",
         ads_accept: "ADS",
         survey_accept: "ENCUESTA",
+        first_name: "NOMBRE",
+        pack_option: "PACK",
         publicity_accept: "PUBLICIDAD",
+        transfer_diageo: "TRANSFER DIAGEO",
       },
       customFormatter: (key, value) => {
         // Formatear booleano de transfer_diageo
@@ -450,7 +450,7 @@ export default function TamboEncryptedPage() {
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <div className="container-blue-principal">
 
             {/* Botones de filtros */}
@@ -482,7 +482,7 @@ export default function TamboEncryptedPage() {
                 isAdmin
                 onPress={() => fetchSorteos(false)}
                 isDisabled={loading}
-                className="!bg-[#ff5b00] hover:!bg-[#e55200] !text-white"
+                className="!bg-[#265197] hover:!bg-[#16305A] !text-white"
               >
                 <span className="flex items-center gap-2">
                   <span>📋</span>
@@ -512,21 +512,30 @@ export default function TamboEncryptedPage() {
               )}
             </div>
 
-            {/* Filtros dinámicos */}
-            {filters.length > 0 && (
-              <div className="flex flex-col gap-3 mb-4">
+            {/* Total de registros + Filtros dinámicos en la misma línea */}
+            {(filters.length > 0 || hasSearched) && (
+              <div className="flex items-center justify-between gap-4 my-0">
+                {hasSearched ? (
+                  <Text isAdmin color="#265197" variant="body" weight="bold">
+                    Total de registros: {sortedItems.length}
+                  </Text>
+                ) : (
+                  <span />
+                )}
+                {filters.length > 0 && (
+                  <div className="flex flex-col gap-1">
                 {filters.map((filter) => (
-                  <div key={filter.id} className="flex items-center gap-2 bg-white/10 p-3 rounded-lg">
+                  <div key={filter.id} className="flex items-center justify-end gap-2 bg-white/10 p-2 rounded-lg">
                     {/* Selector de columna */}
                     <Select
-                      className="text-[#3E688E] w-[160px]"
+                      className="text-[#3E688E] w-[140px]"
                       classNames={{
                         trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                         value: "!text-[#3E688E]",
                       }}
                       selectedKeys={filter.column ? [filter.column] : []}
                       variant="faded"
-                      options={columns.map((col) => ({ value: col.uid, label: col.name }))}
+                      options={columns.filter((col) => col.uid === "id").map((col) => ({ value: col.uid, label: col.name }))}
                       onSelectionChange={(keys) => {
                         const selected = Array.from(keys)[0] as string;
                         updateFilter(filter.id, "column", selected);
@@ -535,7 +544,7 @@ export default function TamboEncryptedPage() {
 
                     {/* Selector de operador */}
                     <Select
-                      className="text-[#3E688E] w-[160px]"
+                      className="text-[#3E688E] w-[140px]"
                       classNames={{
                         trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                         value: "!text-[#3E688E]",
@@ -552,7 +561,7 @@ export default function TamboEncryptedPage() {
                     {/* Input de valor (solo si no es is_null o is_not_null) */}
                     {filter.operator !== "is_null" && filter.operator !== "is_not_null" && (
                       <Input
-                        className="text-[#3E688E] flex-1"
+                        className="text-[#3E688E] w-[180px]"
                         classNames={{
                           inputWrapper: "!bg-[#F4F4F5] !border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
                           input: "!text-[#3E688E] placeholder:!text-[#719BC1]",
@@ -575,46 +584,57 @@ export default function TamboEncryptedPage() {
                     </Button>
                   </div>
                 ))}
-              </div>
-            )}
-
-            {hasSearched && (
-              <div className="mt-4">
-                <Text color="white" variant="body">
-                  Total de registros: {sortedItems.length}
-                </Text>
+                  </div>
+                )}
               </div>
             )}
 
             {!hasSearched && !loading && (
-              <div className="mt-4 p-8 bg-gradient-to-br from-[#3E688E] via-[#5080a8] to-[#719BC1] rounded-xl shadow-2xl text-center">
-                <div className="text-6xl mb-4 animate-bounce">🔍</div>
-                <h3 className="text-3xl font-bold text-white mb-4 drop-shadow-lg">
-                  ¡Comienza tu búsqueda!
-                </h3>
-                <p className="text-white/90 text-lg mb-5 font-medium">
-                  🔐 Para visualizar los registros encriptados de Tambo:
-                </p>
-                <div className="bg-[#ff5b00] rounded-lg p-5 inline-block shadow-xl transform hover:scale-105 transition-transform">
-                  <p className="text-white font-bold text-lg leading-relaxed">
-                    1️⃣ Haz clic en <span className="bg-white/20 px-2 py-1 rounded">+ Agregar Filtro</span><br/>
-                    2️⃣ Selecciona tus criterios de búsqueda<br/>
-                    3️⃣ Presiona el botón <span className="bg-white/20 px-2 py-1 rounded">🔍 Aplicar Filtros</span>
-                  </p>
+              <div className="mt-4 flex flex-col items-center justify-center text-center bg-[#EEF1F7] border border-[#D4DEED] rounded-2xl py-12 px-6">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white mb-5">
+                  <Icon name="Search" size={32} color="#265197" />
+                </div>
+                <Text isAdmin variant="title" weight="bold" color="#16305A">
+                  Comienza tu búsqueda
+                </Text>
+                <div className="mt-2 mb-7">
+                  <Text isAdmin variant="body" color="#5A6B85">
+                    Para visualizar los registros encriptados de Tambo, sigue estos pasos:
+                  </Text>
+                </div>
+                <div className="flex flex-col gap-4 text-left w-full max-w-md">
+                  {[
+                    "Haz clic en “+ Agregar Filtro”",
+                    "Selecciona tus criterios de búsqueda",
+                    "Presiona el botón “Aplicar Filtros”",
+                  ].map((step, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#265197] flex-shrink-0">
+                        <Text isAdmin variant="label" weight="bold" color="#ffffff">
+                          {index + 1}
+                        </Text>
+                      </div>
+                      <Text isAdmin variant="body" color="#16305A">
+                        {step}
+                      </Text>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
 
             {loading && (
-              <div className="mt-4 p-8 bg-gradient-to-br from-[#3E688E] via-[#5080a8] to-[#719BC1] rounded-xl shadow-2xl text-center">
-                <div className="text-6xl mb-4 animate-pulse">⏳</div>
-                <h3 className="text-3xl font-bold text-white mb-4 drop-shadow-lg">
+              <div className="mt-4 flex flex-col items-center justify-center text-center bg-[#EEF1F7] border border-[#D4DEED] rounded-2xl py-12 px-6">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white mb-5">
+                  <Icon className="animate-spin" name="LoaderCircle" size={32} color="#265197" />
+                </div>
+                <Text isAdmin variant="title" weight="bold" color="#16305A">
                   Buscando registros...
-                </h3>
-                <div className="bg-[#ff5b00]/90 rounded-lg p-4 inline-block shadow-lg">
-                  <p className="text-white font-semibold text-lg">
+                </Text>
+                <div className="mt-2">
+                  <Text isAdmin variant="body" color="#5A6B85">
                     Por favor espera mientras procesamos tu consulta
-                  </p>
+                  </Text>
                 </div>
               </div>
             )}
@@ -622,6 +642,7 @@ export default function TamboEncryptedPage() {
 
           {hasSearched && !loading && (
             <Table
+            isStriped
             aria-label="Tabla de Registros Encriptados de Tambo"
             selectionMode="none"
             sortDescriptor={sortDescriptor}
@@ -629,8 +650,9 @@ export default function TamboEncryptedPage() {
               setSortDescriptor(descriptor as LocalSortDescriptor)
             }
             classNames={{
-              wrapper: "bg-transparent overflow-x-auto",
-              th: "bg-[#ff5b00] text-[#fff] font-semibold text-center whitespace-nowrap",
+              wrapper: "bg-transparent overflow-x-auto !p-0",
+              tr: "data-[odd=true]:bg-[#EEF1F7]",
+              th: "bg-[#265197] text-[#fff] font-semibold text-center whitespace-nowrap",
               td: "text-gray-700 text-center whitespace-nowrap",
             }}
           >
@@ -667,13 +689,11 @@ export default function TamboEncryptedPage() {
                 isCompact
                 showControls
                 showShadow
-                className="pagination-reservas"
                 classNames={{
-                  wrapper: "gap-2",
-                  cursor: "bg-[#ff5b00] text-white shadow-md",
-                  item: "bg-transparent",
-                  prev: "bg-white",
-                  next: "bg-white"
+                  cursor: "bg-[#265197] text-white shadow-none",
+                  item: "border-none shadow-none outline-none ring-0",
+                  prev: "border-none shadow-none outline-none ring-0",
+                  next: "border-none shadow-none outline-none ring-0",
                 }}
                 page={page}
                 total={totalPages}
