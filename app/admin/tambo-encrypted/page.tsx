@@ -100,7 +100,6 @@ export default function TamboEncryptedPage() {
   const [error, setError] = useState<string | null>(null);
   const [forbidden, setForbidden] = useState(false);
   const [page, setPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
 
@@ -115,6 +114,10 @@ export default function TamboEncryptedPage() {
   const [filters, setFilters] = useState<Filter[]>([]);
   // Filtros actualmente aplicados en el servidor (para re-usar al cambiar de página/orden)
   const [appliedFilters, setAppliedFilters] = useState<Filter[]>([]);
+
+  // Un filtro "cuenta" si tiene valor, o si su operador no necesita valor (is_null / is_not_null)
+  const isFilterActive = (f: Filter) =>
+    f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null";
 
   type LocalSortDescriptor = {
     column: string;
@@ -145,9 +148,7 @@ export default function TamboEncryptedPage() {
       }
 
       // 2️⃣ Limpiar filtros vacíos antes de enviar
-      const filtersToSend = filtersToApply.filter(
-        (f) => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null"
-      );
+      const filtersToSend = filtersToApply.filter(isFilterActive);
 
       // 3️⃣ Preparar el orden
       const orderBy = {
@@ -201,9 +202,7 @@ export default function TamboEncryptedPage() {
 
   // Hay al menos un filtro válido (con valor, o un operador que no necesita valor).
   // Se exige para poder aplicar filtros (no se permite traer todo sin filtrar).
-  const hasValidFilter = filters.some(
-    (f) => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null"
-  );
+  const hasValidFilter = filters.some(isFilterActive);
 
   // Helpers para mostrar los filtros aplicados de forma legible
   const getColumnName = (uid: string) =>
@@ -212,14 +211,7 @@ export default function TamboEncryptedPage() {
     ALL_OPERATORS.find((o) => o.key === key)?.label || key;
 
   // Filtros aplicados que realmente tienen efecto (con valor o sin necesidad de valor)
-  const activeAppliedFilters = appliedFilters.filter(
-    (f) => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null"
-  );
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setPage(1);
-  };
+  const activeAppliedFilters = appliedFilters.filter(isFilterActive);
 
   const addFilter = () => {
     const newFilter: Filter = {
@@ -240,9 +232,7 @@ export default function TamboEncryptedPage() {
     if (!hasSearched) return;
 
     // Sincronizar con la tabla: re-aplicar los filtros que quedan
-    const validRemaining = remaining.filter(
-      (f) => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null"
-    );
+    const validRemaining = remaining.filter(isFilterActive);
 
     if (validRemaining.length > 0) {
       // Quedan filtros válidos → re-consultar con ellos
@@ -265,7 +255,6 @@ export default function TamboEncryptedPage() {
   };
 
   const clearAllFilters = () => {
-    setSearchTerm("");
     setFilters([]);
     setAppliedFilters([]);
     setPage(1);
@@ -278,10 +267,7 @@ export default function TamboEncryptedPage() {
   const applyFiltersToServer = () => {
     // Guarda de seguridad: no aplicar sin al menos un filtro con valor.
     // (El botón ya está deshabilitado en ese caso; esto es por si acaso.)
-    const valid = filters.some(
-      (f) => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null"
-    );
-    if (!valid) return;
+    if (!filters.some(isFilterActive)) return;
 
     setAppliedFilters(filters);
     fetchSorteos(filters, 1);
@@ -310,9 +296,7 @@ export default function TamboEncryptedPage() {
         return;
       }
 
-      const filtersToSend = appliedFilters.filter(
-        (f) => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null"
-      );
+      const filtersToSend = appliedFilters.filter(isFilterActive);
 
       const orderBy = {
         column: sortDescriptor.column,
@@ -496,7 +480,7 @@ export default function TamboEncryptedPage() {
                   </span>
                 </Button>
               )}
-              {(filters.length > 0 || searchTerm || hasSearched) && (
+              {(filters.length > 0 || hasSearched) && (
                 <Button
                   isAdmin
                   onPress={clearAllFilters}
