@@ -22,6 +22,7 @@ import {
   Database,
   MessageSquare,
   BarChart,
+  Sparkles,
 } from 'lucide-react';
 import { useSalesProjects } from '@/hooks/sales-analytics/use-sales-projects';
 import type { SalesProject } from '@/types/sales-analytics';
@@ -31,7 +32,7 @@ export default function ProjectDetailPage() {
   const params = useParams();
   const projectId = params.id as string;
 
-  const { getProject, updateProject, deleteProject, isUpdating, isDeleting } =
+  const { getProject, updateProject, deleteProject, generateManualReport, isUpdating, isDeleting, isGeneratingReport } =
     useSalesProjects();
 
   const [project, setProject] = useState<SalesProject | null>(null);
@@ -105,6 +106,22 @@ export default function ProjectDetailPage() {
       router.push('/admin/sales-analytics/projects');
     } catch (error: any) {
       alert(`Error eliminando proyecto: ${error.message}`);
+    }
+  };
+
+  // Generar reporte manual
+  const handleGenerateReport = async () => {
+    if (!confirm('¿Generar reporte manual? Esto extraerá data de los últimos 7 días y generará un análisis con IA.')) {
+      return;
+    }
+
+    try {
+      const result = await generateManualReport(projectId);
+      alert(`✅ ${result.message}\n\nReporte generado exitosamente. Puedes verlo en la sección de Reportes.`);
+      // Navegar a reportes
+      router.push(`/admin/sales-analytics/projects/${projectId}/reports`);
+    } catch (error: any) {
+      alert(`❌ Error generando reporte: ${error.message}`);
     }
   };
 
@@ -296,6 +313,46 @@ export default function ProjectDetailPage() {
             </CardBody>
           </Card>
         </div>
+
+        {/* Generate Report Button */}
+        <Card className="mb-6 bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200">
+          <CardBody className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    Generar Reporte Manual
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Extrae data de los últimos 7 días y genera un análisis con IA
+                  </p>
+                </div>
+              </div>
+              <Button
+                color="secondary"
+                size="lg"
+                startContent={<Sparkles className="w-5 h-5" />}
+                onPress={handleGenerateReport}
+                isLoading={isGeneratingReport}
+                isDisabled={!project.is_active || project.connection_status !== 'connected'}
+              >
+                {isGeneratingReport ? 'Generando...' : 'Generar Reporte'}
+              </Button>
+            </div>
+            {(!project.is_active || project.connection_status !== 'connected') && (
+              <div className="mt-4 px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  {!project.is_active
+                    ? '⚠️ El proyecto debe estar activo para generar reportes'
+                    : '⚠️ El proyecto debe estar conectado para generar reportes'}
+                </p>
+              </div>
+            )}
+          </CardBody>
+        </Card>
 
         {/* Action Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
