@@ -34,11 +34,11 @@ const columns = [
   { name: "ID", uid: "id", sortable: true },
   { name: "FECHA CREACIÓN", uid: "created_at", sortable: true },
   { name: "CAMPAÑA", uid: "campaign", sortable: false },
-  { name: "🔐 APELLIDO", uid: "last_name", sortable: true },
-  { name: "🔐 CUMPLEAÑOS", uid: "bday", sortable: true },
+  { name: "🔐 APELLIDO", uid: "last_name", sortable: false },
+  { name: "🔐 CUMPLEAÑOS", uid: "bday", sortable: false },
   { name: "🔐 DIRECCIÓN", uid: "address", sortable: false },
   { name: "🔐 TELÉFONO", uid: "phone", sortable: false },
-  { name: "🔐 EMAIL", uid: "email", sortable: true },
+  { name: "🔐 EMAIL", uid: "email", sortable: false },
   { name: "TIPO DOC", uid: "doc_type", sortable: false },
   { name: "🔐 NRO DOC", uid: "doc_number", sortable: false },
   { name: "TIPO INV", uid: "inv_type", sortable: false },
@@ -48,7 +48,7 @@ const columns = [
   { name: "TÉRMINOS", uid: "terms_accept", sortable: false },
   { name: "ADS", uid: "ads_accept", sortable: false },
   { name: "ENCUESTA", uid: "survey_accept", sortable: false },
-  { name: "🔐 NOMBRE", uid: "first_name", sortable: true },
+  { name: "🔐 NOMBRE", uid: "first_name", sortable: false },
   { name: "PACK", uid: "pack_option", sortable: true },
   { name: "PUBLICIDAD", uid: "publicity_accept", sortable: false },
   { name: "TRANSFER DIAGEO", uid: "transfer_diageo", sortable: true },
@@ -512,21 +512,30 @@ export default function TamboEncryptedPage() {
               )}
             </div>
 
-            {/* Filtros dinámicos */}
-            {filters.length > 0 && (
-              <div className="flex flex-col gap-1 mb-2">
+            {/* Total de registros + Filtros dinámicos en la misma línea */}
+            {(filters.length > 0 || hasSearched) && (
+              <div className="flex items-center justify-between gap-4 my-0">
+                {hasSearched ? (
+                  <Text isAdmin color="#265197" variant="body" weight="bold">
+                    Total de registros: {sortedItems.length}
+                  </Text>
+                ) : (
+                  <span />
+                )}
+                {filters.length > 0 && (
+                  <div className="flex flex-col gap-1">
                 {filters.map((filter) => (
-                  <div key={filter.id} className="flex items-center gap-2 bg-white/10 p-2 rounded-lg">
+                  <div key={filter.id} className="flex items-center justify-end gap-2 bg-white/10 p-2 rounded-lg">
                     {/* Selector de columna */}
                     <Select
-                      className="text-[#3E688E] w-[160px]"
+                      className="text-[#3E688E] w-[140px]"
                       classNames={{
                         trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                         value: "!text-[#3E688E]",
                       }}
                       selectedKeys={filter.column ? [filter.column] : []}
                       variant="faded"
-                      options={columns.map((col) => ({ value: col.uid, label: col.name }))}
+                      options={columns.filter((col) => col.uid === "id").map((col) => ({ value: col.uid, label: col.name }))}
                       onSelectionChange={(keys) => {
                         const selected = Array.from(keys)[0] as string;
                         updateFilter(filter.id, "column", selected);
@@ -535,7 +544,7 @@ export default function TamboEncryptedPage() {
 
                     {/* Selector de operador */}
                     <Select
-                      className="text-[#3E688E] w-[160px]"
+                      className="text-[#3E688E] w-[140px]"
                       classNames={{
                         trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                         value: "!text-[#3E688E]",
@@ -552,7 +561,7 @@ export default function TamboEncryptedPage() {
                     {/* Input de valor (solo si no es is_null o is_not_null) */}
                     {filter.operator !== "is_null" && filter.operator !== "is_not_null" && (
                       <Input
-                        className="text-[#3E688E] flex-1"
+                        className="text-[#3E688E] w-[180px]"
                         classNames={{
                           inputWrapper: "!bg-[#F4F4F5] !border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
                           input: "!text-[#3E688E] placeholder:!text-[#719BC1]",
@@ -575,14 +584,8 @@ export default function TamboEncryptedPage() {
                     </Button>
                   </div>
                 ))}
-              </div>
-            )}
-
-            {hasSearched && (
-              <div className="mt-1">
-                <Text isAdmin color="#265197" variant="body" weight="bold">
-                  Total de registros: {sortedItems.length}
-                </Text>
+                  </div>
+                )}
               </div>
             )}
 
