@@ -137,7 +137,7 @@ export function useSalesPrompts(projectId: string) {
 
   const activatePrompt = async (promptId: string) => {
     // Desactivar todos los prompts del proyecto
-    const deactivatePromises = prompts.map((p) =>
+    const deactivatePromises = prompts.map((p: SalesPrompt) =>
       updatePromptMutation.mutateAsync({
         id: p.id,
         updates: { is_active: false },
@@ -157,7 +157,7 @@ export function useSalesPrompts(projectId: string) {
     // State
     prompts,
     isLoading,
-    activePrompt: prompts.find((p) => p.is_active),
+    activePrompt: prompts.find((p: SalesPrompt) => p.is_active),
 
     // Actions
     refetch,

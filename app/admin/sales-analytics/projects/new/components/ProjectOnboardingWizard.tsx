@@ -328,7 +328,7 @@ export function ProjectOnboardingWizard({
                         Relaciona las columnas detectadas con los campos requeridos:
                       </p>
 
-                      {Object.keys(columnMapping).map((field) => (
+                      {Object.keys(columnMapping).map((field: string) => (
                         <Select
                           key={field}
                           label={field}
@@ -341,7 +341,7 @@ export function ProjectOnboardingWizard({
                           }
                           variant="faded"
                         >
-                          {detectionResult.available_columns!.map((col) => (
+                          {detectionResult.available_columns!.map((col: string) => (
                             <SelectItem key={col} textValue={col}>
                               {col}
                             </SelectItem>

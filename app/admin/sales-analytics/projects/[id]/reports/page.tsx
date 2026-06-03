@@ -130,7 +130,7 @@ export default function ProjectReportsPage() {
                     <p className="text-sm text-gray-600">Costo Total IA</p>
                     <p className="text-xl font-bold text-gray-900">
                       {formatCurrency(
-                        reports.reduce((sum, r) => sum + (r.total_cost || 0), 0)
+                        reports.reduce((sum: number, r: import('@/types/sales-analytics').SalesWeeklyReport) => sum + (r.total_cost || 0), 0)
                       )}
                     </p>
                   </div>
@@ -161,7 +161,7 @@ export default function ProjectReportsPage() {
           </Card>
         ) : (
           <div className="space-y-4">
-            {reports.map((report) => {
+            {reports.map((report: import('@/types/sales-analytics').SalesWeeklyReport) => {
               const analysis = report.analysis_json as any;
               const metrics = analysis?.metricas_clave || {};
 

@@ -65,7 +65,7 @@ export default function SalesAnalyticsProjectsPage() {
                   <p className="text-2xl font-bold text-green-600">
                     {isLoading
                       ? '...'
-                      : projects?.filter((p) => p.is_active && !p.is_paused).length || 0}
+                      : projects?.filter((p: import('@/types/sales-analytics').SalesProject) => p.is_active && !p.is_paused).length || 0}
                   </p>
                 </div>
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
@@ -83,7 +83,7 @@ export default function SalesAnalyticsProjectsPage() {
                   <p className="text-2xl font-bold text-yellow-600">
                     {isLoading
                       ? '...'
-                      : projects?.filter((p) => p.is_paused).length || 0}
+                      : projects?.filter((p: import('@/types/sales-analytics').SalesProject) => p.is_paused).length || 0}
                   </p>
                 </div>
                 <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
@@ -120,7 +120,7 @@ export default function SalesAnalyticsProjectsPage() {
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project) => (
+            {projects.map((project: import('@/types/sales-analytics').SalesProject) => (
               <Card
                 key={project.id}
                 isPressable

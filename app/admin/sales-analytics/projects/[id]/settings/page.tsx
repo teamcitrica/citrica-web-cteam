@@ -291,7 +291,7 @@ export default function ProjectSettingsPage() {
           </Card>
         ) : (
           <div className="space-y-4">
-            {prompts.map((prompt) => (
+            {prompts.map((prompt: import('@/types/sales-analytics').SalesPrompt) => (
               <Card
                 key={prompt.id}
                 className={

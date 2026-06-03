@@ -234,7 +234,7 @@ export default function ProjectChatPage() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {messages.map((msg) => (
+                    {messages.map((msg: import('@/types/sales-analytics').SalesChatMessage) => (
                       <div
                         key={msg.id}
                         className={`flex gap-3 ${
