@@ -205,6 +205,17 @@ export default function TamboEncryptedPage() {
     (f) => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null"
   );
 
+  // Helpers para mostrar los filtros aplicados de forma legible
+  const getColumnName = (uid: string) =>
+    columns.find((c) => c.uid === uid)?.name || uid;
+  const getOperatorLabel = (key: string) =>
+    ALL_OPERATORS.find((o) => o.key === key)?.label || key;
+
+  // Filtros aplicados que realmente tienen efecto (con valor o sin necesidad de valor)
+  const activeAppliedFilters = appliedFilters.filter(
+    (f) => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null"
+  );
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setPage(1);
@@ -221,8 +232,29 @@ export default function TamboEncryptedPage() {
   };
 
   const removeFilter = (filterId: string) => {
-    setFilters(filters.filter((f) => f.id !== filterId));
+    const remaining = filters.filter((f) => f.id !== filterId);
+    setFilters(remaining);
     setPage(1);
+
+    // Si todavía no se ha buscado, no hay nada aplicado que sincronizar
+    if (!hasSearched) return;
+
+    // Sincronizar con la tabla: re-aplicar los filtros que quedan
+    const validRemaining = remaining.filter(
+      (f) => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null"
+    );
+
+    if (validRemaining.length > 0) {
+      // Quedan filtros válidos → re-consultar con ellos
+      setAppliedFilters(remaining);
+      fetchSorteos(remaining, 1);
+    } else {
+      // No queda ningún filtro → limpiar la tabla (volver al estado inicial)
+      setAppliedFilters([]);
+      setSorteos([]);
+      setTotalRecords(0);
+      setHasSearched(false);
+    }
   };
 
   const updateFilter = (filterId: string, field: keyof Filter, value: string) => {
@@ -489,14 +521,36 @@ export default function TamboEncryptedPage() {
 
             {/* Total de registros + Filtros dinámicos en la misma línea */}
             {(filters.length > 0 || hasSearched) && (
-              <div className="flex items-center justify-between gap-4 my-0">
-                {hasSearched ? (
-                  <Text isAdmin color="#265197" variant="body" weight="bold">
-                    Total de registros: {totalRecords}
-                  </Text>
-                ) : (
-                  <span />
-                )}
+              <div className="flex items-start justify-between gap-4 my-0">
+                <div className="flex flex-col gap-2">
+                  {hasSearched ? (
+                    <Text isAdmin color="#265197" variant="body" weight="bold">
+                      Total de registros: {totalRecords}
+                    </Text>
+                  ) : (
+                    <span />
+                  )}
+                  {activeAppliedFilters.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Text isAdmin color="#5A6B85" variant="label">
+                        Filtros aplicados:
+                      </Text>
+                      {activeAppliedFilters.map((f) => (
+                        <span
+                          key={f.id}
+                          className="inline-flex items-center bg-[#EEF1F7] border border-[#D4DEED] rounded-full px-3 py-1"
+                        >
+                          <Text isAdmin color="#265197" variant="label">
+                            {getColumnName(f.column)} · {getOperatorLabel(f.operator)}
+                            {f.operator !== "is_null" && f.operator !== "is_not_null"
+                              ? ` "${f.value}"`
+                              : ""}
+                          </Text>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 {filters.length > 0 && (
                   <div className="flex flex-col gap-1">
                 {filters.map((filter) => (
