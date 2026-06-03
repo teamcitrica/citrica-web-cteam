@@ -1,8 +1,23 @@
 "use client";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+} from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { useState, useCallback } from "react";
-import { Text, Col, Container, Select, Input, Button, Icon } from "citrica-ui-toolkit";
+import {
+  Text,
+  Col,
+  Container,
+  Select,
+  Input,
+  Button,
+  Icon,
+} from "citrica-ui-toolkit";
 import { UserAuth } from "@/shared/context/auth-context";
 import { useExcelExport } from "@/hooks/use-excel-export";
 
@@ -117,7 +132,9 @@ export default function TamboEncryptedPage() {
 
   // Un filtro "cuenta" si tiene valor, o si su operador no necesita valor (is_null / is_not_null)
   const isFilterActive = (f: Filter) =>
-    f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null";
+    f.value.trim() !== "" ||
+    f.operator === "is_null" ||
+    f.operator === "is_not_null";
 
   type LocalSortDescriptor = {
     column: string;
@@ -133,7 +150,7 @@ export default function TamboEncryptedPage() {
   const fetchSorteos = async (
     filtersToApply: Filter[] = [],
     targetPage = 1,
-    sort: LocalSortDescriptor = sortDescriptor
+    sort: LocalSortDescriptor = sortDescriptor,
   ) => {
     try {
       setLoading(true);
@@ -173,7 +190,7 @@ export default function TamboEncryptedPage() {
             "Content-Type": "application/json",
           },
           body,
-        }
+        },
       );
 
       if (res.status === 403) {
@@ -204,6 +221,24 @@ export default function TamboEncryptedPage() {
   // Se exige para poder aplicar filtros (no se permite traer todo sin filtrar).
   const hasValidFilter = filters.some(isFilterActive);
 
+  // El valor debe ser coherente con el tipo de columna:
+  // las columnas numéricas (ej. id) solo aceptan números.
+  const filterHasValidValue = (f: Filter) => {
+    if (f.operator === "is_null" || f.operator === "is_not_null") return true;
+    if (NUMERIC_COLUMNS.includes(f.column) && f.value.trim() !== "") {
+      return !isNaN(Number(f.value));
+    }
+    return true;
+  };
+
+  // ¿Hay algún filtro activo con valor inválido? (ej. texto en la columna ID)
+  const hasInvalidFilter = filters
+    .filter(isFilterActive)
+    .some((f) => !filterHasValidValue(f));
+
+  // Se puede aplicar solo si hay al menos un filtro válido y ninguno inválido
+  const canApply = hasValidFilter && !hasInvalidFilter;
+
   // Helpers para mostrar los filtros aplicados de forma legible
   const getColumnName = (uid: string) =>
     columns.find((c) => c.uid === uid)?.name || uid;
@@ -216,8 +251,8 @@ export default function TamboEncryptedPage() {
   const addFilter = () => {
     const newFilter: Filter = {
       id: `filter-${Date.now()}`,
-      column: "id",
-      operator: "eq",
+      column: "campaign",
+      operator: "contains",
       value: "",
     };
     setFilters([...filters, newFilter]);
@@ -247,9 +282,21 @@ export default function TamboEncryptedPage() {
     }
   };
 
-  const updateFilter = (filterId: string, field: keyof Filter, value: string) => {
+  const updateFilter = (
+    filterId: string,
+    field: keyof Filter,
+    value: string,
+  ) => {
     setFilters(
-      filters.map((f) => (f.id === filterId ? { ...f, [field]: value } : f))
+      filters.map((f) => {
+        if (f.id !== filterId) return f;
+        // Al cambiar de columna, reiniciar el valor y poner un operador válido
+        // por defecto (evita arrastrar texto a una columna numérica como id).
+        if (field === "column") {
+          return { ...f, column: value, operator: "eq", value: "" };
+        }
+        return { ...f, [field]: value };
+      }),
     );
     setPage(1);
   };
@@ -265,9 +312,9 @@ export default function TamboEncryptedPage() {
 
   // Función para aplicar filtros (consulta al servidor, desde la página 1)
   const applyFiltersToServer = () => {
-    // Guarda de seguridad: no aplicar sin al menos un filtro con valor.
-    // (El botón ya está deshabilitado en ese caso; esto es por si acaso.)
-    if (!filters.some(isFilterActive)) return;
+    // Guarda de seguridad: no aplicar si no hay filtro válido o si alguno es inválido
+    // (ej. texto en la columna ID). El botón ya se muestra deshabilitado en ese caso.
+    if (!canApply) return;
 
     setAppliedFilters(filters);
     fetchSorteos(filters, 1);
@@ -315,7 +362,7 @@ export default function TamboEncryptedPage() {
             "Content-Type": "application/json",
           },
           body,
-        }
+        },
       );
 
       const json = await res.json();
@@ -326,35 +373,35 @@ export default function TamboEncryptedPage() {
         fileName: "registros_tambo_encriptados",
         sheetName: "Registros Tambo Encriptados",
         columnMapping: {
-        id: "ID",
-        created_at: "FECHA CREACIÓN",
-        campaign: "CAMPAÑA",
-        last_name: "APELLIDO",
-        bday: "CUMPLEAÑOS",
-        address: "DIRECCIÓN",
-        phone: "TELÉFONO",
-        email: "EMAIL",
-        doc_type: "TIPO DOC",
-        doc_number: "NRO DOC",
-        inv_type: "TIPO INV",
-        inv_serie: "SERIE INV",
-        inv_number: "NRO INV",
-        inv_code: "CÓDIGO INV",
-        terms_accept: "TÉRMINOS",
-        ads_accept: "ADS",
-        survey_accept: "ENCUESTA",
-        first_name: "NOMBRE",
-        pack_option: "PACK",
-        publicity_accept: "PUBLICIDAD",
-        transfer_diageo: "TRANSFER DIAGEO",
-      },
-      customFormatter: (key, value) => {
-        // Formatear booleano de transfer_diageo
-        if (key === "transfer_diageo") {
-          return value === true ? "Sí" : value === false ? "No" : "-";
-        }
-        return value;
-      },
+          id: "ID",
+          created_at: "FECHA CREACIÓN",
+          campaign: "CAMPAÑA",
+          last_name: "APELLIDO",
+          bday: "CUMPLEAÑOS",
+          address: "DIRECCIÓN",
+          phone: "TELÉFONO",
+          email: "EMAIL",
+          doc_type: "TIPO DOC",
+          doc_number: "NRO DOC",
+          inv_type: "TIPO INV",
+          inv_serie: "SERIE INV",
+          inv_number: "NRO INV",
+          inv_code: "CÓDIGO INV",
+          terms_accept: "TÉRMINOS",
+          ads_accept: "ADS",
+          survey_accept: "ENCUESTA",
+          first_name: "NOMBRE",
+          pack_option: "PACK",
+          publicity_accept: "PUBLICIDAD",
+          transfer_diageo: "TRANSFER DIAGEO",
+        },
+        customFormatter: (key, value) => {
+          // Formatear booleano de transfer_diageo
+          if (key === "transfer_diageo") {
+            return value === true ? "Sí" : value === false ? "No" : "-";
+          }
+          return value;
+        },
       });
     } catch (err: any) {
       setError(err.message);
@@ -369,7 +416,11 @@ export default function TamboEncryptedPage() {
         return <p className="text-sm text-black">{sorteo.id}</p>;
 
       case "created_at":
-        return <span className="text-sm text-black">{formatDate(sorteo.created_at)}</span>;
+        return (
+          <span className="text-sm text-black">
+            {formatDate(sorteo.created_at)}
+          </span>
+        );
 
       case "first_name":
         return <p className="text-sm text-black">{sorteo.first_name || "-"}</p>;
@@ -393,15 +444,28 @@ export default function TamboEncryptedPage() {
         return <p className="text-sm text-black">{sorteo.bday || "-"}</p>;
 
       case "address":
-        return <p className="text-sm text-black truncate max-w-xs" title={sorteo.address || "-"}>{sorteo.address || "-"}</p>;
+        return (
+          <p
+            className="text-sm text-black truncate max-w-xs"
+            title={sorteo.address || "-"}
+          >
+            {sorteo.address || "-"}
+          </p>
+        );
 
       case "pack_option":
-        return <p className="text-sm text-black">{sorteo.pack_option ?? "-"}</p>;
+        return (
+          <p className="text-sm text-black">{sorteo.pack_option ?? "-"}</p>
+        );
 
       case "transfer_diageo":
         return (
           <p className="text-sm text-black">
-            {sorteo.transfer_diageo === true ? "Sí" : sorteo.transfer_diageo === false ? "No" : "-"}
+            {sorteo.transfer_diageo === true
+              ? "Sí"
+              : sorteo.transfer_diageo === false
+                ? "No"
+                : "-"}
           </p>
         );
 
@@ -421,16 +485,22 @@ export default function TamboEncryptedPage() {
         return <p className="text-sm text-black">{sorteo.inv_code || "-"}</p>;
 
       case "terms_accept":
-        return <p className="text-sm text-black">{sorteo.terms_accept || "-"}</p>;
+        return (
+          <p className="text-sm text-black">{sorteo.terms_accept || "-"}</p>
+        );
 
       case "ads_accept":
         return <p className="text-sm text-black">{sorteo.ads_accept || "-"}</p>;
 
       case "survey_accept":
-        return <p className="text-sm text-black">{sorteo.survey_accept || "-"}</p>;
+        return (
+          <p className="text-sm text-black">{sorteo.survey_accept || "-"}</p>
+        );
 
       case "publicity_accept":
-        return <p className="text-sm text-black">{sorteo.publicity_accept || "-"}</p>;
+        return (
+          <p className="text-sm text-black">{sorteo.publicity_accept || "-"}</p>
+        );
 
       default:
         return <p className="text-sm text-black">{String(cellValue || "-")}</p>;
@@ -438,7 +508,11 @@ export default function TamboEncryptedPage() {
   }, []);
 
   if (forbidden) {
-    return <p className="text-yellow-600 text-center mt-10">No tienes permiso para ver esta información.</p>;
+    return (
+      <p className="text-yellow-600 text-center mt-10">
+        No tienes permiso para ver esta información.
+      </p>
+    );
   }
 
   if (error) {
@@ -450,7 +524,6 @@ export default function TamboEncryptedPage() {
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="flex flex-col gap-2">
           <div className="container-blue-principal">
-
             {/* Botones de filtros */}
             <div className="flex items-center gap-3 mb-4 flex-wrap">
               <Button
@@ -466,10 +539,16 @@ export default function TamboEncryptedPage() {
               {filters.length > 0 && (
                 <Button
                   isAdmin
-                  title={!hasValidFilter ? "Ingresa un valor en al menos un filtro" : undefined}
+                  title={
+                    hasInvalidFilter
+                      ? "El valor de la columna ID debe ser numérico"
+                      : !hasValidFilter
+                        ? "Ingresa un valor en al menos un filtro"
+                        : undefined
+                  }
                   onPress={applyFiltersToServer}
                   className={
-                    hasValidFilter && !loading
+                    canApply && !loading
                       ? "!bg-[#265197] hover:!bg-[#16305A] !text-white"
                       : "!bg-[#A7BDE2] !text-white !cursor-not-allowed"
                   }
@@ -509,7 +588,7 @@ export default function TamboEncryptedPage() {
                 <div className="flex flex-col gap-2">
                   {hasSearched ? (
                     <Text isAdmin color="#265197" variant="body" weight="bold">
-                      Total de registros: {totalRecords}
+                      Total de registros filtrados: {totalRecords}
                     </Text>
                   ) : (
                     <span />
@@ -525,8 +604,10 @@ export default function TamboEncryptedPage() {
                           className="inline-flex items-center bg-[#EEF1F7] border border-[#D4DEED] rounded-full px-3 py-1"
                         >
                           <Text isAdmin color="#265197" variant="label">
-                            {getColumnName(f.column)} · {getOperatorLabel(f.operator)}
-                            {f.operator !== "is_null" && f.operator !== "is_not_null"
+                            {getColumnName(f.column)} ·{" "}
+                            {getOperatorLabel(f.operator)}
+                            {f.operator !== "is_null" &&
+                            f.operator !== "is_not_null"
                               ? ` "${f.value}"`
                               : ""}
                           </Text>
@@ -537,66 +618,92 @@ export default function TamboEncryptedPage() {
                 </div>
                 {filters.length > 0 && (
                   <div className="flex flex-col gap-1">
-                {filters.map((filter) => (
-                  <div key={filter.id} className="flex items-center justify-end gap-2 bg-white/10 p-2 rounded-lg">
-                    {/* Selector de columna */}
-                    <Select
-                      className="text-[#3E688E] w-[140px]"
-                      classNames={{
-                        trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
-                        value: "!text-[#3E688E]",
-                      }}
-                      selectedKeys={filter.column ? [filter.column] : []}
-                      variant="faded"
-                      options={columns.filter((col) => FILTERABLE_COLUMNS.includes(col.uid)).map((col) => ({ value: col.uid, label: col.name }))}
-                      onSelectionChange={(keys) => {
-                        const selected = Array.from(keys)[0] as string;
-                        updateFilter(filter.id, "column", selected);
-                      }}
-                    />
+                    {filters.map((filter) => (
+                      <div
+                        key={filter.id}
+                        className="flex items-center justify-end gap-2 bg-white/10 p-2 rounded-lg"
+                      >
+                        {/* Selector de columna */}
+                        <Select
+                          className="text-[#3E688E] w-[140px]"
+                          classNames={{
+                            trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
+                            value: "!text-[#3E688E]",
+                          }}
+                          selectedKeys={filter.column ? [filter.column] : []}
+                          variant="faded"
+                          options={columns
+                            .filter((col) =>
+                              FILTERABLE_COLUMNS.includes(col.uid),
+                            )
+                            .map((col) => ({
+                              value: col.uid,
+                              label: col.name,
+                            }))}
+                          onSelectionChange={(keys) => {
+                            const selected = Array.from(keys)[0] as string;
+                            updateFilter(filter.id, "column", selected);
+                          }}
+                        />
 
-                    {/* Selector de operador */}
-                    <Select
-                      className="text-[#3E688E] w-[140px]"
-                      classNames={{
-                        trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
-                        value: "!text-[#3E688E]",
-                      }}
-                      selectedKeys={filter.operator ? [filter.operator] : []}
-                      variant="faded"
-                      options={getOperatorsForColumn(filter.column).map((op) => ({ value: op.key, label: op.label }))}
-                      onSelectionChange={(keys) => {
-                        const selected = Array.from(keys)[0] as string;
-                        updateFilter(filter.id, "operator", selected);
-                      }}
-                    />
+                        {/* Selector de operador */}
+                        <Select
+                          className="text-[#3E688E] w-[140px]"
+                          classNames={{
+                            trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
+                            value: "!text-[#3E688E]",
+                          }}
+                          selectedKeys={
+                            filter.operator ? [filter.operator] : []
+                          }
+                          variant="faded"
+                          options={getOperatorsForColumn(filter.column).map(
+                            (op) => ({ value: op.key, label: op.label }),
+                          )}
+                          onSelectionChange={(keys) => {
+                            const selected = Array.from(keys)[0] as string;
+                            updateFilter(filter.id, "operator", selected);
+                          }}
+                        />
 
-                    {/* Input de valor (solo si no es is_null o is_not_null) */}
-                    {filter.operator !== "is_null" && filter.operator !== "is_not_null" && (
-                      <Input
-                        className="text-[#3E688E] w-[180px]"
-                        classNames={{
-                          inputWrapper: "!bg-[#F4F4F5] !border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
-                          input: "!text-[#3E688E] placeholder:!text-[#719BC1]",
-                        }}
-                        placeholder="Valor..."
-                        value={filter.value}
-                        variant="faded"
-                        onChange={(e) => updateFilter(filter.id, "value", e.target.value)}
-                      />
+                        {/* Input de valor (solo si no es is_null o is_not_null) */}
+                        {filter.operator !== "is_null" &&
+                          filter.operator !== "is_not_null" && (
+                            <Input
+                              className="text-[#3E688E] w-[180px]"
+                              classNames={{
+                                inputWrapper:
+                                  "!bg-[#F4F4F5] !border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                                input:
+                                  "!text-[#3E688E] placeholder:!text-[#719BC1]",
+                              }}
+                              placeholder="Valor..."
+                              value={filter.value}
+                              variant="faded"
+                              onChange={(e) =>
+                                updateFilter(filter.id, "value", e.target.value)
+                              }
+                            />
+                          )}
+
+                        {/* Botón para eliminar filtro */}
+                        <Button
+                          isAdmin
+                          onPress={() => removeFilter(filter.id)}
+                          className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white !min-w-[40px]"
+                          title="Eliminar filtro"
+                        >
+                          ✕
+                        </Button>
+                      </div>
+                    ))}
+                    {hasInvalidFilter && (
+                      <div className="flex justify-end">
+                        <Text isAdmin color="#dc3545" variant="label">
+                          ⚠ El valor de la columna ID debe ser numérico
+                        </Text>
+                      </div>
                     )}
-
-                    {/* Botón para eliminar filtro */}
-                    <Button
-                      isAdmin
-                      onPress={() => removeFilter(filter.id)}
-                      className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white !min-w-[40px]"
-                      title="Eliminar filtro"
-                    >
-                      ✕
-                    </Button>
-                  </div>
-                ))}
                   </div>
                 )}
               </div>
@@ -612,7 +719,8 @@ export default function TamboEncryptedPage() {
                 </Text>
                 <div className="mt-2 mb-7">
                   <Text isAdmin variant="body" color="#5A6B85">
-                    Para visualizar los registros encriptados de Tambo, sigue estos pasos:
+                    Para visualizar los registros encriptados de Tambo, sigue
+                    estos pasos:
                   </Text>
                 </div>
                 <div className="flex flex-col gap-4 text-left w-full max-w-md">
@@ -623,7 +731,12 @@ export default function TamboEncryptedPage() {
                   ].map((step, index) => (
                     <div key={index} className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#265197] flex-shrink-0">
-                        <Text isAdmin variant="label" weight="bold" color="#ffffff">
+                        <Text
+                          isAdmin
+                          variant="label"
+                          weight="bold"
+                          color="#ffffff"
+                        >
                           {index + 1}
                         </Text>
                       </div>
@@ -639,7 +752,12 @@ export default function TamboEncryptedPage() {
             {loading && (
               <div className="mt-4 flex flex-col items-center justify-center text-center bg-[#EEF1F7] border border-[#D4DEED] rounded-2xl py-12 px-6">
                 <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white mb-5">
-                  <Icon className="animate-spin" name="LoaderCircle" size={32} color="#265197" />
+                  <Icon
+                    className="animate-spin"
+                    name="LoaderCircle"
+                    size={32}
+                    color="#265197"
+                  />
                 </div>
                 <Text isAdmin variant="title" weight="bold" color="#16305A">
                   Buscando registros...
@@ -655,47 +773,47 @@ export default function TamboEncryptedPage() {
 
           {hasSearched && !loading && (
             <Table
-            isStriped
-            aria-label="Tabla de Registros Encriptados de Tambo"
-            selectionMode="none"
-            sortDescriptor={sortDescriptor}
-            onSortChange={(descriptor) => {
-              const newSort = descriptor as LocalSortDescriptor;
-              setSortDescriptor(newSort);
-              // Re-consultar al servidor con el nuevo orden, desde la página 1
-              fetchSorteos(appliedFilters, 1, newSort);
-            }}
-            classNames={{
-              wrapper: "bg-transparent overflow-x-auto !p-0",
-              tr: "data-[odd=true]:bg-[#EEF1F7]",
-              th: "bg-[#265197] text-[#fff] font-semibold text-center whitespace-nowrap",
-              td: "text-gray-700 text-center whitespace-nowrap",
-            }}
-          >
-            <TableHeader columns={columns}>
-              {(column) => (
-                <TableColumn
-                  key={column.uid}
-                  align="center"
-                  allowsSorting={column.sortable}
-                >
-                  {column.name}
-                </TableColumn>
-              )}
-            </TableHeader>
-            <TableBody
-              emptyContent={"No se encontraron registros"}
-              items={sorteos}
+              isStriped
+              aria-label="Tabla de Registros Encriptados de Tambo"
+              selectionMode="none"
+              sortDescriptor={sortDescriptor}
+              onSortChange={(descriptor) => {
+                const newSort = descriptor as LocalSortDescriptor;
+                setSortDescriptor(newSort);
+                // Re-consultar al servidor con el nuevo orden, desde la página 1
+                fetchSorteos(appliedFilters, 1, newSort);
+              }}
+              classNames={{
+                wrapper: "bg-transparent overflow-x-auto !p-0",
+                tr: "data-[odd=true]:bg-[#EEF1F7]",
+                th: "bg-[#265197] text-[#fff] font-semibold text-center whitespace-nowrap",
+                td: "text-gray-700 text-center whitespace-nowrap",
+              }}
             >
-              {(item) => (
-                <TableRow key={item.id} className="items-center">
-                  {(columnKey) => (
-                    <TableCell>{renderCell(item, columnKey)}</TableCell>
-                  )}
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              <TableHeader columns={columns}>
+                {(column) => (
+                  <TableColumn
+                    key={column.uid}
+                    align="center"
+                    allowsSorting={column.sortable}
+                  >
+                    {column.name}
+                  </TableColumn>
+                )}
+              </TableHeader>
+              <TableBody
+                emptyContent={"No se encontraron registros"}
+                items={sorteos}
+              >
+                {(item) => (
+                  <TableRow key={item.id} className="items-center">
+                    {(columnKey) => (
+                      <TableCell>{renderCell(item, columnKey)}</TableCell>
+                    )}
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           )}
 
           {/* Paginación */}
