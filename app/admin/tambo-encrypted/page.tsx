@@ -341,6 +341,26 @@ export default function TamboEncryptedPage() {
     }
   };
 
+  // Normaliza el cumpleaños a DD/MM/YYYY parseando los formatos que llegan
+  // (DD/MM/YYYY o ISO YYYY-MM-DD), SIN usar new Date() para no mal-interpretar.
+  const formatBday = (value: string | null) => {
+    if (!value) return "-";
+    const v = String(value).trim();
+    // DD/MM/YYYY o D/M/YYYY
+    const dmy = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (dmy) {
+      const [, d, m, y] = dmy;
+      return `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
+    }
+    // ISO YYYY-MM-DD (con o sin hora)
+    const ymd = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (ymd) {
+      const [, y, m, d] = ymd;
+      return `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
+    }
+    return v; // formato desconocido → tal cual
+  };
+
   // Exportar a Excel: hace su PROPIA consulta SIN paginación (page/pageSize)
   // para que la edge function devuelva TODOS los registros filtrados, no solo la página visible.
   const handleExportToExcel = async () => {
@@ -407,6 +427,10 @@ export default function TamboEncryptedPage() {
           if (key === "transfer_diageo") {
             return value === true ? "Sí" : value === false ? "No" : "-";
           }
+          // Normalizar cumpleaños a DD/MM/YYYY
+          if (key === "bday") {
+            return formatBday(value);
+          }
           return value;
         },
       });
@@ -448,7 +472,9 @@ export default function TamboEncryptedPage() {
         return <p className="text-sm text-black">{sorteo.doc_number || "-"}</p>;
 
       case "bday":
-        return <p className="text-sm text-black">{sorteo.bday || "-"}</p>;
+        return (
+          <p className="text-sm text-black">{formatBday(sorteo.bday)}</p>
+        );
 
       case "address":
         return (

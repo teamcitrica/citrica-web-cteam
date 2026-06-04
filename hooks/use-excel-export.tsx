@@ -96,7 +96,8 @@ export const useExcelExport = () => {
       "updated_at",
       "deleted_at",
       "birthdate",
-      "bday",
+      // "bday" se excluye a propósito: viene en formatos mixtos (DD/MM/YYYY e ISO)
+      // y new Date() lo mal-interpreta. Cada página lo formatea con su customFormatter.
       "birthday",
       "timestamp",
     ];
