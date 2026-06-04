@@ -105,8 +105,11 @@ const getOperatorsForColumn = (columnName: string) => {
     // Para columnas numéricas, mostrar todos los operadores numéricos
     return ALL_OPERATORS.filter((op) => op.numeric);
   } else {
-    // Para columnas de texto (como campaign), solo operadores de texto
-    return ALL_OPERATORS.filter((op) => op.text);
+    // Para columnas de texto (como campaign), solo operadores de texto,
+    // SIN "Es nulo" / "No es nulo".
+    return ALL_OPERATORS.filter(
+      (op) => op.text && op.key !== "is_null" && op.key !== "is_not_null",
+    );
   }
 };
 
@@ -529,17 +532,28 @@ export default function TamboEncryptedPage() {
         <div className="flex flex-col gap-2">
           <div className="container-blue-principal">
             {/* Botones de filtros */}
-            <div className="flex items-center gap-3 mb-4 flex-wrap">
-              <Button
-                isAdmin
-                onPress={addFilter}
-                className="!bg-[#28a745] hover:!bg-[#218838] !text-white"
-              >
-                <span className="flex items-center gap-2">
-                  <span>+</span>
-                  <span>Agregar Filtro</span>
-                </span>
-              </Button>
+            <div className="flex items-center justify-end gap-3 mb-4 flex-wrap">
+              {hasSearched && totalRecords > 0 && (
+                <Button
+                  isAdmin
+                  onPress={handleExportToExcel}
+                  className="!bg-[#3E688E] hover:!bg-[#2d4f6b] !text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <span>📥</span>
+                    <span>Exportar a Excel</span>
+                  </span>
+                </Button>
+              )}
+              {(filters.length > 0 || hasSearched) && (
+                <Button
+                  isAdmin
+                  onPress={clearAllFilters}
+                  className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white"
+                >
+                  Limpiar todo
+                </Button>
+              )}
               {filters.length > 0 && (
                 <Button
                   isAdmin
@@ -563,27 +577,16 @@ export default function TamboEncryptedPage() {
                   </span>
                 </Button>
               )}
-              {(filters.length > 0 || hasSearched) && (
-                <Button
-                  isAdmin
-                  onPress={clearAllFilters}
-                  className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white"
-                >
-                  Limpiar todo
-                </Button>
-              )}
-              {totalRecords > 0 && (
-                <Button
-                  isAdmin
-                  onPress={handleExportToExcel}
-                  className="!bg-[#3E688E] hover:!bg-[#2d4f6b] !text-white"
-                >
-                  <span className="flex items-center gap-2">
-                    <span>📥</span>
-                    <span>Exportar a Excel</span>
-                  </span>
-                </Button>
-              )}
+              <Button
+                isAdmin
+                onPress={addFilter}
+                className="!bg-[#28a745] hover:!bg-[#218838] !text-white"
+              >
+                <span className="flex items-center gap-2">
+                  <span>+</span>
+                  <span>Agregar Filtro</span>
+                </span>
+              </Button>
             </div>
 
             {/* Total de registros + Filtros dinámicos en la misma línea */}
