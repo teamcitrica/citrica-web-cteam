@@ -9,6 +9,7 @@ import {
 } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { useState, useCallback } from "react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import {
   Text,
   Col,
@@ -69,7 +70,9 @@ const columns = [
   { name: "TRANSFER DIAGEO", uid: "transfer_diageo", sortable: true },
 ];
 
-const ITEMS_PER_PAGE = 15;
+const PAGE_SIZE = 15; // registros visibles por página
+const PAGES_PER_BATCH = 7; // páginas que trae cada lote
+const BATCH_SIZE = PAGE_SIZE * PAGES_PER_BATCH; // 105 registros por lote
 
 // Definición de operadores con símbolos
 const ALL_OPERATORS = [
@@ -110,13 +113,9 @@ const getOperatorsForColumn = (columnName: string) => {
 export default function TamboEncryptedPage() {
   const { userSession } = UserAuth();
   const { exportToExcel } = useExcelExport();
-  const [sorteos, setSorteos] = useState<Sorteo[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [forbidden, setForbidden] = useState(false);
+  const [error, setError] = useState<string | null>(null); // errores de exportación / validación
   const [page, setPage] = useState(1);
   const [hasSearched, setHasSearched] = useState(false);
-  const [totalRecords, setTotalRecords] = useState(0);
 
   // Sistema de filtros dinámicos estilo Supabase
   type Filter = {
@@ -127,7 +126,7 @@ export default function TamboEncryptedPage() {
   };
 
   const [filters, setFilters] = useState<Filter[]>([]);
-  // Filtros actualmente aplicados en el servidor (para re-usar al cambiar de página/orden)
+  // Filtros actualmente aplicados en el servidor (van en el queryKey de React Query)
   const [appliedFilters, setAppliedFilters] = useState<Filter[]>([]);
 
   // Un filtro "cuenta" si tiene valor, o si su operador no necesita valor (is_null / is_not_null)
@@ -146,76 +145,81 @@ export default function TamboEncryptedPage() {
     direction: "ascending",
   });
 
-  // Función para traer datos del servidor con filtros
-  const fetchSorteos = async (
-    filtersToApply: Filter[] = [],
-    targetPage = 1,
-    sort: LocalSortDescriptor = sortDescriptor,
-  ) => {
-    try {
-      setLoading(true);
-      setError(null);
-      setHasSearched(true);
+  // Trae un LOTE del servidor (función pura que usa React Query como queryFn).
+  const fetchEncryptedBatch = async (
+    filtersToApply: Filter[],
+    sort: LocalSortDescriptor,
+    targetBatch: number,
+  ): Promise<{ data: Sorteo[]; count: number }> => {
+    const filtersToSend = filtersToApply.filter(isFilterActive);
+    const orderBy = {
+      column: sort.column,
+      ascending: sort.direction === "ascending",
+    };
 
-      // 1️⃣ Verificar que haya sesión activa
-      if (!userSession) {
-        setError("Debes iniciar sesión para ver esta información");
-        setLoading(false);
-        return;
-      }
+    const body = JSON.stringify({
+      filters: filtersToSend,
+      orderBy,
+      page: targetBatch + 1, // nº de lote
+      pageSize: BATCH_SIZE, // 105 → la edge function hace .range()
+    });
 
-      // 2️⃣ Limpiar filtros vacíos antes de enviar
-      const filtersToSend = filtersToApply.filter(isFilterActive);
-
-      // 3️⃣ Preparar el orden
-      const orderBy = {
-        column: sort.column,
-        ascending: sort.direction === "ascending",
-      };
-
-      // 4️⃣ Pedir SOLO la página actual (paginación del servidor)
-      const body = JSON.stringify({
-        filters: filtersToSend,
-        orderBy,
-        page: targetPage,
-        pageSize: ITEMS_PER_PAGE,
-      });
-
-      const res = await fetch(
-        `https://axndntqikmbldyodiwal.supabase.co/functions/v1/get-tambo-encrypted-data`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TAMBO_SUPABASE_ANON_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body,
+    const res = await fetch(
+      `https://axndntqikmbldyodiwal.supabase.co/functions/v1/get-tambo-encrypted-data`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_TAMBO_SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
         },
-      );
+        body,
+      },
+    );
 
-      if (res.status === 403) {
-        setForbidden(true);
-        setLoading(false);
-        return;
-      }
+    if (res.status === 403) throw new Error("FORBIDDEN");
 
-      const json = await res.json();
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || "Error al obtener datos");
 
-      if (!res.ok) throw new Error(json.error || "Error al obtener datos");
-
-      setSorteos(json.data || []);
-      setTotalRecords(json.count || 0);
-      setPage(targetPage);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    return { data: json.data || [], count: json.count || 0 };
   };
 
-  // Paginación del servidor: el filtrado, orden y corte por página los hace la edge function.
-  // El total de páginas se calcula con el conteo total que devuelve la API.
-  const totalPages = Math.ceil(totalRecords / ITEMS_PER_PAGE);
+  // Lote (0-based) que contiene la página actual
+  const batchIndex = Math.floor((page - 1) / PAGES_PER_BATCH);
+
+  // React Query: cachea cada combinación (filtros + orden + lote).
+  // - Volver a un lote ya visto = instantáneo (desde caché).
+  // - Cambiar filtro/orden = otra queryKey → consulta nueva (sin invalidar a mano).
+  // - keepPreviousData = mantiene la tabla anterior mientras llega el nuevo lote.
+  const { data, isLoading, isError, error: queryError } = useQuery<{
+    data: Sorteo[];
+    count: number;
+  }>({
+    queryKey: ["tambo-encrypted", appliedFilters, sortDescriptor, batchIndex],
+    queryFn: () =>
+      fetchEncryptedBatch(appliedFilters, sortDescriptor, batchIndex),
+    enabled: hasSearched && !!userSession,
+    placeholderData: keepPreviousData,
+  });
+
+  // Derivados (reemplazan a los estados manuales)
+  const totalRecords = data?.count ?? 0;
+  const totalPages = Math.ceil(totalRecords / PAGE_SIZE);
+  const offsetInBatch = ((page - 1) % PAGES_PER_BATCH) * PAGE_SIZE;
+  const paginatedItems: Sorteo[] = (data?.data ?? []).slice(
+    offsetInBatch,
+    offsetInBatch + PAGE_SIZE,
+  );
+  const loading = isLoading;
+  const forbidden = isError && (queryError as Error)?.message === "FORBIDDEN";
+  const displayError =
+    error || (isError && !forbidden ? (queryError as Error)?.message : null);
+
+  // Cambiar de página: solo cambia `page`. React Query trae el lote (o usa
+  // caché) automáticamente cuando cambia `batchIndex` dentro del queryKey.
+  const goToPage = (p: number) => {
+    setPage(p);
+  };
 
   // Hay al menos un filtro válido (con valor, o un operador que no necesita valor).
   // Se exige para poder aplicar filtros (no se permite traer todo sin filtrar).
@@ -270,14 +274,13 @@ export default function TamboEncryptedPage() {
     const validRemaining = remaining.filter(isFilterActive);
 
     if (validRemaining.length > 0) {
-      // Quedan filtros válidos → re-consultar con ellos
+      // Quedan filtros válidos → React Query re-consulta solo (cambia el queryKey)
       setAppliedFilters(remaining);
-      fetchSorteos(remaining, 1);
+      setPage(1);
     } else {
-      // No queda ningún filtro → limpiar la tabla (volver al estado inicial)
+      // No queda ningún filtro → volver al estado inicial (sin tabla)
       setAppliedFilters([]);
-      setSorteos([]);
-      setTotalRecords(0);
+      setPage(1);
       setHasSearched(false);
     }
   };
@@ -305,19 +308,20 @@ export default function TamboEncryptedPage() {
     setFilters([]);
     setAppliedFilters([]);
     setPage(1);
-    setSorteos([]);
-    setTotalRecords(0);
+    setError(null);
     setHasSearched(false);
   };
 
-  // Función para aplicar filtros (consulta al servidor, desde la página 1)
+  // Aplicar filtros: setea los filtros aplicados → React Query consulta solo
   const applyFiltersToServer = () => {
     // Guarda de seguridad: no aplicar si no hay filtro válido o si alguno es inválido
     // (ej. texto en la columna ID). El botón ya se muestra deshabilitado en ese caso.
     if (!canApply) return;
 
+    setError(null);
     setAppliedFilters(filters);
-    fetchSorteos(filters, 1);
+    setPage(1);
+    setHasSearched(true);
   };
 
   const formatDate = (dateString: string | null) => {
@@ -515,8 +519,8 @@ export default function TamboEncryptedPage() {
     );
   }
 
-  if (error) {
-    return <p className="text-red-500 text-center mt-10">{error}</p>;
+  if (displayError) {
+    return <p className="text-red-500 text-center mt-10">{displayError}</p>;
   }
 
   return (
@@ -780,8 +784,8 @@ export default function TamboEncryptedPage() {
               onSortChange={(descriptor) => {
                 const newSort = descriptor as LocalSortDescriptor;
                 setSortDescriptor(newSort);
-                // Re-consultar al servidor con el nuevo orden, desde la página 1
-                fetchSorteos(appliedFilters, 1, newSort);
+                // El nuevo orden va en el queryKey → React Query re-consulta solo
+                setPage(1);
               }}
               classNames={{
                 wrapper: "bg-transparent overflow-x-auto !p-0",
@@ -803,7 +807,7 @@ export default function TamboEncryptedPage() {
               </TableHeader>
               <TableBody
                 emptyContent={"No se encontraron registros"}
-                items={sorteos}
+                items={paginatedItems}
               >
                 {(item) => (
                   <TableRow key={item.id} className="items-center">
@@ -831,7 +835,7 @@ export default function TamboEncryptedPage() {
                 }}
                 page={page}
                 total={totalPages}
-                onChange={(p) => fetchSorteos(appliedFilters, p)}
+                onChange={(p) => goToPage(p)}
               />
             </div>
           )}
