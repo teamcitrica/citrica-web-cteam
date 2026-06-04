@@ -1,8 +1,25 @@
 "use client";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+} from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
-import { useState, useCallback, useMemo } from "react";
-import { Text, Col, Container, Select, Input, Button } from "citrica-ui-toolkit";
+import { useState, useCallback } from "react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import {
+  Text,
+  Col,
+  Container,
+  Select,
+  Input,
+  Button,
+  Icon,
+} from "citrica-ui-toolkit";
+
 import { UserAuth } from "@/shared/context/auth-context";
 import { useExcelExport } from "@/hooks/use-excel-export";
 
@@ -35,17 +52,17 @@ interface PollaSorteo {
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
-  { name: "FECHA CREACIÓN", uid: "created_at", sortable: true },
-  { name: "🔐 NOMBRE", uid: "first_name", sortable: true },
-  { name: "🔐 APELLIDO", uid: "last_name", sortable: true },
-  { name: "🔐 EMAIL", uid: "email", sortable: true },
+  { name: "FECHA CREACIÓN", uid: "created_at", sortable: false },
+  { name: "🔐 NOMBRE", uid: "first_name", sortable: false },
+  { name: "🔐 APELLIDO", uid: "last_name", sortable: false },
+  { name: "🔐 EMAIL", uid: "email", sortable: false },
   { name: "🔐 TELÉFONO", uid: "phone", sortable: false },
   { name: "TIPO DOC", uid: "doc_type", sortable: false },
   { name: "🔐 NRO DOC", uid: "doc_number", sortable: false },
-  { name: "🔐 CUMPLEAÑOS", uid: "bday", sortable: true },
+  { name: "🔐 CUMPLEAÑOS", uid: "bday", sortable: false },
   { name: "🔐 DIRECCIÓN", uid: "address", sortable: false },
   { name: "CAMPAÑA", uid: "campaign", sortable: false },
-  { name: "FASE", uid: "votos_fase", sortable: true },
+  { name: "FASE", uid: "votos_fase", sortable: false },
   { name: "VOTOS", uid: "votos", sortable: false },
   { name: "TÉRMINOS", uid: "terms_accept", sortable: false },
   { name: "ADS", uid: "ads_accept", sortable: false },
@@ -53,7 +70,9 @@ const columns = [
   { name: "PUBLICIDAD", uid: "publicity_accept", sortable: false },
 ];
 
-const ITEMS_PER_PAGE = 15;
+const PAGE_SIZE = 15; // registros visibles por página
+const PAGES_PER_BATCH = 7; // páginas que trae cada lote
+const BATCH_SIZE = PAGE_SIZE * PAGES_PER_BATCH; // 105 registros por lote
 
 // Definición de operadores con símbolos
 const ALL_OPERATORS = [
@@ -72,28 +91,32 @@ const ALL_OPERATORS = [
 ];
 
 // Columnas numéricas que permiten operadores de comparación
-const NUMERIC_COLUMNS = ["id", "votos_fase"];
+const NUMERIC_COLUMNS = ["id"];
+
+// Columnas por las que SÍ se puede filtrar en el servidor. En polla el único
+// filtro es por id (que la edge function mapea a user_id en la tabla base).
+const FILTERABLE_COLUMNS = ["id"];
 
 // Función para obtener operadores disponibles según el tipo de columna
 const getOperatorsForColumn = (columnName: string) => {
   const isNumeric = NUMERIC_COLUMNS.includes(columnName);
 
   if (isNumeric) {
+    // Para columnas numéricas, mostrar todos los operadores numéricos
     return ALL_OPERATORS.filter((op) => op.numeric);
   } else {
-    return ALL_OPERATORS.filter((op) => op.text);
+    // Para columnas de texto, solo operadores de texto, SIN "Es nulo" / "No es nulo".
+    return ALL_OPERATORS.filter(
+      (op) => op.text && op.key !== "is_null" && op.key !== "is_not_null",
+    );
   }
 };
 
 export default function PollaEncryptedPage() {
   const { userSession } = UserAuth();
   const { exportToExcel } = useExcelExport();
-  const [sorteos, setSorteos] = useState<PollaSorteo[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [forbidden, setForbidden] = useState(false);
+  const [error, setError] = useState<string | null>(null); // errores de exportación / validación
   const [page, setPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
 
   // Sistema de filtros dinámicos estilo Supabase
@@ -105,6 +128,14 @@ export default function PollaEncryptedPage() {
   };
 
   const [filters, setFilters] = useState<Filter[]>([]);
+  // Filtros actualmente aplicados en el servidor (van en el queryKey de React Query)
+  const [appliedFilters, setAppliedFilters] = useState<Filter[]>([]);
+
+  // Un filtro "cuenta" si tiene valor, o si su operador no necesita valor (is_null / is_not_null)
+  const isFilterActive = (f: Filter) =>
+    f.value.trim() !== "" ||
+    f.operator === "is_null" ||
+    f.operator === "is_not_null";
 
   type LocalSortDescriptor = {
     column: string;
@@ -116,153 +147,119 @@ export default function PollaEncryptedPage() {
     direction: "ascending",
   });
 
-  // Función para traer datos del servidor con filtros
-  const fetchSorteos = async (applyFilters = false) => {
-    try {
-      setLoading(true);
-      setError(null);
-      setHasSearched(true);
+  // Trae un LOTE del servidor (función pura que usa React Query como queryFn).
+  const fetchEncryptedBatch = async (
+    filtersToApply: Filter[],
+    sort: LocalSortDescriptor,
+    targetBatch: number,
+  ): Promise<{ data: PollaSorteo[]; count: number }> => {
+    const filtersToSend = filtersToApply.filter(isFilterActive);
+    const orderBy = {
+      column: sort.column,
+      ascending: sort.direction === "ascending",
+    };
 
-      if (!userSession) {
-        setError("Debes iniciar sesión para ver esta información");
-        setLoading(false);
-        return;
-      }
-
-      const filtersToSend = applyFilters ? filters.filter(f => f.value.trim() !== "" || f.operator === "is_null" || f.operator === "is_not_null") : [];
-
-      const orderBy = {
-        column: sortDescriptor.column,
-        ascending: sortDescriptor.direction === "ascending"
-      };
-
-      const method = "POST";
-      const body = JSON.stringify({ filters: filtersToSend, orderBy });
-
-      const res = await fetch(
-        `https://axndntqikmbldyodiwal.supabase.co/functions/v1/get-polla-encrypted-data`,
-        {
-          method,
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TAMBO_SUPABASE_ANON_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body,
-        }
-      );
-
-      if (res.status === 403) {
-        setForbidden(true);
-        setLoading(false);
-        return;
-      }
-
-      const json = await res.json();
-
-      if (!res.ok) throw new Error(json.error || "Error al obtener datos");
-
-      console.log("Respuesta de la API:", json);
-      console.log("Datos de polla:", json.data);
-
-      setSorteos(json.data || []);
-      setPage(1);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Filtrado local solo para búsqueda general (searchTerm)
-  const filteredSorteos = useMemo(() => {
-    let filtered = sorteos;
-
-    if (searchTerm.trim()) {
-      filtered = filtered.filter((sorteo) => {
-        const firstName = sorteo.first_name || "";
-        const lastName = sorteo.last_name || "";
-        const email = sorteo.email || "";
-        const phone = sorteo.phone || "";
-        const docNumber = sorteo.doc_number || "";
-        const campaign = sorteo.campaign || "";
-        const id = String(sorteo.id || "");
-        const votos = sorteo.votos || "";
-        const searchLower = searchTerm.toLowerCase();
-
-        return (
-          firstName.toLowerCase().includes(searchLower) ||
-          lastName.toLowerCase().includes(searchLower) ||
-          email.toLowerCase().includes(searchLower) ||
-          phone.toLowerCase().includes(searchLower) ||
-          docNumber.toLowerCase().includes(searchLower) ||
-          campaign.toLowerCase().includes(searchLower) ||
-          id.toLowerCase().includes(searchLower) ||
-          votos.toLowerCase().includes(searchLower)
-        );
-      });
-    }
-
-    return filtered;
-  }, [sorteos, searchTerm]);
-
-  // Ordenar sorteos
-  const sortedItems = useMemo(() => {
-    return [...filteredSorteos].sort((a, b) => {
-      let first: any;
-      let second: any;
-
-      switch (sortDescriptor.column) {
-        case "id":
-          first = a.id || 0;
-          second = b.id || 0;
-          break;
-        case "created_at":
-          first = a.created_at ? new Date(a.created_at).getTime() : 0;
-          second = b.created_at ? new Date(b.created_at).getTime() : 0;
-          break;
-        case "first_name":
-          first = (a.first_name || "").toLowerCase();
-          second = (b.first_name || "").toLowerCase();
-          break;
-        case "last_name":
-          first = (a.last_name || "").toLowerCase();
-          second = (b.last_name || "").toLowerCase();
-          break;
-        case "email":
-          first = (a.email || "").toLowerCase();
-          second = (b.email || "").toLowerCase();
-          break;
-        case "bday":
-          first = a.bday ? new Date(a.bday).getTime() : 0;
-          second = b.bday ? new Date(b.bday).getTime() : 0;
-          break;
-        case "votos_fase":
-          first = a.votos_fase || 0;
-          second = b.votos_fase || 0;
-          break;
-        default:
-          return 0;
-      }
-
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
-
-      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    const body = JSON.stringify({
+      filters: filtersToSend,
+      orderBy,
+      page: targetBatch + 1, // nº de lote
+      pageSize: BATCH_SIZE, // 105 → la edge function hace .range()
     });
-  }, [filteredSorteos, sortDescriptor]);
 
-  // Calcular cantidad de páginas
-  const totalPages = Math.ceil(sortedItems.length / ITEMS_PER_PAGE);
+    const res = await fetch(
+      `https://axndntqikmbldyodiwal.supabase.co/functions/v1/get-polla-encrypted-data`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_TAMBO_SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body,
+      },
+    );
 
-  // Obtener sorteos para la página actual
-  const paginatedItems = useMemo(() => {
-    const startIndex = (page - 1) * ITEMS_PER_PAGE;
-    return sortedItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [sortedItems, page]);
+    if (res.status === 403) throw new Error("FORBIDDEN");
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setPage(1);
+    const json = await res.json();
+
+    if (!res.ok) throw new Error(json.error || "Error al obtener datos");
+
+    return { data: json.data || [], count: json.count || 0 };
   };
+
+  // Lote (0-based) que contiene la página actual
+  const batchIndex = Math.floor((page - 1) / PAGES_PER_BATCH);
+
+  // React Query: cachea cada combinación (filtros + orden + lote).
+  // - Volver a un lote ya visto = instantáneo (desde caché).
+  // - Cambiar filtro/orden = otra queryKey → consulta nueva (sin invalidar a mano).
+  // - keepPreviousData = mantiene la tabla anterior mientras llega el nuevo lote.
+  const {
+    data,
+    isLoading,
+    isError,
+    error: queryError,
+  } = useQuery<{
+    data: PollaSorteo[];
+    count: number;
+  }>({
+    queryKey: ["polla-encrypted", appliedFilters, sortDescriptor, batchIndex],
+    queryFn: () =>
+      fetchEncryptedBatch(appliedFilters, sortDescriptor, batchIndex),
+    enabled: hasSearched && !!userSession,
+    placeholderData: keepPreviousData,
+  });
+
+  // Derivados (reemplazan a los estados manuales)
+  const totalRecords = data?.count ?? 0;
+  const totalPages = Math.ceil(totalRecords / PAGE_SIZE);
+  const offsetInBatch = ((page - 1) % PAGES_PER_BATCH) * PAGE_SIZE;
+  const paginatedItems: PollaSorteo[] = (data?.data ?? []).slice(
+    offsetInBatch,
+    offsetInBatch + PAGE_SIZE,
+  );
+  const loading = isLoading;
+  const forbidden = isError && (queryError as Error)?.message === "FORBIDDEN";
+  const displayError =
+    error || (isError && !forbidden ? (queryError as Error)?.message : null);
+
+  // Cambiar de página: solo cambia `page`. React Query trae el lote (o usa
+  // caché) automáticamente cuando cambia `batchIndex` dentro del queryKey.
+  const goToPage = (p: number) => {
+    setPage(p);
+  };
+
+  // Hay al menos un filtro válido (con valor, o un operador que no necesita valor).
+  // Se exige para poder aplicar filtros (no se permite traer todo sin filtrar).
+  const hasValidFilter = filters.some(isFilterActive);
+
+  // El valor debe ser coherente con el tipo de columna:
+  // las columnas numéricas (ej. id) solo aceptan números.
+  const filterHasValidValue = (f: Filter) => {
+    if (f.operator === "is_null" || f.operator === "is_not_null") return true;
+    if (NUMERIC_COLUMNS.includes(f.column) && f.value.trim() !== "") {
+      return !isNaN(Number(f.value));
+    }
+
+    return true;
+  };
+
+  // ¿Hay algún filtro activo con valor inválido? (ej. texto en la columna ID)
+  const hasInvalidFilter = filters
+    .filter(isFilterActive)
+    .some((f) => !filterHasValidValue(f));
+
+  // Se puede aplicar solo si hay al menos un filtro válido y ninguno inválido
+  const canApply = hasValidFilter && !hasInvalidFilter;
+
+  // Helpers para mostrar los filtros aplicados de forma legible
+  const getColumnName = (uid: string) =>
+    columns.find((c) => c.uid === uid)?.name || uid;
+  const getOperatorLabel = (key: string) =>
+    ALL_OPERATORS.find((o) => o.key === key)?.label || key;
+
+  // Filtros aplicados que realmente tienen efecto (con valor o sin necesidad de valor)
+  const activeAppliedFilters = appliedFilters.filter(isFilterActive);
 
   const addFilter = () => {
     const newFilter: Filter = {
@@ -271,173 +268,351 @@ export default function PollaEncryptedPage() {
       operator: "eq",
       value: "",
     };
+
     setFilters([...filters, newFilter]);
   };
 
   const removeFilter = (filterId: string) => {
-    setFilters(filters.filter((f) => f.id !== filterId));
+    const remaining = filters.filter((f) => f.id !== filterId);
+
+    setFilters(remaining);
     setPage(1);
+
+    // Si todavía no se ha buscado, no hay nada aplicado que sincronizar
+    if (!hasSearched) return;
+
+    // Sincronizar con la tabla: re-aplicar los filtros que quedan
+    const validRemaining = remaining.filter(isFilterActive);
+
+    if (validRemaining.length > 0) {
+      // Quedan filtros válidos → React Query re-consulta solo (cambia el queryKey)
+      setAppliedFilters(remaining);
+      setPage(1);
+    } else {
+      // No queda ningún filtro → volver al estado inicial (sin tabla)
+      setAppliedFilters([]);
+      setPage(1);
+      setHasSearched(false);
+    }
   };
 
-  const updateFilter = (filterId: string, field: keyof Filter, value: string) => {
+  const updateFilter = (
+    filterId: string,
+    field: keyof Filter,
+    value: string,
+  ) => {
     setFilters(
-      filters.map((f) => (f.id === filterId ? { ...f, [field]: value } : f))
+      filters.map((f) => {
+        if (f.id !== filterId) return f;
+        // Al cambiar de columna, reiniciar el valor y poner un operador válido
+        // por defecto (evita arrastrar texto a una columna numérica como id).
+        if (field === "column") {
+          return { ...f, column: value, operator: "eq", value: "" };
+        }
+
+        return { ...f, [field]: value };
+      }),
     );
     setPage(1);
   };
 
   const clearAllFilters = () => {
-    setSearchTerm("");
     setFilters([]);
+    setAppliedFilters([]);
     setPage(1);
-    setSorteos([]);
+    setError(null);
     setHasSearched(false);
   };
 
+  // Aplicar filtros: setea los filtros aplicados → React Query consulta solo
   const applyFiltersToServer = () => {
-    fetchSorteos(true);
+    // Guarda de seguridad: no aplicar si no hay filtro válido o si alguno es inválido
+    // (ej. texto en la columna ID). El botón ya se muestra deshabilitado en ese caso.
+    if (!canApply) return;
+
+    setError(null);
+    setAppliedFilters(filters);
+    setPage(1);
+    setHasSearched(true);
   };
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "Sin fecha";
+  // Normaliza una fecha a DD/MM/YYYY parseando los formatos que llegan
+  // (DD/MM/YYYY o ISO YYYY-MM-DD, con o sin hora), SIN usar new Date()
+  // para no mal-interpretar (ej. 12/02 como mes/día). Sirve para bday y created_at.
+  const formatFecha = (value: string | null) => {
+    if (!value) return "-";
+    const v = String(value).trim();
+    // DD/MM/YYYY o D/M/YYYY
+    const dmy = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+
+    if (dmy) {
+      const [, d, m, y] = dmy;
+
+      return `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
+    }
+    // ISO YYYY-MM-DD (con o sin hora, ej. timestamp de created_at)
+    const ymd = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+
+    if (ymd) {
+      const [, y, m, d] = ymd;
+      const fecha = `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
+      // Si trae hora (HH:MM:SS), la agregamos tal cual viene guardada
+      const hora = v.match(/[ T](\d{2}):(\d{2}):(\d{2})/);
+
+      if (hora) {
+        const [, hh, mm, ss] = hora;
+
+        return `${fecha} ${hh}:${mm}:${ss}`;
+      }
+
+      return fecha;
+    }
+
+    return v; // formato desconocido → tal cual
+  };
+
+  // Exportar a Excel: hace su PROPIA consulta SIN paginación (page/pageSize)
+  // para que la edge function devuelva TODOS los registros filtrados, no solo la página visible.
+  const handleExportToExcel = async () => {
     try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("es-ES", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+      if (!userSession) {
+        setError("Debes iniciar sesión para exportar");
+
+        return;
+      }
+
+      const filtersToSend = appliedFilters.filter(isFilterActive);
+
+      const orderBy = {
+        column: sortDescriptor.column,
+        ascending: sortDescriptor.direction === "ascending",
+      };
+
+      // Sin page/pageSize → trae todo lo filtrado
+      const body = JSON.stringify({ filters: filtersToSend, orderBy });
+
+      const res = await fetch(
+        `https://axndntqikmbldyodiwal.supabase.co/functions/v1/get-polla-encrypted-data`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TAMBO_SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body,
+        },
+      );
+
+      const json = await res.json();
+
+      if (!res.ok) throw new Error(json.error || "Error al exportar");
+
+      exportToExcel({
+        data: json.data || [],
+        fileName: "registros_polla_encriptados",
+        sheetName: "Registros Polla Encriptados",
+        // Columnas que NO se exportan (la función las devuelve pero la tabla no las muestra)
+        excludeColumns: [
+          "inv_type",
+          "inv_serie",
+          "inv_number",
+          "inv_code",
+          "pack_option",
+          "transfer_diageo",
+          "votos_id",
+        ],
+        columnMapping: {
+          id: "ID",
+          created_at: "FECHA CREACIÓN",
+          first_name: "NOMBRE",
+          last_name: "APELLIDO",
+          email: "EMAIL",
+          phone: "TELÉFONO",
+          doc_type: "TIPO DOC",
+          doc_number: "NRO DOC",
+          bday: "CUMPLEAÑOS",
+          address: "DIRECCIÓN",
+          campaign: "CAMPAÑA",
+          votos_fase: "FASE",
+          votos: "VOTOS",
+          terms_accept: "TÉRMINOS",
+          ads_accept: "ADS",
+          survey_accept: "ENCUESTA",
+          publicity_accept: "PUBLICIDAD",
+        },
+        customFormatter: (key, value) => {
+          // Normalizar fechas (cumpleaños y fecha de creación) a DD/MM/YYYY
+          if (key === "bday" || key === "created_at") {
+            return formatFecha(value);
+          }
+
+          return value;
+        },
       });
-    } catch {
-      return "Fecha inválida";
+    } catch (err: any) {
+      setError(err.message);
     }
   };
 
-  // Función para exportar a Excel usando el hook reutilizable
-  const handleExportToExcel = () => {
-    exportToExcel({
-      data: sortedItems,
-      fileName: "registros_polla_encriptados",
-      sheetName: "Registros Polla Encriptados",
-      columnMapping: {
-        id: "ID",
-        created_at: "FECHA CREACIÓN",
-        first_name: "NOMBRE",
-        last_name: "APELLIDO",
-        email: "EMAIL",
-        phone: "TELÉFONO",
-        doc_type: "TIPO DOC",
-        doc_number: "NRO DOC",
-        bday: "CUMPLEAÑOS",
-        address: "DIRECCIÓN",
-        campaign: "CAMPAÑA",
-        votos_fase: "FASE",
-        votos: "VOTOS",
-        terms_accept: "TÉRMINOS",
-        ads_accept: "ADS",
-        survey_accept: "ENCUESTA",
-        publicity_accept: "PUBLICIDAD",
-      },
-      customFormatter: (key, value) => {
-        if (key === "transfer_diageo") {
-          return value === true ? "Sí" : value === false ? "No" : "-";
-        }
-        return value;
-      },
-    });
-  };
+  const renderCell = useCallback(
+    (sorteo: PollaSorteo, columnKey: React.Key) => {
+      const cellValue = sorteo[columnKey as keyof PollaSorteo];
 
-  const renderCell = useCallback((sorteo: PollaSorteo, columnKey: React.Key) => {
-    const cellValue = sorteo[columnKey as keyof PollaSorteo];
+      switch (columnKey) {
+        case "id":
+          return <p className="text-sm text-black">{sorteo.id}</p>;
 
-    switch (columnKey) {
-      case "id":
-        return <p className="text-sm text-black">{sorteo.id}</p>;
+        case "created_at":
+          return (
+            <span className="text-sm text-black">
+              {formatFecha(sorteo.created_at)}
+            </span>
+          );
 
-      case "created_at":
-        return <span className="text-sm text-black">{formatDate(sorteo.created_at)}</span>;
+        case "first_name":
+          return (
+            <p className="text-sm text-black">{sorteo.first_name || "-"}</p>
+          );
 
-      case "first_name":
-        return <p className="text-sm text-black">{sorteo.first_name || "-"}</p>;
+        case "last_name":
+          return (
+            <p className="text-sm text-black">{sorteo.last_name || "-"}</p>
+          );
 
-      case "last_name":
-        return <p className="text-sm text-black">{sorteo.last_name || "-"}</p>;
+        case "email":
+          return <p className="text-sm text-black">{sorteo.email || "-"}</p>;
 
-      case "email":
-        return <p className="text-sm text-black">{sorteo.email || "-"}</p>;
+        case "phone":
+          return <p className="text-sm text-black">{sorteo.phone || "-"}</p>;
 
-      case "phone":
-        return <p className="text-sm text-black">{sorteo.phone || "-"}</p>;
+        case "doc_type":
+          return <p className="text-sm text-black">{sorteo.doc_type || "-"}</p>;
 
-      case "doc_type":
-        return <p className="text-sm text-black">{sorteo.doc_type || "-"}</p>;
+        case "doc_number":
+          return (
+            <p className="text-sm text-black">{sorteo.doc_number || "-"}</p>
+          );
 
-      case "doc_number":
-        return <p className="text-sm text-black">{sorteo.doc_number || "-"}</p>;
+        case "bday":
+          return (
+            <p className="text-sm text-black">{formatFecha(sorteo.bday)}</p>
+          );
 
-      case "bday":
-        return <p className="text-sm text-black">{sorteo.bday || "-"}</p>;
+        case "address":
+          return (
+            <p
+              className="text-sm text-black truncate max-w-xs"
+              title={sorteo.address || "-"}
+            >
+              {sorteo.address || "-"}
+            </p>
+          );
 
-      case "address":
-        return <p className="text-sm text-black truncate max-w-xs" title={sorteo.address || "-"}>{sorteo.address || "-"}</p>;
+        case "campaign":
+          return <p className="text-sm text-black">{sorteo.campaign || "-"}</p>;
 
-      case "campaign":
-        return <p className="text-sm text-black">{sorteo.campaign || "-"}</p>;
+        case "votos_fase":
+          return (
+            <p className="text-sm text-black">{sorteo.votos_fase ?? "-"}</p>
+          );
 
-      case "votos_fase":
-        return <p className="text-sm text-black">{sorteo.votos_fase ?? "-"}</p>;
+        case "votos":
+          return (
+            <p
+              className="text-sm text-black truncate max-w-xs"
+              title={sorteo.votos || "-"}
+            >
+              {sorteo.votos || "-"}
+            </p>
+          );
 
-      case "votos":
-        return <p className="text-sm text-black truncate max-w-xs" title={sorteo.votos || "-"}>{sorteo.votos || "-"}</p>;
+        case "terms_accept":
+          return (
+            <p className="text-sm text-black">{sorteo.terms_accept || "-"}</p>
+          );
 
-      case "terms_accept":
-        return <p className="text-sm text-black">{sorteo.terms_accept || "-"}</p>;
+        case "ads_accept":
+          return (
+            <p className="text-sm text-black">{sorteo.ads_accept || "-"}</p>
+          );
 
-      case "ads_accept":
-        return <p className="text-sm text-black">{sorteo.ads_accept || "-"}</p>;
+        case "survey_accept":
+          return (
+            <p className="text-sm text-black">{sorteo.survey_accept || "-"}</p>
+          );
 
-      case "survey_accept":
-        return <p className="text-sm text-black">{sorteo.survey_accept || "-"}</p>;
+        case "publicity_accept":
+          return (
+            <p className="text-sm text-black">
+              {sorteo.publicity_accept || "-"}
+            </p>
+          );
 
-      case "publicity_accept":
-        return <p className="text-sm text-black">{sorteo.publicity_accept || "-"}</p>;
-
-      default:
-        return <p className="text-sm text-black">{String(cellValue || "-")}</p>;
-    }
-  }, []);
+        default:
+          return (
+            <p className="text-sm text-black">{String(cellValue || "-")}</p>
+          );
+      }
+    },
+    [],
+  );
 
   if (forbidden) {
-    return <p className="text-yellow-600 text-center mt-10">No tienes permiso para ver esta información.</p>;
+    return (
+      <p className="text-yellow-600 text-center mt-10">
+        No tienes permiso para ver esta información.
+      </p>
+    );
   }
 
-  if (error) {
-    return <p className="text-red-500 text-center mt-10">{error}</p>;
+  if (displayError) {
+    return <p className="text-red-500 text-center mt-10">{displayError}</p>;
   }
 
   return (
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           <div className="container-blue-principal">
-
             {/* Botones de filtros */}
-            <div className="flex items-center gap-3 mb-4 flex-wrap">
-              <Button
-                isAdmin
-                onPress={addFilter}
-                className="!bg-[#28a745] hover:!bg-[#218838] !text-white"
-              >
-                <span className="flex items-center gap-2">
-                  <span>+</span>
-                  <span>Agregar Filtro</span>
-                </span>
-              </Button>
+            <div className="flex items-center justify-end gap-3 mb-4 flex-wrap">
+              {hasSearched && totalRecords > 0 && (
+                <Button
+                  isAdmin
+                  className="!bg-[#3E688E] hover:!bg-[#2d4f6b] !text-white"
+                  onPress={handleExportToExcel}
+                >
+                  <span className="flex items-center gap-2">
+                    <span>📥</span>
+                    <span>Exportar a Excel</span>
+                  </span>
+                </Button>
+              )}
+              {(filters.length > 0 || hasSearched) && (
+                <Button
+                  isAdmin
+                  className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white"
+                  onPress={clearAllFilters}
+                >
+                  Limpiar todo
+                </Button>
+              )}
               {filters.length > 0 && (
                 <Button
                   isAdmin
+                  className={
+                    canApply && !loading
+                      ? "!bg-[#265197] hover:!bg-[#16305A] !text-white"
+                      : "!bg-[#A7BDE2] !text-white !cursor-not-allowed"
+                  }
+                  title={
+                    hasInvalidFilter
+                      ? "El valor de la columna ID debe ser numérico"
+                      : !hasValidFilter
+                        ? "Ingresa un valor en al menos un filtro"
+                        : undefined
+                  }
                   onPress={applyFiltersToServer}
-                  isDisabled={loading}
-                  className="!bg-[#265197] hover:!bg-[#16305A] !text-white"
                 >
                   <span className="flex items-center gap-2">
                     <span>🔍</span>
@@ -447,137 +622,202 @@ export default function PollaEncryptedPage() {
               )}
               <Button
                 isAdmin
-                onPress={() => fetchSorteos(false)}
-                isDisabled={loading}
-                className="!bg-[#ff5b00] hover:!bg-[#e55200] !text-white"
+                className="!bg-[#28a745] hover:!bg-[#218838] !text-white"
+                onPress={addFilter}
               >
                 <span className="flex items-center gap-2">
-                  <span>📋</span>
-                  <span>{loading ? "Cargando..." : "Buscar Todos"}</span>
+                  <span>+</span>
+                  <span>Agregar Filtro</span>
                 </span>
               </Button>
-              {(filters.length > 0 || searchTerm || hasSearched) && (
-                <Button
-                  isAdmin
-                  onPress={clearAllFilters}
-                  className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white"
-                >
-                  Limpiar todo
-                </Button>
-              )}
-              {sortedItems.length > 0 && (
-                <Button
-                  isAdmin
-                  onPress={handleExportToExcel}
-                  className="!bg-[#3E688E] hover:!bg-[#2d4f6b] !text-white"
-                >
-                  <span className="flex items-center gap-2">
-                    <span>📥</span>
-                    <span>Exportar a Excel</span>
-                  </span>
-                </Button>
-              )}
             </div>
 
-            {/* Filtros dinámicos */}
-            {filters.length > 0 && (
-              <div className="flex flex-col gap-3 mb-4">
-                {filters.map((filter) => (
-                  <div key={filter.id} className="flex items-center gap-2 bg-white/10 p-3 rounded-lg">
-                    <Select
-                      className="text-[#3E688E] w-[160px]"
-                      classNames={{
-                        trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
-                        value: "!text-[#3E688E]",
-                      }}
-                      selectedKeys={filter.column ? [filter.column] : []}
-                      variant="faded"
-                      options={columns.map((col) => ({ value: col.uid, label: col.name }))}
-                      onSelectionChange={(keys) => {
-                        const selected = Array.from(keys)[0] as string;
-                        updateFilter(filter.id, "column", selected);
-                      }}
-                    />
+            {/* Total de registros + Filtros dinámicos en la misma línea */}
+            {(filters.length > 0 || hasSearched) && (
+              <div className="flex items-start justify-between gap-4 my-0">
+                <div className="flex flex-col gap-2">
+                  {hasSearched ? (
+                    <Text isAdmin color="#265197" variant="body" weight="bold">
+                      Total de registros filtrados: {totalRecords}
+                    </Text>
+                  ) : (
+                    <span />
+                  )}
+                  {activeAppliedFilters.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Text isAdmin color="#5A6B85" variant="label">
+                        Filtros aplicados:
+                      </Text>
+                      {activeAppliedFilters.map((f) => (
+                        <span
+                          key={f.id}
+                          className="inline-flex items-center bg-[#EEF1F7] border border-[#D4DEED] rounded-full px-3 py-1"
+                        >
+                          <Text isAdmin color="#265197" variant="label">
+                            {getColumnName(f.column)} ·{" "}
+                            {getOperatorLabel(f.operator)}
+                            {f.operator !== "is_null" &&
+                            f.operator !== "is_not_null"
+                              ? ` "${f.value}"`
+                              : ""}
+                          </Text>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {filters.length > 0 && (
+                  <div className="flex flex-col gap-1">
+                    {filters.map((filter) => (
+                      <div
+                        key={filter.id}
+                        className="flex items-center justify-end gap-2 bg-white/10 p-2 rounded-lg"
+                      >
+                        {/* Selector de columna */}
+                        <Select
+                          className="text-[#3E688E] w-[140px]"
+                          classNames={{
+                            trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
+                            value: "!text-[#3E688E]",
+                          }}
+                          options={columns
+                            .filter((col) =>
+                              FILTERABLE_COLUMNS.includes(col.uid),
+                            )
+                            .map((col) => ({
+                              value: col.uid,
+                              label: col.name,
+                            }))}
+                          selectedKeys={filter.column ? [filter.column] : []}
+                          variant="faded"
+                          onSelectionChange={(keys) => {
+                            const selected = Array.from(keys)[0] as string;
 
-                    <Select
-                      className="text-[#3E688E] w-[160px]"
-                      classNames={{
-                        trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
-                        value: "!text-[#3E688E]",
-                      }}
-                      selectedKeys={filter.operator ? [filter.operator] : []}
-                      variant="faded"
-                      options={getOperatorsForColumn(filter.column).map((op) => ({ value: op.key, label: op.label }))}
-                      onSelectionChange={(keys) => {
-                        const selected = Array.from(keys)[0] as string;
-                        updateFilter(filter.id, "operator", selected);
-                      }}
-                    />
+                            updateFilter(filter.id, "column", selected);
+                          }}
+                        />
 
-                    {filter.operator !== "is_null" && filter.operator !== "is_not_null" && (
-                      <Input
-                        className="text-[#3E688E] flex-1"
-                        classNames={{
-                          inputWrapper: "!bg-[#F4F4F5] !border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
-                          input: "!text-[#3E688E] placeholder:!text-[#719BC1]",
-                        }}
-                        placeholder="Valor..."
-                        value={filter.value}
-                        variant="faded"
-                        onChange={(e) => updateFilter(filter.id, "value", e.target.value)}
-                      />
+                        {/* Selector de operador */}
+                        <Select
+                          className="text-[#3E688E] w-[140px]"
+                          classNames={{
+                            trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
+                            value: "!text-[#3E688E]",
+                          }}
+                          options={getOperatorsForColumn(filter.column).map(
+                            (op) => ({ value: op.key, label: op.label }),
+                          )}
+                          selectedKeys={
+                            filter.operator ? [filter.operator] : []
+                          }
+                          variant="faded"
+                          onSelectionChange={(keys) => {
+                            const selected = Array.from(keys)[0] as string;
+
+                            updateFilter(filter.id, "operator", selected);
+                          }}
+                        />
+
+                        {/* Input de valor (solo si no es is_null o is_not_null) */}
+                        {filter.operator !== "is_null" &&
+                          filter.operator !== "is_not_null" && (
+                            <Input
+                              className="text-[#3E688E] w-[180px]"
+                              classNames={{
+                                inputWrapper:
+                                  "!bg-[#F4F4F5] !border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                                input:
+                                  "!text-[#3E688E] placeholder:!text-[#719BC1]",
+                              }}
+                              placeholder="Valor..."
+                              value={filter.value}
+                              variant="faded"
+                              onChange={(e) =>
+                                updateFilter(filter.id, "value", e.target.value)
+                              }
+                            />
+                          )}
+
+                        {/* Botón para eliminar filtro */}
+                        <Button
+                          isAdmin
+                          className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white !min-w-[40px]"
+                          title="Eliminar filtro"
+                          onPress={() => removeFilter(filter.id)}
+                        >
+                          ✕
+                        </Button>
+                      </div>
+                    ))}
+                    {hasInvalidFilter && (
+                      <div className="flex justify-end">
+                        <Text isAdmin color="#dc3545" variant="label">
+                          ⚠ El valor de la columna ID debe ser numérico
+                        </Text>
+                      </div>
                     )}
-
-                    <Button
-                      isAdmin
-                      onPress={() => removeFilter(filter.id)}
-                      className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white !min-w-[40px]"
-                      title="Eliminar filtro"
-                    >
-                      ✕
-                    </Button>
                   </div>
-                ))}
-              </div>
-            )}
-
-            {hasSearched && (
-              <div className="mt-4">
-                <Text color="white" variant="body">
-                  Total de registros: {sortedItems.length}
-                </Text>
+                )}
               </div>
             )}
 
             {!hasSearched && !loading && (
-              <div className="mt-4 p-8 bg-gradient-to-br from-[#3E688E] via-[#5080a8] to-[#719BC1] rounded-xl shadow-2xl text-center">
-                <div className="text-6xl mb-4 animate-bounce">🔍</div>
-                <h3 className="text-3xl font-bold text-white mb-4 drop-shadow-lg">
-                  ¡Comienza tu búsqueda!
-                </h3>
-                <p className="text-white/90 text-lg mb-5 font-medium">
-                  🔐 Para visualizar los registros encriptados de la Polla:
-                </p>
-                <div className="bg-[#ff5b00] rounded-lg p-5 inline-block shadow-xl transform hover:scale-105 transition-transform">
-                  <p className="text-white font-bold text-lg leading-relaxed">
-                    1️⃣ Haz clic en <span className="bg-white/20 px-2 py-1 rounded">+ Agregar Filtro</span><br/>
-                    2️⃣ Selecciona tus criterios de búsqueda<br/>
-                    3️⃣ Presiona el botón <span className="bg-white/20 px-2 py-1 rounded">🔍 Aplicar Filtros</span>
-                  </p>
+              <div className="mt-4 flex flex-col items-center justify-center text-center bg-[#EEF1F7] border border-[#D4DEED] rounded-2xl py-12 px-6">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white mb-5">
+                  <Icon color="#265197" name="Search" size={32} />
+                </div>
+                <Text isAdmin color="#16305A" variant="title" weight="bold">
+                  Comienza tu búsqueda
+                </Text>
+                <div className="mt-2 mb-7">
+                  <Text isAdmin color="#5A6B85" variant="body">
+                    Para visualizar los registros encriptados de la Polla, sigue
+                    estos pasos:
+                  </Text>
+                </div>
+                <div className="flex flex-col gap-4 text-left w-full max-w-md">
+                  {[
+                    "Haz clic en “+ Agregar Filtro”",
+                    "Selecciona tus criterios de búsqueda",
+                    "Presiona el botón “Aplicar Filtros”",
+                  ].map((step, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#265197] flex-shrink-0">
+                        <Text
+                          isAdmin
+                          color="#ffffff"
+                          variant="label"
+                          weight="bold"
+                        >
+                          {index + 1}
+                        </Text>
+                      </div>
+                      <Text isAdmin color="#16305A" variant="body">
+                        {step}
+                      </Text>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
 
             {loading && (
-              <div className="mt-4 p-8 bg-gradient-to-br from-[#3E688E] via-[#5080a8] to-[#719BC1] rounded-xl shadow-2xl text-center">
-                <div className="text-6xl mb-4 animate-pulse">⏳</div>
-                <h3 className="text-3xl font-bold text-white mb-4 drop-shadow-lg">
+              <div className="mt-4 flex flex-col items-center justify-center text-center bg-[#EEF1F7] border border-[#D4DEED] rounded-2xl py-12 px-6">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white mb-5">
+                  <Icon
+                    className="animate-spin"
+                    color="#265197"
+                    name="LoaderCircle"
+                    size={32}
+                  />
+                </div>
+                <Text isAdmin color="#16305A" variant="title" weight="bold">
                   Buscando registros...
-                </h3>
-                <div className="bg-[#ff5b00]/90 rounded-lg p-4 inline-block shadow-lg">
-                  <p className="text-white font-semibold text-lg">
+                </Text>
+                <div className="mt-2">
+                  <Text isAdmin color="#5A6B85" variant="body">
                     Por favor espera mientras procesamos tu consulta
-                  </p>
+                  </Text>
                 </div>
               </div>
             )}
@@ -585,42 +825,48 @@ export default function PollaEncryptedPage() {
 
           {hasSearched && !loading && (
             <Table
-            aria-label="Tabla de Registros Encriptados de la Polla"
-            selectionMode="none"
-            sortDescriptor={sortDescriptor}
-            onSortChange={(descriptor) =>
-              setSortDescriptor(descriptor as LocalSortDescriptor)
-            }
-            classNames={{
-              wrapper: "bg-transparent overflow-x-auto",
-              th: "bg-[#ff5b00] text-[#fff] font-semibold text-center whitespace-nowrap",
-              td: "text-gray-700 text-center whitespace-nowrap",
-            }}
-          >
-            <TableHeader columns={columns}>
-              {(column) => (
-                <TableColumn
-                  key={column.uid}
-                  align="center"
-                  allowsSorting={column.sortable}
-                >
-                  {column.name}
-                </TableColumn>
-              )}
-            </TableHeader>
-            <TableBody
-              emptyContent={"No se encontraron registros"}
-              items={paginatedItems}
+              isStriped
+              aria-label="Tabla de Registros Encriptados de la Polla"
+              classNames={{
+                wrapper: "bg-transparent overflow-x-auto !p-0",
+                tr: "data-[odd=true]:bg-[#EEF1F7]",
+                th: "bg-[#265197] text-[#fff] font-semibold text-center whitespace-nowrap",
+                td: "text-gray-700 text-center whitespace-nowrap",
+              }}
+              selectionMode="none"
+              sortDescriptor={sortDescriptor}
+              onSortChange={(descriptor) => {
+                const newSort = descriptor as LocalSortDescriptor;
+
+                setSortDescriptor(newSort);
+                // El nuevo orden va en el queryKey → React Query re-consulta solo
+                setPage(1);
+              }}
             >
-              {(item) => (
-                <TableRow key={item.id} className="items-center">
-                  {(columnKey) => (
-                    <TableCell>{renderCell(item, columnKey)}</TableCell>
-                  )}
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              <TableHeader columns={columns}>
+                {(column) => (
+                  <TableColumn
+                    key={column.uid}
+                    align="center"
+                    allowsSorting={column.sortable}
+                  >
+                    {column.name}
+                  </TableColumn>
+                )}
+              </TableHeader>
+              <TableBody
+                emptyContent={"No se encontraron registros"}
+                items={paginatedItems}
+              >
+                {(item) => (
+                  <TableRow key={item.id} className="items-center">
+                    {(columnKey) => (
+                      <TableCell>{renderCell(item, columnKey)}</TableCell>
+                    )}
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           )}
 
           {/* Paginación */}
@@ -630,17 +876,15 @@ export default function PollaEncryptedPage() {
                 isCompact
                 showControls
                 showShadow
-                className="pagination-reservas"
                 classNames={{
-                  wrapper: "gap-2",
-                  cursor: "bg-[#ff5b00] text-white shadow-md",
-                  item: "bg-transparent",
-                  prev: "bg-white",
-                  next: "bg-white"
+                  cursor: "bg-[#265197] text-white shadow-none",
+                  item: "border-none shadow-none outline-none ring-0",
+                  prev: "border-none shadow-none outline-none ring-0",
+                  next: "border-none shadow-none outline-none ring-0",
                 }}
                 page={page}
                 total={totalPages}
-                onChange={setPage}
+                onChange={(p) => goToPage(p)}
               />
             </div>
           )}
