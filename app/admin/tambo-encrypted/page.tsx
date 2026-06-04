@@ -9,6 +9,7 @@ import {
 } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { useState, useCallback } from "react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import {
   Text,
   Col,
@@ -49,6 +50,7 @@ const columns = [
   { name: "ID", uid: "id", sortable: true },
   { name: "FECHA CREACIÓN", uid: "created_at", sortable: true },
   { name: "CAMPAÑA", uid: "campaign", sortable: false },
+  { name: "🔐 NOMBRE", uid: "first_name", sortable: false },
   { name: "🔐 APELLIDO", uid: "last_name", sortable: false },
   { name: "🔐 CUMPLEAÑOS", uid: "bday", sortable: false },
   { name: "🔐 DIRECCIÓN", uid: "address", sortable: false },
@@ -63,13 +65,11 @@ const columns = [
   { name: "TÉRMINOS", uid: "terms_accept", sortable: false },
   { name: "ADS", uid: "ads_accept", sortable: false },
   { name: "ENCUESTA", uid: "survey_accept", sortable: false },
-  { name: "🔐 NOMBRE", uid: "first_name", sortable: false },
-  { name: "PACK", uid: "pack_option", sortable: true },
-  { name: "PUBLICIDAD", uid: "publicity_accept", sortable: false },
-  { name: "TRANSFER DIAGEO", uid: "transfer_diageo", sortable: true },
 ];
 
-const ITEMS_PER_PAGE = 15;
+const PAGE_SIZE = 15; // registros visibles por página
+const PAGES_PER_BATCH = 7; // páginas que trae cada lote
+const BATCH_SIZE = PAGE_SIZE * PAGES_PER_BATCH; // 105 registros por lote
 
 // Definición de operadores con símbolos
 const ALL_OPERATORS = [
@@ -102,21 +102,20 @@ const getOperatorsForColumn = (columnName: string) => {
     // Para columnas numéricas, mostrar todos los operadores numéricos
     return ALL_OPERATORS.filter((op) => op.numeric);
   } else {
-    // Para columnas de texto (como campaign), solo operadores de texto
-    return ALL_OPERATORS.filter((op) => op.text);
+    // Para columnas de texto (como campaign), solo operadores de texto,
+    // SIN "Es nulo" / "No es nulo".
+    return ALL_OPERATORS.filter(
+      (op) => op.text && op.key !== "is_null" && op.key !== "is_not_null",
+    );
   }
 };
 
 export default function TamboEncryptedPage() {
   const { userSession } = UserAuth();
   const { exportToExcel } = useExcelExport();
-  const [sorteos, setSorteos] = useState<Sorteo[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [forbidden, setForbidden] = useState(false);
+  const [error, setError] = useState<string | null>(null); // errores de exportación / validación
   const [page, setPage] = useState(1);
   const [hasSearched, setHasSearched] = useState(false);
-  const [totalRecords, setTotalRecords] = useState(0);
 
   // Sistema de filtros dinámicos estilo Supabase
   type Filter = {
@@ -127,7 +126,7 @@ export default function TamboEncryptedPage() {
   };
 
   const [filters, setFilters] = useState<Filter[]>([]);
-  // Filtros actualmente aplicados en el servidor (para re-usar al cambiar de página/orden)
+  // Filtros actualmente aplicados en el servidor (van en el queryKey de React Query)
   const [appliedFilters, setAppliedFilters] = useState<Filter[]>([]);
 
   // Un filtro "cuenta" si tiene valor, o si su operador no necesita valor (is_null / is_not_null)
@@ -146,76 +145,81 @@ export default function TamboEncryptedPage() {
     direction: "ascending",
   });
 
-  // Función para traer datos del servidor con filtros
-  const fetchSorteos = async (
-    filtersToApply: Filter[] = [],
-    targetPage = 1,
-    sort: LocalSortDescriptor = sortDescriptor,
-  ) => {
-    try {
-      setLoading(true);
-      setError(null);
-      setHasSearched(true);
+  // Trae un LOTE del servidor (función pura que usa React Query como queryFn).
+  const fetchEncryptedBatch = async (
+    filtersToApply: Filter[],
+    sort: LocalSortDescriptor,
+    targetBatch: number,
+  ): Promise<{ data: Sorteo[]; count: number }> => {
+    const filtersToSend = filtersToApply.filter(isFilterActive);
+    const orderBy = {
+      column: sort.column,
+      ascending: sort.direction === "ascending",
+    };
 
-      // 1️⃣ Verificar que haya sesión activa
-      if (!userSession) {
-        setError("Debes iniciar sesión para ver esta información");
-        setLoading(false);
-        return;
-      }
+    const body = JSON.stringify({
+      filters: filtersToSend,
+      orderBy,
+      page: targetBatch + 1, // nº de lote
+      pageSize: BATCH_SIZE, // 105 → la edge function hace .range()
+    });
 
-      // 2️⃣ Limpiar filtros vacíos antes de enviar
-      const filtersToSend = filtersToApply.filter(isFilterActive);
-
-      // 3️⃣ Preparar el orden
-      const orderBy = {
-        column: sort.column,
-        ascending: sort.direction === "ascending",
-      };
-
-      // 4️⃣ Pedir SOLO la página actual (paginación del servidor)
-      const body = JSON.stringify({
-        filters: filtersToSend,
-        orderBy,
-        page: targetPage,
-        pageSize: ITEMS_PER_PAGE,
-      });
-
-      const res = await fetch(
-        `https://axndntqikmbldyodiwal.supabase.co/functions/v1/get-tambo-encrypted-data`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TAMBO_SUPABASE_ANON_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body,
+    const res = await fetch(
+      `https://axndntqikmbldyodiwal.supabase.co/functions/v1/get-tambo-encrypted-data`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_TAMBO_SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
         },
-      );
+        body,
+      },
+    );
 
-      if (res.status === 403) {
-        setForbidden(true);
-        setLoading(false);
-        return;
-      }
+    if (res.status === 403) throw new Error("FORBIDDEN");
 
-      const json = await res.json();
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || "Error al obtener datos");
 
-      if (!res.ok) throw new Error(json.error || "Error al obtener datos");
-
-      setSorteos(json.data || []);
-      setTotalRecords(json.count || 0);
-      setPage(targetPage);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    return { data: json.data || [], count: json.count || 0 };
   };
 
-  // Paginación del servidor: el filtrado, orden y corte por página los hace la edge function.
-  // El total de páginas se calcula con el conteo total que devuelve la API.
-  const totalPages = Math.ceil(totalRecords / ITEMS_PER_PAGE);
+  // Lote (0-based) que contiene la página actual
+  const batchIndex = Math.floor((page - 1) / PAGES_PER_BATCH);
+
+  // React Query: cachea cada combinación (filtros + orden + lote).
+  // - Volver a un lote ya visto = instantáneo (desde caché).
+  // - Cambiar filtro/orden = otra queryKey → consulta nueva (sin invalidar a mano).
+  // - keepPreviousData = mantiene la tabla anterior mientras llega el nuevo lote.
+  const { data, isLoading, isError, error: queryError } = useQuery<{
+    data: Sorteo[];
+    count: number;
+  }>({
+    queryKey: ["tambo-encrypted", appliedFilters, sortDescriptor, batchIndex],
+    queryFn: () =>
+      fetchEncryptedBatch(appliedFilters, sortDescriptor, batchIndex),
+    enabled: hasSearched && !!userSession,
+    placeholderData: keepPreviousData,
+  });
+
+  // Derivados (reemplazan a los estados manuales)
+  const totalRecords = data?.count ?? 0;
+  const totalPages = Math.ceil(totalRecords / PAGE_SIZE);
+  const offsetInBatch = ((page - 1) % PAGES_PER_BATCH) * PAGE_SIZE;
+  const paginatedItems: Sorteo[] = (data?.data ?? []).slice(
+    offsetInBatch,
+    offsetInBatch + PAGE_SIZE,
+  );
+  const loading = isLoading;
+  const forbidden = isError && (queryError as Error)?.message === "FORBIDDEN";
+  const displayError =
+    error || (isError && !forbidden ? (queryError as Error)?.message : null);
+
+  // Cambiar de página: solo cambia `page`. React Query trae el lote (o usa
+  // caché) automáticamente cuando cambia `batchIndex` dentro del queryKey.
+  const goToPage = (p: number) => {
+    setPage(p);
+  };
 
   // Hay al menos un filtro válido (con valor, o un operador que no necesita valor).
   // Se exige para poder aplicar filtros (no se permite traer todo sin filtrar).
@@ -270,14 +274,13 @@ export default function TamboEncryptedPage() {
     const validRemaining = remaining.filter(isFilterActive);
 
     if (validRemaining.length > 0) {
-      // Quedan filtros válidos → re-consultar con ellos
+      // Quedan filtros válidos → React Query re-consulta solo (cambia el queryKey)
       setAppliedFilters(remaining);
-      fetchSorteos(remaining, 1);
+      setPage(1);
     } else {
-      // No queda ningún filtro → limpiar la tabla (volver al estado inicial)
+      // No queda ningún filtro → volver al estado inicial (sin tabla)
       setAppliedFilters([]);
-      setSorteos([]);
-      setTotalRecords(0);
+      setPage(1);
       setHasSearched(false);
     }
   };
@@ -305,33 +308,48 @@ export default function TamboEncryptedPage() {
     setFilters([]);
     setAppliedFilters([]);
     setPage(1);
-    setSorteos([]);
-    setTotalRecords(0);
+    setError(null);
     setHasSearched(false);
   };
 
-  // Función para aplicar filtros (consulta al servidor, desde la página 1)
+  // Aplicar filtros: setea los filtros aplicados → React Query consulta solo
   const applyFiltersToServer = () => {
     // Guarda de seguridad: no aplicar si no hay filtro válido o si alguno es inválido
     // (ej. texto en la columna ID). El botón ya se muestra deshabilitado en ese caso.
     if (!canApply) return;
 
+    setError(null);
     setAppliedFilters(filters);
-    fetchSorteos(filters, 1);
+    setPage(1);
+    setHasSearched(true);
   };
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "Sin fecha";
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("es-ES", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch {
-      return "Fecha inválida";
+  // Normaliza una fecha a DD/MM/YYYY parseando los formatos que llegan
+  // (DD/MM/YYYY o ISO YYYY-MM-DD, con o sin hora), SIN usar new Date()
+  // para no mal-interpretar (ej. 12/02 como mes/día). Sirve para bday y created_at.
+  const formatFecha = (value: string | null) => {
+    if (!value) return "-";
+    const v = String(value).trim();
+    // DD/MM/YYYY o D/M/YYYY
+    const dmy = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (dmy) {
+      const [, d, m, y] = dmy;
+      return `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
     }
+    // ISO YYYY-MM-DD (con o sin hora, ej. timestamp de created_at)
+    const ymd = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (ymd) {
+      const [, y, m, d] = ymd;
+      const fecha = `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
+      // Si trae hora (HH:MM:SS), la agregamos tal cual viene guardada
+      const hora = v.match(/[ T](\d{2}):(\d{2}):(\d{2})/);
+      if (hora) {
+        const [, hh, mm, ss] = hora;
+        return `${fecha} ${hh}:${mm}:${ss}`;
+      }
+      return fecha;
+    }
+    return v; // formato desconocido → tal cual
   };
 
   // Exportar a Excel: hace su PROPIA consulta SIN paginación (page/pageSize)
@@ -372,10 +390,13 @@ export default function TamboEncryptedPage() {
         data: json.data || [],
         fileName: "registros_tambo_encriptados",
         sheetName: "Registros Tambo Encriptados",
+        // Columnas que NO se exportan (no están en la tabla)
+        excludeColumns: ["pack_option", "publicity_accept", "transfer_diageo"],
         columnMapping: {
           id: "ID",
           created_at: "FECHA CREACIÓN",
           campaign: "CAMPAÑA",
+          first_name: "NOMBRE",
           last_name: "APELLIDO",
           bday: "CUMPLEAÑOS",
           address: "DIRECCIÓN",
@@ -390,15 +411,15 @@ export default function TamboEncryptedPage() {
           terms_accept: "TÉRMINOS",
           ads_accept: "ADS",
           survey_accept: "ENCUESTA",
-          first_name: "NOMBRE",
-          pack_option: "PACK",
-          publicity_accept: "PUBLICIDAD",
-          transfer_diageo: "TRANSFER DIAGEO",
         },
         customFormatter: (key, value) => {
           // Formatear booleano de transfer_diageo
           if (key === "transfer_diageo") {
             return value === true ? "Sí" : value === false ? "No" : "-";
+          }
+          // Normalizar fechas (cumpleaños y fecha de creación) a DD/MM/YYYY
+          if (key === "bday" || key === "created_at") {
+            return formatFecha(value);
           }
           return value;
         },
@@ -418,7 +439,7 @@ export default function TamboEncryptedPage() {
       case "created_at":
         return (
           <span className="text-sm text-black">
-            {formatDate(sorteo.created_at)}
+            {formatFecha(sorteo.created_at)}
           </span>
         );
 
@@ -441,7 +462,9 @@ export default function TamboEncryptedPage() {
         return <p className="text-sm text-black">{sorteo.doc_number || "-"}</p>;
 
       case "bday":
-        return <p className="text-sm text-black">{sorteo.bday || "-"}</p>;
+        return (
+          <p className="text-sm text-black">{formatFecha(sorteo.bday)}</p>
+        );
 
       case "address":
         return (
@@ -515,8 +538,8 @@ export default function TamboEncryptedPage() {
     );
   }
 
-  if (error) {
-    return <p className="text-red-500 text-center mt-10">{error}</p>;
+  if (displayError) {
+    return <p className="text-red-500 text-center mt-10">{displayError}</p>;
   }
 
   return (
@@ -525,17 +548,28 @@ export default function TamboEncryptedPage() {
         <div className="flex flex-col gap-2">
           <div className="container-blue-principal">
             {/* Botones de filtros */}
-            <div className="flex items-center gap-3 mb-4 flex-wrap">
-              <Button
-                isAdmin
-                onPress={addFilter}
-                className="!bg-[#28a745] hover:!bg-[#218838] !text-white"
-              >
-                <span className="flex items-center gap-2">
-                  <span>+</span>
-                  <span>Agregar Filtro</span>
-                </span>
-              </Button>
+            <div className="flex items-center justify-end gap-3 mb-4 flex-wrap">
+              {hasSearched && totalRecords > 0 && (
+                <Button
+                  isAdmin
+                  onPress={handleExportToExcel}
+                  className="!bg-[#3E688E] hover:!bg-[#2d4f6b] !text-white"
+                >
+                  <span className="flex items-center gap-2">
+                    <span>📥</span>
+                    <span>Exportar a Excel</span>
+                  </span>
+                </Button>
+              )}
+              {(filters.length > 0 || hasSearched) && (
+                <Button
+                  isAdmin
+                  onPress={clearAllFilters}
+                  className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white"
+                >
+                  Limpiar todo
+                </Button>
+              )}
               {filters.length > 0 && (
                 <Button
                   isAdmin
@@ -559,27 +593,16 @@ export default function TamboEncryptedPage() {
                   </span>
                 </Button>
               )}
-              {(filters.length > 0 || hasSearched) && (
-                <Button
-                  isAdmin
-                  onPress={clearAllFilters}
-                  className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white"
-                >
-                  Limpiar todo
-                </Button>
-              )}
-              {totalRecords > 0 && (
-                <Button
-                  isAdmin
-                  onPress={handleExportToExcel}
-                  className="!bg-[#3E688E] hover:!bg-[#2d4f6b] !text-white"
-                >
-                  <span className="flex items-center gap-2">
-                    <span>📥</span>
-                    <span>Exportar a Excel</span>
-                  </span>
-                </Button>
-              )}
+              <Button
+                isAdmin
+                onPress={addFilter}
+                className="!bg-[#28a745] hover:!bg-[#218838] !text-white"
+              >
+                <span className="flex items-center gap-2">
+                  <span>+</span>
+                  <span>Agregar Filtro</span>
+                </span>
+              </Button>
             </div>
 
             {/* Total de registros + Filtros dinámicos en la misma línea */}
@@ -780,8 +803,8 @@ export default function TamboEncryptedPage() {
               onSortChange={(descriptor) => {
                 const newSort = descriptor as LocalSortDescriptor;
                 setSortDescriptor(newSort);
-                // Re-consultar al servidor con el nuevo orden, desde la página 1
-                fetchSorteos(appliedFilters, 1, newSort);
+                // El nuevo orden va en el queryKey → React Query re-consulta solo
+                setPage(1);
               }}
               classNames={{
                 wrapper: "bg-transparent overflow-x-auto !p-0",
@@ -803,7 +826,7 @@ export default function TamboEncryptedPage() {
               </TableHeader>
               <TableBody
                 emptyContent={"No se encontraron registros"}
-                items={sorteos}
+                items={paginatedItems}
               >
                 {(item) => (
                   <TableRow key={item.id} className="items-center">
@@ -831,7 +854,7 @@ export default function TamboEncryptedPage() {
                 }}
                 page={page}
                 total={totalPages}
-                onChange={(p) => fetchSorteos(appliedFilters, p)}
+                onChange={(p) => goToPage(p)}
               />
             </div>
           )}
