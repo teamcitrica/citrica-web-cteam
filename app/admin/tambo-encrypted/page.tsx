@@ -50,6 +50,7 @@ const columns = [
   { name: "ID", uid: "id", sortable: true },
   { name: "FECHA CREACIÓN", uid: "created_at", sortable: true },
   { name: "CAMPAÑA", uid: "campaign", sortable: false },
+  { name: "🔐 NOMBRE", uid: "first_name", sortable: false },
   { name: "🔐 APELLIDO", uid: "last_name", sortable: false },
   { name: "🔐 CUMPLEAÑOS", uid: "bday", sortable: false },
   { name: "🔐 DIRECCIÓN", uid: "address", sortable: false },
@@ -64,10 +65,6 @@ const columns = [
   { name: "TÉRMINOS", uid: "terms_accept", sortable: false },
   { name: "ADS", uid: "ads_accept", sortable: false },
   { name: "ENCUESTA", uid: "survey_accept", sortable: false },
-  { name: "🔐 NOMBRE", uid: "first_name", sortable: false },
-  { name: "PACK", uid: "pack_option", sortable: true },
-  { name: "PUBLICIDAD", uid: "publicity_accept", sortable: false },
-  { name: "TRANSFER DIAGEO", uid: "transfer_diageo", sortable: true },
 ];
 
 const PAGE_SIZE = 15; // registros visibles por página
@@ -327,23 +324,10 @@ export default function TamboEncryptedPage() {
     setHasSearched(true);
   };
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "Sin fecha";
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("es-ES", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch {
-      return "Fecha inválida";
-    }
-  };
-
-  // Normaliza el cumpleaños a DD/MM/YYYY parseando los formatos que llegan
-  // (DD/MM/YYYY o ISO YYYY-MM-DD), SIN usar new Date() para no mal-interpretar.
-  const formatBday = (value: string | null) => {
+  // Normaliza una fecha a DD/MM/YYYY parseando los formatos que llegan
+  // (DD/MM/YYYY o ISO YYYY-MM-DD, con o sin hora), SIN usar new Date()
+  // para no mal-interpretar (ej. 12/02 como mes/día). Sirve para bday y created_at.
+  const formatFecha = (value: string | null) => {
     if (!value) return "-";
     const v = String(value).trim();
     // DD/MM/YYYY o D/M/YYYY
@@ -352,11 +336,18 @@ export default function TamboEncryptedPage() {
       const [, d, m, y] = dmy;
       return `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
     }
-    // ISO YYYY-MM-DD (con o sin hora)
+    // ISO YYYY-MM-DD (con o sin hora, ej. timestamp de created_at)
     const ymd = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
     if (ymd) {
       const [, y, m, d] = ymd;
-      return `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
+      const fecha = `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
+      // Si trae hora (HH:MM:SS), la agregamos tal cual viene guardada
+      const hora = v.match(/[ T](\d{2}):(\d{2}):(\d{2})/);
+      if (hora) {
+        const [, hh, mm, ss] = hora;
+        return `${fecha} ${hh}:${mm}:${ss}`;
+      }
+      return fecha;
     }
     return v; // formato desconocido → tal cual
   };
@@ -399,10 +390,13 @@ export default function TamboEncryptedPage() {
         data: json.data || [],
         fileName: "registros_tambo_encriptados",
         sheetName: "Registros Tambo Encriptados",
+        // Columnas que NO se exportan (no están en la tabla)
+        excludeColumns: ["pack_option", "publicity_accept", "transfer_diageo"],
         columnMapping: {
           id: "ID",
           created_at: "FECHA CREACIÓN",
           campaign: "CAMPAÑA",
+          first_name: "NOMBRE",
           last_name: "APELLIDO",
           bday: "CUMPLEAÑOS",
           address: "DIRECCIÓN",
@@ -417,19 +411,15 @@ export default function TamboEncryptedPage() {
           terms_accept: "TÉRMINOS",
           ads_accept: "ADS",
           survey_accept: "ENCUESTA",
-          first_name: "NOMBRE",
-          pack_option: "PACK",
-          publicity_accept: "PUBLICIDAD",
-          transfer_diageo: "TRANSFER DIAGEO",
         },
         customFormatter: (key, value) => {
           // Formatear booleano de transfer_diageo
           if (key === "transfer_diageo") {
             return value === true ? "Sí" : value === false ? "No" : "-";
           }
-          // Normalizar cumpleaños a DD/MM/YYYY
-          if (key === "bday") {
-            return formatBday(value);
+          // Normalizar fechas (cumpleaños y fecha de creación) a DD/MM/YYYY
+          if (key === "bday" || key === "created_at") {
+            return formatFecha(value);
           }
           return value;
         },
@@ -449,7 +439,7 @@ export default function TamboEncryptedPage() {
       case "created_at":
         return (
           <span className="text-sm text-black">
-            {formatDate(sorteo.created_at)}
+            {formatFecha(sorteo.created_at)}
           </span>
         );
 
@@ -473,7 +463,7 @@ export default function TamboEncryptedPage() {
 
       case "bday":
         return (
-          <p className="text-sm text-black">{formatBday(sorteo.bday)}</p>
+          <p className="text-sm text-black">{formatFecha(sorteo.bday)}</p>
         );
 
       case "address":
