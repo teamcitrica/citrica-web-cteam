@@ -63,6 +63,7 @@ const columns = [
   { name: "🔐 DIRECCIÓN", uid: "address", sortable: false },
   { name: "TÉRMINOS", uid: "terms_accept", sortable: false },
   { name: "ADS", uid: "ads_accept", sortable: false },
+  { name: "ENCUESTA", uid: "survey_accept", sortable: false },
   { name: "FASE", uid: "votos_fase", sortable: false },
   { name: "VOTOS", uid: "votos", sortable: false },
 ];
@@ -457,7 +458,6 @@ export default function PollaEncryptedPage() {
           "transfer_diageo",
           "votos_id",
           "campaign",
-          "survey_accept",
           "publicity_accept",
         ],
         columnMapping: {
@@ -473,6 +473,7 @@ export default function PollaEncryptedPage() {
           address: "DIRECCIÓN",
           terms_accept: "TÉRMINOS",
           ads_accept: "ADS",
+          survey_accept: "ENCUESTA",
           votos_fase: "FASE",
           votos: "VOTOS",
         },
