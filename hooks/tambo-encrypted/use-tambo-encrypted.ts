@@ -23,7 +23,7 @@ type LocalSortDescriptor = {
   direction: "ascending" | "descending";
 };
 
-export const TAMBO_PAGE_SIZE = 15; // registros visibles por página
+export const TAMBO_PAGE_SIZE = 10; // registros visibles por página
 const PAGES_PER_BATCH = 10; // páginas que trae cada lote
 const BATCH_SIZE = TAMBO_PAGE_SIZE * PAGES_PER_BATCH; // 150 registros por lote
 // IMPORTANTE: NUNCA debe superar el `max-rows` de Supabase (default 1000). Si lo
