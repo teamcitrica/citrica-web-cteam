@@ -49,7 +49,7 @@ interface Sorteo {
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
-  { name: "FECHA CREACIÓN", uid: "created_at", sortable: true },
+  { name: "FECHA CREACIÓN", uid: "created_at", sortable: false },
   { name: "CAMPAÑA", uid: "campaign", sortable: false },
   { name: "🔐 NOMBRE", uid: "first_name", sortable: false },
   { name: "🔐 APELLIDO", uid: "last_name", sortable: false },
