@@ -71,8 +71,8 @@ const columns = [
 ];
 
 const PAGE_SIZE = 15; // registros visibles por página
-const PAGES_PER_BATCH = 7; // páginas que trae cada lote
-const BATCH_SIZE = PAGE_SIZE * PAGES_PER_BATCH; // 105 registros por lote
+const PAGES_PER_BATCH = 10; // páginas que trae cada lote
+const BATCH_SIZE = PAGE_SIZE * PAGES_PER_BATCH; // 150 registros por lote
 
 // Definición de operadores con símbolos
 const ALL_OPERATORS = [
@@ -118,6 +118,7 @@ export default function PollaEncryptedPage() {
   const [error, setError] = useState<string | null>(null); // errores de exportación / validación
   const [page, setPage] = useState(1);
   const [hasSearched, setHasSearched] = useState(false);
+  const [exporting, setExporting] = useState(false); // descarga de Excel en curso
 
   // Sistema de filtros dinámicos estilo Supabase
   type Filter = {
@@ -163,7 +164,7 @@ export default function PollaEncryptedPage() {
       filters: filtersToSend,
       orderBy,
       page: targetBatch + 1, // nº de lote
-      pageSize: BATCH_SIZE, // 105 → la edge function hace .range()
+      pageSize: BATCH_SIZE, // 150 → la edge function hace .range()
     });
 
     const res = await fetch(
@@ -197,6 +198,7 @@ export default function PollaEncryptedPage() {
   const {
     data,
     isLoading,
+    isFetching,
     isError,
     error: queryError,
   } = useQuery<{
@@ -219,6 +221,9 @@ export default function PollaEncryptedPage() {
     offsetInBatch + PAGE_SIZE,
   );
   const loading = isLoading;
+  // Cargando un lote NUEVO (no cacheado) mientras keepPreviousData mantiene
+  // visible la tabla anterior → mostramos un overlay sutil encima de la tabla.
+  const isFetchingBatch = isFetching && !isLoading;
   const forbidden = isError && (queryError as Error)?.message === "FORBIDDEN";
   const displayError =
     error || (isError && !forbidden ? (queryError as Error)?.message : null);
@@ -371,26 +376,28 @@ export default function PollaEncryptedPage() {
     return v; // formato desconocido → tal cual
   };
 
-  // Exportar a Excel: hace su PROPIA consulta SIN paginación (page/pageSize)
-  // para que la edge function devuelva TODOS los registros filtrados, no solo la página visible.
-  const handleExportToExcel = async () => {
-    try {
-      if (!userSession) {
-        setError("Debes iniciar sesión para exportar");
+  // Trae TODOS los registros filtrados en bloques (paginados). Pide el bloque 1
+  // para obtener el total (count) y luego itera los bloques restantes acumulando.
+  // Respeta exactamente los filtros aplicados.
+  // IMPORTANTE: este tamaño NUNCA debe superar el `max-rows` de Supabase (default
+  // 1000). Si lo supera, la paginación por offset saltaría filas en silencio.
+  // Se usa 500 para dejar margen y aligerar el desencriptado por bloque.
+  const EXPORT_BLOCK_SIZE = 500;
 
-        return;
-      }
+  const fetchAllFilteredForExport = async (): Promise<PollaSorteo[]> => {
+    const filtersToSend = appliedFilters.filter(isFilterActive);
+    const orderBy = {
+      column: sortDescriptor.column,
+      ascending: sortDescriptor.direction === "ascending",
+    };
 
-      const filtersToSend = appliedFilters.filter(isFilterActive);
-
-      const orderBy = {
-        column: sortDescriptor.column,
-        ascending: sortDescriptor.direction === "ascending",
-      };
-
-      // Sin page/pageSize → trae todo lo filtrado
-      const body = JSON.stringify({ filters: filtersToSend, orderBy });
-
+    const fetchBlock = async (pageNum: number) => {
+      const body = JSON.stringify({
+        filters: filtersToSend,
+        orderBy,
+        page: pageNum,
+        pageSize: EXPORT_BLOCK_SIZE,
+      });
       const res = await fetch(
         `https://axndntqikmbldyodiwal.supabase.co/functions/v1/get-polla-encrypted-data`,
         {
@@ -402,13 +409,45 @@ export default function PollaEncryptedPage() {
           body,
         },
       );
-
       const json = await res.json();
 
       if (!res.ok) throw new Error(json.error || "Error al exportar");
 
+      return json as { data: PollaSorteo[]; count: number };
+    };
+
+    // Bloque 1 → datos + total real (count exact)
+    const first = await fetchBlock(1);
+    const total = first.count || first.data.length;
+    const all: PollaSorteo[] = [...(first.data || [])];
+
+    // Bloques restantes (orden por id asc → offsets estables aunque entre data nueva)
+    const totalBlocks = Math.ceil(total / EXPORT_BLOCK_SIZE);
+
+    for (let p = 2; p <= totalBlocks; p++) {
+      const block = await fetchBlock(p);
+
+      all.push(...(block.data || []));
+    }
+
+    return all;
+  };
+
+  // Exportar a Excel: trae TODOS los registros filtrados (en bloques) y arma el .xlsx.
+  const handleExportToExcel = async () => {
+    try {
+      if (!userSession) {
+        setError("Debes iniciar sesión para exportar");
+
+        return;
+      }
+
+      setExporting(true);
+
+      const allRecords = await fetchAllFilteredForExport();
+
       exportToExcel({
-        data: json.data || [],
+        data: allRecords,
         fileName: "registros_polla_encriptados",
         sheetName: "Registros Polla Encriptados",
         // Columnas que NO se exportan (la función las devuelve pero la tabla no las muestra)
@@ -451,6 +490,8 @@ export default function PollaEncryptedPage() {
       });
     } catch (err: any) {
       setError(err.message);
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -579,12 +620,21 @@ export default function PollaEncryptedPage() {
               {hasSearched && totalRecords > 0 && (
                 <Button
                   isAdmin
-                  className="!bg-[#3E688E] hover:!bg-[#2d4f6b] !text-white"
-                  onPress={handleExportToExcel}
+                  className={
+                    exporting
+                      ? "!bg-[#A7BDE2] !text-white !cursor-not-allowed"
+                      : "!bg-[#3E688E] hover:!bg-[#2d4f6b] !text-white"
+                  }
+                  onPress={() => {
+                    if (exporting) return;
+                    handleExportToExcel();
+                  }}
                 >
                   <span className="flex items-center gap-2">
                     <span>📥</span>
-                    <span>Exportar a Excel</span>
+                    <span>
+                      {exporting ? "Exportando..." : "Exportar a Excel"}
+                    </span>
                   </span>
                 </Button>
               )}
@@ -824,49 +874,72 @@ export default function PollaEncryptedPage() {
           </div>
 
           {hasSearched && !loading && (
-            <Table
-              isStriped
-              aria-label="Tabla de Registros Encriptados de la Polla"
-              classNames={{
-                wrapper: "bg-transparent overflow-x-auto !p-0",
-                tr: "data-[odd=true]:bg-[#EEF1F7]",
-                th: "bg-[#265197] text-[#fff] font-semibold text-center whitespace-nowrap",
-                td: "text-gray-700 text-center whitespace-nowrap",
-              }}
-              selectionMode="none"
-              sortDescriptor={sortDescriptor}
-              onSortChange={(descriptor) => {
-                const newSort = descriptor as LocalSortDescriptor;
-
-                setSortDescriptor(newSort);
-                // El nuevo orden va en el queryKey → React Query re-consulta solo
-                setPage(1);
-              }}
-            >
-              <TableHeader columns={columns}>
-                {(column) => (
-                  <TableColumn
-                    key={column.uid}
-                    align="center"
-                    allowsSorting={column.sortable}
-                  >
-                    {column.name}
-                  </TableColumn>
-                )}
-              </TableHeader>
-              <TableBody
-                emptyContent={"No se encontraron registros"}
-                items={paginatedItems}
+            <div className="relative">
+              <div
+                className={
+                  isFetchingBatch ? "opacity-40 pointer-events-none" : ""
+                }
               >
-                {(item) => (
-                  <TableRow key={item.id} className="items-center">
-                    {(columnKey) => (
-                      <TableCell>{renderCell(item, columnKey)}</TableCell>
+                <Table
+                  isStriped
+                  aria-label="Tabla de Registros Encriptados de la Polla"
+                  classNames={{
+                    wrapper: "bg-transparent overflow-x-auto !p-0",
+                    tr: "data-[odd=true]:bg-[#EEF1F7]",
+                    th: "bg-[#265197] text-[#fff] font-semibold text-center whitespace-nowrap",
+                    td: "text-gray-700 text-center whitespace-nowrap",
+                  }}
+                  selectionMode="none"
+                  sortDescriptor={sortDescriptor}
+                  onSortChange={(descriptor) => {
+                    const newSort = descriptor as LocalSortDescriptor;
+
+                    setSortDescriptor(newSort);
+                    // El nuevo orden va en el queryKey → React Query re-consulta solo
+                    setPage(1);
+                  }}
+                >
+                  <TableHeader columns={columns}>
+                    {(column) => (
+                      <TableColumn
+                        key={column.uid}
+                        align="center"
+                        allowsSorting={column.sortable}
+                      >
+                        {column.name}
+                      </TableColumn>
                     )}
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  </TableHeader>
+                  <TableBody
+                    emptyContent={"No se encontraron registros"}
+                    items={paginatedItems}
+                  >
+                    {(item) => (
+                      <TableRow key={item.id} className="items-center">
+                        {(columnKey) => (
+                          <TableCell>{renderCell(item, columnKey)}</TableCell>
+                        )}
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              {isFetchingBatch && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="flex items-center gap-2 bg-white/90 border border-[#D4DEED] rounded-full px-4 py-2 shadow-sm">
+                    <Icon
+                      className="animate-spin"
+                      color="#265197"
+                      name="LoaderCircle"
+                      size={20}
+                    />
+                    <Text isAdmin color="#265197" variant="label" weight="bold">
+                      Cargando...
+                    </Text>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           {/* Paginación */}
