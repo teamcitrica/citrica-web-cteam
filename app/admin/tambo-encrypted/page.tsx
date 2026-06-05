@@ -1,15 +1,7 @@
 "use client";
-import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-} from "@heroui/table";
-import { Pagination } from "@heroui/pagination";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { addToast } from "@heroui/toast";
 import {
   Text,
   Col,
@@ -22,6 +14,10 @@ import {
 
 import { UserAuth } from "@/shared/context/auth-context";
 import { useExcelExport } from "@/hooks/use-excel-export";
+import {
+  DataTable,
+  Column,
+} from "@/shared/components/citrica-ui/organism/data-table";
 
 interface Sorteo {
   id: number;
@@ -51,14 +47,14 @@ const columns = [
   { name: "ID", uid: "id", sortable: true },
   { name: "FECHA CREACIÓN", uid: "created_at", sortable: false },
   { name: "CAMPAÑA", uid: "campaign", sortable: false },
-  { name: "🔐 NOMBRE", uid: "first_name", sortable: false },
-  { name: "🔐 APELLIDO", uid: "last_name", sortable: false },
-  { name: "🔐 CUMPLEAÑOS", uid: "bday", sortable: false },
-  { name: "🔐 DIRECCIÓN", uid: "address", sortable: false },
-  { name: "🔐 TELÉFONO", uid: "phone", sortable: false },
-  { name: "🔐 EMAIL", uid: "email", sortable: false },
+  { name: "NOMBRE", uid: "first_name", sortable: false },
+  { name: "APELLIDO", uid: "last_name", sortable: false },
+  { name: "CUMPLEAÑOS", uid: "bday", sortable: false },
+  { name: "DIRECCIÓN", uid: "address", sortable: false },
+  { name: "TELÉFONO", uid: "phone", sortable: false },
+  { name: "EMAIL", uid: "email", sortable: false },
   { name: "TIPO DOC", uid: "doc_type", sortable: false },
-  { name: "🔐 NRO DOC", uid: "doc_number", sortable: false },
+  { name: "NRO DOC", uid: "doc_number", sortable: false },
   { name: "TIPO INV", uid: "inv_type", sortable: false },
   { name: "SERIE INV", uid: "inv_serie", sortable: false },
   { name: "NRO INV", uid: "inv_number", sortable: false },
@@ -114,7 +110,6 @@ const getOperatorsForColumn = (columnName: string) => {
 export default function TamboEncryptedPage() {
   const { userSession } = UserAuth();
   const { exportToExcel } = useExcelExport();
-  const [error, setError] = useState<string | null>(null); // errores de exportación / validación
   const [page, setPage] = useState(1);
   const [hasSearched, setHasSearched] = useState(false);
   const [exporting, setExporting] = useState(false); // descarga de Excel en curso
@@ -213,7 +208,6 @@ export default function TamboEncryptedPage() {
 
   // Derivados (reemplazan a los estados manuales)
   const totalRecords = data?.count ?? 0;
-  const totalPages = Math.ceil(totalRecords / PAGE_SIZE);
   const offsetInBatch = ((page - 1) % PAGES_PER_BATCH) * PAGE_SIZE;
   const paginatedItems: Sorteo[] = (data?.data ?? []).slice(
     offsetInBatch,
@@ -221,11 +215,11 @@ export default function TamboEncryptedPage() {
   );
   const loading = isLoading;
   // Cargando un lote NUEVO (no cacheado) mientras keepPreviousData mantiene
-  // visible la tabla anterior → mostramos un overlay sutil encima de la tabla.
+  // visible la tabla anterior.
   const isFetchingBatch = isFetching && !isLoading;
   const forbidden = isError && (queryError as Error)?.message === "FORBIDDEN";
   const displayError =
-    error || (isError && !forbidden ? (queryError as Error)?.message : null);
+    isError && !forbidden ? (queryError as Error)?.message : null;
 
   // Cambiar de página: solo cambia `page`. React Query trae el lote (o usa
   // caché) automáticamente cuando cambia `batchIndex` dentro del queryKey.
@@ -234,7 +228,6 @@ export default function TamboEncryptedPage() {
   };
 
   // Hay al menos un filtro válido (con valor, o un operador que no necesita valor).
-  // Se exige para poder aplicar filtros (no se permite traer todo sin filtrar).
   const hasValidFilter = filters.some(isFilterActive);
 
   // El valor debe ser coherente con el tipo de columna:
@@ -324,7 +317,6 @@ export default function TamboEncryptedPage() {
     setFilters([]);
     setAppliedFilters([]);
     setPage(1);
-    setError(null);
     setHasSearched(false);
   };
 
@@ -334,7 +326,6 @@ export default function TamboEncryptedPage() {
     // (ej. texto en la columna ID). El botón ya se muestra deshabilitado en ese caso.
     if (!canApply) return;
 
-    setError(null);
     setAppliedFilters(filters);
     setPage(1);
     setHasSearched(true);
@@ -377,10 +368,8 @@ export default function TamboEncryptedPage() {
 
   // Trae TODOS los registros filtrados en bloques (paginados). Pide el bloque 1
   // para obtener el total (count) y luego itera los bloques restantes acumulando.
-  // Respeta exactamente los filtros aplicados.
   // IMPORTANTE: este tamaño NUNCA debe superar el `max-rows` de Supabase (default
   // 1000). Si lo supera, la paginación por offset saltaría filas en silencio.
-  // Se usa 500 para dejar margen y aligerar el desencriptado por bloque.
   const EXPORT_BLOCK_SIZE = 500;
 
   const fetchAllFilteredForExport = async (): Promise<Sorteo[]> => {
@@ -432,15 +421,29 @@ export default function TamboEncryptedPage() {
     return all;
   };
 
-  // Exportar a Excel: trae TODOS los registros filtrados (en bloques) y arma el .xlsx.
-  const handleExportToExcel = async () => {
+  // Descarga directa a Excel de TODOS los registros filtrados (en bloques).
+  const handleDownloadExcel = async () => {
+    if (!userSession) {
+      addToast({
+        title: "Sesión requerida",
+        description: "Debes iniciar sesión para exportar.",
+        color: "danger",
+      });
+
+      return;
+    }
+
+    if (!hasSearched || totalRecords === 0) {
+      addToast({
+        title: "Aplica un filtro",
+        description: "Filtra los registros antes de exportar.",
+        color: "warning",
+      });
+
+      return;
+    }
+
     try {
-      if (!userSession) {
-        setError("Debes iniciar sesión para exportar");
-
-        return;
-      }
-
       setExporting(true);
 
       const allRecords = await fetchAllFilteredForExport();
@@ -485,13 +488,17 @@ export default function TamboEncryptedPage() {
         },
       });
     } catch (err: any) {
-      setError(err.message);
+      addToast({
+        title: "Error al exportar",
+        description: err.message || "Ocurrió un error al exportar",
+        color: "danger",
+      });
     } finally {
       setExporting(false);
     }
   };
 
-  const renderCell = useCallback((sorteo: Sorteo, columnKey: React.Key) => {
+  const renderCell = useCallback((sorteo: Sorteo, columnKey: string) => {
     const cellValue = sorteo[columnKey as keyof Sorteo];
 
     switch (columnKey) {
@@ -536,22 +543,6 @@ export default function TamboEncryptedPage() {
           </p>
         );
 
-      case "pack_option":
-        return (
-          <p className="text-sm text-black">{sorteo.pack_option ?? "-"}</p>
-        );
-
-      case "transfer_diageo":
-        return (
-          <p className="text-sm text-black">
-            {sorteo.transfer_diageo === true
-              ? "Sí"
-              : sorteo.transfer_diageo === false
-                ? "No"
-                : "-"}
-          </p>
-        );
-
       case "campaign":
         return <p className="text-sm text-black">{sorteo.campaign || "-"}</p>;
 
@@ -580,15 +571,193 @@ export default function TamboEncryptedPage() {
           <p className="text-sm text-black">{sorteo.survey_accept || "-"}</p>
         );
 
-      case "publicity_accept":
-        return (
-          <p className="text-sm text-black">{sorteo.publicity_accept || "-"}</p>
-        );
-
       default:
         return <p className="text-sm text-black">{String(cellValue || "-")}</p>;
     }
   }, []);
+
+  // Columnas para el DataTable: mismas columnas, cada una con su render propio.
+  const dataTableColumns: Column<Sorteo>[] = useMemo(
+    () =>
+      columns.map((c) => ({
+        ...c,
+        render: (item: Sorteo) => renderCell(item, c.uid),
+      })),
+    [renderCell],
+  );
+
+  // Barra de filtros (slot customFilters del DataTable). Mantiene la lógica de
+  // filtros estilo Supabase, con componentes del toolkit (sin emojis).
+  const filterBar = (
+    <div className="flex flex-col gap-3 pb-2">
+      {/* Botones de filtros (siempre visibles al entrar a la página) */}
+      <div className="flex items-center justify-end gap-3 flex-wrap">
+        <Button
+          isAdmin
+          isDisabled={filters.length === 0 && !hasSearched}
+          startContent={<Icon name="Trash2" size={16} />}
+          variant="secondary"
+          onPress={clearAllFilters}
+        >
+          Limpiar todo
+        </Button>
+        <Button
+          isAdmin
+          isDisabled={!hasSearched || totalRecords === 0 || exporting}
+          startContent={<Icon name="Download" size={16} />}
+          variant="primary"
+          onPress={handleDownloadExcel}
+        >
+          {exporting ? "Descargando..." : "Descargar"}
+        </Button>
+        <Button
+          isAdmin
+          isDisabled={!canApply || loading}
+          startContent={<Icon name="Search" size={16} />}
+          title={
+            hasInvalidFilter
+              ? "El valor de la columna ID debe ser numérico"
+              : !hasValidFilter
+                ? "Ingresa un valor en al menos un filtro"
+                : undefined
+          }
+          variant="primary"
+          onPress={applyFiltersToServer}
+        >
+          {loading ? "Aplicando..." : "Aplicar Filtros"}
+        </Button>
+        <Button
+          isAdmin
+          startContent={<Icon name="Plus" size={16} />}
+          variant="primary"
+          onPress={addFilter}
+        >
+          Agregar Filtro
+        </Button>
+      </div>
+
+      {/* Total de registros + filtros dinámicos */}
+      {(filters.length > 0 || hasSearched) && (
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-2">
+            {hasSearched && (
+              <Text isAdmin color="#265197" variant="body" weight="bold">
+                Total de registros filtrados: {totalRecords}
+              </Text>
+            )}
+            {activeAppliedFilters.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <Text isAdmin color="#5A6B85" variant="label">
+                  Filtros aplicados:
+                </Text>
+                {activeAppliedFilters.map((f) => (
+                  <span
+                    key={f.id}
+                    className="inline-flex items-center bg-[#EEF1F7] border border-[#D4DEED] rounded-full px-3 py-1"
+                  >
+                    <Text isAdmin color="#265197" variant="label">
+                      {getColumnName(f.column)} · {getOperatorLabel(f.operator)}
+                      {f.operator !== "is_null" && f.operator !== "is_not_null"
+                        ? ` "${f.value}"`
+                        : ""}
+                    </Text>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+          {filters.length > 0 && (
+            <div className="flex flex-col gap-1">
+              {filters.map((filter) => (
+                <div
+                  key={filter.id}
+                  className="flex items-center justify-end gap-2 p-2 rounded-lg"
+                >
+                  {/* Selector de columna */}
+                  <Select
+                    className="text-[#3E688E] w-[140px]"
+                    classNames={{
+                      trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
+                      value: "!text-[#3E688E]",
+                    }}
+                    options={columns
+                      .filter((col) => FILTERABLE_COLUMNS.includes(col.uid))
+                      .map((col) => ({ value: col.uid, label: col.name }))}
+                    selectedKeys={filter.column ? [filter.column] : []}
+                    variant="faded"
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+
+                      updateFilter(filter.id, "column", selected);
+                    }}
+                  />
+
+                  {/* Selector de operador */}
+                  <Select
+                    className="text-[#3E688E] w-[140px]"
+                    classNames={{
+                      trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
+                      value: "!text-[#3E688E]",
+                    }}
+                    options={getOperatorsForColumn(filter.column).map((op) => ({
+                      value: op.key,
+                      label: op.label,
+                    }))}
+                    selectedKeys={filter.operator ? [filter.operator] : []}
+                    variant="faded"
+                    onSelectionChange={(keys) => {
+                      const selected = Array.from(keys)[0] as string;
+
+                      updateFilter(filter.id, "operator", selected);
+                    }}
+                  />
+
+                  {/* Input de valor (solo si no es is_null o is_not_null) */}
+                  {filter.operator !== "is_null" &&
+                    filter.operator !== "is_not_null" && (
+                      <Input
+                        className="text-[#3E688E] w-[180px]"
+                        classNames={{
+                          inputWrapper:
+                            "!bg-[#F4F4F5] !border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
+                          input: "!text-[#3E688E] placeholder:!text-[#719BC1]",
+                        }}
+                        placeholder="Valor..."
+                        value={filter.value}
+                        variant="faded"
+                        onChange={(e) =>
+                          updateFilter(filter.id, "value", e.target.value)
+                        }
+                      />
+                    )}
+
+                  {/* Botón para eliminar filtro */}
+                  <Button
+                    isAdmin
+                    isIconOnly
+                    className="!min-w-6 !w-6 !h-7 !px-0"
+                    size="sm"
+                    title="Eliminar filtro"
+                    variant="secondary"
+                    onPress={() => removeFilter(filter.id)}
+                  >
+                    <Icon name="X" size={14} />
+                  </Button>
+                </div>
+              ))}
+              {hasInvalidFilter && (
+                <div className="flex justify-end">
+                  <Text isAdmin color="#dc3545" variant="label">
+                    El valor de la columna ID debe ser numérico
+                  </Text>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 
   if (forbidden) {
     return (
@@ -603,367 +772,50 @@ export default function TamboEncryptedPage() {
   }
 
   return (
-    <Container>
-      <Col cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div className="flex flex-col gap-2">
-          <Text
-            isAdmin
-            as="h1"
-            color="#265197"
-            variant="headline"
-            weight="bold"
-          >
-            Tambo Encriptado
-          </Text>
-          <div className="container-blue-principal">
-            {/* Botones de filtros */}
-            <div className="flex items-center justify-end gap-3 mb-4 flex-wrap">
-              {hasSearched && totalRecords > 0 && (
-                <Button
-                  isAdmin
-                  className={
-                    exporting
-                      ? "!bg-[#A7BDE2] !text-white !cursor-not-allowed"
-                      : "!bg-[#3E688E] hover:!bg-[#2d4f6b] !text-white"
-                  }
-                  onPress={() => {
-                    if (exporting) return;
-                    handleExportToExcel();
-                  }}
-                >
-                  <span className="flex items-center gap-2">
-                    <span>📥</span>
-                    <span>
-                      {exporting ? "Exportando..." : "Exportar a Excel"}
-                    </span>
-                  </span>
-                </Button>
-              )}
-              {(filters.length > 0 || hasSearched) && (
-                <Button
-                  isAdmin
-                  className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white"
-                  onPress={clearAllFilters}
-                >
-                  Limpiar todo
-                </Button>
-              )}
-              {filters.length > 0 && (
-                <Button
-                  isAdmin
-                  className={
-                    canApply && !loading
-                      ? "!bg-[#265197] hover:!bg-[#16305A] !text-white"
-                      : "!bg-[#A7BDE2] !text-white !cursor-not-allowed"
-                  }
-                  title={
-                    hasInvalidFilter
-                      ? "El valor de la columna ID debe ser numérico"
-                      : !hasValidFilter
-                        ? "Ingresa un valor en al menos un filtro"
-                        : undefined
-                  }
-                  onPress={applyFiltersToServer}
-                >
-                  <span className="flex items-center gap-2">
-                    <span>🔍</span>
-                    <span>{loading ? "Aplicando..." : "Aplicar Filtros"}</span>
-                  </span>
-                </Button>
-              )}
-              <Button
-                isAdmin
-                className="!bg-[#28a745] hover:!bg-[#218838] !text-white"
-                onPress={addFilter}
-              >
-                <span className="flex items-center gap-2">
-                  <span>+</span>
-                  <span>Agregar Filtro</span>
-                </span>
-              </Button>
-            </div>
+    <div className="pb-[100px]">
+      <Container>
+        <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }}>
+          <div className="">
+            <h1 className="text-2xl font-bold text-[#265197] mb-5">
+              <Text isAdmin color="#678CC5" variant="title" weight="bold">
+                CRM
+              </Text>
+              {" > "}
+              <Text isAdmin color="#265197" variant="title" weight="bold">
+                Tambo Encriptado
+              </Text>
+            </h1>
 
-            {/* Total de registros + Filtros dinámicos en la misma línea */}
-            {(filters.length > 0 || hasSearched) && (
-              <div className="flex items-start justify-between gap-4 my-0">
-                <div className="flex flex-col gap-2">
-                  {hasSearched ? (
-                    <Text isAdmin color="#265197" variant="body" weight="bold">
-                      Total de registros filtrados: {totalRecords}
-                    </Text>
-                  ) : (
-                    <span />
-                  )}
-                  {activeAppliedFilters.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Text isAdmin color="#5A6B85" variant="label">
-                        Filtros aplicados:
-                      </Text>
-                      {activeAppliedFilters.map((f) => (
-                        <span
-                          key={f.id}
-                          className="inline-flex items-center bg-[#EEF1F7] border border-[#D4DEED] rounded-full px-3 py-1"
-                        >
-                          <Text isAdmin color="#265197" variant="label">
-                            {getColumnName(f.column)} ·{" "}
-                            {getOperatorLabel(f.operator)}
-                            {f.operator !== "is_null" &&
-                            f.operator !== "is_not_null"
-                              ? ` "${f.value}"`
-                              : ""}
-                          </Text>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                {filters.length > 0 && (
-                  <div className="flex flex-col gap-1">
-                    {filters.map((filter) => (
-                      <div
-                        key={filter.id}
-                        className="flex items-center justify-end gap-2 bg-white/10 p-2 rounded-lg"
-                      >
-                        {/* Selector de columna */}
-                        <Select
-                          className="text-[#3E688E] w-[140px]"
-                          classNames={{
-                            trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
-                            value: "!text-[#3E688E]",
-                          }}
-                          options={columns
-                            .filter((col) =>
-                              FILTERABLE_COLUMNS.includes(col.uid),
-                            )
-                            .map((col) => ({
-                              value: col.uid,
-                              label: col.name,
-                            }))}
-                          selectedKeys={filter.column ? [filter.column] : []}
-                          variant="faded"
-                          onSelectionChange={(keys) => {
-                            const selected = Array.from(keys)[0] as string;
-
-                            updateFilter(filter.id, "column", selected);
-                          }}
-                        />
-
-                        {/* Selector de operador */}
-                        <Select
-                          className="text-[#3E688E] w-[140px]"
-                          classNames={{
-                            trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
-                            value: "!text-[#3E688E]",
-                          }}
-                          options={getOperatorsForColumn(filter.column).map(
-                            (op) => ({ value: op.key, label: op.label }),
-                          )}
-                          selectedKeys={
-                            filter.operator ? [filter.operator] : []
-                          }
-                          variant="faded"
-                          onSelectionChange={(keys) => {
-                            const selected = Array.from(keys)[0] as string;
-
-                            updateFilter(filter.id, "operator", selected);
-                          }}
-                        />
-
-                        {/* Input de valor (solo si no es is_null o is_not_null) */}
-                        {filter.operator !== "is_null" &&
-                          filter.operator !== "is_not_null" && (
-                            <Input
-                              className="text-[#3E688E] w-[180px]"
-                              classNames={{
-                                inputWrapper:
-                                  "!bg-[#F4F4F5] !border-[#D4DEED] !rounded-[12px] data-[hover=true]:!border-[#265197]",
-                                input:
-                                  "!text-[#3E688E] placeholder:!text-[#719BC1]",
-                              }}
-                              placeholder="Valor..."
-                              value={filter.value}
-                              variant="faded"
-                              onChange={(e) =>
-                                updateFilter(filter.id, "value", e.target.value)
-                              }
-                            />
-                          )}
-
-                        {/* Botón para eliminar filtro */}
-                        <Button
-                          isAdmin
-                          className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white !min-w-[40px]"
-                          title="Eliminar filtro"
-                          onPress={() => removeFilter(filter.id)}
-                        >
-                          ✕
-                        </Button>
-                      </div>
-                    ))}
-                    {hasInvalidFilter && (
-                      <div className="flex justify-end">
-                        <Text isAdmin color="#dc3545" variant="label">
-                          ⚠ El valor de la columna ID debe ser numérico
-                        </Text>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!hasSearched && !loading && (
-              <div className="mt-4 flex flex-col items-center justify-center text-center bg-[#EEF1F7] border border-[#D4DEED] rounded-2xl py-12 px-6">
-                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white mb-5">
-                  <Icon color="#265197" name="Search" size={32} />
-                </div>
-                <Text isAdmin color="#16305A" variant="title" weight="bold">
-                  Comienza tu búsqueda
-                </Text>
-                <div className="mt-2 mb-7">
-                  <Text isAdmin color="#5A6B85" variant="body">
-                    Para visualizar los registros encriptados de Tambo, sigue
-                    estos pasos:
-                  </Text>
-                </div>
-                <div className="flex flex-col gap-4 text-left w-full max-w-md">
-                  {[
-                    "Haz clic en “+ Agregar Filtro”",
-                    "Selecciona tus criterios de búsqueda",
-                    "Presiona el botón “Aplicar Filtros”",
-                  ].map((step, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#265197] flex-shrink-0">
-                        <Text
-                          isAdmin
-                          color="#ffffff"
-                          variant="label"
-                          weight="bold"
-                        >
-                          {index + 1}
-                        </Text>
-                      </div>
-                      <Text isAdmin color="#16305A" variant="body">
-                        {step}
-                      </Text>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {loading && (
-              <div className="mt-4 flex flex-col items-center justify-center text-center bg-[#EEF1F7] border border-[#D4DEED] rounded-2xl py-12 px-6">
-                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white mb-5">
-                  <Icon
-                    className="animate-spin"
-                    color="#265197"
-                    name="LoaderCircle"
-                    size={32}
-                  />
-                </div>
-                <Text isAdmin color="#16305A" variant="title" weight="bold">
-                  Buscando registros...
-                </Text>
-                <div className="mt-2">
-                  <Text isAdmin color="#5A6B85" variant="body">
-                    Por favor espera mientras procesamos tu consulta
-                  </Text>
-                </div>
-              </div>
-            )}
+            <DataTable<Sorteo>
+              key={`${sortDescriptor.column}-${sortDescriptor.direction}`}
+              serverSidePagination
+              columns={dataTableColumns}
+              currentPage={page}
+              customFilters={filterBar}
+              data={paginatedItems}
+              defaultSortDirection={sortDescriptor.direction}
+              emptyContent={
+                hasSearched
+                  ? "No se encontraron registros"
+                  : "Aplica un filtro para ver registros"
+              }
+              getRowKey={(s) => s.id}
+              headerColor="#265197"
+              headerTextColor="#ffffff"
+              isLoading={loading || isFetchingBatch}
+              itemsPerPage={PAGE_SIZE}
+              paginationColor="#265197"
+              searchFields={[]}
+              totalRecords={totalRecords}
+              onPageChange={goToPage}
+              onSortChange={(col, dir) => {
+                setSortDescriptor({ column: col, direction: dir });
+                setPage(1);
+              }}
+            />
           </div>
-
-          {hasSearched && !loading && (
-            <div className="relative">
-              <div
-                className={
-                  isFetchingBatch ? "opacity-40 pointer-events-none" : ""
-                }
-              >
-                <Table
-                  isStriped
-                  aria-label="Tabla de Registros Encriptados de Tambo"
-                  classNames={{
-                    wrapper: "bg-transparent overflow-x-auto !p-0",
-                    tr: "data-[odd=true]:bg-[#EEF1F7]",
-                    th: "bg-[#265197] text-[#fff] font-semibold text-center whitespace-nowrap",
-                    td: "text-gray-700 text-center whitespace-nowrap",
-                  }}
-                  selectionMode="none"
-                  sortDescriptor={sortDescriptor}
-                  onSortChange={(descriptor) => {
-                    const newSort = descriptor as LocalSortDescriptor;
-
-                    setSortDescriptor(newSort);
-                    // El nuevo orden va en el queryKey → React Query re-consulta solo
-                    setPage(1);
-                  }}
-                >
-                  <TableHeader columns={columns}>
-                    {(column) => (
-                      <TableColumn
-                        key={column.uid}
-                        align="center"
-                        allowsSorting={column.sortable}
-                      >
-                        {column.name}
-                      </TableColumn>
-                    )}
-                  </TableHeader>
-                  <TableBody
-                    emptyContent={"No se encontraron registros"}
-                    items={paginatedItems}
-                  >
-                    {(item) => (
-                      <TableRow key={item.id} className="items-center">
-                        {(columnKey) => (
-                          <TableCell>{renderCell(item, columnKey)}</TableCell>
-                        )}
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-              {isFetchingBatch && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="flex items-center gap-2 bg-white/90 border border-[#D4DEED] rounded-full px-4 py-2 shadow-sm">
-                    <Icon
-                      className="animate-spin"
-                      color="#265197"
-                      name="LoaderCircle"
-                      size={20}
-                    />
-                    <Text isAdmin color="#265197" variant="label" weight="bold">
-                      Cargando...
-                    </Text>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Paginación */}
-          {hasSearched && !loading && totalPages > 0 && (
-            <div className="flex justify-center mt-4">
-              <Pagination
-                isCompact
-                showControls
-                showShadow
-                classNames={{
-                  cursor: "bg-[#265197] text-white shadow-none",
-                  item: "border-none shadow-none outline-none ring-0",
-                  prev: "border-none shadow-none outline-none ring-0",
-                  next: "border-none shadow-none outline-none ring-0",
-                }}
-                page={page}
-                total={totalPages}
-                onChange={(p) => goToPage(p)}
-              />
-            </div>
-          )}
-        </div>
-      </Col>
-    </Container>
+        </Col>
+      </Container>
+    </div>
   );
 }
