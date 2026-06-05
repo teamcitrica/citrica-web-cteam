@@ -40,7 +40,11 @@ export default function PollaFilterBar({ table }: Props) {
       <div className="flex items-center justify-end gap-3 flex-wrap">
         <Button
           isAdmin
-          isDisabled={filters.length === 0 && !hasSearched}
+          className={
+            filters.length === 0 && !hasSearched
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }
           startContent={<Icon name="Trash2" size={16} />}
           variant="secondary"
           onPress={clearAllFilters}
@@ -49,7 +53,11 @@ export default function PollaFilterBar({ table }: Props) {
         </Button>
         <Button
           isAdmin
-          isDisabled={!hasSearched || totalRecords === 0 || exporting}
+          className={
+            !hasSearched || totalRecords === 0 || exporting
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }
           startContent={<Icon name="Download" size={16} />}
           variant="primary"
           onPress={handleDownloadExcel}
@@ -58,7 +66,9 @@ export default function PollaFilterBar({ table }: Props) {
         </Button>
         <Button
           isAdmin
-          isDisabled={!canApply || loading}
+          className={
+            !canApply || loading ? "opacity-50 cursor-not-allowed" : ""
+          }
           startContent={<Icon name="Search" size={16} />}
           title={
             hasInvalidFilter

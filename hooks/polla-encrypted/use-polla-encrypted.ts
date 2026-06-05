@@ -321,6 +321,8 @@ export function usePollaEncrypted() {
 
   // Descarga directa a Excel de TODOS los registros filtrados (en bloques).
   const handleDownloadExcel = async () => {
+    if (exporting) return; // evita doble clic durante la descarga
+
     if (!userSession) {
       addToast({
         title: "Sesión requerida",
