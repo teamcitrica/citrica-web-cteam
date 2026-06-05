@@ -1,13 +1,13 @@
 "use client";
 import { Text, Select, Input, Button, Icon } from "citrica-ui-toolkit";
 
-import { useTamboEncrypted } from "@/hooks/tambo-encrypted/use-tambo-encrypted";
+import { usePollaEncrypted } from "@/hooks/polla-encrypted/use-polla-encrypted";
 
 type Props = {
-  table: ReturnType<typeof useTamboEncrypted>;
+  table: ReturnType<typeof usePollaEncrypted>;
 };
 
-export default function TamboFilterBar({ table }: Props) {
+export default function PollaFilterBar({ table }: Props) {
   const {
     filters,
     hasSearched,
