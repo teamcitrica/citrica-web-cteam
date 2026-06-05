@@ -206,13 +206,14 @@ export default function TamboEncryptedPage() {
     placeholderData: keepPreviousData,
   });
 
-  // Derivados (reemplazan a los estados manuales)
-  const totalRecords = data?.count ?? 0;
+  // Derivados (reemplazan a los estados manuales). Se atan a `hasSearched` para
+  // que al Limpiar todo (o quitar el último filtro) la tabla quede vacía aunque
+  // React Query conserve el último resultado en caché.
+  const totalRecords = hasSearched ? (data?.count ?? 0) : 0;
   const offsetInBatch = ((page - 1) % PAGES_PER_BATCH) * PAGE_SIZE;
-  const paginatedItems: Sorteo[] = (data?.data ?? []).slice(
-    offsetInBatch,
-    offsetInBatch + PAGE_SIZE,
-  );
+  const paginatedItems: Sorteo[] = hasSearched
+    ? (data?.data ?? []).slice(offsetInBatch, offsetInBatch + PAGE_SIZE)
+    : [];
   const loading = isLoading;
   // Cargando un lote NUEVO (no cacheado) mientras keepPreviousData mantiene
   // visible la tabla anterior.
@@ -589,7 +590,7 @@ export default function TamboEncryptedPage() {
   // Barra de filtros (slot customFilters del DataTable). Mantiene la lógica de
   // filtros estilo Supabase, con componentes del toolkit (sin emojis).
   const filterBar = (
-    <div className="flex flex-col gap-3 pb-2">
+    <div className="flex flex-col gap-3 pb-8">
       {/* Botones de filtros (siempre visibles al entrar a la página) */}
       <div className="flex items-center justify-end gap-3 flex-wrap">
         <Button
@@ -797,7 +798,7 @@ export default function TamboEncryptedPage() {
               emptyContent={
                 hasSearched
                   ? "No se encontraron registros"
-                  : "Aplica un filtro para ver registros"
+                  : "Agrega y aplica un filtro para ver registros"
               }
               getRowKey={(s) => s.id}
               headerColor="#265197"
