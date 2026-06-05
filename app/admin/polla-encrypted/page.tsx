@@ -612,6 +612,15 @@ export default function PollaEncryptedPage() {
     <Container>
       <Col cols={{ lg: 12, md: 6, sm: 4 }}>
         <div className="flex flex-col gap-2">
+          <Text
+            isAdmin
+            as="h1"
+            color="#265197"
+            variant="headline"
+            weight="bold"
+          >
+            Polla Encriptada
+          </Text>
           <div className="container-blue-principal">
             {/* Botones de filtros */}
             <div className="flex items-center justify-end gap-3 mb-4 flex-wrap">
