@@ -19,6 +19,7 @@ import {
   Button,
   Icon,
 } from "citrica-ui-toolkit";
+
 import { UserAuth } from "@/shared/context/auth-context";
 import { useExcelExport } from "@/hooks/use-excel-export";
 
@@ -68,8 +69,8 @@ const columns = [
 ];
 
 const PAGE_SIZE = 15; // registros visibles por página
-const PAGES_PER_BATCH = 7; // páginas que trae cada lote
-const BATCH_SIZE = PAGE_SIZE * PAGES_PER_BATCH; // 105 registros por lote
+const PAGES_PER_BATCH = 10; // páginas que trae cada lote
+const BATCH_SIZE = PAGE_SIZE * PAGES_PER_BATCH; // 150 registros por lote
 
 // Definición de operadores con símbolos
 const ALL_OPERATORS = [
@@ -116,6 +117,7 @@ export default function TamboEncryptedPage() {
   const [error, setError] = useState<string | null>(null); // errores de exportación / validación
   const [page, setPage] = useState(1);
   const [hasSearched, setHasSearched] = useState(false);
+  const [exporting, setExporting] = useState(false); // descarga de Excel en curso
 
   // Sistema de filtros dinámicos estilo Supabase
   type Filter = {
@@ -161,7 +163,7 @@ export default function TamboEncryptedPage() {
       filters: filtersToSend,
       orderBy,
       page: targetBatch + 1, // nº de lote
-      pageSize: BATCH_SIZE, // 105 → la edge function hace .range()
+      pageSize: BATCH_SIZE, // 150 → la edge function hace .range()
     });
 
     const res = await fetch(
@@ -179,6 +181,7 @@ export default function TamboEncryptedPage() {
     if (res.status === 403) throw new Error("FORBIDDEN");
 
     const json = await res.json();
+
     if (!res.ok) throw new Error(json.error || "Error al obtener datos");
 
     return { data: json.data || [], count: json.count || 0 };
@@ -191,7 +194,13 @@ export default function TamboEncryptedPage() {
   // - Volver a un lote ya visto = instantáneo (desde caché).
   // - Cambiar filtro/orden = otra queryKey → consulta nueva (sin invalidar a mano).
   // - keepPreviousData = mantiene la tabla anterior mientras llega el nuevo lote.
-  const { data, isLoading, isError, error: queryError } = useQuery<{
+  const {
+    data,
+    isLoading,
+    isFetching,
+    isError,
+    error: queryError,
+  } = useQuery<{
     data: Sorteo[];
     count: number;
   }>({
@@ -211,6 +220,9 @@ export default function TamboEncryptedPage() {
     offsetInBatch + PAGE_SIZE,
   );
   const loading = isLoading;
+  // Cargando un lote NUEVO (no cacheado) mientras keepPreviousData mantiene
+  // visible la tabla anterior → mostramos un overlay sutil encima de la tabla.
+  const isFetchingBatch = isFetching && !isLoading;
   const forbidden = isError && (queryError as Error)?.message === "FORBIDDEN";
   const displayError =
     error || (isError && !forbidden ? (queryError as Error)?.message : null);
@@ -232,6 +244,7 @@ export default function TamboEncryptedPage() {
     if (NUMERIC_COLUMNS.includes(f.column) && f.value.trim() !== "") {
       return !isNaN(Number(f.value));
     }
+
     return true;
   };
 
@@ -259,11 +272,13 @@ export default function TamboEncryptedPage() {
       operator: "contains",
       value: "",
     };
+
     setFilters([...filters, newFilter]);
   };
 
   const removeFilter = (filterId: string) => {
     const remaining = filters.filter((f) => f.id !== filterId);
+
     setFilters(remaining);
     setPage(1);
 
@@ -298,6 +313,7 @@ export default function TamboEncryptedPage() {
         if (field === "column") {
           return { ...f, column: value, operator: "eq", value: "" };
         }
+
         return { ...f, [field]: value };
       }),
     );
@@ -332,45 +348,55 @@ export default function TamboEncryptedPage() {
     const v = String(value).trim();
     // DD/MM/YYYY o D/M/YYYY
     const dmy = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+
     if (dmy) {
       const [, d, m, y] = dmy;
+
       return `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
     }
     // ISO YYYY-MM-DD (con o sin hora, ej. timestamp de created_at)
     const ymd = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+
     if (ymd) {
       const [, y, m, d] = ymd;
       const fecha = `${d.padStart(2, "0")}/${m.padStart(2, "0")}/${y}`;
       // Si trae hora (HH:MM:SS), la agregamos tal cual viene guardada
       const hora = v.match(/[ T](\d{2}):(\d{2}):(\d{2})/);
+
       if (hora) {
         const [, hh, mm, ss] = hora;
+
         return `${fecha} ${hh}:${mm}:${ss}`;
       }
+
       return fecha;
     }
+
     return v; // formato desconocido → tal cual
   };
 
-  // Exportar a Excel: hace su PROPIA consulta SIN paginación (page/pageSize)
-  // para que la edge function devuelva TODOS los registros filtrados, no solo la página visible.
-  const handleExportToExcel = async () => {
-    try {
-      if (!userSession) {
-        setError("Debes iniciar sesión para exportar");
-        return;
-      }
+  // Trae TODOS los registros filtrados en bloques (paginados). Pide el bloque 1
+  // para obtener el total (count) y luego itera los bloques restantes acumulando.
+  // Respeta exactamente los filtros aplicados.
+  // IMPORTANTE: este tamaño NUNCA debe superar el `max-rows` de Supabase (default
+  // 1000). Si lo supera, la paginación por offset saltaría filas en silencio.
+  // Se usa 500 para dejar margen y aligerar el desencriptado por bloque.
+  const EXPORT_BLOCK_SIZE = 500;
 
-      const filtersToSend = appliedFilters.filter(isFilterActive);
+  const fetchAllFilteredForExport = async (): Promise<Sorteo[]> => {
+    const filtersToSend = appliedFilters.filter(isFilterActive);
+    const orderBy = {
+      column: sortDescriptor.column,
+      ascending: sortDescriptor.direction === "ascending",
+    };
 
-      const orderBy = {
-        column: sortDescriptor.column,
-        ascending: sortDescriptor.direction === "ascending",
-      };
-
-      // Sin page/pageSize → trae todo lo filtrado
-      const body = JSON.stringify({ filters: filtersToSend, orderBy });
-
+    const fetchBlock = async (pageNum: number) => {
+      const body = JSON.stringify({
+        filters: filtersToSend,
+        orderBy,
+        page: pageNum,
+        pageSize: EXPORT_BLOCK_SIZE,
+      });
       const res = await fetch(
         `https://axndntqikmbldyodiwal.supabase.co/functions/v1/get-tambo-encrypted-data`,
         {
@@ -382,12 +408,45 @@ export default function TamboEncryptedPage() {
           body,
         },
       );
-
       const json = await res.json();
+
       if (!res.ok) throw new Error(json.error || "Error al exportar");
 
+      return json as { data: Sorteo[]; count: number };
+    };
+
+    // Bloque 1 → datos + total real (count exact)
+    const first = await fetchBlock(1);
+    const total = first.count || first.data.length;
+    const all: Sorteo[] = [...(first.data || [])];
+
+    // Bloques restantes (orden por id asc → offsets estables aunque entre data nueva)
+    const totalBlocks = Math.ceil(total / EXPORT_BLOCK_SIZE);
+
+    for (let p = 2; p <= totalBlocks; p++) {
+      const block = await fetchBlock(p);
+
+      all.push(...(block.data || []));
+    }
+
+    return all;
+  };
+
+  // Exportar a Excel: trae TODOS los registros filtrados (en bloques) y arma el .xlsx.
+  const handleExportToExcel = async () => {
+    try {
+      if (!userSession) {
+        setError("Debes iniciar sesión para exportar");
+
+        return;
+      }
+
+      setExporting(true);
+
+      const allRecords = await fetchAllFilteredForExport();
+
       exportToExcel({
-        data: json.data || [],
+        data: allRecords,
         fileName: "registros_tambo_encriptados",
         sheetName: "Registros Tambo Encriptados",
         // Columnas que NO se exportan (no están en la tabla)
@@ -421,11 +480,14 @@ export default function TamboEncryptedPage() {
           if (key === "bday" || key === "created_at") {
             return formatFecha(value);
           }
+
           return value;
         },
       });
     } catch (err: any) {
       setError(err.message);
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -462,9 +524,7 @@ export default function TamboEncryptedPage() {
         return <p className="text-sm text-black">{sorteo.doc_number || "-"}</p>;
 
       case "bday":
-        return (
-          <p className="text-sm text-black">{formatFecha(sorteo.bday)}</p>
-        );
+        return <p className="text-sm text-black">{formatFecha(sorteo.bday)}</p>;
 
       case "address":
         return (
@@ -552,20 +612,29 @@ export default function TamboEncryptedPage() {
               {hasSearched && totalRecords > 0 && (
                 <Button
                   isAdmin
-                  onPress={handleExportToExcel}
-                  className="!bg-[#3E688E] hover:!bg-[#2d4f6b] !text-white"
+                  className={
+                    exporting
+                      ? "!bg-[#A7BDE2] !text-white !cursor-not-allowed"
+                      : "!bg-[#3E688E] hover:!bg-[#2d4f6b] !text-white"
+                  }
+                  onPress={() => {
+                    if (exporting) return;
+                    handleExportToExcel();
+                  }}
                 >
                   <span className="flex items-center gap-2">
                     <span>📥</span>
-                    <span>Exportar a Excel</span>
+                    <span>
+                      {exporting ? "Exportando..." : "Exportar a Excel"}
+                    </span>
                   </span>
                 </Button>
               )}
               {(filters.length > 0 || hasSearched) && (
                 <Button
                   isAdmin
-                  onPress={clearAllFilters}
                   className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white"
+                  onPress={clearAllFilters}
                 >
                   Limpiar todo
                 </Button>
@@ -573,6 +642,11 @@ export default function TamboEncryptedPage() {
               {filters.length > 0 && (
                 <Button
                   isAdmin
+                  className={
+                    canApply && !loading
+                      ? "!bg-[#265197] hover:!bg-[#16305A] !text-white"
+                      : "!bg-[#A7BDE2] !text-white !cursor-not-allowed"
+                  }
                   title={
                     hasInvalidFilter
                       ? "El valor de la columna ID debe ser numérico"
@@ -581,11 +655,6 @@ export default function TamboEncryptedPage() {
                         : undefined
                   }
                   onPress={applyFiltersToServer}
-                  className={
-                    canApply && !loading
-                      ? "!bg-[#265197] hover:!bg-[#16305A] !text-white"
-                      : "!bg-[#A7BDE2] !text-white !cursor-not-allowed"
-                  }
                 >
                   <span className="flex items-center gap-2">
                     <span>🔍</span>
@@ -595,8 +664,8 @@ export default function TamboEncryptedPage() {
               )}
               <Button
                 isAdmin
-                onPress={addFilter}
                 className="!bg-[#28a745] hover:!bg-[#218838] !text-white"
+                onPress={addFilter}
               >
                 <span className="flex items-center gap-2">
                   <span>+</span>
@@ -653,8 +722,6 @@ export default function TamboEncryptedPage() {
                             trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                             value: "!text-[#3E688E]",
                           }}
-                          selectedKeys={filter.column ? [filter.column] : []}
-                          variant="faded"
                           options={columns
                             .filter((col) =>
                               FILTERABLE_COLUMNS.includes(col.uid),
@@ -663,8 +730,11 @@ export default function TamboEncryptedPage() {
                               value: col.uid,
                               label: col.name,
                             }))}
+                          selectedKeys={filter.column ? [filter.column] : []}
+                          variant="faded"
                           onSelectionChange={(keys) => {
                             const selected = Array.from(keys)[0] as string;
+
                             updateFilter(filter.id, "column", selected);
                           }}
                         />
@@ -676,15 +746,16 @@ export default function TamboEncryptedPage() {
                             trigger: "!bg-[#F4F4F5] !text-[#3E688E]",
                             value: "!text-[#3E688E]",
                           }}
+                          options={getOperatorsForColumn(filter.column).map(
+                            (op) => ({ value: op.key, label: op.label }),
+                          )}
                           selectedKeys={
                             filter.operator ? [filter.operator] : []
                           }
                           variant="faded"
-                          options={getOperatorsForColumn(filter.column).map(
-                            (op) => ({ value: op.key, label: op.label }),
-                          )}
                           onSelectionChange={(keys) => {
                             const selected = Array.from(keys)[0] as string;
+
                             updateFilter(filter.id, "operator", selected);
                           }}
                         />
@@ -712,9 +783,9 @@ export default function TamboEncryptedPage() {
                         {/* Botón para eliminar filtro */}
                         <Button
                           isAdmin
-                          onPress={() => removeFilter(filter.id)}
                           className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white !min-w-[40px]"
                           title="Eliminar filtro"
+                          onPress={() => removeFilter(filter.id)}
                         >
                           ✕
                         </Button>
@@ -735,13 +806,13 @@ export default function TamboEncryptedPage() {
             {!hasSearched && !loading && (
               <div className="mt-4 flex flex-col items-center justify-center text-center bg-[#EEF1F7] border border-[#D4DEED] rounded-2xl py-12 px-6">
                 <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white mb-5">
-                  <Icon name="Search" size={32} color="#265197" />
+                  <Icon color="#265197" name="Search" size={32} />
                 </div>
-                <Text isAdmin variant="title" weight="bold" color="#16305A">
+                <Text isAdmin color="#16305A" variant="title" weight="bold">
                   Comienza tu búsqueda
                 </Text>
                 <div className="mt-2 mb-7">
-                  <Text isAdmin variant="body" color="#5A6B85">
+                  <Text isAdmin color="#5A6B85" variant="body">
                     Para visualizar los registros encriptados de Tambo, sigue
                     estos pasos:
                   </Text>
@@ -756,14 +827,14 @@ export default function TamboEncryptedPage() {
                       <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#265197] flex-shrink-0">
                         <Text
                           isAdmin
+                          color="#ffffff"
                           variant="label"
                           weight="bold"
-                          color="#ffffff"
                         >
                           {index + 1}
                         </Text>
                       </div>
-                      <Text isAdmin variant="body" color="#16305A">
+                      <Text isAdmin color="#16305A" variant="body">
                         {step}
                       </Text>
                     </div>
@@ -777,16 +848,16 @@ export default function TamboEncryptedPage() {
                 <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white mb-5">
                   <Icon
                     className="animate-spin"
+                    color="#265197"
                     name="LoaderCircle"
                     size={32}
-                    color="#265197"
                   />
                 </div>
-                <Text isAdmin variant="title" weight="bold" color="#16305A">
+                <Text isAdmin color="#16305A" variant="title" weight="bold">
                   Buscando registros...
                 </Text>
                 <div className="mt-2">
-                  <Text isAdmin variant="body" color="#5A6B85">
+                  <Text isAdmin color="#5A6B85" variant="body">
                     Por favor espera mientras procesamos tu consulta
                   </Text>
                 </div>
@@ -795,48 +866,72 @@ export default function TamboEncryptedPage() {
           </div>
 
           {hasSearched && !loading && (
-            <Table
-              isStriped
-              aria-label="Tabla de Registros Encriptados de Tambo"
-              selectionMode="none"
-              sortDescriptor={sortDescriptor}
-              onSortChange={(descriptor) => {
-                const newSort = descriptor as LocalSortDescriptor;
-                setSortDescriptor(newSort);
-                // El nuevo orden va en el queryKey → React Query re-consulta solo
-                setPage(1);
-              }}
-              classNames={{
-                wrapper: "bg-transparent overflow-x-auto !p-0",
-                tr: "data-[odd=true]:bg-[#EEF1F7]",
-                th: "bg-[#265197] text-[#fff] font-semibold text-center whitespace-nowrap",
-                td: "text-gray-700 text-center whitespace-nowrap",
-              }}
-            >
-              <TableHeader columns={columns}>
-                {(column) => (
-                  <TableColumn
-                    key={column.uid}
-                    align="center"
-                    allowsSorting={column.sortable}
-                  >
-                    {column.name}
-                  </TableColumn>
-                )}
-              </TableHeader>
-              <TableBody
-                emptyContent={"No se encontraron registros"}
-                items={paginatedItems}
+            <div className="relative">
+              <div
+                className={
+                  isFetchingBatch ? "opacity-40 pointer-events-none" : ""
+                }
               >
-                {(item) => (
-                  <TableRow key={item.id} className="items-center">
-                    {(columnKey) => (
-                      <TableCell>{renderCell(item, columnKey)}</TableCell>
+                <Table
+                  isStriped
+                  aria-label="Tabla de Registros Encriptados de Tambo"
+                  classNames={{
+                    wrapper: "bg-transparent overflow-x-auto !p-0",
+                    tr: "data-[odd=true]:bg-[#EEF1F7]",
+                    th: "bg-[#265197] text-[#fff] font-semibold text-center whitespace-nowrap",
+                    td: "text-gray-700 text-center whitespace-nowrap",
+                  }}
+                  selectionMode="none"
+                  sortDescriptor={sortDescriptor}
+                  onSortChange={(descriptor) => {
+                    const newSort = descriptor as LocalSortDescriptor;
+
+                    setSortDescriptor(newSort);
+                    // El nuevo orden va en el queryKey → React Query re-consulta solo
+                    setPage(1);
+                  }}
+                >
+                  <TableHeader columns={columns}>
+                    {(column) => (
+                      <TableColumn
+                        key={column.uid}
+                        align="center"
+                        allowsSorting={column.sortable}
+                      >
+                        {column.name}
+                      </TableColumn>
                     )}
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                  </TableHeader>
+                  <TableBody
+                    emptyContent={"No se encontraron registros"}
+                    items={paginatedItems}
+                  >
+                    {(item) => (
+                      <TableRow key={item.id} className="items-center">
+                        {(columnKey) => (
+                          <TableCell>{renderCell(item, columnKey)}</TableCell>
+                        )}
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              {isFetchingBatch && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="flex items-center gap-2 bg-white/90 border border-[#D4DEED] rounded-full px-4 py-2 shadow-sm">
+                    <Icon
+                      className="animate-spin"
+                      color="#265197"
+                      name="LoaderCircle"
+                      size={20}
+                    />
+                    <Text isAdmin color="#265197" variant="label" weight="bold">
+                      Cargando...
+                    </Text>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           {/* Paginación */}
