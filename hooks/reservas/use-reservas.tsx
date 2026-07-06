@@ -89,6 +89,24 @@ export const useReservas = () => {
     fetchReservas()
   }, [fetchReservas, refreshFlag])
 
+  // Realtime: escuchar cambios en bookings y refrescar automáticamente
+  useEffect(() => {
+    const channel = supabase
+      .channel('bookings-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'bookings' },
+        () => {
+          fetchReservas()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [supabase, fetchReservas])
+
   const deleteReserva = useCallback(
     async (id: string) => {
       try {
