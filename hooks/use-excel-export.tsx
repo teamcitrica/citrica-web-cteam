@@ -96,7 +96,8 @@ export const useExcelExport = () => {
       "updated_at",
       "deleted_at",
       "birthdate",
-      "bday",
+      // "bday" se excluye a propósito: viene en formatos mixtos (DD/MM/YYYY e ISO)
+      // y new Date() lo mal-interpreta. Cada página lo formatea con su customFormatter.
       "birthday",
       "timestamp",
     ];
@@ -190,10 +191,22 @@ export const useExcelExport = () => {
     const dataToExport = data.map((row) => {
       const exportRow: any = {};
 
-      // Procesar cada columna
-      Object.keys(row).forEach((key) => {
+      // Determinar el orden de las columnas: si hay columnMapping, respetar SU orden;
+      // luego agregar cualquier columna del dato que no esté en el mapping (sin perder data).
+      // Si no hay mapping, mantener el orden original de las claves del dato.
+      const mappedKeys = columnMapping ? Object.keys(columnMapping) : [];
+      const remainingKeys = Object.keys(row).filter((k) => !mappedKeys.includes(k));
+      const orderedKeys = [...mappedKeys, ...remainingKeys];
+
+      // Procesar cada columna en el orden determinado
+      orderedKeys.forEach((key) => {
         // Saltar columnas excluidas
         if (excludeColumns.includes(key)) {
+          return;
+        }
+
+        // Ignorar claves del mapping que no existan en el dato (evita columnas fantasma)
+        if (!(key in row)) {
           return;
         }
 

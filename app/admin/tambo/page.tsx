@@ -2,7 +2,7 @@
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { useState, useCallback, useMemo } from "react";
-import { Text, Col, Container, Select, Input } from "citrica-ui-toolkit";
+import { Text, Col, Container, Select, Input, Button } from "citrica-ui-toolkit";
 import { UserAuth } from "@/shared/context/auth-context";
 import { useExcelExport } from "@/hooks/use-excel-export";
 
@@ -454,40 +454,61 @@ export default function TamboPage() {
           <div className="container-blue-principal">
 
             {/* Botones de filtros */}
-            <div className="flex items-center gap-3 mb-4">
-              <button
-                onClick={addFilter}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap flex items-center gap-2"
+            <div className="flex items-center gap-3 mb-4 flex-wrap">
+              <Button
+                isAdmin
+                onPress={addFilter}
+                className="!bg-[#28a745] hover:!bg-[#218838] !text-white"
               >
-                <span>+</span>
-                <span>Agregar Filtro</span>
-              </button>
+                <span className="flex items-center gap-2">
+                  <span>+</span>
+                  <span>Agregar Filtro</span>
+                </span>
+              </Button>
               {filters.length > 0 && (
-                <button
-                  onClick={applyFiltersToServer}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors whitespace-nowrap flex items-center gap-2"
-                  disabled={loading}
+                <Button
+                  isAdmin
+                  onPress={applyFiltersToServer}
+                  isDisabled={loading}
+                  className="!bg-[#265197] hover:!bg-[#16305A] !text-white"
                 >
-                  <span>🔍</span>
-                  <span>{loading ? "Aplicando..." : "Aplicar Filtros"}</span>
-                </button>
+                  <span className="flex items-center gap-2">
+                    <span>🔍</span>
+                    <span>{loading ? "Aplicando..." : "Aplicar Filtros"}</span>
+                  </span>
+                </Button>
               )}
+              <Button
+                isAdmin
+                onPress={() => fetchSorteos(false)}
+                isDisabled={loading}
+                className="!bg-[#ff5b00] hover:!bg-[#e55200] !text-white"
+              >
+                <span className="flex items-center gap-2">
+                  <span>📋</span>
+                  <span>{loading ? "Cargando..." : "Buscar Todos"}</span>
+                </span>
+              </Button>
               {(filters.length > 0 || searchTerm || hasSearched) && (
-                <button
-                  onClick={clearAllFilters}
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors whitespace-nowrap"
+                <Button
+                  isAdmin
+                  onPress={clearAllFilters}
+                  className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white"
                 >
                   Limpiar todo
-                </button>
+                </Button>
               )}
               {sortedItems.length > 0 && (
-                <button
-                  onClick={handleExportToExcel}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap flex items-center gap-2"
+                <Button
+                  isAdmin
+                  onPress={handleExportToExcel}
+                  className="!bg-[#3E688E] hover:!bg-[#2d4f6b] !text-white"
                 >
-                  <span>📥</span>
-                  <span>Exportar a Excel</span>
-                </button>
+                  <span className="flex items-center gap-2">
+                    <span>📥</span>
+                    <span>Exportar a Excel</span>
+                  </span>
+                </Button>
               )}
             </div>
 
@@ -544,13 +565,14 @@ export default function TamboPage() {
                     )}
 
                     {/* Botón para eliminar filtro */}
-                    <button
-                      onClick={() => removeFilter(filter.id)}
-                      className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                    <Button
+                      isAdmin
+                      onPress={() => removeFilter(filter.id)}
+                      className="!bg-[#dc3545] hover:!bg-[#c82333] !text-white !min-w-[40px]"
                       title="Eliminar filtro"
                     >
                       ✕
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>

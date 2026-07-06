@@ -6,6 +6,7 @@ import { Button, Input, Col, Container, Icon, Text } from "citrica-ui-toolkit";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
 import { addToast } from "@heroui/toast";
 import { Divider } from "@heroui/divider";
+import StorageFilesModal from "./components/StorageFilesModal";
 
 // Tipo para los storage de documentos
 interface DocumentStorage {
@@ -18,6 +19,8 @@ interface DocumentStorage {
   status: "ready" | "processing" | "error";
   createdAt: string;
   files: StorageFile[];
+  total_tokens_used?: number;
+  total_cost_usd?: number;
 }
 
 interface StorageFile {
@@ -40,15 +43,18 @@ export default function DatabasesRAGPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [storageToDelete, setStorageToDelete] = useState<DocumentStorage | null>(null);
+  const [selectedStorageForFiles, setSelectedStorageForFiles] = useState<DocumentStorage | null>(null);
 
   // Cargar storages al montar el componente
   useEffect(() => {
     fetchStorages();
   }, []);
 
-  const fetchStorages = async () => {
+  const fetchStorages = async (silent = false) => {
     try {
-      setIsLoading(true);
+      if (!silent) {
+        setIsLoading(true);
+      }
       const response = await fetch("/api/rag/storage");
       const data = await response.json();
 
@@ -63,7 +69,9 @@ export default function DatabasesRAGPage() {
     } catch (error) {
       console.error("Error fetching storages:", error);
     } finally {
-      setIsLoading(false);
+      if (!silent) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -109,6 +117,9 @@ export default function DatabasesRAGPage() {
 
     setUploadingFiles(prev => ({ ...prev, [storageId]: true }));
 
+    let uploadedCount = 0;
+    let totalSize = 0;
+
     try {
       // Procesar cada archivo
       for (const file of Array.from(files)) {
@@ -129,14 +140,54 @@ export default function DatabasesRAGPage() {
 
         const result = await response.json();
         console.log("Upload result:", result);
+        uploadedCount++;
+        totalSize += file.size;
       }
 
       addToast({
         title: "Éxito",
-        description: `${files.length} archivo(s) procesado(s) exitosamente`,
+        description: `${uploadedCount} archivo(s) procesado(s) exitosamente`,
         color: "success",
       });
-      await fetchStorages(); // Recargar lista
+
+      // ✅ MEJORA: Actualización optimista - solo actualizar el storage afectado
+      setStorages(prev => prev.map(storage => {
+        if (storage.id === storageId) {
+          return {
+            ...storage,
+            fileCount: storage.fileCount + uploadedCount,
+            totalSize: storage.totalSize + totalSize,
+            status: "processing" as const, // Se actualizará cuando Gemini termine
+          };
+        }
+        return storage;
+      }));
+
+      // Actualizar storage específico en background (sin bloquear UI)
+      setTimeout(async () => {
+        try {
+          const response = await fetch("/api/rag/storage");
+          const data = await response.json();
+          if (data.storages) {
+            const updatedStorage = data.storages.find((s: any) => s.id === storageId);
+            if (updatedStorage) {
+              setStorages(prev => prev.map(storage =>
+                storage.id === storageId
+                  ? {
+                      ...storage,
+                      ...updatedStorage,
+                      createdAt: updatedStorage.created_at,
+                      embeddingModel: updatedStorage.embedding_model,
+                    }
+                  : storage
+              ));
+            }
+          }
+        } catch (error) {
+          console.error("Error refreshing storage:", error);
+        }
+      }, 1000); // Esperar 1 segundo para que Gemini procese
+
     } catch (error: any) {
       console.error("Error uploading files:", error);
       addToast({
@@ -295,8 +346,9 @@ export default function DatabasesRAGPage() {
               storages.filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase())).map((storage) => (
                 <Card
                   key={storage.id}
-                  onPress={() => setSelectedStorage(storage)}
-                  className="w-full hover:scale-[1.02] transition-transform"
+                  isPressable
+                  onPress={() => setSelectedStorageForFiles(storage)}
+                  className="w-full hover:scale-[1.02] transition-transform cursor-pointer"
                 >
                   <CardHeader className="p-4 flex-col items-start">
                     <div className="flex items-start justify-between w-full">
@@ -333,7 +385,7 @@ export default function DatabasesRAGPage() {
 
                   <CardBody className="p-4">
                     {/* Stats */}
-                    <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="grid grid-cols-2 gap-3 mb-3">
                       <div className="bg-gray-50 p-3 rounded-lg">
                         <div className="text-xs text-gray-500 mb-1">
                           <Text isAdmin={true} variant="label" color="#4B5563">Archivos</Text>
@@ -348,6 +400,28 @@ export default function DatabasesRAGPage() {
                         </div>
                         <div className="text-xl font-bold text-[#265197]">
                           <Text isAdmin={true} variant="body" color="#265197">{formatFileSize(storage.totalSize)}</Text>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Tokens y Costo */}
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                        <div className="text-xs text-gray-600 mb-1 flex items-center gap-1">
+                          <Icon name="Zap" size={12} color="#2563eb" />
+                          <Text isAdmin={true} variant="label" color="#4B5563">Tokens</Text>
+                        </div>
+                        <div className="text-lg font-bold text-blue-600">
+                          {storage.total_tokens_used?.toLocaleString() || 0}
+                        </div>
+                      </div>
+                      <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                        <div className="text-xs text-gray-600 mb-1 flex items-center gap-1">
+                          <Icon name="DollarSign" size={12} color="#16a34a" />
+                          <Text isAdmin={true} variant="label" color="#4B5563">Costo</Text>
+                        </div>
+                        <div className="text-lg font-bold text-green-600">
+                          ${(storage.total_cost_usd || 0).toFixed(4)}
                         </div>
                       </div>
                     </div>
@@ -502,6 +576,15 @@ export default function DatabasesRAGPage() {
           </div>
         </div>
       </Modal>
+
+      {/* Modal Archivos del Storage */}
+      <StorageFilesModal
+        storageId={selectedStorageForFiles?.id || null}
+        storageName={selectedStorageForFiles?.name || ""}
+        isOpen={!!selectedStorageForFiles}
+        onClose={() => setSelectedStorageForFiles(null)}
+        onRefresh={fetchStorages}
+      />
     </Container>
   );
 }

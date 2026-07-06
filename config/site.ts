@@ -1,5 +1,5 @@
 export type SiteConfig = typeof siteConfig;
-import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck, Calendar, UserStar, Sparkles, Folder, Briefcase } from "lucide-react"
+import { Home, ClipboardCheck, Settings, Users, Bell, ShieldCheck, Calendar, UserStar, Sparkles, Folder, Briefcase, BarChart } from "lucide-react"
 
 const ROL_ADMIN = 1;
 const ROL_USER = 2;
@@ -45,13 +45,38 @@ export const siteConfig = {
 			href: "/admin/ia",
 			allowedRoles: [ROL_ADMIN],
 			subItems: [
-				{ 
+				{
 					title: "Databases RAG",
 					href: "/admin/ia/databases_rag",
 				},
 				{
 					title: "Chat",
 					href: "/admin/ia/chat",
+				},
+				{
+					title: "Configuración",
+					href: "/admin/ia/config",
+				},
+
+			],
+		},
+		{
+			title: "SALES ANALYTICS",
+			icon: "BarChart",
+			href: "/admin/sales-analytics",
+			allowedRoles: [ROL_ADMIN],
+			subItems: [
+				{
+					title: "Proyectos",
+					href: "/admin/sales-analytics/projects",
+				},
+				{
+					title: "Nuevo Proyecto",
+					href: "/admin/sales-analytics/projects/new",
+				},
+				{
+					title: "Configuración",
+					href: "/admin/sales-analytics/config",
 				},
 
 			],
@@ -105,6 +130,14 @@ export const siteConfig = {
 				{
 					title: "Proyectos",
 					href: "/admin/crm/proyectos",
+				},
+				{
+					title: "Tambo Encriptado",
+					href: "/admin/tambo-encrypted",
+				},
+				{
+					title: "Polla Encriptada",
+					href: "/admin/polla-encrypted",
 				},
 				// {
 				// 	title: "Configuración",
