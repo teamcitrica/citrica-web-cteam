@@ -100,7 +100,7 @@ const CitricaWebsite = () => {
         <div className="hero-marquee-wrapper">
           <CurvedLoop
             items={["Websites", "Landing Pages", "Web Apps", "Mobile Apps (IOS y Android)", "SAAS", "Integraciones de IA", "E-Commerce", "Plataformas web a Medida"]}
-            speed={1}
+            speed={0.5}
             direction="right"
             interactive={true}
             textVariant="h3"
