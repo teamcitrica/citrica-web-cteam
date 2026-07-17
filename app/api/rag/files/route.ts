@@ -1,7 +1,8 @@
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { deleteFile } from "@/lib/ai/gemini-service";
+import { deleteFileSearchDocument } from "@/lib/ai/gemini-service";
+import { getGeminiApiKey } from "@/lib/ai/gemini-api-key";
 
 /**
  * Helper: Extrae el path del archivo desde la publicUrl de Supabase
@@ -101,20 +102,24 @@ export async function DELETE(request: Request) {
     console.log("📄 Archivo encontrado:", file.file_name);
 
     // ================================================================
-    // 2. ELIMINAR DE GEMINI FILE API
+    // 2. ELIMINAR DEL FILE SEARCH STORE
     // ================================================================
+    // Filas legacy (solo gemini_file_name, del File API de 48h) se saltan:
+    // esos archivos caducaron en Gemini hace tiempo
 
-    if (file.gemini_file_name) {
+    if (file.gemini_document_name) {
       try {
-        console.log("🔹 Eliminando de Gemini File API:", file.gemini_file_name);
-        await deleteFile(file.gemini_file_name);
-        console.log("✅ Eliminado de Gemini File API");
+        const apiKey = await getGeminiApiKey(supabase);
+        if (apiKey) {
+          console.log("🔹 Eliminando del File Search store:", file.gemini_document_name);
+          await deleteFileSearchDocument(apiKey, file.gemini_document_name);
+        }
       } catch (geminiError: any) {
         console.error("⚠️ Error eliminando de Gemini:", geminiError.message);
-        // Continuar aunque falle (puede que el archivo ya no exista en Gemini)
+        // Continuar aunque falle (puede que el documento ya no exista)
       }
     } else {
-      console.log("⚠️ No hay gemini_file_name, saltando eliminación de Gemini");
+      console.log("⚠️ Sin gemini_document_name (archivo legacy), saltando eliminación de Gemini");
     }
 
     // ================================================================

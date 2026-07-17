@@ -2,155 +2,94 @@
 
 ## 📚 Descripción
 
-Sistema RAG que permite subir documentos y hacer preguntas sobre su contenido usando **Gemini 2.5 Flash**.
+RAG real sobre **Gemini File Search**: los documentos se indexan una vez (chunking + embeddings con **`gemini-embedding-001`**, administrados por Google) y el chat recupera **solo los fragmentos relevantes** para cada pregunta. No se pasa el documento completo al contexto — el costo de prompt es chunks + pregunta.
 
-## 🏗️ Arquitectura
+Actualizado: 2026-07-17 (migración desde Gemini File API, que caducaba a las 48h y metía documentos completos al contexto).
 
-**Flujo:**
-1. Usuario sube documento → Se guarda en **Supabase Storage**
-2. Metadata se guarda en **Supabase PostgreSQL**
-3. Archivo también se sube a **Gemini File API** (para uso futuro)
-4. Al hacer preguntas en el chat:
-   - Descarga documentos desde Supabase Storage
-   - Pasa el contenido completo como contexto a Gemini
-   - Gemini responde basándose en los documentos
+## 🏗️ Arquitectura — las 3 vistas trabajan en conjunto
+
+### 1. Configuración (`/admin/ia/config`)
+
+- La API key de Gemini se guarda en la tabla **`api_config`** y **tiene prioridad** sobre `GEMINI_API_KEY` del `.env.local`. Resolución centralizada en `lib/ai/gemini-api-key.ts` (`getGeminiApiKey`).
+- "Sincronizar modelos" puebla **`ai_model_config`** (lista blanca de modelos Gemini + modelo default que usa el chat cuando no se selecciona uno).
+- ⚠️ Si cambias de key, hazlo AQUÍ (la DB manda); cambiar solo el `.env` no tiene efecto mientras haya una key activa en DB.
+
+### 2. Bases de datos (`/admin/ia/databases_rag`)
+
+Crear storage = fila en `document_storages`. Al **primer upload** se crea su **File Search store** real en Gemini y se guarda en `gemini_vector_store_id` (formato `fileSearchStores/...`).
+
+**Flujo de subida de documento** (`POST /api/rag/upload`):
+1. Original → bucket **`rag-documents`** de Supabase Storage (respaldo permanente, permite reindexar)
+2. Fila en `storage_files` con estado `PROCESSING` (antes de llamar a Gemini — un fallo nunca deja archivos huérfanos)
+3. Indexado en el File Search store: Gemini hace chunking + embeddings (`gemini-embedding-001`). **Persistente, sin caducidad.**
+4. Fila → `ACTIVE` con `gemini_document_name` (`fileSearchStores/.../documents/...`)
+
+**Estados de archivo** (`gemini_file_state`): `PENDING` (pendiente de reindexar) · `PROCESSING` · `ACTIVE` (con embeddings, listo para retrieval) · `FAILED`.
+
+**Botón ↻ Reprocesar** (`POST /api/rag/storage/reprocess`): reindexar desde el respaldo del bucket sin re-subir — cura archivos `PENDING`/`FAILED` y huérfanos del bucket. Los archivos sin respaldo quedan `FAILED` y requieren re-subida manual.
+
+### 3. Chat (`/admin/ia/chat`)
+
+Selecciona base de datos (o "Todas"), modelo y perfil de respuesta. `POST /api/rag/chat`:
+
+- Resuelve los File Search stores con archivos `ACTIVE` (máx. 10 stores por pregunta en modo "Todas").
+- Llama a Gemini con la tool **`fileSearch`** — Gemini hace la búsqueda semántica y recupera solo los chunks relevantes. El modelo responde basándose en ellos.
+- Sin stores activos → chat simple sin documentos.
+- Respuesta en streaming; errores legibles (créditos agotados, key inválida, cuota) se muestran en el chat.
+- Se guarda en `chat_conversations`: mensaje, respuesta, tokens, costo y **`sources_used`** con las citas reales del retrieval (documento + fragmento, de `groundingMetadata`).
 
 ## 📦 Estructura de Base de Datos
 
-### Tablas principales
-
 #### `document_storages`
-Contenedores para organizar documentos
 ```sql
 - id: UUID
-- name: TEXT
-- description: TEXT
-- gemini_vector_store_id: TEXT
-- status: TEXT (ready, processing, error)
-- total_tokens_used: BIGINT
-- total_cost_usd: DECIMAL
+- name, description: TEXT
+- gemini_vector_store_id: TEXT   -- "fileSearchStores/..." (NULL = aún sin store)
+- status: TEXT (ready | processing | error)
+- total_tokens_used, total_cost_usd
 ```
 
 #### `storage_files`
-Archivos individuales
 ```sql
-- id: UUID
-- storage_id: UUID
-- file_name: TEXT
-- file_size: BIGINT
-- file_type: TEXT
-- file_url: TEXT (Supabase Storage)
-- gemini_file_uri: TEXT (Gemini File API)
-- gemini_file_state: TEXT (PENDING, PROCESSING, ACTIVE, FAILED)
-- processed: BOOLEAN
-- tokens_used: BIGINT
+- id, storage_id (FK cascade)
+- file_name, file_size, file_type, file_url  -- file_url apunta al respaldo en bucket
+- gemini_document_name: TEXT     -- documento en el store (el que importa)
+- gemini_file_state: TEXT (PENDING | PROCESSING | ACTIVE | FAILED)
+- gemini_file_uri, gemini_file_name  -- DEPRECATED (File API legacy 48h)
+- processed, tokens_used, processing_cost_usd
 ```
 
 #### `chat_conversations`
-Historial de conversaciones
-```sql
-- id: UUID
-- storage_id: UUID
-- user_message: TEXT
-- assistant_response: TEXT
-- prompt_tokens: INTEGER
-- completion_tokens: INTEGER
-- total_tokens: INTEGER
-- cost_usd: DECIMAL
-- model: TEXT
-- sources_used: JSONB
-```
+Historial por storage (`storage_id NULL` = "todas las bases"), con tokens, costo y `sources_used`.
 
-## 🔧 Configuración
+## 💰 Costos
 
-### Variables de entorno (.env.local)
-```bash
-GEMINI_API_KEY=tu_api_key_de_google_ai_studio
-NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
-```
+| Concepto | Costo |
+|----------|-------|
+| Indexación (una vez por documento) | $0.15 / 1M tokens |
+| Almacenamiento del índice | Gratis |
+| Embeddings de consulta | Gratis |
+| Chat | Solo tokens del modelo (chunks recuperados + respuesta) |
 
-### Obtener API Key de Gemini
-1. Ve a: https://aistudio.google.com/app/apikey
-2. Crea una nueva API key
-3. Cópiala a `.env.local`
+## 🔧 Código
 
-## 🚀 Uso
+- `lib/ai/gemini-service.ts` — File Search: `createFileSearchStore`, `uploadToFileSearchStore`, `deleteFileSearchDocument`, `deleteFileSearchStore`, `isRealStoreName`, `resolveMimeType`, perfiles de respuesta.
+- `lib/ai/gemini-api-key.ts` — resolución de API key (DB > env).
+- `app/api/rag/upload/route.ts` · `app/api/rag/chat/route.ts` · `app/api/rag/storage/route.ts` (+ `/reprocess`) · `app/api/rag/files/route.ts` (+ `/download`).
+- SDK: **`@google/genai`** (el viejo `@google/generative-ai` fue removido).
 
-### 1. Crear Storage
-- Ir a `/admin/ia/databases_rag`
-- Clic en "Nuevo Storage"
-- Ingresar nombre y descripción
+## ✅ Checklist de validación end-to-end (ejecutar cuando haya key con saldo)
 
-### 2. Subir Documentos
-- Seleccionar un storage
-- Clic en "Subir Archivos"
-- Seleccionar archivos (PDF, TXT, DOC, DOCX, MD)
+1. Pegar la key en `/admin/ia/config` → estado "valid" → sincronizar modelos.
+2. En `/admin/ia/databases_rag`: crear storage de prueba y subir un PDF.
+3. Verificar: archivo "Activo" en el modal; en DB `gemini_document_name` con formato `fileSearchStores/.../documents/...` y `gemini_vector_store_id` real en el storage.
+4. En `/admin/ia/chat`: seleccionar la base y preguntar algo específico del documento → responde con su contenido.
+5. Verificar en `chat_conversations`: `sources_used` con el título del documento y `prompt_tokens` bajo (solo chunks, no el documento entero).
+6. Probar "Todas las bases", borrar un archivo y borrar el storage (limpia el store en Gemini).
 
-### 3. Hacer Preguntas
-- Ir a `/admin/ia/chat`
-- Seleccionar base de datos (o "Todas las bases")
-- Escribir pregunta
-- El sistema usa el contenido de los documentos como contexto
+## 📎 Notas
 
-## 📊 Tracking de Costos
-
-El sistema calcula automáticamente:
-- **Tokens usados** por cada conversación
-- **Costo estimado** en USD
-- **Tokens totales** por storage
-
-**Costos de Gemini 2.5 Flash:**
-- Input: $0.075 por 1M tokens
-- Output: $0.30 por 1M tokens
-
-## 🔄 Migraciones
-
-### Ejecutar en Supabase SQL Editor:
-```sql
--- 1. Crear tablas base
-\i supabase/migrations/001_create_rag_tables.sql
-
--- 2. Crear bucket de almacenamiento
-\i supabase/migrations/002_create_storage_bucket.sql
-
--- 3. Migrar a nueva estructura (opcional, si vienes de versión anterior)
-\i supabase/migrations/003_migrate_to_gemini_vector_stores.sql
-```
-
-## 🛠️ Archivos Principales
-
-### Backend
-- `lib/ai/gemini-service.ts` - Servicio de Gemini AI
-- `app/api/rag/upload/route.ts` - Subir documentos
-- `app/api/rag/chat/route.ts` - Chat con RAG
-- `app/api/rag/storage/route.ts` - Gestión de storages
-
-### Frontend
-- `app/admin/ia/databases_rag/page.tsx` - Gestión de documentos
-- `app/admin/ia/chat/page.tsx` - Interfaz de chat
-
-### Database
-- `supabase/migrations/` - Migraciones SQL
-
-## ⚡ Características
-
-✅ Subida de documentos a Supabase Storage
-✅ Metadata en PostgreSQL
-✅ Chat contextual con documentos
-✅ Tracking de tokens y costos
-✅ Retry automático si servidor sobrecargado
-✅ Múltiples storages para organización
-✅ Soporte para múltiples formatos de archivo
-
-## 🔍 Modelo Usado
-
-**Gemini 2.5 Flash**
-- Modelo más reciente y rápido
-- Soporte para hasta 1M tokens de contexto
-- Multimodal (texto, imágenes, etc.)
-
----
-
-**Última actualización:** 2025-12-09
-**Versión:** 1.0 (RAG con contexto completo)
+- **Formatos soportados**: PDF, TXT, MD, DOCX, JSON, CSV, **XLSX/XLS** (Excel se convierte automáticamente a texto CSV por hoja antes de indexar; el original queda intacto en el bucket). El `.doc` viejo de Word ya no se acepta.
+- **Límite**: 100MB por archivo. Free tier: 1GB de índice total.
+- **Feedback al usuario**: los límites se muestran bajo el botón de subida; formato/tamaño inválido se rechaza con toast antes de subir (y el servidor valida en espejo); si la indexación falla, el motivo queda en `storage_files.error_message` y se muestra en el modal junto al estado "Error". Fuente única de límites: `lib/ai/rag-file-support.ts`.
+- Free tier de Gemini: Google puede usar los datos enviados para mejorar sus productos — considerar para documentos sensibles.

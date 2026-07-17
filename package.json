@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.61",
-    "@google/generative-ai": "^0.24.1",
+    "@google/genai": "^2.12.0",
     "@heroui/autocomplete": "2.3.31",
     "@heroui/avatar": "2.2.24",
     "@heroui/button": "2.2.29",

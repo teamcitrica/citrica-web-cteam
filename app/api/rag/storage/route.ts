@@ -1,7 +1,8 @@
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { deleteFile } from "@/lib/ai/gemini-service";
+import { deleteFileSearchStore, isRealStoreName } from "@/lib/ai/gemini-service";
+import { getGeminiApiKey } from "@/lib/ai/gemini-api-key";
 
 /**
  * Helper: Extrae el path del archivo desde la publicUrl de Supabase
@@ -104,8 +105,14 @@ export async function DELETE(request: Request) {
     console.log("🗑️ Eliminando storage:", storageId);
 
     // ================================================================
-    // 1. OBTENER TODOS LOS ARCHIVOS DEL STORAGE
+    // 1. OBTENER STORAGE Y SUS ARCHIVOS
     // ================================================================
+
+    const { data: storageRow } = await supabase
+      .from("document_storages")
+      .select("gemini_vector_store_id")
+      .eq("id", storageId)
+      .single();
 
     const { data: files, error: filesError } = await supabase
       .from("storage_files")
@@ -120,26 +127,29 @@ export async function DELETE(request: Request) {
     console.log(`📂 ${files?.length || 0} archivos encontrados para eliminar`);
 
     // ================================================================
-    // 2. ELIMINAR CADA ARCHIVO DE GEMINI Y SUPABASE STORAGE
+    // 2. ELIMINAR EL FILE SEARCH STORE COMPLETO (force borra sus documentos)
+    // ================================================================
+
+    if (isRealStoreName(storageRow?.gemini_vector_store_id)) {
+      try {
+        const apiKey = await getGeminiApiKey(supabase);
+        if (apiKey) {
+          await deleteFileSearchStore(apiKey, storageRow!.gemini_vector_store_id!);
+        }
+      } catch (error: any) {
+        console.error("⚠️ Error eliminando File Search store:", error.message);
+        // Continuar aunque falle
+      }
+    }
+
+    // ================================================================
+    // 3. ELIMINAR CADA ARCHIVO DE SUPABASE STORAGE
     // ================================================================
 
     if (files && files.length > 0) {
       // Procesar eliminaciones en paralelo para mejor performance
       const deletionPromises = files.map(async (file) => {
         const errors = [];
-
-        // Eliminar de Gemini File API
-        if (file.gemini_file_name) {
-          try {
-            console.log(`🔹 Eliminando de Gemini: ${file.gemini_file_name}`);
-            await deleteFile(file.gemini_file_name);
-            console.log(`✅ Eliminado de Gemini: ${file.file_name}`);
-          } catch (error: any) {
-            console.error(`⚠️ Error eliminando de Gemini (${file.file_name}):`, error.message);
-            errors.push(`Gemini: ${error.message}`);
-            // Continuar aunque falle
-          }
-        }
 
         // Eliminar de Supabase Storage
         if (file.file_url) {
@@ -185,7 +195,7 @@ export async function DELETE(request: Request) {
     }
 
     // ================================================================
-    // 3. ELIMINAR STORAGE (CASCADE ELIMINA REGISTROS DE storage_files)
+    // 4. ELIMINAR STORAGE (CASCADE ELIMINA REGISTROS DE storage_files)
     // ================================================================
 
     const { error } = await supabase

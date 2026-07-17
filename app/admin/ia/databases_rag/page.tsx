@@ -7,6 +7,7 @@ import Modal from "@/shared/components/citrica-ui/molecules/modal";
 import { addToast } from "@heroui/toast";
 import { Divider } from "@heroui/divider";
 import StorageFilesModal from "./components/StorageFilesModal";
+import { validateRagFile, ACCEPT_ATTRIBUTE, LIMITS_LABEL } from "@/lib/ai/rag-file-support";
 
 // Tipo para los storage de documentos
 interface DocumentStorage {
@@ -40,6 +41,7 @@ export default function DatabasesRAGPage() {
   const [newStorageDescription, setNewStorageDescription] = useState("");
   const [selectedStorage, setSelectedStorage] = useState<DocumentStorage | null>(null);
   const [uploadingFiles, setUploadingFiles] = useState<Record<string, boolean>>({});
+  const [reprocessingStorages, setReprocessingStorages] = useState<Record<string, boolean>>({});
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [storageToDelete, setStorageToDelete] = useState<DocumentStorage | null>(null);
@@ -115,6 +117,26 @@ export default function DatabasesRAGPage() {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
+    // Validar formato y tamaño ANTES de subir — feedback inmediato
+    const validFiles: File[] = [];
+    for (const file of Array.from(files)) {
+      const error = validateRagFile(file.name, file.size);
+      if (error) {
+        addToast({
+          title: `No se puede subir "${file.name}"`,
+          description: error,
+          color: "danger",
+        });
+      } else {
+        validFiles.push(file);
+      }
+    }
+
+    if (validFiles.length === 0) {
+      event.target.value = "";
+      return;
+    }
+
     setUploadingFiles(prev => ({ ...prev, [storageId]: true }));
 
     let uploadedCount = 0;
@@ -122,7 +144,7 @@ export default function DatabasesRAGPage() {
 
     try {
       // Procesar cada archivo
-      for (const file of Array.from(files)) {
+      for (const file of validFiles) {
         const formData = new FormData();
         formData.append("storageId", storageId);
         formData.append("file", file);
@@ -200,6 +222,48 @@ export default function DatabasesRAGPage() {
     }
   };
 
+  // Reindexa en Gemini File Search los archivos pendientes/fallidos del storage
+  // usando los respaldos del bucket (no requiere volver a subir los archivos)
+  const handleReprocess = async (storageId: string) => {
+    setReprocessingStorages(prev => ({ ...prev, [storageId]: true }));
+    setStorages(prev => prev.map(s => s.id === storageId ? { ...s, status: "processing" as const } : s));
+
+    try {
+      const response = await fetch("/api/rag/storage/reprocess", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storageId }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Error al reprocesar");
+      }
+
+      const failedDetail = (result.files || [])
+        .filter((f: any) => f.state === "FAILED")
+        .map((f: any) => f.fileName)
+        .join(", ");
+
+      addToast({
+        title: result.failed > 0 ? "Reproceso con errores" : "Reproceso completado",
+        description: `${result.processed} indexado(s), ${result.skipped} sin cambios, ${result.failed} fallido(s)${failedDetail ? `: ${failedDetail}` : ""}`,
+        color: result.failed > 0 ? "warning" : "success",
+      });
+    } catch (error: any) {
+      console.error("Error reprocessing storage:", error);
+      addToast({
+        title: "Error",
+        description: error.message || "Error al reprocesar el storage",
+        color: "danger",
+      });
+    } finally {
+      setReprocessingStorages(prev => ({ ...prev, [storageId]: false }));
+      await fetchStorages(true);
+    }
+  };
+
   const openDeleteModal = (storage: DocumentStorage) => {
     setStorageToDelete(storage);
     setIsDeleteModalOpen(true);
@@ -272,9 +336,9 @@ export default function DatabasesRAGPage() {
                 </h3>
                 <p>
                   <Text isAdmin={true} variant="body" color="#265197">
-                    Los documentos se suben a Gemini File API y se procesan automáticamente.
-                    Gemini genera los embeddings y realiza búsquedas vectoriales internamente,
-                    proporcionando respuestas contextualizadas en el chat.
+                    Los documentos se indexan en Gemini File Search: Gemini genera los
+                    embeddings (gemini-embedding-001) y hace la búsqueda semántica.
+                    El índice es persistente y el chat responde solo con los fragmentos relevantes.
                   </Text>
                 </p>
               </div>
@@ -441,11 +505,12 @@ export default function DatabasesRAGPage() {
                     </div>
                   </CardBody>
 
-                  <CardFooter className="p-4 pt-0">
+                  <CardFooter className="p-4 pt-0 flex-col gap-1">
+                    <div className="flex gap-2 w-full">
                     {/* Upload Button */}
                     <label
                       onClick={(e) => e.stopPropagation()}
-                      className={`w-full flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-[#265197] text-[#265197] rounded-lg hover:bg-blue-50 transition-colors cursor-pointer ${uploadingFiles[storage.id] ? "opacity-50 cursor-not-allowed" : ""
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-[#265197] text-[#265197] rounded-lg hover:bg-blue-50 transition-colors cursor-pointer ${uploadingFiles[storage.id] ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                     >
                       {uploadingFiles[storage.id] ? (
@@ -464,12 +529,45 @@ export default function DatabasesRAGPage() {
                       <input
                         type="file"
                         multiple
-                        accept=".pdf,.txt,.doc,.docx,.md"
+                        accept={ACCEPT_ATTRIBUTE}
                         onChange={(e) => handleFileUpload(storage.id, e)}
                         disabled={uploadingFiles[storage.id]}
                         className="hidden"
                       />
                     </label>
+
+                    {/* Reprocess Button */}
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!reprocessingStorages[storage.id]) {
+                          handleReprocess(storage.id);
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if ((e.key === 'Enter' || e.key === ' ') && !reprocessingStorages[storage.id]) {
+                          e.stopPropagation();
+                          handleReprocess(storage.id);
+                        }
+                      }}
+                      title="Reindexar archivos pendientes desde el respaldo"
+                      className={`flex items-center justify-center px-3 py-2 border-2 border-[#265197] text-[#265197] rounded-lg hover:bg-blue-50 transition-colors cursor-pointer ${reprocessingStorages[storage.id] ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                    >
+                      <Icon
+                        name="RefreshCw"
+                        size={20}
+                        className={reprocessingStorages[storage.id] ? "animate-spin" : ""}
+                      />
+                    </div>
+                    </div>
+
+                    {/* Límites visibles para el usuario */}
+                    <p className="text-[11px] text-gray-400 text-center w-full">
+                      {LIMITS_LABEL}
+                    </p>
                   </CardFooter>
                 </Card>
               ))
