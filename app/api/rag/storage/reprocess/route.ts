@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import {
   createFileSearchStore,
   uploadToFileSearchStore,
+  fileSearchStoreExists,
   isRealStoreName,
   resolveMimeType,
   friendlyAIError,
@@ -23,17 +24,22 @@ export const maxDuration = 300;
  * - Archivos huérfanos en bucket sin fila en storage_files → fila creada + indexado
  * - Filas sin respaldo en bucket → marcadas FAILED (requieren re-subida manual)
  *
- * Body: { storageId: string, force?: boolean }  (force reindexa también los ACTIVE)
+ * Body: { storageId: string, force?: boolean, resetStore?: boolean }
+ * - force: reindexa también los ACTIVE
+ * - resetStore: crea un store NUEVO con la key actual (para cambio de key
+ *   a otro proyecto Google, donde los stores viejos no son accesibles)
  */
 export async function POST(request: Request) {
   const supabase = createRouteHandlerClient({ cookies });
 
   let storageId: string | null = null;
   let force = false;
+  let resetStore = false;
   try {
     const body = await request.json();
     storageId = body.storageId;
     force = !!body.force;
+    resetStore = !!body.resetStore;
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
@@ -74,12 +80,25 @@ export async function POST(request: Request) {
     // ================================================================
 
     let storeName = storage.gemini_vector_store_id;
-    if (!isRealStoreName(storeName)) {
+    // Store nuevo si: se pide reset, no hay store real, o el store existente
+    // pertenece a otro proyecto Google y la key actual no lo ve (auto-curación)
+    const needsNewStore =
+      resetStore ||
+      !isRealStoreName(storeName) ||
+      !(await fileSearchStoreExists(apiKey, storeName as string));
+
+    if (needsNewStore) {
+      const isOrphanStore = !resetStore && isRealStoreName(storeName);
       storeName = await createFileSearchStore(apiKey, storage.name);
       await supabase
         .from("document_storages")
         .update({ gemini_vector_store_id: storeName })
         .eq("id", storageId);
+      if (isOrphanStore) {
+        // El store viejo quedó inaccesible: reindexar todo en el nuevo
+        force = true;
+        console.log("⚠️ Store anterior inaccesible con la key actual; se creó uno nuevo y se reindexa todo");
+      }
     }
 
     // ================================================================

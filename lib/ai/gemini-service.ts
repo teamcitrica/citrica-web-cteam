@@ -286,6 +286,21 @@ export async function uploadToFileSearchStore(
 }
 
 /**
+ * Verifica si una key puede acceder a un File Search store.
+ * Los stores pertenecen al proyecto Google de la key que los creó:
+ * una key de otro proyecto no los ve (403/404) y requiere reindexar.
+ */
+export async function fileSearchStoreExists(apiKey: string, storeName: string): Promise<boolean> {
+  const ai = new GoogleGenAI({ apiKey });
+  try {
+    await ai.fileSearchStores.get({ name: storeName });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Elimina un documento de un File Search store. Tolera not-found
  * (el documento pudo haberse borrado desde otra sesión).
  */
