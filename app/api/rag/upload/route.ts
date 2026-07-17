@@ -2,34 +2,68 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import {
-  uploadFileToGemini,
-  createVectorStore,
+  createFileSearchStore,
+  uploadToFileSearchStore,
+  isRealStoreName,
+  resolveMimeType,
+  friendlyAIError,
+  FILE_SEARCH_INDEXING_PER_1M,
 } from "@/lib/ai/gemini-service";
+import { getGeminiApiKey } from "@/lib/ai/gemini-api-key";
+import { validateRagFile, prepareForIndexing } from "@/lib/ai/rag-file-support";
+
+// El poll de indexación puede tardar hasta 2 minutos
+export const maxDuration = 300;
 
 /**
- * POST - Subir archivo a Gemini File API y Supabase Storage
+ * POST - Subir documento al RAG
  * Flujo:
- * 1. Guardar archivo en Supabase Storage (para recuperación futura)
- * 2. Subir archivo a Gemini File API (para RAG)
- * 3. Crear/asociar Vector Store si es necesario
- * 4. Guardar metadata en base de datos
+ * 1. Guardar archivo en Supabase Storage (respaldo, permite reindexar)
+ * 2. Registrar fila en storage_files (PROCESSING) — antes de Gemini, así
+ *    un fallo de indexación nunca deja archivos huérfanos en el bucket
+ * 3. Indexar en el File Search store del storage (embeddings por Gemini)
+ * 4. Actualizar fila con el resultado
  */
 export async function POST(request: Request) {
+  const supabase = createRouteHandlerClient({ cookies });
+
+  // Leer el form ANTES del try: el catch necesita storageId, y el body
+  // solo puede consumirse una vez
+  let storageId: string | null = null;
+  let file: File | null = null;
   try {
-    const supabase = createRouteHandlerClient({ cookies });
     const formData = await request.formData();
+    storageId = formData.get("storageId") as string;
+    file = formData.get("file") as File;
+  } catch {
+    return NextResponse.json({ error: "Invalid form data" }, { status: 400 });
+  }
 
-    const storageId = formData.get("storageId") as string;
-    const file = formData.get("file") as File;
+  if (!storageId || !file) {
+    return NextResponse.json(
+      { error: "Storage ID and file are required" },
+      { status: 400 }
+    );
+  }
 
-    if (!storageId || !file) {
+  // Validación espejo de la del cliente (formato + tamaño)
+  const validationError = validateRagFile(file.name, file.size);
+  if (validationError) {
+    return NextResponse.json({ error: validationError }, { status: 400 });
+  }
+
+  let fileRecordId: string | null = null;
+
+  try {
+    console.log("📦 Processing file:", file.name, "for storage:", storageId);
+
+    const apiKey = await getGeminiApiKey(supabase);
+    if (!apiKey) {
       return NextResponse.json(
-        { error: "Storage ID and file are required" },
+        { error: "No hay API key de Gemini configurada. Configura una en /admin/ia/config" },
         { status: 400 }
       );
     }
-
-    console.log("📦 Processing file:", file.name, "for storage:", storageId);
 
     // Actualizar estado del storage a "processing"
     await supabase
@@ -38,17 +72,18 @@ export async function POST(request: Request) {
       .eq("id", storageId);
 
     // ================================================================
-    // 1. GUARDAR ARCHIVO EN SUPABASE STORAGE (para recuperación)
+    // 1. GUARDAR ARCHIVO EN SUPABASE STORAGE (respaldo)
     // ================================================================
 
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const fileName = `${storageId}/${Date.now()}_${file.name}`;
+    const bucketPath = `${storageId}/${Date.now()}_${file.name}`;
+    const mimeType = resolveMimeType(file.name, file.type);
 
     console.log("💾 Guardando archivo en Supabase Storage...");
     const { error: uploadError } = await supabase.storage
       .from("rag-documents")
-      .upload(fileName, fileBuffer, {
-        contentType: file.type,
+      .upload(bucketPath, fileBuffer, {
+        contentType: mimeType,
         cacheControl: "3600",
       });
 
@@ -57,15 +92,14 @@ export async function POST(request: Request) {
       throw new Error(`Error guardando archivo: ${uploadError.message}`);
     }
 
-    // Obtener URL pública del archivo
     const {
       data: { publicUrl },
-    } = supabase.storage.from("rag-documents").getPublicUrl(fileName);
+    } = supabase.storage.from("rag-documents").getPublicUrl(bucketPath);
 
     console.log("✅ Archivo guardado en Supabase:", publicUrl);
 
     // ================================================================
-    // 2. VERIFICAR/CREAR VECTOR STORE EN GEMINI
+    // 2. ASEGURAR FILE SEARCH STORE REAL
     // ================================================================
 
     const { data: storageData } = await supabase
@@ -74,56 +108,33 @@ export async function POST(request: Request) {
       .eq("id", storageId)
       .single();
 
-    let vectorStoreId = storageData?.gemini_vector_store_id;
+    let storeName = storageData?.gemini_vector_store_id;
 
-    // Si no existe Vector Store, crearlo
-    if (!vectorStoreId) {
-      console.log("🗄️ Creando nuevo Vector Store para este storage...");
-      vectorStoreId = await createVectorStore(storageData?.name || "Unnamed Storage");
-
-      // Guardar Vector Store ID en la base de datos
+    if (!isRealStoreName(storeName)) {
+      storeName = await createFileSearchStore(apiKey, storageData?.name || "Unnamed Storage");
       await supabase
         .from("document_storages")
-        .update({ gemini_vector_store_id: vectorStoreId })
+        .update({ gemini_vector_store_id: storeName })
         .eq("id", storageId);
-
-      console.log("✅ Vector Store creado:", vectorStoreId);
     }
 
     // ================================================================
-    // 3. SUBIR ARCHIVO A GEMINI FILE API
+    // 3. REGISTRAR FILA ANTES DE INDEXAR (evita huérfanos en bucket)
     // ================================================================
 
-    console.log("📤 Subiendo archivo a Gemini File API...");
-    const geminiFile = await uploadFileToGemini(
-      fileBuffer,
-      file.type || "text/plain",
-      file.name
-    );
+    const estimatedTokens = Math.ceil(file.size / 4); // estimación; File Search no reporta tokens exactos
+    const estimatedCost = (estimatedTokens / 1_000_000) * FILE_SEARCH_INDEXING_PER_1M;
 
-    console.log("✅ Archivo subido a Gemini:", geminiFile.uri);
-
-    // ================================================================
-    // 4. GUARDAR METADATA EN BASE DE DATOS
-    // ================================================================
-
-    // Calcular tokens usados (aproximación basada en tamaño)
-    const estimatedTokens = Math.ceil(parseInt(geminiFile.sizeBytes) / 4);
-    const estimatedCost = estimatedTokens * 0.00001; // Costo aproximado
-
-    // Crear registro del archivo
     const { data: fileRecord, error: fileError } = await supabase
       .from("storage_files")
       .insert({
         storage_id: storageId,
         file_name: file.name,
         file_size: file.size,
-        file_type: file.type,
+        file_type: mimeType,
         file_url: publicUrl,
-        gemini_file_uri: geminiFile.uri,
-        gemini_file_name: geminiFile.name,
-        gemini_file_state: geminiFile.state,
-        processed: geminiFile.state === "ACTIVE",
+        gemini_file_state: "PROCESSING",
+        processed: false,
         tokens_used: estimatedTokens,
         processing_cost_usd: estimatedCost,
       })
@@ -134,8 +145,31 @@ export async function POST(request: Request) {
       console.error("Error creating file record:", fileError);
       throw fileError;
     }
+    fileRecordId = fileRecord.id;
 
-    console.log("✅ Registro de archivo creado:", fileRecord.id);
+    // ================================================================
+    // 4. INDEXAR EN FILE SEARCH (chunking + embeddings por Gemini)
+    // Excel se convierte a texto CSV por hoja; el original queda en el bucket
+    // ================================================================
+
+    const indexable = await prepareForIndexing(fileBuffer, file.name, mimeType);
+
+    const { documentName, state } = await uploadToFileSearchStore(apiKey, {
+      storeName: storeName as string,
+      buffer: indexable.buffer,
+      displayName: indexable.displayName,
+      mimeType: indexable.mimeType,
+    });
+
+    await supabase
+      .from("storage_files")
+      .update({
+        gemini_document_name: documentName,
+        gemini_file_state: state,
+        processed: state === "ACTIVE",
+        error_message: null,
+      })
+      .eq("id", fileRecord.id);
 
     // Actualizar contadores del storage
     await supabase.rpc("increment_storage_usage", {
@@ -144,7 +178,6 @@ export async function POST(request: Request) {
       p_cost: estimatedCost,
     });
 
-    // Actualizar estado del storage a "ready"
     await supabase
       .from("document_storages")
       .update({ status: "ready" })
@@ -154,31 +187,30 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      file: fileRecord,
-      geminiFile: {
-        uri: geminiFile.uri,
-        name: geminiFile.name,
-        state: geminiFile.state,
-      },
-      vectorStoreId,
+      file: { ...fileRecord, gemini_document_name: documentName, gemini_file_state: state },
+      vectorStoreId: storeName,
       tokensUsed: estimatedTokens,
       estimatedCost,
     });
   } catch (error: any) {
     console.error("❌ Error uploading document:", error);
 
-    // Si hay error, actualizar estado del storage a "error"
+    // Marcar el archivo como FAILED (si alcanzó a registrarse) y el storage en error
     try {
-      const formData = await request.formData();
-      const storageId = formData.get("storageId") as string;
-
-      if (storageId) {
-        const supabase = createRouteHandlerClient({ cookies });
+      if (fileRecordId) {
         await supabase
-          .from("document_storages")
-          .update({ status: "error" })
-          .eq("id", storageId);
+          .from("storage_files")
+          .update({
+            gemini_file_state: "FAILED",
+            processed: false,
+            error_message: friendlyAIError(error),
+          })
+          .eq("id", fileRecordId);
       }
+      await supabase
+        .from("document_storages")
+        .update({ status: "error" })
+        .eq("id", storageId);
     } catch (e) {
       console.error("Error updating storage status:", e);
     }

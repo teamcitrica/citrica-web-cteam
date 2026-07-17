@@ -2,34 +2,36 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+function maskKey(key: string): string {
+  return `${key.slice(0, 7)}...${key.slice(-4)}`;
+}
+
 /**
- * GET - Obtener configuración de API actual
+ * GET - Listar todas las API keys configuradas (enmascaradas)
  */
 export async function GET() {
   try {
     const supabase = createRouteHandlerClient({ cookies });
 
-    const { data: config, error } = await supabase
+    const { data: configs, error } = await supabase
       .from("api_config")
-      .select("*")
+      .select("id, provider, name, api_key, is_active, is_selected, verification_status, last_verified_at, error_message, metadata, updated_at")
       .eq("provider", "gemini")
-      .single();
+      .order("created_at", { ascending: true });
 
-    if (error && error.code !== 'PGRST116') throw error;
+    if (error) throw error;
 
-    // No devolver la API key completa por seguridad, solo los últimos 4 caracteres
-    if (config && config.api_key) {
-      const maskedKey = `${config.api_key.slice(0, 7)}...${config.api_key.slice(-4)}`;
-      return NextResponse.json({
-        config: {
-          ...config,
-          api_key: maskedKey,
-          api_key_full: config.api_key, // Solo para uso interno
-        }
-      });
-    }
+    const keys = (configs || []).map((c) => ({
+      ...c,
+      api_key: maskKey(c.api_key),
+      models_count: c.metadata?.total_models ?? null,
+      available_models: c.metadata?.available_models ?? [],
+    }));
 
-    return NextResponse.json({ config: null });
+    // Compatibilidad con consumidores del formato viejo: config = key seleccionada
+    const selected = keys.find((k) => k.is_selected) || null;
+
+    return NextResponse.json({ keys, config: selected });
   } catch (error: any) {
     console.error("Error fetching API config:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -37,14 +39,16 @@ export async function GET() {
 }
 
 /**
- * POST - Crear o actualizar configuración de API
+ * POST - Agregar una API key: verifica contra Gemini, detecta sus modelos y guarda.
+ * Body: { api_key: string, name?: string }
+ * Si es la primera key del proveedor, queda seleccionada automáticamente.
  */
 export async function POST(request: Request) {
   try {
     const supabase = createRouteHandlerClient({ cookies });
     const body = await request.json();
 
-    const { api_key } = body;
+    const { api_key, name } = body;
 
     if (!api_key) {
       return NextResponse.json(
@@ -53,21 +57,33 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verificar que la API key funciona
+    const keyName = (name || "Principal").trim();
+
+    // Verificar que la API key funciona y qué modelos tiene
     const verificationResult = await verifyApiKey(api_key);
+
+    // ¿Es la primera key del proveedor? → seleccionarla
+    const { count } = await supabase
+      .from("api_config")
+      .select("id", { count: "exact", head: true })
+      .eq("provider", "gemini");
+
+    const isFirst = (count || 0) === 0;
 
     const { data: config, error } = await supabase
       .from("api_config")
       .upsert({
         provider: "gemini",
+        name: keyName,
         api_key,
         is_active: verificationResult.isValid,
+        is_selected: isFirst,
         last_verified_at: new Date().toISOString(),
         verification_status: verificationResult.isValid ? "valid" : "invalid",
         error_message: verificationResult.error || null,
         metadata: verificationResult.metadata || {},
       }, {
-        onConflict: "provider"
+        onConflict: "provider,name",
       })
       .select()
       .single();
@@ -75,11 +91,101 @@ export async function POST(request: Request) {
     if (error) throw error;
 
     return NextResponse.json({
-      config,
-      verification: verificationResult
+      config: { ...config, api_key: maskKey(config.api_key) },
+      verification: verificationResult,
     });
   } catch (error: any) {
     console.error("Error saving API config:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+/**
+ * PATCH - Seleccionar qué key usa el sistema.
+ * Body: { id: string }
+ */
+export async function PATCH(request: Request) {
+  try {
+    const supabase = createRouteHandlerClient({ cookies });
+    const { id } = await request.json();
+
+    if (!id) {
+      return NextResponse.json({ error: "id is required" }, { status: 400 });
+    }
+
+    const { data: target, error: fetchError } = await supabase
+      .from("api_config")
+      .select("id, provider, verification_status")
+      .eq("id", id)
+      .single();
+
+    if (fetchError || !target) {
+      return NextResponse.json({ error: "Key not found" }, { status: 404 });
+    }
+
+    if (target.verification_status !== "valid") {
+      return NextResponse.json(
+        { error: "No se puede seleccionar una key inválida. Verifícala primero." },
+        { status: 400 }
+      );
+    }
+
+    // Deseleccionar todas y seleccionar la elegida
+    await supabase
+      .from("api_config")
+      .update({ is_selected: false })
+      .eq("provider", target.provider);
+
+    const { error: selectError } = await supabase
+      .from("api_config")
+      .update({ is_selected: true })
+      .eq("id", id);
+
+    if (selectError) throw selectError;
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("Error selecting API key:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+/**
+ * DELETE - Eliminar una key (?id=...). No permite borrar la seleccionada.
+ */
+export async function DELETE(request: Request) {
+  try {
+    const supabase = createRouteHandlerClient({ cookies });
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json({ error: "id is required" }, { status: 400 });
+    }
+
+    const { data: target } = await supabase
+      .from("api_config")
+      .select("id, is_selected")
+      .eq("id", id)
+      .single();
+
+    if (!target) {
+      return NextResponse.json({ error: "Key not found" }, { status: 404 });
+    }
+
+    if (target.is_selected) {
+      return NextResponse.json(
+        { error: "No puedes eliminar la key en uso. Selecciona otra primero." },
+        { status: 400 }
+      );
+    }
+
+    const { error } = await supabase.from("api_config").delete().eq("id", id);
+    if (error) throw error;
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("Error deleting API key:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

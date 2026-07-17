@@ -10,6 +10,18 @@ interface Message {
   timestamp?: Date;
 }
 
+const INITIAL_MESSAGE_CONTENT =
+  "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?";
+
+const makeInitialMessages = (): Message[] => [
+  {
+    id: "initial",
+    role: "assistant",
+    content: INITIAL_MESSAGE_CONTENT,
+    timestamp: new Date(),
+  },
+];
+
 export default function ChatPage() {
   const [selectedDatabase, setSelectedDatabase] = useState<string>("all");
   const [storages, setStorages] = useState<any[]>([]);
@@ -20,15 +32,8 @@ export default function ChatPage() {
   const [costUsed, setCostUsed] = useState<number>(0);
   const [selectedModel, setSelectedModel] = useState<string>("");
   const [availableModels, setAvailableModels] = useState<any[]>([]);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "initial",
-      role: "assistant",
-      content:
-        "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?",
-      timestamp: new Date(),
-    },
-  ]);
+  const [showSettings, setShowSettings] = useState(false);
+  const [messages, setMessages] = useState<Message[]>(makeInitialMessages());
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -99,24 +104,9 @@ export default function ChatPage() {
           role: msg.role,
           content: msg.content,
         }));
-        setMessages([
-          {
-            id: "initial",
-            role: "assistant",
-            content:
-              "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?",
-          },
-          ...formattedMessages,
-        ]);
+        setMessages([...makeInitialMessages(), ...formattedMessages]);
       } else {
-        setMessages([
-          {
-            id: "initial",
-            role: "assistant",
-            content:
-              "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?",
-          },
-        ]);
+        setMessages(makeInitialMessages());
       }
     } catch (error) {
       console.error("Error fetching chat history:", error);
@@ -139,14 +129,7 @@ export default function ChatPage() {
 
     // Si es "all", no cargar historial, empezar limpio
     if (dbId === "all") {
-      setMessages([
-        {
-          id: "initial",
-          role: "assistant",
-          content:
-            "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?",
-        },
-      ]);
+      setMessages(makeInitialMessages());
     } else {
       // Para bases de datos específicas, cargar su historial
       fetchChatHistory(dbId);
@@ -163,14 +146,7 @@ export default function ChatPage() {
       });
 
       if (response.ok) {
-        setMessages([
-          {
-            id: "initial",
-            role: "assistant",
-            content:
-              "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?",
-          },
-        ]);
+        setMessages(makeInitialMessages());
         setIsDeleteModalOpen(false);
       } else {
         alert("Error al eliminar el historial");
@@ -231,7 +207,13 @@ export default function ChatPage() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Error: ${response.statusText}`);
+        let serverMessage = "";
+        try {
+          serverMessage = JSON.parse(errorText)?.error || "";
+        } catch {
+          // El body no era JSON, usar el mensaje genérico
+        }
+        throw new Error(serverMessage || `Error ${response.status}: ${response.statusText}`);
       }
 
       // Leer el stream
@@ -264,6 +246,21 @@ export default function ChatPage() {
         );
       }
 
+      // Stream terminó sin texto: avisar en vez de dejar la burbuja vacía
+      if (accumulatedText.trim() === "") {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantMessageId
+              ? {
+                  ...msg,
+                  content:
+                    "⚠️ El modelo no devolvió respuesta. Puede ser un límite de tokens muy bajo (perfil 'Concisa') o un problema con la API. Intenta con otro perfil o modelo.",
+                }
+              : msg
+          )
+        );
+      }
+
     } catch (error: any) {
       if (error.name === "AbortError") {
         return;
@@ -277,7 +274,11 @@ export default function ChatPage() {
           msg.id === assistantMessageId
             ? {
                 ...msg,
-                content: `❌ Lo siento, ocurrió un error al procesar tu mensaje. ${error.message || "Por favor intenta de nuevo."}`,
+                // Los mensajes del servidor ya vienen formateados con ⚠️/❌
+                content:
+                  error.message?.startsWith("⚠️") || error.message?.startsWith("❌")
+                    ? error.message
+                    : `❌ Lo siento, ocurrió un error al procesar tu mensaje. ${error.message || "Por favor intenta de nuevo."}`,
               }
             : msg
         )
@@ -291,7 +292,7 @@ export default function ChatPage() {
         fetchStorages();
       }, 500);
     }
-  }, [input, isLoading, messages, selectedDatabase, responseProfile, fetchStorages]);
+  }, [input, isLoading, messages, selectedDatabase, responseProfile, selectedModel, fetchStorages]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -322,18 +323,81 @@ export default function ChatPage() {
     }, 0);
   }, [messages, handleSubmit]);
 
+  const selectedDatabaseName =
+    selectedDatabase === "all"
+      ? "Todas las bases"
+      : storages.find((s) => s.id === selectedDatabase)?.name || "";
+  const selectedModelName =
+    availableModels.find((m) => m.model_id === selectedModel)?.display_name || selectedModel;
+  const messagesSent = Math.max(1, Math.floor(messages.length / 2));
+
   return (
     <Container>
       <Col noPadding cols={{ lg: 12, md: 6, sm: 4 }}>
-        <div className="h-[calc(100vh-120px)] flex flex-col">
-          <h1 className="text-2xl font-bold text-[#265197]">
-            <Text isAdmin={true} variant="title" weight="bold" color="#678CC5">IA</Text> {'>'}  <Text isAdmin={true} variant="title" weight="bold" color="#16305A">Chat RAG</Text>
-          </h1>
+        <div className="h-[calc(100vh-100px)] flex flex-col">
+          {/* Header compacto: título + stats + acciones */}
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <h1 className="text-2xl font-bold text-[#265197]">
+              <Text isAdmin={true} variant="title" weight="bold" color="#678CC5">IA</Text> {'>'}  <Text isAdmin={true} variant="title" weight="bold" color="#16305A">Chat RAG</Text>
+            </h1>
 
-          {/* Selectores */}
-          <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
-            {/* Selector de Base de Datos */}
-            <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Stats compactas */}
+              <div
+                className="flex items-center gap-1 px-2 py-1 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700"
+                title="Tokens usados (entrada + salida). Los límites de Gemini son dinámicos según tu tier de cuenta."
+              >
+                <Icon name="Zap" size={14} color="#2563eb" />
+                <span className="font-semibold">{tokensUsed.toLocaleString()}</span>
+              </div>
+              <div
+                className="flex items-center gap-1 px-2 py-1 bg-green-50 border border-green-200 rounded-lg text-xs text-green-700"
+                title="Costo total acumulado (USD)"
+              >
+                <Icon name="DollarSign" size={14} color="#16a34a" />
+                <span className="font-semibold">${costUsed.toFixed(4)}</span>
+              </div>
+              <div
+                className="hidden md:flex items-center gap-1 px-2 py-1 bg-purple-50 border border-purple-200 rounded-lg text-xs text-purple-700"
+                title={`Promedio por mensaje (~${messages.length > 1 ? Math.floor(tokensUsed / messagesSent).toLocaleString() : "0"} tokens)`}
+              >
+                <Icon name="TrendingUp" size={14} color="#9333ea" />
+                <span className="font-semibold">
+                  ${messages.length > 1 ? (costUsed / messagesSent).toFixed(4) : "0.0000"}/msg
+                </span>
+              </div>
+
+              {/* Toggle de configuración */}
+              <button
+                type="button"
+                onClick={() => setShowSettings((prev) => !prev)}
+                className={`flex items-center gap-1 px-3 py-1.5 border rounded-lg text-xs transition-colors ${
+                  showSettings
+                    ? "bg-[#265197] border-[#265197] text-white"
+                    : "bg-white border-[#D4DEED] text-[#265197] hover:bg-blue-50"
+                }`}
+                title="Mostrar / ocultar configuración"
+              >
+                <Icon name="SlidersHorizontal" size={14} color={showSettings ? "white" : "#265197"} />
+                <span>Configuración</span>
+              </button>
+
+              {/* Eliminar historial */}
+              <button
+                type="button"
+                onClick={() => setIsDeleteModalOpen(true)}
+                className="flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                title="Eliminar historial"
+              >
+                <Icon name="Trash2" size={14} color="white" />
+              </button>
+            </div>
+          </div>
+
+          {/* Panel de configuración colapsable */}
+          {showSettings ? (
+            <div className="mb-2 grid grid-cols-1 md:grid-cols-3 gap-2">
+              {/* Selector de Base de Datos */}
               <Select
                 label="Base de Datos"
                 selectedKeys={[selectedDatabase]}
@@ -357,10 +421,8 @@ export default function ChatPage() {
                   }))
                 ]}
               />
-            </div>
 
-            {/* Selector de Modelo IA */}
-            <div>
+              {/* Selector de Modelo IA */}
               <Select
                 label="Modelo IA"
                 selectedKeys={selectedModel ? [selectedModel] : []}
@@ -381,10 +443,8 @@ export default function ChatPage() {
                   label: model.display_name,
                 }))}
               />
-            </div>
 
-            {/* Selector de Perfil de Respuesta */}
-            <div>
+              {/* Selector de Perfil de Respuesta */}
               <Select
                 label="Calidad de Respuesta"
                 selectedKeys={[responseProfile]}
@@ -408,86 +468,25 @@ export default function ChatPage() {
                 ]}
               />
             </div>
-
-            {/* Botón de eliminar historial */}
-            <div className="flex items-center justify-center">
-              <Button
-                isAdmin
-                onClick={() => setIsDeleteModalOpen(true)}
-                variant="secondary"
-                style={{ backgroundColor: "#dc2626", color: "white", minWidth: "auto" }}
-              >
-                <Icon name="Trash2" size={16} />
-              </Button>
+          ) : (
+            /* Resumen de selección actual cuando el panel está cerrado */
+            <div className="mb-2 flex items-center gap-2 flex-wrap text-xs text-[#678CC5]">
+              <span className="flex items-center gap-1">
+                <Icon name="Database" size={12} color="#678CC5" />
+                {selectedDatabaseName}
+              </span>
+              <span className="text-[#D4DEED]">|</span>
+              <span className="flex items-center gap-1">
+                <Icon name="Bot" size={12} color="#678CC5" />
+                {selectedModelName || "Modelo por defecto"}
+              </span>
+              <span className="text-[#D4DEED]">|</span>
+              <span className="capitalize">{responseProfile}</span>
             </div>
-          </div>
-
-          {/* Estadísticas de Uso */}
-          <div className="mb-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-            {/* Tokens Usados */}
-            <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Icon name="Zap" size={18} color="#2563eb" />
-                <Text isAdmin={true} variant="label" color="#1e40af">
-                  Tokens Usados
-                </Text>
-              </div>
-              <div className="text-2xl font-bold text-blue-600">
-                {tokensUsed.toLocaleString()}
-              </div>
-              <div className="text-xs text-gray-600 mt-1">
-                Entrada + Salida
-              </div>
-            </div>
-
-            {/* Costo Total */}
-            <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Icon name="DollarSign" size={18} color="#16a34a" />
-                <Text isAdmin={true} variant="label" color="#15803d">
-                  Costo Total
-                </Text>
-              </div>
-              <div className="text-2xl font-bold text-green-600">
-                ${costUsed.toFixed(4)}
-              </div>
-              <div className="text-xs text-gray-600 mt-1">
-                USD acumulado
-              </div>
-            </div>
-
-            {/* Costo Promedio por Mensaje */}
-            <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <Icon name="TrendingUp" size={18} color="#9333ea" />
-                <Text isAdmin={true} variant="label" color="#7e22ce">
-                  Promedio/Mensaje
-                </Text>
-              </div>
-              <div className="text-2xl font-bold text-purple-600">
-                ${messages.length > 1 ? (costUsed / Math.max(1, Math.floor(messages.length / 2))).toFixed(4) : "0.0000"}
-              </div>
-              <div className="text-xs text-gray-600 mt-1">
-                ~{messages.length > 1 ? Math.floor(tokensUsed / Math.max(1, Math.floor(messages.length / 2))).toLocaleString() : "0"} tokens
-              </div>
-            </div>
-          </div>
-
-          {/* Info sobre límites */}
-          <div className="mb-4 px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg">
-            <div className="flex items-start gap-2">
-              <Icon name="Info" size={16} color="#d97706" className="mt-0.5" />
-              <div className="text-xs text-amber-800">
-                <strong>Nota:</strong> Gemini no tiene un límite público fijo de tokens. Los límites son dinámicos según tu tier de cuenta.
-                {selectedDatabase === "all"
-                  ? " Mostrando uso total de todas las bases de datos."
-                  : " Mostrando uso de la base de datos seleccionada."}
-              </div>
-            </div>
-          </div>
+          )}
 
           {/* Área de Mensajes */}
-          <div className="flex-1 overflow-y-auto bg-white border border-gray-200 rounded-lg p-4 mb-4 space-y-4">
+          <div className="flex-1 overflow-y-auto bg-white border border-gray-200 rounded-lg p-4 mb-3 space-y-4">
             {isLoadingHistory ? (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
@@ -604,14 +603,6 @@ export default function ChatPage() {
               )}
             </Button>
           </form>
-
-          {/* Información adicional */}
-          <div className="mt-3 text-xs text-gray-500 text-center">
-            <Text variant="label" weight="light" className="text-gray-500">
-              💡 Este chat utiliza RAG (Retrieval-Augmented Generation) con embeddings
-              de Gemini para proporcionar respuestas contextualizadas
-            </Text>
-          </div>
         </div>
       </Col>
 

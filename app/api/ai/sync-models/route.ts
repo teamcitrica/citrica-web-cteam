@@ -1,31 +1,25 @@
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getGeminiApiKey } from "@/lib/ai/gemini-api-key";
 
 /**
  * POST - Sincronizar modelos disponibles desde la API de Gemini
- * Obtiene la lista real de modelos desde Gemini API
+ * Usa la key seleccionada en configuración (cada key puede tener modelos distintos)
  */
 export async function POST() {
   try {
     const supabase = createRouteHandlerClient({ cookies });
 
-    // Obtener API key configurada
-    const { data: apiConfig } = await supabase
-      .from("api_config")
-      .select("api_key, is_active")
-      .eq("provider", "gemini")
-      .eq("is_active", true)
-      .single();
+    // Key seleccionada en configuración (fallback: env)
+    const apiKey = await getGeminiApiKey(supabase);
 
-    if (!apiConfig || !apiConfig.api_key) {
+    if (!apiKey) {
       return NextResponse.json(
         { error: "No hay API key configurada" },
         { status: 400 }
       );
     }
-
-    const apiKey = apiConfig.api_key;
 
     // Obtener lista de modelos desde Gemini API
     const response = await fetch(

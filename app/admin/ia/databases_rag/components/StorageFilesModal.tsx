@@ -12,6 +12,7 @@ interface StorageFile {
   uploaded_at: string;
   gemini_file_state: string;
   processed: boolean;
+  error_message?: string | null;
 }
 
 interface Props {
@@ -178,6 +179,8 @@ export default function StorageFilesModal({
         return <Icon name="CheckCircle" size={16} color="#22c55e" />;
       case "PROCESSING":
         return <Icon name="Loader2" size={16} color="#eab308" className="animate-spin" />;
+      case "PENDING":
+        return <Icon name="Clock" size={16} color="#f97316" />;
       case "FAILED":
         return <Icon name="AlertCircle" size={16} color="#ef4444" />;
       default:
@@ -191,6 +194,8 @@ export default function StorageFilesModal({
         return "Activo";
       case "PROCESSING":
         return "Procesando";
+      case "PENDING":
+        return "Pendiente de reindexar";
       case "FAILED":
         return "Error";
       default:
@@ -301,6 +306,12 @@ export default function StorageFilesModal({
                             {getStateText(file.gemini_file_state)}
                           </Text>
                         </div>
+                        {/* Motivo del fallo, visible para el usuario */}
+                        {file.gemini_file_state === "FAILED" && file.error_message && (
+                          <p className="text-[11px] text-red-600 mt-1 max-w-[240px]">
+                            {file.error_message}
+                          </p>
+                        )}
                       </td>
                       <td className="py-3 px-2">
                         <div className="flex items-center justify-center gap-2">
