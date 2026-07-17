@@ -1,6 +1,7 @@
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { getGeminiApiKey } from "@/lib/ai/gemini-api-key";
 
 /**
  * GET - Listar TODOS los modelos disponibles en la API de Gemini
@@ -10,22 +11,15 @@ export async function GET() {
   try {
     const supabase = createRouteHandlerClient({ cookies });
 
-    // Obtener API key configurada
-    const { data: apiConfig } = await supabase
-      .from("api_config")
-      .select("api_key")
-      .eq("provider", "gemini")
-      .eq("is_active", true)
-      .single();
+    // Key seleccionada en configuración (fallback: env)
+    const apiKey = await getGeminiApiKey(supabase);
 
-    if (!apiConfig || !apiConfig.api_key) {
+    if (!apiKey) {
       return NextResponse.json(
         { error: "No hay API key configurada" },
         { status: 400 }
       );
     }
-
-    const apiKey = apiConfig.api_key;
 
     // Obtener lista completa de modelos
     const response = await fetch(

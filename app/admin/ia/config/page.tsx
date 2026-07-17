@@ -24,14 +24,25 @@ interface AIModel {
   config: any;
 }
 
+interface ApiKeyEntry {
+  id: string;
+  name: string;
+  api_key: string; // enmascarada
+  is_selected: boolean;
+  verification_status: string;
+  models_count: number | null;
+  error_message?: string | null;
+}
+
 export default function ConfigPage() {
   const [models, setModels] = useState<AIModel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [apiKey, setApiKey] = useState<string>("");
-  const [maskedApiKey, setMaskedApiKey] = useState<string>("");
+  const [apiKeyName, setApiKeyName] = useState<string>("");
+  const [apiKeys, setApiKeys] = useState<ApiKeyEntry[]>([]);
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [apiKeyStatus, setApiKeyStatus] = useState<string>("");
+  const [switchingKeyId, setSwitchingKeyId] = useState<string | null>(null);
   const [syncProgress, setSyncProgress] = useState<{
     step: string;
     current?: number;
@@ -65,9 +76,8 @@ export default function ConfigPage() {
     try {
       const response = await fetch("/api/ai/config");
       const data = await response.json();
-      if (data.config) {
-        setMaskedApiKey(data.config.api_key);
-        setApiKeyStatus(data.config.verification_status);
+      if (data.keys) {
+        setApiKeys(data.keys);
       }
     } catch (error) {
       console.error("Error fetching API config:", error);
@@ -78,43 +88,46 @@ export default function ConfigPage() {
     if (!apiKey.trim()) return;
 
     setIsSyncing(true);
-    setSyncProgress({ step: "Verificando API Key..." });
+    setSyncProgress({ step: "Verificando API Key y detectando modelos..." });
 
     try {
-      console.log("Guardando API key...");
       const response = await fetch("/api/ai/config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ api_key: apiKey }),
+        body: JSON.stringify({
+          api_key: apiKey,
+          name: apiKeyName.trim() || `Key ${apiKeys.length + 1}`,
+        }),
       });
 
       const data = await response.json();
-      console.log("Respuesta del servidor:", data);
 
       if (response.ok) {
         setIsApiKeyModalOpen(false);
         setApiKey("");
+        setApiKeyName("");
         await fetchApiConfig();
 
         if (data.verification && data.verification.isValid) {
+          const modelsCount = data.verification.metadata?.total_models;
           addToast({
-            title: "API Key guardada",
-            description: "Sincronizando modelos disponibles...",
+            title: "✅ API Key verificada y guardada",
+            description: `${modelsCount ?? "?"} modelos en catálogo. Los usables se determinan al ponerla en uso.`,
             color: "success",
           });
 
-          setSyncProgress({ step: "Sincronizando y probando modelos Gemini..." });
-
-          // Sincronizar automáticamente los modelos
-          await handleSyncModels();
+          // Si quedó seleccionada (primera key), sincronizar modelos del sistema
+          if (data.config?.is_selected) {
+            setSyncProgress({ step: "Sincronizando y probando modelos Gemini..." });
+            await handleSyncModels();
+            return;
+          }
         } else {
           addToast({
             title: "API Key guardada con advertencia",
             description: `Falló la verificación: ${data.verification?.error || "Error desconocido"}`,
             color: "warning",
           });
-          setIsSyncing(false);
-          setSyncProgress(null);
         }
       } else {
         addToast({
@@ -122,8 +135,6 @@ export default function ConfigPage() {
           description: data.error || "No se pudo guardar la API Key",
           color: "danger",
         });
-        setIsSyncing(false);
-        setSyncProgress(null);
       }
     } catch (error) {
       console.error("Error saving API key:", error);
@@ -132,8 +143,76 @@ export default function ConfigPage() {
         description: "Error al guardar la API Key",
         color: "danger",
       });
+    } finally {
       setIsSyncing(false);
       setSyncProgress(null);
+    }
+  };
+
+  // Cambiar la key en uso: selecciona y resincroniza los modelos del sistema
+  const handleSelectKey = async (key: ApiKeyEntry) => {
+    if (key.is_selected) return;
+
+    setSwitchingKeyId(key.id);
+    setIsSyncing(true);
+    setSyncProgress({ step: `Cambiando a "${key.name}"...` });
+
+    try {
+      const response = await fetch("/api/ai/config", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: key.id }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo seleccionar la key");
+      }
+
+      await fetchApiConfig();
+      setSyncProgress({ step: "Sincronizando modelos de la nueva key..." });
+      await handleSyncModels();
+
+      addToast({
+        title: `Usando "${key.name}"`,
+        description: "Modelos sincronizados con la nueva key",
+        color: "success",
+      });
+    } catch (error: any) {
+      addToast({
+        title: "Error",
+        description: error.message || "Error al cambiar de key",
+        color: "danger",
+      });
+    } finally {
+      setSwitchingKeyId(null);
+      setIsSyncing(false);
+      setSyncProgress(null);
+    }
+  };
+
+  const handleDeleteKey = async (key: ApiKeyEntry) => {
+    try {
+      const response = await fetch(`/api/ai/config?id=${key.id}`, { method: "DELETE" });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo eliminar la key");
+      }
+
+      await fetchApiConfig();
+      addToast({
+        title: "Key eliminada",
+        description: `"${key.name}" fue eliminada`,
+        color: "success",
+      });
+    } catch (error: any) {
+      addToast({
+        title: "Error",
+        description: error.message || "Error al eliminar la key",
+        color: "danger",
+      });
     }
   };
 
@@ -232,41 +311,99 @@ export default function ConfigPage() {
             </p>
           </div>
 
-          {/* API Key Configuration Card */}
+          {/* API Keys Card — múltiples keys con selector */}
           <Card className="mb-6">
             <CardHeader className="flex flex-col items-start p-4">
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2">
                   <Icon name="Key" size={20} color="#265197" />
                   <Text isAdmin={true} variant="body" weight="bold" color="#16305A">
-                    Configuración de API Key
+                    API Keys de Gemini
                   </Text>
                 </div>
-                {apiKeyStatus === "valid" && (
-                  <Chip size="sm" color="success" variant="flat">
-                    Verificada
-                  </Chip>
-                )}
-                {apiKeyStatus === "invalid" && (
-                  <Chip size="sm" color="danger" variant="flat">
-                    Inválida
-                  </Chip>
-                )}
+                <Chip size="sm" color="primary" variant="flat">
+                  {apiKeys.length} key{apiKeys.length !== 1 ? "s" : ""}
+                </Chip>
               </div>
             </CardHeader>
             <Divider />
             <CardBody className="p-4">
-              <div className="space-y-4">
-                <div>
-                  <Text isAdmin={true} variant="label" color="#4B5563">
-                    API Key Actual
-                  </Text>
-                  <div className="mt-1 text-sm text-gray-600 font-mono bg-gray-50 p-2 rounded">
-                    {maskedApiKey || "No configurada"}
+              <div className="space-y-3">
+                {apiKeys.length === 0 ? (
+                  <div className="text-sm text-gray-500 py-2">
+                    No hay API keys configuradas. Agrega la primera para activar el sistema de IA.
                   </div>
-                </div>
+                ) : (
+                  apiKeys.map((key) => (
+                    <div
+                      key={key.id}
+                      className={`flex items-center justify-between gap-3 p-3 rounded-lg border ${
+                        key.is_selected ? "border-green-400 bg-green-50" : "border-gray-200 bg-gray-50"
+                      }`}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Text isAdmin variant="body" weight="bold" color="#16305A">
+                            {key.name}
+                          </Text>
+                          {key.is_selected && (
+                            <Chip size="sm" color="success" variant="flat">En uso</Chip>
+                          )}
+                          {key.verification_status !== "valid" ? (
+                            <Chip size="sm" color="danger" variant="flat">Inválida</Chip>
+                          ) : key.is_selected ? (
+                            // Key en uso: modelos que pasaron la prueba real (los del grid)
+                            <Chip size="sm" color="primary" variant="flat">
+                              {models.length} modelos usables
+                            </Chip>
+                          ) : (
+                            // Keys en espera: solo conocemos su catálogo; los usables
+                            // se determinan al seleccionarla (sincronización + prueba real)
+                            <Chip size="sm" color="default" variant="flat">
+                              {key.models_count ?? "?"} en catálogo
+                            </Chip>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-500 font-mono mt-1 truncate">
+                          {key.api_key}
+                        </div>
+                        {key.verification_status !== "valid" && key.error_message && (
+                          <div className="text-xs text-red-600 mt-1 truncate">{key.error_message}</div>
+                        )}
+                      </div>
 
-                <div className="flex gap-2">
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {!key.is_selected && (
+                          <Button
+                            isAdmin
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => handleSelectKey(key)}
+                            disabled={isSyncing || key.verification_status !== "valid"}
+                          >
+                            {switchingKeyId === key.id ? (
+                              <Icon name="Loader2" size={14} className="animate-spin" />
+                            ) : (
+                              "Usar"
+                            )}
+                          </Button>
+                        )}
+                        {!key.is_selected && (
+                          <button
+                            onClick={() => handleDeleteKey(key)}
+                            disabled={isSyncing}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                            title="Eliminar key"
+                          >
+                            <Icon name="Trash2" size={16} color="#EF4444" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+
+                <div className="flex gap-2 pt-1">
                   <Button
                     isAdmin
                     variant="primary"
@@ -276,18 +413,18 @@ export default function ConfigPage() {
                       isSyncing ? (
                         <Icon name="Loader2" size={16} className="animate-spin" />
                       ) : (
-                        <Icon name="Edit" size={16} />
+                        <Icon name="Plus" size={16} />
                       )
                     }
                   >
-                    {isSyncing ? "Sincronizando modelos..." : "Cambiar API Key"}
+                    {isSyncing ? "Sincronizando..." : "Agregar API Key"}
                   </Button>
 
                   <Button
                     isAdmin
                     variant="secondary"
                     onClick={handleShowAllModels}
-                    disabled={!maskedApiKey}
+                    disabled={!apiKeys.some((k) => k.is_selected)}
                     startContent={<Icon name="List" size={16} />}
                   >
                     Ver Todos los Modelos
@@ -295,7 +432,9 @@ export default function ConfigPage() {
                 </div>
 
                 <div className="text-xs text-gray-500">
-                  💡 Al cambiar la API Key, el sistema detectará automáticamente qué modelos están disponibles con tu cuenta.
+                  💡 "En catálogo" = todos los modelos que Google lista para esa key (incluye imagen, voz y modelos de pago).
+                  "Usables" = los que pasaron una prueba real de chat con tu tier — son los que aparecen abajo y en el chat.
+                  Al cambiar de key se vuelven a probar.
                 </div>
               </div>
             </CardBody>
@@ -437,14 +576,15 @@ export default function ConfigPage() {
         </div>
       </Col>
 
-      {/* Modal para cambiar API Key */}
+      {/* Modal para agregar API Key */}
       <Modal
         isOpen={isApiKeyModalOpen}
         onClose={() => {
           setIsApiKeyModalOpen(false);
           setApiKey("");
+          setApiKeyName("");
         }}
-        title="Configurar API Key de Gemini"
+        title="Agregar API Key de Gemini"
         size="md"
         footer={
           <div className="flex gap-3 w-full">
@@ -453,6 +593,7 @@ export default function ConfigPage() {
               onClick={() => {
                 setIsApiKeyModalOpen(false);
                 setApiKey("");
+                setApiKeyName("");
               }}
               variant="secondary"
             >
@@ -470,6 +611,23 @@ export default function ConfigPage() {
         }
       >
         <div className="space-y-4">
+          <div>
+            <Text isAdmin={true} variant="label" color="#4B5563">
+              Nombre de la key
+            </Text>
+            <Input
+              type="text"
+              value={apiKeyName}
+              onChange={(e) => setApiKeyName(e.target.value)}
+              placeholder="Ej: Cuenta principal, Free tier backup..."
+              className="mt-2"
+              classNames={{
+                inputWrapper: "!border-[#D4DEED] !rounded-[12px]",
+                input: "!text-[#265197]",
+              }}
+            />
+          </div>
+
           <div>
             <Text isAdmin={true} variant="label" color="#4B5563">
               API Key de Google Gemini

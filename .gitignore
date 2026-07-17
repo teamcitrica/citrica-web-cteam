@@ -57,3 +57,6 @@ supabase/functions/
 
 # MCP config (contiene tokens sensibles)
 .mcp.json
+
+# Claude Code local settings
+.claude/settings.local.json
