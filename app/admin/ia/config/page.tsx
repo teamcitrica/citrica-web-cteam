@@ -43,6 +43,8 @@ export default function ConfigPage() {
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [switchingKeyId, setSwitchingKeyId] = useState<string | null>(null);
+  const [reindexPrompt, setReindexPrompt] = useState<{ storages: { id: string; name: string }[] } | null>(null);
+  const [isReindexing, setIsReindexing] = useState(false);
   const [syncProgress, setSyncProgress] = useState<{
     step: string;
     current?: number;
@@ -179,6 +181,24 @@ export default function ConfigPage() {
         description: "Modelos sincronizados con la nueva key",
         color: "success",
       });
+
+      // La key nueva es de otro proyecto Google y no ve los índices RAG
+      // existentes → preguntar si reindexar las bases desde los respaldos
+      if (data.needsReindex) {
+        try {
+          const storagesResponse = await fetch("/api/rag/storage");
+          const storagesData = await storagesResponse.json();
+          const withFiles = (storagesData.storages || [])
+            .filter((s: any) => (s.fileCount || 0) > 0)
+            .map((s: any) => ({ id: s.id, name: s.name }));
+
+          if (withFiles.length > 0) {
+            setReindexPrompt({ storages: withFiles });
+          }
+        } catch (e) {
+          console.error("Error listando storages para reindexar:", e);
+        }
+      }
     } catch (error: any) {
       addToast({
         title: "Error",
@@ -188,6 +208,54 @@ export default function ConfigPage() {
     } finally {
       setSwitchingKeyId(null);
       setIsSyncing(false);
+      setSyncProgress(null);
+    }
+  };
+
+  // Reindexa todas las bases con la key nueva: store nuevo por base,
+  // documentos releídos desde el respaldo del bucket
+  const handleReindexAll = async () => {
+    if (!reindexPrompt) return;
+    const storagesToReindex = reindexPrompt.storages;
+    setReindexPrompt(null);
+    setIsReindexing(true);
+
+    let ok = 0;
+    let failed = 0;
+
+    try {
+      for (let i = 0; i < storagesToReindex.length; i++) {
+        const storage = storagesToReindex[i];
+        setSyncProgress({
+          step: `Reindexando "${storage.name}"...`,
+          current: i + 1,
+          total: storagesToReindex.length,
+        });
+
+        try {
+          const response = await fetch("/api/rag/storage/reprocess", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ storageId: storage.id, force: true, resetStore: true }),
+          });
+          const result = await response.json();
+          if (response.ok && result.failed === 0) {
+            ok++;
+          } else {
+            failed++;
+          }
+        } catch {
+          failed++;
+        }
+      }
+
+      addToast({
+        title: failed === 0 ? "✅ Bases reindexadas" : "Reindexado con errores",
+        description: `${ok} base(s) reindexada(s) con la nueva key${failed ? `, ${failed} con fallos (revisa cada base y usa Reprocesar)` : ""}`,
+        color: failed === 0 ? "success" : "warning",
+      });
+    } finally {
+      setIsReindexing(false);
       setSyncProgress(null);
     }
   };
@@ -669,6 +737,51 @@ export default function ConfigPage() {
               </div>
             </div>
           </div>
+        </div>
+      </Modal>
+
+      {/* Modal: la nueva key no ve los índices — ¿reindexar? */}
+      <Modal
+        isOpen={!!reindexPrompt}
+        onClose={() => setReindexPrompt(null)}
+        title="⚠️ Los índices RAG pertenecen a otra cuenta"
+        size="md"
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button
+              isAdmin
+              variant="secondary"
+              onClick={() => setReindexPrompt(null)}
+            >
+              Ahora no
+            </Button>
+            <Button isAdmin variant="primary" onClick={handleReindexAll} disabled={isReindexing}>
+              Reindexar ahora
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-gray-700 text-sm">
+            La key que acabas de activar es de <strong>otro proyecto de Google</strong> y no puede
+            ver los índices (embeddings) creados con la key anterior. Las bases afectadas no
+            responderán en el chat hasta reindexarlas.
+          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-sm text-blue-800 font-semibold mb-1">
+              Bases a reindexar ({reindexPrompt?.storages.length}):
+            </p>
+            <ul className="text-sm text-blue-700 list-disc ml-5">
+              {reindexPrompt?.storages.map((s) => (
+                <li key={s.id}>{s.name}</li>
+              ))}
+            </ul>
+          </div>
+          <p className="text-xs text-gray-500">
+            Los documentos se releen desde el respaldo en Supabase (no necesitas re-subirlos).
+            Costo: indexación normal ($0.15/1M tokens por documento). Si eliges "Ahora no",
+            puedes reindexar cada base después con su botón ↻ Reprocesar.
+          </p>
         </div>
       </Modal>
 

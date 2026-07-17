@@ -1,6 +1,7 @@
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { fileSearchStoreExists, isRealStoreName } from "@/lib/ai/gemini-service";
 
 function maskKey(key: string): string {
   return `${key.slice(0, 7)}...${key.slice(-4)}`;
@@ -115,7 +116,7 @@ export async function PATCH(request: Request) {
 
     const { data: target, error: fetchError } = await supabase
       .from("api_config")
-      .select("id, provider, verification_status")
+      .select("id, provider, verification_status, api_key")
       .eq("id", id)
       .single();
 
@@ -143,7 +144,31 @@ export async function PATCH(request: Request) {
 
     if (selectError) throw selectError;
 
-    return NextResponse.json({ success: true });
+    // ¿La nueva key ve los índices RAG existentes? Los File Search stores
+    // pertenecen al proyecto Google de la key que los creó — una key de
+    // otro proyecto no los ve y las bases requieren reindexado
+    let needsReindex = false;
+    let storagesWithIndex = 0;
+
+    const { data: storagesWithStore } = await supabase
+      .from("document_storages")
+      .select("id, gemini_vector_store_id")
+      .like("gemini_vector_store_id", "fileSearchStores/%");
+
+    const realStores = (storagesWithStore || []).filter((s) =>
+      isRealStoreName(s.gemini_vector_store_id)
+    );
+    storagesWithIndex = realStores.length;
+
+    if (realStores.length > 0) {
+      const accessible = await fileSearchStoreExists(
+        target.api_key,
+        realStores[0].gemini_vector_store_id!
+      );
+      needsReindex = !accessible;
+    }
+
+    return NextResponse.json({ success: true, needsReindex, storagesWithIndex });
   } catch (error: any) {
     console.error("Error selecting API key:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
