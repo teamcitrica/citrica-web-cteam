@@ -110,9 +110,19 @@ export async function runWeeklyReport(params: {
     totalOrders = Number(summary[0].total_orders) || 0;
     totalCustomers = Number(summary[0].total_customers) || 0;
   } else {
-    totalRevenue = salesRows.reduce((sum: number, r: any) => sum + (Number(r.total_revenue) || 0), 0);
-    totalOrders = salesRows.reduce((sum: number, r: any) => sum + (Number(r.order_count) || 0), 0);
-    totalCustomers = Math.max(...salesRows.map((r: any) => Number(r.customer_count) || 0), 0);
+    // Las filas del RPC llegan con prefijo out_ (OUT params de get_sales_data_for_export)
+    totalRevenue = salesRows.reduce(
+      (sum: number, r: any) => sum + (Number(r.out_total_revenue ?? r.total_revenue) || 0),
+      0
+    );
+    totalOrders = salesRows.reduce(
+      (sum: number, r: any) => sum + (Number(r.out_order_count ?? r.order_count) || 0),
+      0
+    );
+    totalCustomers = Math.max(
+      ...salesRows.map((r: any) => Number(r.out_customer_count ?? r.customer_count) || 0),
+      0
+    );
     console.warn("⚠️ get_sales_summary no disponible; órdenes/clientes son aproximados");
   }
 
