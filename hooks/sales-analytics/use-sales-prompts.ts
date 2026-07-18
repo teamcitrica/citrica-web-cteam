@@ -132,25 +132,23 @@ export function useSalesPrompts(projectId: string) {
   });
 
   // =============================================
-  // Activate prompt (desactiva todos los demás)
+  // Activate prompt — atómico en el servidor (un solo request)
   // =============================================
 
   const activatePrompt = async (promptId: string) => {
-    // Desactivar todos los prompts del proyecto
-    const deactivatePromises = prompts.map((p: SalesPrompt) =>
-      updatePromptMutation.mutateAsync({
-        id: p.id,
-        updates: { is_active: false },
-      })
-    );
-
-    await Promise.all(deactivatePromises);
-
-    // Activar el seleccionado
-    await updatePromptMutation.mutateAsync({
-      id: promptId,
-      updates: { is_active: true },
+    const response = await fetch('/api/sales-analytics/prompts', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: promptId, action: 'activate' }),
     });
+
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(data.error);
+    }
+
+    await queryClient.refetchQueries({ queryKey: ['sales-prompts', projectId] });
+    return data.prompt;
   };
 
   return {

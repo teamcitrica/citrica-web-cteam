@@ -1,26 +1,25 @@
 // =============================================
 // Hook: use-sales-chat
-// Gestión de chat interactivo con IA
+// Chat interactivo con IA — un registro por intercambio
+// (esquema real de sales_chat_conversations)
 // =============================================
 
-import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { SalesChatConversation, SalesChatMessage } from '@/types/sales-analytics';
+import type { SalesChatExchange } from '@/types/sales-analytics';
 
 export function useSalesChat(projectId: string) {
   const queryClient = useQueryClient();
-  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
 
   // =============================================
-  // Get conversations list
+  // Historial de intercambios del proyecto
   // =============================================
 
   const {
-    data: conversations = [],
-    isLoading: isLoadingConversations,
-    refetch: refetchConversations,
+    data: exchanges = [],
+    isLoading: isLoadingHistory,
+    refetch: refetchHistory,
   } = useQuery({
-    queryKey: ['sales-chat-conversations', projectId],
+    queryKey: ['sales-chat-exchanges', projectId],
     queryFn: async () => {
       const response = await fetch(
         `/api/sales-analytics/chat?project_id=${projectId}`
@@ -31,40 +30,13 @@ export function useSalesChat(projectId: string) {
         throw new Error(data.error);
       }
 
-      return data.conversations as SalesChatConversation[];
+      return data.exchanges as SalesChatExchange[];
     },
     enabled: !!projectId,
   });
 
   // =============================================
-  // Get messages for conversation
-  // =============================================
-
-  const {
-    data: messages = [],
-    isLoading: isLoadingMessages,
-    refetch: refetchMessages,
-  } = useQuery({
-    queryKey: ['sales-chat-messages', currentConversationId],
-    queryFn: async () => {
-      if (!currentConversationId) return [];
-
-      const response = await fetch(
-        `/api/sales-analytics/chat?project_id=${projectId}&conversation_id=${currentConversationId}`
-      );
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error);
-      }
-
-      return data.messages as SalesChatMessage[];
-    },
-    enabled: !!currentConversationId,
-  });
-
-  // =============================================
-  // Send message
+  // Enviar mensaje
   // =============================================
 
   const sendMessageMutation = useMutation({
@@ -81,7 +53,6 @@ export function useSalesChat(projectId: string) {
         body: JSON.stringify({
           project_id: projectId,
           message,
-          conversation_id: currentConversationId,
           include_context: includeContext,
         }),
       });
@@ -94,20 +65,9 @@ export function useSalesChat(projectId: string) {
 
       return data;
     },
-    onSuccess: async (data) => {
-      // Si es conversación nueva, actualizar el ID actual
-      if (!currentConversationId && data.conversation_id) {
-        setCurrentConversationId(data.conversation_id);
-      }
-
-      // Refetch mensajes
+    onSuccess: async () => {
       await queryClient.refetchQueries({
-        queryKey: ['sales-chat-messages', data.conversation_id || currentConversationId],
-      });
-
-      // Refetch conversaciones
-      await queryClient.refetchQueries({
-        queryKey: ['sales-chat-conversations', projectId],
+        queryKey: ['sales-chat-exchanges', projectId],
       });
     },
     onError: (error: Error) => {
@@ -116,76 +76,55 @@ export function useSalesChat(projectId: string) {
   });
 
   // =============================================
-  // Delete conversation
+  // Borrar un intercambio o todo el historial
   // =============================================
 
-  const deleteConversationMutation = useMutation({
-    mutationFn: async (conversationId: string) => {
-      const response = await fetch(
-        `/api/sales-analytics/chat?conversation_id=${conversationId}`,
-        {
-          method: 'DELETE',
-        }
-      );
-
+  const deleteExchangeMutation = useMutation({
+    mutationFn: async (exchangeId: string) => {
+      const response = await fetch(`/api/sales-analytics/chat?id=${exchangeId}`, {
+        method: 'DELETE',
+      });
       const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error);
-      }
-
+      if (!data.success) throw new Error(data.error);
       return data;
     },
     onSuccess: async () => {
-      // Si eliminamos la conversación actual, limpiar
-      if (currentConversationId) {
-        setCurrentConversationId(null);
-      }
-
-      // Refetch conversaciones
       await queryClient.refetchQueries({
-        queryKey: ['sales-chat-conversations', projectId],
+        queryKey: ['sales-chat-exchanges', projectId],
       });
-    },
-    onError: (error: Error) => {
-      console.error('Error eliminando conversación:', error.message);
     },
   });
 
-  // =============================================
-  // Start new conversation
-  // =============================================
-
-  const startNewConversation = () => {
-    setCurrentConversationId(null);
-  };
-
-  // =============================================
-  // Select conversation
-  // =============================================
-
-  const selectConversation = (conversationId: string) => {
-    setCurrentConversationId(conversationId);
-  };
+  const clearHistoryMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(
+        `/api/sales-analytics/chat?project_id=${projectId}`,
+        { method: 'DELETE' }
+      );
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error);
+      return data;
+    },
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
+        queryKey: ['sales-chat-exchanges', projectId],
+      });
+    },
+  });
 
   return {
     // State
-    conversations,
-    messages,
-    currentConversationId,
-    isLoadingConversations,
-    isLoadingMessages,
+    exchanges,
+    isLoadingHistory,
 
     // Actions
     sendMessage: sendMessageMutation.mutateAsync,
-    deleteConversation: deleteConversationMutation.mutateAsync,
-    startNewConversation,
-    selectConversation,
-    refetchConversations,
-    refetchMessages,
+    deleteExchange: deleteExchangeMutation.mutateAsync,
+    clearHistory: clearHistoryMutation.mutateAsync,
+    refetchHistory,
 
     // Loading states
     isSending: sendMessageMutation.isPending,
-    isDeleting: deleteConversationMutation.isPending,
+    isDeleting: deleteExchangeMutation.isPending || clearHistoryMutation.isPending,
   };
 }

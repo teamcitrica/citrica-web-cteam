@@ -11,6 +11,8 @@ import { Button } from '@heroui/button';
 import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Chip } from '@heroui/chip';
 import { Switch } from '@heroui/switch';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/modal';
+import { addToast } from '@heroui/toast';
 import {
   ArrowLeft,
   Settings,
@@ -32,11 +34,17 @@ export default function ProjectDetailPage() {
   const params = useParams();
   const projectId = params.id as string;
 
-  const { getProject, updateProject, deleteProject, generateManualReport, isUpdating, isDeleting, isGeneratingReport } =
+  const { getProject, updateProject, deleteProject, generateManualReport, verifySetup, isUpdating, isDeleting, isGeneratingReport } =
     useSalesProjects();
 
   const [project, setProject] = useState<SalesProject | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const {
+    isOpen: isReportModalOpen,
+    onOpen: openReportModal,
+    onClose: closeReportModal,
+  } = useDisclosure();
 
   // Cargar proyecto
   useEffect(() => {
@@ -109,19 +117,44 @@ export default function ProjectDetailPage() {
     }
   };
 
-  // Generar reporte manual
-  const handleGenerateReport = async () => {
-    if (!confirm('¿Generar reporte manual? Esto extraerá data de los últimos 7 días y generará un análisis con IA.')) {
-      return;
+  // Verificar conexión con el Supabase del proyecto (tabla + RPCs)
+  const handleVerifyConnection = async () => {
+    try {
+      setIsVerifying(true);
+      const result = await verifySetup(projectId);
+      if (result.success) {
+        alert(result.message || '✅ Conexión verificada');
+      } else {
+        alert(`❌ ${result.error || 'La verificación falló'}`);
+      }
+      await loadProject();
+    } catch (error: any) {
+      alert(`❌ Error verificando: ${error.message}`);
+    } finally {
+      setIsVerifying(false);
     }
+  };
 
+  // Generar reporte manual (confirmado desde el modal)
+  const handleGenerateReport = async () => {
     try {
       const result = await generateManualReport(projectId);
-      alert(`✅ ${result.message}\n\nReporte generado exitosamente. Puedes verlo en la sección de Reportes.`);
+      closeReportModal();
+      addToast({
+        title: 'Reporte generado',
+        description: result.message || 'Puedes verlo en la sección de Reportes.',
+        color: 'success',
+        timeout: 5000,
+      });
       // Navegar a reportes
       router.push(`/admin/sales-analytics/projects/${projectId}/reports`);
     } catch (error: any) {
-      alert(`❌ Error generando reporte: ${error.message}`);
+      addToast({
+        title: 'Error generando reporte',
+        description: error.message,
+        color: 'danger',
+        timeout: 8000,
+      });
     }
   };
 
@@ -144,7 +177,7 @@ export default function ProjectDetailPage() {
             <p className="text-gray-600 mb-6">
               El proyecto que buscas no existe o fue eliminado
             </p>
-            <Button onPress={() => router.push('/sales-analytics/projects')}>
+            <Button onPress={() => router.push('/admin/sales-analytics/projects')}>
               Volver a Proyectos
             </Button>
           </CardBody>
@@ -335,7 +368,7 @@ export default function ProjectDetailPage() {
                 color="secondary"
                 size="lg"
                 startContent={<Sparkles className="w-5 h-5" />}
-                onPress={handleGenerateReport}
+                onPress={openReportModal}
                 isLoading={isGeneratingReport}
                 isDisabled={!project.is_active || project.connection_status !== 'connected'}
               >
@@ -343,12 +376,23 @@ export default function ProjectDetailPage() {
               </Button>
             </div>
             {(!project.is_active || project.connection_status !== 'connected') && (
-              <div className="mt-4 px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="mt-4 px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center justify-between gap-4">
                 <p className="text-sm text-yellow-800">
                   {!project.is_active
                     ? '⚠️ El proyecto debe estar activo para generar reportes'
                     : '⚠️ El proyecto debe estar conectado para generar reportes'}
                 </p>
+                {project.is_active && project.connection_status !== 'connected' && (
+                  <Button
+                    size="sm"
+                    color="warning"
+                    variant="flat"
+                    onPress={handleVerifyConnection}
+                    isLoading={isVerifying}
+                  >
+                    Verificar conexión
+                  </Button>
+                )}
               </div>
             )}
           </CardBody>
@@ -395,7 +439,7 @@ export default function ProjectDetailPage() {
           <Card
             isPressable
             onPress={() =>
-              router.push(`/sales-analytics/projects/${projectId}/settings`)
+              router.push(`/admin/sales-analytics/projects/${projectId}/settings`)
             }
             className="hover:shadow-lg transition-shadow"
           >
@@ -411,6 +455,55 @@ export default function ProjectDetailPage() {
           </Card>
         </div>
       </div>
+
+      {/* Modal: confirmar generación de reporte manual */}
+      <Modal
+        isOpen={isReportModalOpen}
+        onClose={closeReportModal}
+        size="md"
+        isDismissable={!isGeneratingReport}
+        hideCloseButton={isGeneratingReport}
+      >
+        <ModalContent>
+          <ModalHeader className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-purple-600" />
+            <h3 className="text-lg font-semibold text-gray-800">
+              Generar Reporte Manual
+            </h3>
+          </ModalHeader>
+          <ModalBody>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Se extraerá la data de los últimos 7 días del proyecto{' '}
+                <strong>{project.name}</strong> y se generará un análisis con IA.
+              </p>
+              <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                <p className="text-xs text-purple-800">
+                  <strong>Nota:</strong> Este proceso puede tardar unos segundos.
+                  Al finalizar serás redirigido a la sección de Reportes.
+                </p>
+              </div>
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              onPress={closeReportModal}
+              isDisabled={isGeneratingReport}
+            >
+              Cancelar
+            </Button>
+            <Button
+              color="secondary"
+              startContent={!isGeneratingReport && <Sparkles className="w-4 h-4" />}
+              onPress={handleGenerateReport}
+              isLoading={isGeneratingReport}
+            >
+              {isGeneratingReport ? 'Generando...' : 'Generar Reporte'}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
