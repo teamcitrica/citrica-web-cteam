@@ -16,15 +16,14 @@ export default function NewSalesAnalyticsProjectPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
 
-  const totalSteps = 6;
+  const totalSteps = 5;
 
   const steps = [
     'Información Básica',
     'Conexión Supabase',
-    'Auto-Detección',
-    'Configuración',
-    'Reportes',
-    'Destinatarios',
+    'Instalación SQL',
+    'Reportes y Modelo',
+    'Resumen',
   ];
 
   return (

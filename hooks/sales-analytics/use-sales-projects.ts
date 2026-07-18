@@ -183,7 +183,7 @@ export function useSalesProjects() {
   // =============================================
 
   const generateSetupScript = async (
-    projectId: string
+    projectId?: string
   ): Promise<GenerateScriptResponse> => {
     const response = await fetch(
       '/api/sales-analytics/projects/generate-setup-script',

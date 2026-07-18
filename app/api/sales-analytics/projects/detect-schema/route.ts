@@ -5,9 +5,13 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { requireSession } from '@/lib/sales-analytics/api-helpers';
 import type { DetectSchemaResponse } from '@/types/sales-analytics';
 
 export async function POST(request: NextRequest) {
+  const session = await requireSession();
+  if (session.errorResponse) return session.errorResponse;
+
   try {
     const { supabaseUrl, supabaseAnonKey } = await request.json();
 
@@ -63,42 +67,14 @@ export async function POST(request: NextRequest) {
     }
 
     // =============================================
-    // ESTRATEGIA 2: Detectar tablas orders/order_items
-    // =============================================
-
-    try {
-      const { data: orders, error: ordersError } = await restaurantSupabase
-        .from('orders')
-        .select('*')
-        .limit(1);
-
-      if (!ordersError && orders && orders.length > 0) {
-        const columns = Object.keys(orders[0]);
-
-        const response: DetectSchemaResponse = {
-          strategy: 'direct_query',
-          message:
-            '⚠️ Se detectaron tablas estándar (orders/order_items). Requiere mapeo de columnas.',
-          available_columns: columns,
-          requires_mapping: true,
-          requires_setup: false,
-          ready: false,
-        };
-
-        return NextResponse.json({ success: true, ...response });
-      }
-    } catch (err) {
-      // orders no existe, continuar
-    }
-
-    // =============================================
-    // ESTRATEGIA 3: No se detectó nada compatible
+    // Sin sistema instalado: se requiere ejecutar el script de setup
+    // (v1 solo soporta la estrategia RPC; el script instala tabla + RPCs + trigger)
     // =============================================
 
     const response: DetectSchemaResponse = {
-      strategy: 'custom_query',
+      strategy: 'rpc',
       message:
-        '❌ No se detectaron tablas compatibles. Se requiere ejecutar script SQL.',
+        '⚠️ El sistema de analytics no está instalado en esta base. Genera el script SQL, ejecútalo en el Supabase del proyecto y verifica la instalación.',
       requires_setup: true,
       requires_script: true,
       ready: false,

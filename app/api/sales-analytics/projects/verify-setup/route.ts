@@ -6,14 +6,14 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 import { decrypt } from '@/lib/sales-analytics/encryptionHelpers';
+import { requireSession, getServiceClient } from '@/lib/sales-analytics/api-helpers';
 import type { VerifySetupResponse } from '@/types/sales-analytics';
 
-const citricaSupabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function POST(request: NextRequest) {
+  const session = await requireSession();
+  if (session.errorResponse) return session.errorResponse;
+  const citricaSupabase = getServiceClient();
+
   try {
     const { projectId } = await request.json();
 
@@ -126,6 +126,21 @@ export async function POST(request: NextRequest) {
     }
 
     // =============================================
+    // PASO 3: Verificar RPC get_sales_summary (totales exactos; opcional)
+    // =============================================
+
+    let summaryWorks = false;
+    try {
+      const { error: summaryErr } = await restaurantSupabase.rpc('get_sales_summary', {
+        p_start_date: '2026-01-01',
+        p_end_date: '2026-01-02',
+      });
+      summaryWorks = !summaryErr;
+    } catch {
+      // opcional: el reporte funciona sin él con totales aproximados
+    }
+
+    // =============================================
     // ✅ VERIFICACIÓN EXITOSA
     // =============================================
 
@@ -144,7 +159,9 @@ export async function POST(request: NextRequest) {
 
     const response: VerifySetupResponse = {
       success: true,
-      message: '✅ Proyecto configurado correctamente. Sistema listo para generar reportes.',
+      message: summaryWorks
+        ? '✅ Proyecto configurado correctamente. Sistema listo para generar reportes.'
+        : '✅ Conectado. Nota: falta el RPC get_sales_summary — los totales de órdenes/clientes serán aproximados hasta ejecutar el script completo.',
     };
 
     return NextResponse.json(response);

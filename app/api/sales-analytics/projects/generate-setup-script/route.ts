@@ -3,61 +3,42 @@
 // Generar script SQL para setup manual
 // =============================================
 
-import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { requireSession, getServiceClient } from '@/lib/sales-analytics/api-helpers';
 import type { GenerateScriptResponse } from '@/types/sales-analytics';
 
-const citricaSupabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function POST(request: NextRequest) {
+  const session = await requireSession();
+  if (session.errorResponse) return session.errorResponse;
+  const citricaSupabase = getServiceClient();
+
   try {
     const { projectId } = await request.json();
 
-    if (!projectId) {
-      return NextResponse.json(
-        { success: false, error: 'ID de proyecto requerido' },
-        { status: 400 }
-      );
+    // projectId es opcional: el wizard genera el script ANTES de crear el proyecto
+    let project: { id: string; name: string } = {
+      id: '(pendiente de crear)',
+      name: 'Nuevo proyecto',
+    };
+
+    if (projectId) {
+      const { data, error: projectError } = await citricaSupabase
+        .from('sales_projects')
+        .select('id, name')
+        .eq('id', projectId)
+        .single();
+
+      if (projectError || !data) {
+        return NextResponse.json(
+          { success: false, error: 'Proyecto no encontrado' },
+          { status: 404 }
+        );
+      }
+      project = data;
     }
 
-    // Obtener proyecto
-    const { data: project, error: projectError } = await citricaSupabase
-      .from('sales_projects')
-      .select('*')
-      .eq('id', projectId)
-      .single();
-
-    if (projectError || !project) {
-      return NextResponse.json(
-        { success: false, error: 'Proyecto no encontrado' },
-        { status: 404 }
-      );
-    }
-
-    // Leer migración 155 de RestorApp (template)
-    const migration155Path = join(
-      process.cwd(),
-      '..',
-      '..',
-      'RestorAppV2',
-      'delixcafe-frontend-cteam',
-      'docs',
-      'migrations',
-      '155_create_sales_analytics_system.sql'
-    );
-
-    let migration155Content: string;
-    try {
-      migration155Content = await readFile(migration155Path, 'utf-8');
-    } catch (err) {
-      // Si no se puede leer el archivo, usar template inline
-      migration155Content = SALES_ANALYTICS_TABLE_SQL;
-    }
+    // Template inline: única fuente de verdad del contrato externo
+    const migration155Content = SALES_ANALYTICS_TABLE_SQL;
 
     // Generar script personalizado
     const setupScript = `
@@ -349,6 +330,98 @@ CREATE TRIGGER trigger_populate_sales_analytics
   AFTER INSERT ON order_items
   FOR EACH ROW
   EXECUTE FUNCTION populate_sales_analytics();
+
+-- =============================================
+-- FUNCIÓN RPC: get_sales_summary (totales exactos del período)
+-- Las filas de get_sales_data_for_export vienen agrupadas por producto,
+-- por lo que sumar order_count sobreconta órdenes. Este RPC da los reales.
+-- =============================================
+
+CREATE OR REPLACE FUNCTION get_sales_summary(
+  p_start_date DATE,
+  p_end_date DATE
+)
+RETURNS TABLE (
+  total_revenue NUMERIC,
+  total_orders BIGINT,
+  total_customers BIGINT,
+  avg_order_value NUMERIC
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    COALESCE(SUM(sa.total_item_price), 0) as total_revenue,
+    COUNT(DISTINCT sa.order_id) as total_orders,
+    COUNT(DISTINCT sa.customer_account_id) FILTER (WHERE NOT sa.is_generic_customer) as total_customers,
+    CASE
+      WHEN COUNT(DISTINCT sa.order_id) > 0
+      THEN COALESCE(SUM(sa.total_item_price), 0) / COUNT(DISTINCT sa.order_id)
+      ELSE 0
+    END as avg_order_value
+  FROM sales_analytics sa
+  WHERE sa.sale_date BETWEEN p_start_date AND p_end_date;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- =============================================
+-- BACKFILL HISTÓRICO (solo si la tabla está vacía)
+-- El trigger solo captura ventas NUEVAS; sin este paso el primer
+-- reporte semanal saldría vacío.
+-- =============================================
+
+INSERT INTO sales_analytics (
+  sale_timestamp, order_id, order_number, order_type, order_status_id,
+  payment_status_id, product_id, product_name, category_id, category_name,
+  customer_account_id, customer_name, is_generic_customer,
+  waiter_id, waiter_name, created_by_id, created_by_name, cash_register_id,
+  quantity, unit_price, total_item_price, discount_amount,
+  sale_date, sale_hour, sale_day_of_week, sale_week_of_year, sale_month, sale_year
+)
+SELECT
+  COALESCE(o.delivered_at, o.created_at),
+  oi.order_id,
+  o.order_number,
+  o.order_type,
+  o.status_id,
+  o.payment_status_id,
+  oi.product_id,
+  oi.product_name,
+  p.categories_id,
+  c.name,
+  o.customer_account_id,
+  COALESCE(ca.customer_name, o.customer_name, 'Genérico'),
+  (o.customer_name IN ('Genérico', 'Cliente Genérico') OR o.customer_account_id IS NULL),
+  o.waiter_id,
+  CONCAT(w.first_name, ' ', w.last_name),
+  o.created_by,
+  CONCAT(cr.first_name, ' ', cr.last_name),
+  o.cash_register_id,
+  oi.quantity,
+  oi.unit_price,
+  oi.total_price,
+  COALESCE(oi.discount_amount, 0),
+  DATE(COALESCE(o.delivered_at, o.created_at)),
+  EXTRACT(HOUR FROM COALESCE(o.delivered_at, o.created_at))::INTEGER,
+  EXTRACT(DOW FROM COALESCE(o.delivered_at, o.created_at))::INTEGER,
+  EXTRACT(WEEK FROM COALESCE(o.delivered_at, o.created_at))::INTEGER,
+  EXTRACT(MONTH FROM COALESCE(o.delivered_at, o.created_at))::INTEGER,
+  EXTRACT(YEAR FROM COALESCE(o.delivered_at, o.created_at))::INTEGER
+FROM order_items oi
+JOIN orders o ON o.id = oi.order_id
+LEFT JOIN products p ON p.id = oi.product_id
+LEFT JOIN categories c ON c.id = p.categories_id
+LEFT JOIN customer_accounts ca ON ca.id = o.customer_account_id
+LEFT JOIN users w ON w.id = o.waiter_id
+LEFT JOIN users cr ON cr.id = o.created_by
+WHERE NOT EXISTS (SELECT 1 FROM sales_analytics LIMIT 1);
+
+-- =============================================
+-- PERMISOS: la conexión desde Citrica usa la anon key
+-- =============================================
+
+GRANT SELECT ON sales_analytics TO anon;
+GRANT EXECUTE ON FUNCTION get_sales_data_for_export(DATE, DATE) TO anon;
+GRANT EXECUTE ON FUNCTION get_sales_summary(DATE, DATE) TO anon;
 
 -- =============================================
 -- FIN DEL SETUP

@@ -1,14 +1,16 @@
 "use client";
 
 // =============================================
-// Page: /sales-analytics/projects/[id]/reports
-// Historial de reportes generados
+// Page: /admin/sales-analytics/projects/[id]/reports
+// Historial de reportes generados — lee las columnas reales
+// (ai_analysis, recommendations, key_insights, top_products, trends)
 // =============================================
 
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@heroui/button';
 import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Chip } from '@heroui/chip';
+import { addToast } from '@heroui/toast';
 import {
   ArrowLeft,
   FileText,
@@ -16,10 +18,10 @@ import {
   Trash2,
   Calendar,
   DollarSign,
-  TrendingUp,
   AlertCircle,
 } from 'lucide-react';
 import { useSalesReports } from '@/hooks/sales-analytics/use-sales-reports';
+import type { SalesWeeklyReport } from '@/types/sales-analytics';
 
 export default function ProjectReportsPage() {
   const router = useRouter();
@@ -34,15 +36,27 @@ export default function ProjectReportsPage() {
 
     try {
       await deleteReport(reportId);
-      alert('Reporte eliminado exitosamente');
+      addToast({ title: 'Reporte eliminado', color: 'success' });
     } catch (error: any) {
-      alert(`Error: ${error.message}`);
+      addToast({ title: 'Error', description: error.message, color: 'danger' });
     }
   };
 
-  const handleDownload = (report: any) => {
-    // Crear un blob con el contenido del reporte
-    const blob = new Blob([JSON.stringify(report.analysis_json, null, 2)], {
+  const handleDownload = (report: SalesWeeklyReport) => {
+    const exportData = {
+      period: { start: report.period_start, end: report.period_end },
+      analysis: report.ai_analysis,
+      recommendations: report.recommendations,
+      keyInsights: report.key_insights,
+      topProducts: report.top_products,
+      worstProducts: report.worst_products,
+      trends: report.trends,
+      model: report.model_used,
+      tokens: report.total_tokens,
+      costUsd: report.cost_usd,
+      generatedAt: report.generated_at,
+    };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
       type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
@@ -59,6 +73,16 @@ export default function ProjectReportsPage() {
     return new Intl.NumberFormat('es-VE', {
       style: 'currency',
       currency: 'USD',
+    }).format(amount);
+  };
+
+  // Costos de IA son fracciones de centavo — con 2 decimales siempre saldría $0.00
+  const formatCost = (amount: number) => {
+    return new Intl.NumberFormat('es-VE', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 6,
     }).format(amount);
   };
 
@@ -84,7 +108,7 @@ export default function ProjectReportsPage() {
                 Historial de Reportes
               </h1>
               <p className="text-gray-600 mt-2">
-                Reportes generados automáticamente con IA
+                Reportes generados con IA sobre las ventas reales
               </p>
             </div>
           </div>
@@ -113,7 +137,7 @@ export default function ProjectReportsPage() {
                   <div>
                     <p className="text-sm text-gray-600">Último Reporte</p>
                     <p className="text-sm font-medium text-gray-900">
-                      {new Date(reports[0].created_at).toLocaleDateString(
+                      {new Date(reports[0].generated_at).toLocaleDateString(
                         'es-ES'
                       )}
                     </p>
@@ -129,8 +153,11 @@ export default function ProjectReportsPage() {
                   <div>
                     <p className="text-sm text-gray-600">Costo Total IA</p>
                     <p className="text-xl font-bold text-gray-900">
-                      {formatCurrency(
-                        reports.reduce((sum: number, r: import('@/types/sales-analytics').SalesWeeklyReport) => sum + (r.total_cost || 0), 0)
+                      {formatCost(
+                        reports.reduce(
+                          (sum: number, r: SalesWeeklyReport) => sum + Number(r.cost_usd || 0),
+                          0
+                        )
                       )}
                     </p>
                   </div>
@@ -154,138 +181,156 @@ export default function ProjectReportsPage() {
                 No hay reportes generados
               </h3>
               <p className="text-gray-600">
-                Los reportes se generarán automáticamente según la programación
-                del proyecto
+                Usa "Generar Reporte Manual" en el proyecto, o espera la próxima
+                ejecución programada
               </p>
             </CardBody>
           </Card>
         ) : (
           <div className="space-y-4">
-            {reports.map((report: import('@/types/sales-analytics').SalesWeeklyReport) => {
-              const analysis = report.analysis_json as any;
-              const metrics = analysis?.metricas_clave || {};
-
-              return (
-                <Card key={report.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start w-full">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <FileText className="w-5 h-5 text-primary" />
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            Reporte {report.period_start} - {report.period_end}
-                          </h3>
-                        </div>
-                        <p className="text-sm text-gray-600">
-                          Generado el{' '}
-                          {new Date(report.created_at).toLocaleString('es-ES')}
-                        </p>
+            {reports.map((report: SalesWeeklyReport) => (
+              <Card key={report.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between items-start w-full">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <FileText className="w-5 h-5 text-primary" />
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          Reporte {report.period_start} - {report.period_end}
+                        </h3>
+                        {report.generated_by === 'system' && (
+                          <Chip size="sm" variant="flat" color="secondary">
+                            Automático
+                          </Chip>
+                        )}
                       </div>
+                      <p className="text-sm text-gray-600">
+                        Generado el{' '}
+                        {new Date(report.generated_at).toLocaleString('es-ES')}
+                        {report.model_used ? ` · ${report.model_used}` : ''}
+                      </p>
+                    </div>
 
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="flat"
-                          startContent={<Download className="w-4 h-4" />}
-                          onPress={() => handleDownload(report)}
-                        >
-                          Descargar
-                        </Button>
-                        <Button
-                          size="sm"
-                          color="danger"
-                          variant="flat"
-                          startContent={<Trash2 className="w-4 h-4" />}
-                          onPress={() => handleDelete(report.id)}
-                          isLoading={isDeleting}
-                        >
-                          Eliminar
-                        </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="flat"
+                        startContent={<Download className="w-4 h-4" />}
+                        onPress={() => handleDownload(report)}
+                      >
+                        Descargar
+                      </Button>
+                      <Button
+                        size="sm"
+                        color="danger"
+                        variant="flat"
+                        startContent={<Trash2 className="w-4 h-4" />}
+                        onPress={() => handleDelete(report.id)}
+                        isLoading={isDeleting}
+                      >
+                        Eliminar
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+
+                <CardBody className="pt-2">
+                  {/* Análisis */}
+                  {report.ai_analysis && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                        Análisis
+                      </h4>
+                      <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {report.ai_analysis}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Recomendaciones */}
+                  {report.recommendations && report.recommendations.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                        Recomendaciones
+                      </h4>
+                      <ul className="list-disc ml-5 space-y-1">
+                        {report.recommendations.map((rec, i) => (
+                          <li key={i} className="text-sm text-gray-700">
+                            {rec}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Top productos */}
+                  {report.top_products && report.top_products.length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                        Productos Destacados
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        {report.top_products.slice(0, 6).map((p, i) => (
+                          <div key={i} className="bg-green-50 p-2 rounded-lg text-sm">
+                            <span className="font-medium text-green-900">{p.name}</span>
+                            {p.revenue !== undefined && (
+                              <span className="text-green-700 block text-xs">
+                                {formatCurrency(Number(p.revenue))}
+                                {p.quantity !== undefined ? ` · ${p.quantity} uds` : ''}
+                              </span>
+                            )}
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  </CardHeader>
+                  )}
 
-                  <CardBody className="pt-2">
-                    {/* Métricas Clave */}
-                    {metrics && Object.keys(metrics).length > 0 && (
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        {metrics.revenue_total !== undefined && (
-                          <div className="bg-green-50 p-3 rounded-lg">
-                            <p className="text-xs text-green-700 mb-1">
-                              Revenue Total
-                            </p>
-                            <p className="text-lg font-bold text-green-900">
-                              {formatCurrency(metrics.revenue_total)}
-                            </p>
-                          </div>
-                        )}
-
-                        {metrics.total_orders !== undefined && (
-                          <div className="bg-blue-50 p-3 rounded-lg">
-                            <p className="text-xs text-blue-700 mb-1">
-                              Órdenes Totales
-                            </p>
-                            <p className="text-lg font-bold text-blue-900">
-                              {metrics.total_orders}
-                            </p>
-                          </div>
-                        )}
-
-                        {metrics.avg_order_value !== undefined && (
-                          <div className="bg-purple-50 p-3 rounded-lg">
-                            <p className="text-xs text-purple-700 mb-1">
-                              Ticket Promedio
-                            </p>
-                            <p className="text-lg font-bold text-purple-900">
-                              {formatCurrency(metrics.avg_order_value)}
-                            </p>
-                          </div>
-                        )}
-
-                        {metrics.unique_customers !== undefined && (
-                          <div className="bg-yellow-50 p-3 rounded-lg">
-                            <p className="text-xs text-yellow-700 mb-1">
-                              Clientes Únicos
-                            </p>
-                            <p className="text-lg font-bold text-yellow-900">
-                              {metrics.unique_customers}
-                            </p>
-                          </div>
-                        )}
+                  {/* Insights */}
+                  {report.key_insights && Object.keys(report.key_insights).length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                        Insights
+                      </h4>
+                      <div className="space-y-1">
+                        {Object.entries(report.key_insights).map(([key, value]) => (
+                          <p key={key} className="text-sm text-gray-700">
+                            <span className="font-medium capitalize">{key.replace(/_/g, ' ')}:</span>{' '}
+                            {String(value)}
+                          </p>
+                        ))}
                       </div>
-                    )}
-
-                    {/* Resumen Ejecutivo */}
-                    {analysis?.resumen_ejecutivo && (
-                      <div className="mb-4">
-                        <h4 className="text-sm font-semibold text-gray-900 mb-2">
-                          Resumen Ejecutivo
-                        </h4>
-                        <p className="text-sm text-gray-700 leading-relaxed">
-                          {analysis.resumen_ejecutivo}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Footer Info */}
-                    <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
-                        <span>
-                          Tokens: {report.prompt_tokens} + {report.completion_tokens}
-                        </span>
-                        <span>Costo: {formatCurrency(report.total_cost || 0)}</span>
-                      </div>
-
-                      {report.whatsapp_sent && (
-                        <Chip size="sm" color="success" variant="flat">
-                          Enviado por WhatsApp
-                        </Chip>
-                      )}
                     </div>
-                  </CardBody>
-                </Card>
-              );
-            })}
+                  )}
+
+                  {/* Tendencias */}
+                  {report.trends && Object.keys(report.trends).length > 0 && (
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                        Tendencias
+                      </h4>
+                      <div className="space-y-1">
+                        {Object.entries(report.trends).map(([key, value]) => (
+                          <p key={key} className="text-sm text-gray-700">
+                            <span className="font-medium capitalize">{key.replace(/_/g, ' ')}:</span>{' '}
+                            {String(value)}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Footer Info */}
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <span>
+                        Tokens: {report.prompt_tokens || 0} + {report.completion_tokens || 0}
+                      </span>
+                      <span>Costo: {formatCost(Number(report.cost_usd || 0))}</span>
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+            ))}
           </div>
         )}
       </div>
