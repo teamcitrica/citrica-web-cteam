@@ -277,10 +277,10 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Soft delete: marcar como inactivo
+    // Borrado real: snapshots, reportes, prompts, chats y logs caen por FK CASCADE
     const { error } = await citricaSupabase
       .from('sales_projects')
-      .update({ is_active: false })
+      .delete()
       .eq('id', projectId);
 
     if (error) {
@@ -292,7 +292,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Proyecto desactivado exitosamente',
+      message: 'Proyecto eliminado exitosamente',
     });
   } catch (error: any) {
     return NextResponse.json(
