@@ -4,18 +4,18 @@
 // =============================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE!;
+import { requireSession, getServiceClient } from '@/lib/sales-analytics/api-helpers';
 
 // =============================================
 // GET - Obtener reportes de un proyecto
 // =============================================
 
 export async function GET(request: NextRequest) {
+  const session = await requireSession();
+  if (session.errorResponse) return session.errorResponse;
+
   try {
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = getServiceClient();
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get('project_id');
     const limit = searchParams.get('limit') || '50';
@@ -27,12 +27,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Obtener reportes del proyecto
+    // La tabla no tiene created_at; el timestamp real es generated_at
     const { data: reports, error } = await supabase
       .from('sales_weekly_reports')
       .select('*')
       .eq('project_id', projectId)
-      .order('created_at', { ascending: false })
+      .order('generated_at', { ascending: false })
       .limit(parseInt(limit));
 
     if (error) {
@@ -58,8 +58,11 @@ export async function GET(request: NextRequest) {
 // =============================================
 
 export async function DELETE(request: NextRequest) {
+  const session = await requireSession();
+  if (session.errorResponse) return session.errorResponse;
+
   try {
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = getServiceClient();
     const { searchParams } = new URL(request.url);
     const reportId = searchParams.get('id');
 

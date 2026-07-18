@@ -13,50 +13,9 @@ export type VerificationStatus = 'pending' | 'valid' | 'invalid';
 export type ResponseFormat = 'json' | 'markdown' | 'text';
 export type WhatsAppRole = 'owner' | 'manager' | 'admin';
 
-// =============================================
-// Model Config
-// =============================================
-
-export interface SalesModelConfig {
-  id: string;
-  model_id: string;
-  display_name: string;
-  description?: string;
-  provider: string;
-  input_token_limit?: number;
-  output_token_limit?: number;
-  cost_per_1m_input_tokens: number;
-  cost_per_1m_output_tokens: number;
-  supports_streaming: boolean;
-  supports_json_mode: boolean;
-  is_active: boolean;
-  is_default: boolean;
-  config: {
-    temperature?: number;
-    topP?: number;
-    topK?: number;
-    [key: string]: any;
-  };
-  created_at: string;
-  updated_at: string;
-}
-
-// =============================================
-// API Config
-// =============================================
-
-export interface SalesApiConfig {
-  id: string;
-  provider: string;
-  api_key: string; // Encrypted
-  is_active: boolean;
-  last_verified_at?: string;
-  verification_status: VerificationStatus;
-  error_message?: string;
-  metadata: Record<string, any>;
-  created_at: string;
-  updated_at: string;
-}
+// NOTA: la configuración de modelos y API keys vive en el sistema principal
+// (tablas ai_model_config y api_config, UI en /admin/ia/config).
+// Las tablas sales_model_config y sales_api_config fueron eliminadas (migración 014).
 
 // =============================================
 // Projects
@@ -105,10 +64,8 @@ export interface SalesProject {
   last_report_generated_at?: string;
   next_scheduled_execution?: string;
 
-  // IA
-  ai_model_id?: string;
-  use_custom_api_key: boolean;
-  custom_api_key?: string; // Encrypted
+  // IA (model_id de ai_model_config; NULL = default del sistema)
+  ai_model?: string;
 
   // Estado
   is_active: boolean;
@@ -169,23 +126,21 @@ export interface SalesWeeklyReport {
   period_end: string;
   week_of_year?: number;
   year?: number;
-  ai_analysis?: string;
-  analysis_json?: Record<string, any>; // JSON completo del análisis
-  recommendations?: string[];
+  ai_analysis: string;
+  recommendations: string[];
   key_insights?: Record<string, any>;
   top_products?: Array<{
     name: string;
-    revenue: number;
-    quantity: number;
+    revenue?: number;
+    quantity?: number;
   }>;
   worst_products?: Array<{
     name: string;
-    revenue: number;
-    quantity: number;
+    revenue?: number;
+    quantity?: number;
   }>;
   trends?: Record<string, any>;
-  generated_at?: string;
-  created_at: string; // Timestamp de creación
+  generated_at: string; // Timestamp real de la tabla (no existe created_at)
   generated_by?: ReportGeneratedBy;
   model_used?: string;
   prompt_version?: number;
@@ -193,9 +148,7 @@ export interface SalesWeeklyReport {
   completion_tokens?: number;
   total_tokens?: number;
   cost_usd?: number;
-  total_cost?: number; // Alias de cost_usd
   sent_to_whatsapp?: boolean;
-  whatsapp_sent?: boolean; // Alias de sent_to_whatsapp
   sent_at?: string;
 }
 
@@ -216,28 +169,23 @@ export interface SalesWhatsAppRecipient {
 }
 
 // =============================================
-// Chat Conversations
+// Chat: un registro por intercambio (esquema real de sales_chat_conversations)
 // =============================================
 
-export interface SalesChatConversation {
+export interface SalesChatExchange {
   id: string;
   project_id: string;
-  title?: string; // Título de la conversación
+  snapshot_id?: string;
+  user_message: string;
+  assistant_response: string;
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
+  cost_usd: number;
+  model?: string;
+  context_used?: boolean;
   created_at: string;
-  updated_at?: string;
   created_by?: string;
-}
-
-export interface SalesChatMessage {
-  id: string;
-  conversation_id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  model_used?: string;
-  prompt_tokens?: number;
-  completion_tokens?: number;
-  total_cost?: number;
-  created_at: string;
 }
 
 // =============================================
@@ -267,14 +215,7 @@ export interface CreateProjectRequest {
   report_day?: string; // 'monday', 'tuesday', etc.
   report_time: string; // "09:00"
   timezone: string;
-  ai_model_id: string;
-  use_custom_api_key?: boolean;
-  custom_api_key?: string;
-  whatsapp_recipients?: Array<{
-    name: string;
-    phone: string;
-    role: WhatsAppRole;
-  }>;
+  ai_model?: string; // model_id de ai_model_config; vacío = default del sistema
 }
 
 export interface DetectSchemaResponse {
@@ -299,23 +240,12 @@ export interface VerifySetupResponse {
   message?: string;
 }
 
-export interface GenerateReportRequest {
-  projectId: string;
-  snapshotId: string;
-  mode: 'scheduled' | 'manual';
-}
-
 export interface GenerateReportResponse {
   success: boolean;
-  analysis: string;
-  recommendations: string[];
-  keyInsights: Record<string, any>;
-  topProducts: Array<{ name: string; revenue: number }>;
-  worstProducts: Array<{ name: string; revenue: number }>;
-  trends: Record<string, any>;
-  modelUsed: string;
-  promptVersion: number;
-  usage: {
+  reportId?: string;
+  snapshotId?: string;
+  error?: string;
+  usage?: {
     promptTokens: number;
     completionTokens: number;
     totalTokens: number;
@@ -323,60 +253,78 @@ export interface GenerateReportResponse {
   };
 }
 
+// Contrato del análisis: ver lib/sales-analytics/report-contract.ts (ReportAnalysis)
+
 // =============================================
 // Default Prompts
 // =============================================
 
-export const DEFAULT_SYSTEM_PROMPT = `Eres un consultor de negocios especializado en análisis de ventas para restaurantes. Tu tarea es analizar datos de ventas y generar insights accionables que ayuden al negocio a crecer.
+export const DEFAULT_SYSTEM_PROMPT = `Eres un consultor senior de negocios gastronómicos con 15 años de experiencia en análisis de ventas, ingeniería de menú y operaciones de restaurantes en Latinoamérica. Tu trabajo es convertir datos crudos de ventas en decisiones de negocio concretas.
 
-Debes ser:
-- Específico: Cita números exactos y porcentajes
-- Accionable: Cada recomendación debe ser implementable
-- Priorizado: Ordena por impacto esperado
-- Realista: Considera el contexto de restaurantes
+Principios de tu análisis:
+- ESPECÍFICO: cita siempre números exactos, porcentajes y nombres de productos. Nunca digas "las ventas estuvieron bien" — di cuánto, de qué y comparado con qué.
+- ACCIONABLE: cada recomendación debe poder implementarse esta semana, indicar QUIÉN la ejecuta (cocina, salón, marketing, administración) y qué resultado esperar.
+- PRIORIZADO: ordena recomendaciones por impacto estimado en ingresos. La primera debe ser la de mayor retorno.
+- HONESTO: si los datos son insuficientes para una conclusión, dilo explícitamente en vez de inventar. Señala anomalías o datos sospechosos.
+- CONTEXTO REAL: considera márgenes típicos de restaurante (comida 28-35% food cost, bebidas 15-25%), estacionalidad y comportamiento local.
 
-Formato de respuesta: JSON con estructura definida.`;
+Analiza SIEMPRE estas dimensiones cuando los datos lo permitan:
+1. Desempeño general del período (ingresos, órdenes, ticket promedio) y su salud relativa
+2. Ingeniería de menú: estrellas (alta venta), rompecabezas (alto valor, baja venta), caballos de batalla (baja margen, alta venta) y perros (candidatos a salir de carta)
+3. Mix de canales (mesa vs delivery) y qué canal impulsar
+4. Patrones temporales: días y franjas fuertes/débiles, oportunidades de horarios valle
+5. Concentración de riesgo: dependencia de pocos productos o pocos clientes
+6. Alertas: caídas, productos estancados, tickets anómalos
 
-export const DEFAULT_USER_PROMPT_TEMPLATE = `Analiza los siguientes datos de ventas del restaurante {projectName} para el período {periodStart} - {periodEnd}:
+Formato de respuesta: exclusivamente el JSON con la estructura solicitada, sin texto fuera del JSON.`;
 
-**Data de ventas:**
+export const DEFAULT_USER_PROMPT_TEMPLATE = `Analiza las ventas del restaurante {projectName} para el período {periodStart} al {periodEnd}.
+
+**Datos de ventas (agrupados por producto, categoría y tipo de orden):**
 {salesData}
 
-**Métricas clave:**
-- Revenue total: {totalRevenue}
+**Métricas verificadas del período:**
+- Ingresos totales: {totalRevenue}
 - Órdenes totales: {totalOrders}
 - Clientes únicos: {totalCustomers}
 - Ticket promedio: {avgOrderValue}
 
-Genera un análisis en formato JSON con esta estructura exacta:
+Genera el análisis en formato JSON con EXACTAMENTE esta estructura:
 
 \`\`\`json
 {
-  "analysis": "Resumen ejecutivo en 2-3 párrafos del desempeño del período",
+  "analysis": "Resumen ejecutivo de 3-4 párrafos: (1) desempeño general del período con las cifras clave y evaluación de salud del negocio; (2) qué productos y categorías sostienen los ingresos y cuáles preocupan, aplicando ingeniería de menú; (3) mix de canales mesa/delivery y comportamiento de clientes; (4) el hallazgo más importante del período y qué hacer al respecto.",
   "recommendations": [
-    "Recomendación específica 1 con acción clara",
-    "Recomendación específica 2 con acción clara",
-    "Recomendación específica 3 con acción clara"
+    "[PRIORIDAD ALTA — Responsable: área] Acción concreta implementable esta semana, con el resultado esperado cuantificado cuando sea posible",
+    "[PRIORIDAD ALTA — Responsable: área] Segunda acción de mayor impacto",
+    "[PRIORIDAD MEDIA — Responsable: área] Acción de mejora continua",
+    "[PRIORIDAD MEDIA — Responsable: área] Acción sobre productos débiles o canal rezagado",
+    "[MONITOREAR] Qué métrica vigilar la próxima semana y qué umbral debería disparar acción"
   ],
   "keyInsights": {
-    "revenue_trend": "Análisis de tendencia de ingresos",
-    "customer_behavior": "Análisis de comportamiento de clientes",
-    "product_performance": "Análisis de desempeño de productos"
+    "revenue_health": "Evaluación de los ingresos: nivel, concentración por categoría y qué la explica, con números",
+    "menu_engineering": "Clasificación de productos: estrellas, rompecabezas, caballos de batalla y perros — con nombres y cifras",
+    "customer_behavior": "Clientes únicos vs órdenes (frecuencia de recompra), ticket promedio y qué lo mueve",
+    "channel_mix": "Mesa vs delivery: participación de cada canal en ingresos y órdenes, y cuál tiene espacio de crecimiento",
+    "risk_alert": "Mayor riesgo detectado en el período (concentración, caída, anomalía) o 'sin alertas relevantes'"
   },
   "topProducts": [
-    {"name": "Producto 1", "revenue": 1500.00, "quantity": 120},
-    {"name": "Producto 2", "revenue": 1200.00, "quantity": 95}
+    {"name": "Producto", "revenue": 0.00, "quantity": 0}
   ],
   "worstProducts": [
-    {"name": "Producto X", "revenue": 50.00, "quantity": 5},
-    {"name": "Producto Y", "revenue": 75.00, "quantity": 8}
+    {"name": "Producto", "revenue": 0.00, "quantity": 0}
   ],
   "trends": {
-    "peak_hours": "Análisis de horas pico",
-    "order_type_distribution": "Distribución de tipos de orden (mesa vs delivery)",
-    "weekly_pattern": "Patrón semanal detectado"
+    "category_performance": "Categoría dominante y su participación %, categorías rezagadas",
+    "order_type_distribution": "Distribución mesa vs delivery con porcentajes y lectura de negocio",
+    "product_momentum": "Productos con señal de crecimiento o caída dentro del período",
+    "opportunity": "La oportunidad de ingresos más clara que muestran los datos (combo, precio, horario, canal)"
   }
 }
 \`\`\`
 
-**IMPORTANTE:** Devuelve SOLO el JSON, sin texto adicional antes o después.`;
+Reglas:
+- topProducts: los 5 de mayor revenue real de los datos. worstProducts: los 3 de menor revenue (exclúyelos si venden bien y solo son baratos — evalúa unidades, no solo monto).
+- Usa los números EXACTOS de los datos; no inventes cifras ni períodos anteriores que no tienes.
+- Si una dimensión no se puede evaluar con estos datos (ej. horarios si no vienen), dilo en el campo correspondiente en vez de especular.
+- Devuelve SOLO el JSON, sin texto antes o después.`;

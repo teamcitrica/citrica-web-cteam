@@ -3,30 +3,26 @@
 // CRUD de proyectos de Sales Analytics
 // =============================================
 
-import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 import { encrypt } from '@/lib/sales-analytics/encryptionHelpers';
+import { requireSession, getServiceClient } from '@/lib/sales-analytics/api-helpers';
 import {
   generateCronExpression,
   getNextExecution,
   slugify,
 } from '@/lib/sales-analytics/cronHelpers';
-import type {
-  CreateProjectRequest,
-  SalesProject,
-} from '@/types/sales-analytics';
+import type { CreateProjectRequest } from '@/types/sales-analytics';
 import { DEFAULT_SYSTEM_PROMPT, DEFAULT_USER_PROMPT_TEMPLATE } from '@/types/sales-analytics';
-
-const citricaSupabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 // =============================================
 // GET: Listar proyectos
 // =============================================
 
 export async function GET(request: NextRequest) {
+  const session = await requireSession();
+  if (session.errorResponse) return session.errorResponse;
+  const citricaSupabase = getServiceClient();
+
   try {
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get('id');
@@ -76,6 +72,10 @@ export async function GET(request: NextRequest) {
 // =============================================
 
 export async function POST(request: NextRequest) {
+  const session = await requireSession();
+  if (session.errorResponse) return session.errorResponse;
+  const citricaSupabase = getServiceClient();
+
   try {
     const formData: CreateProjectRequest = await request.json();
 
@@ -107,11 +107,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Encriptar credenciales
+    // Encriptar credencial del Supabase externo
     const encryptedAnonKey = encrypt(formData.supabase_anon_key);
-    const encryptedApiKey = formData.custom_api_key
-      ? encrypt(formData.custom_api_key)
-      : null;
 
     // Generar cron expression
     const cronExpression = generateCronExpression(
@@ -123,9 +120,8 @@ export async function POST(request: NextRequest) {
     // Calcular próxima ejecución
     const nextExecution = getNextExecution(cronExpression, formData.timezone);
 
-    // Obtener usuario autenticado (simplificado - ajustar según tu auth)
-    // En producción, obtener desde JWT o session
-    const userId = request.headers.get('x-user-id'); // Placeholder
+    // Usuario real de la sesión (no headers falsificables)
+    const userId = session.user!.id;
 
     // Insertar proyecto
     const { data: project, error } = await citricaSupabase
@@ -137,16 +133,14 @@ export async function POST(request: NextRequest) {
         company_id: formData.company_id,
         supabase_url: formData.supabase_url,
         supabase_anon_key: encryptedAnonKey,
-        data_extraction_strategy: 'rpc', // Default, se ajusta en detect-schema
+        data_extraction_strategy: 'rpc', // v1: solo estrategia RPC
         report_frequency: formData.report_frequency,
         cron_expression: cronExpression,
         timezone: formData.timezone,
         next_scheduled_execution: nextExecution,
-        ai_model_id: formData.ai_model_id,
-        use_custom_api_key: formData.use_custom_api_key || false,
-        custom_api_key: encryptedApiKey,
+        ai_model: formData.ai_model || null, // NULL = modelo default del sistema
         is_active: true,
-        created_by: userId || null,
+        created_by: userId,
       })
       .select()
       .single();
@@ -167,23 +161,13 @@ export async function POST(request: NextRequest) {
       temperature: 0.7,
       max_tokens: 4096,
       version: 1,
+      version_name: 'Prompt inicial',
       is_active: true,
-      created_by: userId || null,
+      created_by: userId,
     });
 
-    // Guardar destinatarios WhatsApp
-    if (formData.whatsapp_recipients && formData.whatsapp_recipients.length > 0) {
-      await citricaSupabase.from('sales_whatsapp_recipients').insert(
-        formData.whatsapp_recipients.map((r) => ({
-          project_id: project.id,
-          name: r.name,
-          phone: r.phone,
-          role: r.role,
-          is_active: true,
-          receive_reports: true,
-        }))
-      );
-    }
+    // (WhatsApp fuera de alcance por ahora; la tabla sales_whatsapp_recipients
+    // queda disponible para cuando se integre un proveedor de envío)
 
     return NextResponse.json({
       success: true,
@@ -205,6 +189,10 @@ export async function POST(request: NextRequest) {
 // =============================================
 
 export async function PATCH(request: NextRequest) {
+  const session = await requireSession();
+  if (session.errorResponse) return session.errorResponse;
+  const citricaSupabase = getServiceClient();
+
   try {
     const { id, updates } = await request.json();
 
@@ -215,13 +203,9 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    // Encriptar credenciales si se actualizan
+    // Encriptar credencial si se actualiza
     if (updates.supabase_anon_key) {
       updates.supabase_anon_key = encrypt(updates.supabase_anon_key);
-    }
-
-    if (updates.custom_api_key) {
-      updates.custom_api_key = encrypt(updates.custom_api_key);
     }
 
     // Actualizar cron expression si cambia la configuración
@@ -278,6 +262,10 @@ export async function PATCH(request: NextRequest) {
 // =============================================
 
 export async function DELETE(request: NextRequest) {
+  const session = await requireSession();
+  if (session.errorResponse) return session.errorResponse;
+  const citricaSupabase = getServiceClient();
+
   try {
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get('id');
@@ -289,10 +277,10 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Soft delete: marcar como inactivo
+    // Borrado real: snapshots, reportes, prompts, chats y logs caen por FK CASCADE
     const { error } = await citricaSupabase
       .from('sales_projects')
-      .update({ is_active: false })
+      .delete()
       .eq('id', projectId);
 
     if (error) {
@@ -304,7 +292,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Proyecto desactivado exitosamente',
+      message: 'Proyecto eliminado exitosamente',
     });
   } catch (error: any) {
     return NextResponse.json(

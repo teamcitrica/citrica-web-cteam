@@ -147,36 +147,108 @@ function isValidCronPart(part: string, min: number, max: number): boolean {
 }
 
 /**
- * Calcular próxima ejecución basada en cron expression
- * (Implementación simplificada - para producción usar librería como 'cron-parser')
+ * Fecha (Y-M-D) y día de semana de un instante, vistos desde un timezone
+ */
+function getZonedDateParts(
+  date: Date,
+  timezone: string
+): { year: number; month: number; day: number; dayOfWeek: number } {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    weekday: 'short',
+  });
+  const parts = formatter.formatToParts(date);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value || '';
+  const weekdays: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+  return {
+    year: parseInt(get('year'), 10),
+    month: parseInt(get('month'), 10),
+    day: parseInt(get('day'), 10),
+    dayOfWeek: weekdays[get('weekday')] ?? 0,
+  };
+}
+
+/**
+ * Offset (ms) del timezone respecto a UTC en un instante dado.
+ * Usa formatToParts — independiente del timezone del servidor.
+ */
+function tzOffsetMs(date: Date, timezone: string): number {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: false,
+  }).formatToParts(date);
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value || 0);
+  const asUTC = Date.UTC(
+    get('year'),
+    get('month') - 1,
+    get('day'),
+    get('hour') % 24,
+    get('minute'),
+    get('second')
+  );
+  return asUTC - date.getTime();
+}
+
+/**
+ * Convierte una hora de pared (wall clock) en un timezone al instante UTC real
+ */
+function zonedWallTimeToUtc(
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number,
+  timezone: string
+): Date {
+  const utcGuess = Date.UTC(year, month - 1, day, hour, minute, 0, 0);
+  const offset = tzOffsetMs(new Date(utcGuess), timezone);
+  return new Date(utcGuess - offset);
+}
+
+/**
+ * Calcular próxima ejecución basada en cron expression (min hora díaMes mes díaSemana)
+ * Soporta correctamente: diaria, semanal (día de semana) y mensual (día del mes),
+ * interpretando la hora en el timezone del proyecto.
  * @param cronExpression - Expresión cron
- * @param timezone - Timezone (ej: 'America/Caracas')
- * @returns ISO string de próxima ejecución
+ * @param timezone - Timezone IANA (ej: 'America/Caracas')
+ * @returns ISO string UTC de la próxima ejecución
  */
 export function getNextExecution(
   cronExpression: string,
   timezone: string = 'UTC'
 ): string {
-  // Esta es una implementación simplificada
-  // En producción, usar librería 'cron-parser' con soporte de timezone
-
   const now = new Date();
-  const [minute, hour, day, month, dayOfWeek] = cronExpression.split(' ');
+  const [minuteStr, hourStr, dayOfMonthStr, , dayOfWeekStr] = cronExpression.split(' ');
+  const minute = minuteStr === '*' ? 0 : parseInt(minuteStr, 10) || 0;
+  const hour = hourStr === '*' ? 0 : parseInt(hourStr, 10) || 0;
 
-  // Calcular próxima fecha (simplificado - asume ejecución diaria/semanal)
-  const next = new Date(now);
+  // Escanear los próximos 62 días buscando el primer instante futuro que cumpla
+  for (let offsetDays = 0; offsetDays <= 62; offsetDays++) {
+    const probe = new Date(now.getTime() + offsetDays * 24 * 60 * 60 * 1000);
+    const parts = getZonedDateParts(probe, timezone);
 
-  // Si es hora/minuto específico
-  if (hour !== '*' && minute !== '*') {
-    next.setHours(parseInt(hour, 10), parseInt(minute, 10), 0, 0);
+    if (dayOfWeekStr !== '*' && parts.dayOfWeek !== parseInt(dayOfWeekStr, 10) % 7) continue;
+    if (dayOfMonthStr !== '*' && parts.day !== parseInt(dayOfMonthStr, 10)) continue;
 
-    // Si ya pasó hoy, mover a mañana
-    if (next <= now) {
-      next.setDate(next.getDate() + 1);
+    const candidate = zonedWallTimeToUtc(parts.year, parts.month, parts.day, hour, minute, timezone);
+    if (candidate > now) {
+      return candidate.toISOString();
     }
   }
 
-  return next.toISOString();
+  // Fallback defensivo: mañana a la hora indicada
+  const fallback = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  return fallback.toISOString();
 }
 
 /**

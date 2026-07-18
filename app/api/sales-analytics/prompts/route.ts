@@ -4,18 +4,18 @@
 // =============================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE!;
+import { requireSession, getServiceClient } from '@/lib/sales-analytics/api-helpers';
 
 // =============================================
 // GET - Obtener prompts de un proyecto
 // =============================================
 
 export async function GET(request: NextRequest) {
+  const session = await requireSession();
+  if (session.errorResponse) return session.errorResponse;
+
   try {
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = getServiceClient();
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get('project_id');
     const promptId = searchParams.get('id');
@@ -75,8 +75,11 @@ export async function GET(request: NextRequest) {
 // =============================================
 
 export async function POST(request: NextRequest) {
+  const session = await requireSession();
+  if (session.errorResponse) return session.errorResponse;
+
   try {
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = getServiceClient();
     const body = await request.json();
 
     const {
@@ -99,16 +102,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Versión incremental server-side
+    const { data: lastVersion } = await supabase
+      .from('sales_prompts')
+      .select('version')
+      .eq('project_id', project_id)
+      .order('version', { ascending: false })
+      .limit(1);
+
+    const nextVersion = (lastVersion?.[0]?.version || 0) + 1;
+
     const { data: prompt, error } = await supabase
       .from('sales_prompts')
       .insert({
         project_id,
-        version_name: version_name || `v${Date.now()}`,
+        version: nextVersion,
+        version_name: version_name || `Versión ${nextVersion}`,
         system_prompt,
         user_prompt_template,
         temperature: temperature || 0.7,
         max_tokens: max_tokens || 4000,
         is_active: is_active !== undefined ? is_active : false,
+        created_by: session.user!.id,
       })
       .select()
       .single();
@@ -136,14 +151,56 @@ export async function POST(request: NextRequest) {
 // =============================================
 
 export async function PATCH(request: NextRequest) {
-  try {
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const body = await request.json();
-    const { id, updates } = body;
+  const session = await requireSession();
+  if (session.errorResponse) return session.errorResponse;
 
-    if (!id || !updates) {
+  try {
+    const supabase = getServiceClient();
+    const body = await request.json();
+    const { id, updates, action } = body;
+
+    if (!id) {
       return NextResponse.json(
-        { success: false, error: 'id y updates son requeridos' },
+        { success: false, error: 'id es requerido' },
+        { status: 400 }
+      );
+    }
+
+    // Activación atómica server-side (reemplaza el N+1 del cliente).
+    // Orden importa: primero desactivar todos (respeta el índice único parcial)
+    if (action === 'activate') {
+      const { data: target } = await supabase
+        .from('sales_prompts')
+        .select('project_id')
+        .eq('id', id)
+        .single();
+
+      if (!target) {
+        return NextResponse.json(
+          { success: false, error: 'Prompt no encontrado' },
+          { status: 404 }
+        );
+      }
+
+      await supabase
+        .from('sales_prompts')
+        .update({ is_active: false })
+        .eq('project_id', target.project_id);
+
+      const { data: activated, error: activateError } = await supabase
+        .from('sales_prompts')
+        .update({ is_active: true })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (activateError) throw activateError;
+      return NextResponse.json({ success: true, prompt: activated });
+    }
+
+    if (!updates) {
+      return NextResponse.json(
+        { success: false, error: 'updates es requerido' },
         { status: 400 }
       );
     }
@@ -178,8 +235,11 @@ export async function PATCH(request: NextRequest) {
 // =============================================
 
 export async function DELETE(request: NextRequest) {
+  const session = await requireSession();
+  if (session.errorResponse) return session.errorResponse;
+
   try {
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = getServiceClient();
     const { searchParams } = new URL(request.url);
     const promptId = searchParams.get('id');
 
