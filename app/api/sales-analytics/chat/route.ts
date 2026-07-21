@@ -128,8 +128,11 @@ export async function POST(request: NextRequest) {
 
     const systemPrompt =
       `Eres un analista de ventas del proyecto "${project.name}". ` +
-      `Responde en español, claro y accionable, basándote en los reportes disponibles.` +
-      (context ? `\n\nContexto de reportes recientes:\n${context}` : '') +
+      `Responde en español, claro y accionable, basándote en los reportes disponibles. ` +
+      `Solo puedes afirmar datos (productos, cifras, tendencias) que aparezcan en el contexto de reportes; nunca inventes datos de ventas.` +
+      (context
+        ? `\n\nContexto de reportes recientes:\n${context}`
+        : `\n\nNo hay reportes generados para este proyecto todavía. Indícalo al usuario y sugiérele generar un reporte desde la vista del proyecto. No inventes cifras ni productos.`) +
       (historyText ? `\n\nConversación previa:\n${historyText}` : '');
 
     const result = await generateText({
