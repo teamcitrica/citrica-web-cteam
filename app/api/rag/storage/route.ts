@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     const supabase = createRouteHandlerClient({ cookies });
     const body = await request.json();
 
-    const { name, description } = body;
+    const { name, description, strict_mode } = body;
 
     if (!name) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
@@ -78,6 +78,7 @@ export async function POST(request: Request) {
         name,
         description,
         status: "ready",
+        strict_mode: !!strict_mode,
       })
       .select()
       .single();
@@ -87,6 +88,42 @@ export async function POST(request: Request) {
     return NextResponse.json({ storage }, { status: 201 });
   } catch (error: any) {
     console.error("Error creating storage:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+// PATCH - Actualizar storage (nombre, descripción, modo estricto)
+export async function PATCH(request: Request) {
+  try {
+    const supabase = createRouteHandlerClient({ cookies });
+    const body = await request.json();
+    const { id, name, description, strict_mode } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Storage ID is required" }, { status: 400 });
+    }
+
+    const updates: Record<string, any> = {};
+    if (name !== undefined) updates.name = name;
+    if (description !== undefined) updates.description = description;
+    if (strict_mode !== undefined) updates.strict_mode = !!strict_mode;
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
+    }
+
+    const { data: storage, error } = await supabase
+      .from("document_storages")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return NextResponse.json({ storage });
+  } catch (error: any) {
+    console.error("Error updating storage:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

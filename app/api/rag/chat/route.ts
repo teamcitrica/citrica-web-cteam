@@ -17,6 +17,25 @@ import { getGeminiApiKey } from "@/lib/ai/gemini-api-key";
 // (el máximo real por request no está documentado)
 const MAX_STORES = 10;
 
+// Instrucción base: prioriza documentos, permite conocimiento general
+// siempre que se distinga la fuente (anti-atribución falsa)
+const BASE_RAG_INSTRUCTION =
+  "Prioriza la información de los documentos recuperados como fuente principal. " +
+  "Puedes complementar con tu conocimiento general cuando aporte valor, pero " +
+  "distingue con claridad qué proviene de los documentos y qué es conocimiento general. " +
+  "Nunca atribuyas a los documentos información que no contienen; si algo no está en ellos, dilo.";
+
+// Instrucción cuando el storage tiene strict_mode activado (reemplaza a la base:
+// combinarlas se contradice — la base permite conocimiento general)
+const STRICT_RAG_INSTRUCTION =
+  "MODO ESTRICTO: El documento es tu única fuente y tu guion. " +
+  "Sigue su estructura y sus secciones en el orden exacto en que aparecen, al pie de la letra. " +
+  "No agregues preguntas, temas ni contenido que no estén escritos en el documento. " +
+  "Si el usuario pide algo fuera del documento, responde que no está contemplado en el documento.";
+
+// Temperature baja en modo estricto para minimizar improvisación
+const STRICT_TEMPERATURE = 0.3;
+
 /**
  * POST - Chat RAG con Gemini File Search (retrieval administrado por Gemini)
  * Flujo:
@@ -89,7 +108,7 @@ export async function POST(request: Request) {
 
     const storageQuery = supabase
       .from("document_storages")
-      .select("id, name, gemini_vector_store_id, storage_files!inner(file_name, gemini_file_state)")
+      .select("id, name, gemini_vector_store_id, strict_mode, storage_files!inner(file_name, gemini_file_state)")
       .like("gemini_vector_store_id", "fileSearchStores/%")
       .eq("storage_files.gemini_file_state", "ACTIVE");
 
@@ -103,14 +122,22 @@ export async function POST(request: Request) {
       throw storagesError;
     }
 
+    let strictMode = false;
+    const strictFlags: boolean[] = [];
+
     for (const storage of storagesWithFiles || []) {
       if (isRealStoreName(storage.gemini_vector_store_id)) {
         storeNames.push(storage.gemini_vector_store_id);
+        strictFlags.push(!!(storage as any).strict_mode);
         for (const f of (storage as any).storage_files || []) {
           sources.push({ document: f.file_name, storage: storage.name });
         }
       }
     }
+
+    // Estricto solo si TODAS las bases consultadas lo son (en "todas las bases"
+    // no se fuerza el guion de una sobre las demás)
+    strictMode = strictFlags.length > 0 && strictFlags.every(Boolean);
 
     if (storeNames.length > MAX_STORES) {
       console.warn(`⚠️ ${storeNames.length} stores; se usan solo los primeros ${MAX_STORES}`);
@@ -169,13 +196,24 @@ export async function POST(request: Request) {
         parts: [{ text: msg.content }],
       }));
 
+      const systemInstruction = strictMode
+        ? STRICT_RAG_INSTRUCTION
+        : BASE_RAG_INSTRUCTION;
+
+      const temperature = strictMode
+        ? Math.min(profileConfig.temperature, STRICT_TEMPERATURE)
+        : profileConfig.temperature;
+
+      console.log(`🎯 Modo estricto: ${strictMode ? "ON" : "OFF"}`);
+
       const generate = (model: string) =>
         ai.models.generateContentStream({
           model,
           contents,
           config: {
+            systemInstruction,
             tools: [{ fileSearch: { fileSearchStoreNames: storeNames } }],
-            temperature: profileConfig.temperature,
+            temperature,
             maxOutputTokens: profileConfig.maxOutputTokens,
           },
         });
