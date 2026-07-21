@@ -6,6 +6,7 @@ import { Button, Input, Col, Container, Icon, Text } from "citrica-ui-toolkit";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
 import { addToast } from "@heroui/toast";
 import { Divider } from "@heroui/divider";
+import { Switch } from "@heroui/switch";
 import StorageFilesModal from "./components/StorageFilesModal";
 import { validateRagFile, ACCEPT_ATTRIBUTE, LIMITS_LABEL } from "@/lib/ai/rag-file-support";
 
@@ -22,6 +23,7 @@ interface DocumentStorage {
   files: StorageFile[];
   total_tokens_used?: number;
   total_cost_usd?: number;
+  strict_mode?: boolean;
 }
 
 interface StorageFile {
@@ -39,6 +41,7 @@ export default function DatabasesRAGPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newStorageName, setNewStorageName] = useState("");
   const [newStorageDescription, setNewStorageDescription] = useState("");
+  const [newStorageStrictMode, setNewStorageStrictMode] = useState(false);
   const [selectedStorage, setSelectedStorage] = useState<DocumentStorage | null>(null);
   const [uploadingFiles, setUploadingFiles] = useState<Record<string, boolean>>({});
   const [reprocessingStorages, setReprocessingStorages] = useState<Record<string, boolean>>({});
@@ -95,6 +98,7 @@ export default function DatabasesRAGPage() {
         body: JSON.stringify({
           name: newStorageName,
           description: newStorageDescription,
+          strict_mode: newStorageStrictMode,
         }),
       });
 
@@ -102,6 +106,7 @@ export default function DatabasesRAGPage() {
         setIsCreateModalOpen(false);
         setNewStorageName("");
         setNewStorageDescription("");
+        setNewStorageStrictMode(false);
         await fetchStorages(); // Recargar lista
       }
     } catch (error) {
@@ -261,6 +266,39 @@ export default function DatabasesRAGPage() {
     } finally {
       setReprocessingStorages(prev => ({ ...prev, [storageId]: false }));
       await fetchStorages(true);
+    }
+  };
+
+  const handleToggleStrictMode = async (storage: DocumentStorage, value: boolean) => {
+    // Actualización optimista; revertir si el PATCH falla
+    setStorages(prev => prev.map(s => s.id === storage.id ? { ...s, strict_mode: value } : s));
+
+    try {
+      const response = await fetch("/api/rag/storage", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: storage.id, strict_mode: value }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error al actualizar modo estricto");
+      }
+
+      addToast({
+        title: value ? "Modo estricto activado" : "Modo estricto desactivado",
+        description: value
+          ? "El chat responderá solo con el contenido del documento, siguiendo su estructura."
+          : "El chat puede complementar con conocimiento general.",
+        color: "success",
+      });
+    } catch (error: any) {
+      setStorages(prev => prev.map(s => s.id === storage.id ? { ...s, strict_mode: !value } : s));
+      addToast({
+        title: "Error",
+        description: error.message || "Error al actualizar modo estricto",
+        color: "danger",
+      });
     }
   };
 
@@ -491,7 +529,7 @@ export default function DatabasesRAGPage() {
                     </div>
 
                     {/* Estado */}
-                    <div className="grid grid-cols-2 gap-3 items-center">
+                    <div className="grid grid-cols-2 gap-3 items-center mb-3">
                       <div className="flex items-center gap-2">
                         <Text isAdmin={true} variant="label" color="#4B5563">Estado:</Text>
                         <div className="flex items-center gap-1">
@@ -502,6 +540,23 @@ export default function DatabasesRAGPage() {
                       <div className="flex items-center justify-end">
                         <Text isAdmin={true} variant="label" color="#4B5563">Creado: {new Date(storage.createdAt).toLocaleDateString("es-ES")}</Text>
                       </div>
+                    </div>
+
+                    {/* Modo estricto */}
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg px-3 py-2"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Icon name="Lock" size={14} color="#b45309" />
+                        <Text isAdmin={true} variant="label" color="#92400E">Modo estricto (solo documento)</Text>
+                      </div>
+                      <Switch
+                        size="sm"
+                        isSelected={!!storage.strict_mode}
+                        onValueChange={(value) => handleToggleStrictMode(storage, value)}
+                        aria-label="Modo estricto"
+                      />
                     </div>
                   </CardBody>
 
@@ -626,6 +681,21 @@ export default function DatabasesRAGPage() {
               placeholder="Breve descripción del contenido..."
               rows={3}
               className="text-black w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#265197]"
+            />
+          </div>
+
+          <div className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+            <div>
+              <Text isAdmin={true} variant="label" weight="bold" color="#92400E">Modo estricto</Text>
+              <p className="text-xs text-amber-700">
+                El chat responderá solo con el contenido de los documentos, siguiendo su estructura al pie de la letra.
+              </p>
+            </div>
+            <Switch
+              size="sm"
+              isSelected={newStorageStrictMode}
+              onValueChange={setNewStorageStrictMode}
+              aria-label="Modo estricto"
             />
           </div>
         </div>
