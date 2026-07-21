@@ -76,7 +76,13 @@ export async function POST(request: Request) {
     // ================================================================
 
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const bucketPath = `${storageId}/${Date.now()}_${file.name}`;
+    // Supabase Storage rechaza keys con espacios/acentos; el nombre original
+    // se conserva en storage_files.file_name y como displayName en Gemini
+    const safeName = file.name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9._-]+/g, "_");
+    const bucketPath = `${storageId}/${Date.now()}_${safeName}`;
     const mimeType = resolveMimeType(file.name, file.type);
 
     console.log("💾 Guardando archivo en Supabase Storage...");
