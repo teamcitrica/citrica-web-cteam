@@ -17,12 +17,16 @@ import { getGeminiApiKey } from "@/lib/ai/gemini-api-key";
 // (el máximo real por request no está documentado)
 const MAX_STORES = 10;
 
-// Instrucción base: siempre activa cuando hay documentos (anti-invención)
+// Instrucción base: prioriza documentos, permite conocimiento general
+// siempre que se distinga la fuente (anti-atribución falsa)
 const BASE_RAG_INSTRUCTION =
-  "Responde únicamente con base en la información de los documentos recuperados. " +
-  "Si la respuesta no está en los documentos, dilo explícitamente en lugar de inventar información.";
+  "Prioriza la información de los documentos recuperados como fuente principal. " +
+  "Puedes complementar con tu conocimiento general cuando aporte valor, pero " +
+  "distingue con claridad qué proviene de los documentos y qué es conocimiento general. " +
+  "Nunca atribuyas a los documentos información que no contienen; si algo no está en ellos, dilo.";
 
-// Instrucción adicional cuando el storage tiene strict_mode activado
+// Instrucción cuando el storage tiene strict_mode activado (reemplaza a la base:
+// combinarlas se contradice — la base permite conocimiento general)
 const STRICT_RAG_INSTRUCTION =
   "MODO ESTRICTO: El documento es tu única fuente y tu guion. " +
   "Sigue su estructura y sus secciones en el orden exacto en que aparecen, al pie de la letra. " +
@@ -193,7 +197,7 @@ export async function POST(request: Request) {
       }));
 
       const systemInstruction = strictMode
-        ? `${BASE_RAG_INSTRUCTION}\n\n${STRICT_RAG_INSTRUCTION}`
+        ? STRICT_RAG_INSTRUCTION
         : BASE_RAG_INSTRUCTION;
 
       const temperature = strictMode
