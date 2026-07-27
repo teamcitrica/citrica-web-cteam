@@ -7,6 +7,8 @@ import Modal from "@/shared/components/citrica-ui/molecules/modal";
 import { addToast } from "@heroui/toast";
 import { Divider } from "@heroui/divider";
 import { Switch } from "@heroui/switch";
+import { Chip } from "@heroui/chip";
+import { Tooltip } from "@heroui/tooltip";
 import StorageFilesModal from "./components/StorageFilesModal";
 import { validateRagFile, ACCEPT_ATTRIBUTE, LIMITS_LABEL } from "@/lib/ai/rag-file-support";
 
@@ -24,6 +26,7 @@ interface DocumentStorage {
   total_tokens_used?: number;
   total_cost_usd?: number;
   strict_mode?: boolean;
+  custom_prompt?: string | null;
 }
 
 interface StorageFile {
@@ -49,10 +52,20 @@ export default function DatabasesRAGPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [storageToDelete, setStorageToDelete] = useState<DocumentStorage | null>(null);
   const [selectedStorageForFiles, setSelectedStorageForFiles] = useState<DocumentStorage | null>(null);
+  const [promptModalStorage, setPromptModalStorage] = useState<DocumentStorage | null>(null);
+  const [promptDraft, setPromptDraft] = useState("");
+  const [isSavingPrompt, setIsSavingPrompt] = useState(false);
+  const [ragDefaults, setRagDefaults] = useState<{ base: string; strict: string } | null>(null);
 
-  // Cargar storages al montar el componente
+  // Cargar storages y prompts default al montar el componente
   useEffect(() => {
     fetchStorages();
+    fetch("/api/rag/prompts")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.defaults) setRagDefaults(data.defaults);
+      })
+      .catch((error) => console.error("Error fetching RAG prompt defaults:", error));
   }, []);
 
   const fetchStorages = async (silent = false) => {
@@ -302,6 +315,52 @@ export default function DatabasesRAGPage() {
     }
   };
 
+  // Abrir editor de prompt personalizado, prefilled con el custom o el default efectivo
+  const openPromptModal = (storage: DocumentStorage) => {
+    const effectiveDefault = storage.strict_mode
+      ? ragDefaults?.strict || ""
+      : ragDefaults?.base || "";
+    setPromptDraft(storage.custom_prompt || effectiveDefault);
+    setPromptModalStorage(storage);
+  };
+
+  // custom_prompt: string guarda, null limpia (vuelve al default global)
+  const patchStoragePrompt = async (storage: DocumentStorage, customPrompt: string | null) => {
+    setIsSavingPrompt(true);
+    try {
+      const response = await fetch("/api/rag/storage", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: storage.id, custom_prompt: customPrompt }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error al guardar el prompt");
+      }
+
+      setStorages(prev => prev.map(s =>
+        s.id === storage.id ? { ...s, custom_prompt: customPrompt } : s
+      ));
+      setPromptModalStorage(null);
+      addToast({
+        title: customPrompt ? "Prompt personalizado guardado" : "Prompt restaurado al default",
+        description: customPrompt
+          ? `"${storage.name}" usará su propio prompt en el chat.`
+          : `"${storage.name}" volverá a usar el prompt default global.`,
+        color: "success",
+      });
+    } catch (error: any) {
+      addToast({
+        title: "Error",
+        description: error.message || "Error al guardar el prompt",
+        color: "danger",
+      });
+    } finally {
+      setIsSavingPrompt(false);
+    }
+  };
+
   const openDeleteModal = (storage: DocumentStorage) => {
     setStorageToDelete(storage);
     setIsDeleteModalOpen(true);
@@ -364,27 +423,25 @@ export default function DatabasesRAGPage() {
             </p>
           </div>
 
-          {/* Info Card */}
-          <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
-            <div className="flex items-start gap-2">
-              <Icon name="Database" size={24} color="#16305A" />
-              <div>
-                <h3 className="mb-1">
-                  <Text isAdmin={true} variant="body" weight="bold" color="#16305A">Gemini File Search + Vector Stores</Text>
-                </h3>
-                <p>
-                  <Text isAdmin={true} variant="body" color="#265197">
-                    Los documentos se indexan en Gemini File Search: Gemini genera los
-                    embeddings (gemini-embedding-001) y hace la búsqueda semántica.
-                    El índice es persistente y el chat responde solo con los fragmentos relevantes.
-                  </Text>
-                </p>
+          {/* Info compacta con tooltip */}
+          <Tooltip
+            placement="bottom-start"
+            content={
+              <div className="max-w-xs p-1 text-xs text-[#265197]">
+                Los documentos se indexan en Gemini File Search: Gemini genera los
+                embeddings (gemini-embedding-001) y hace la búsqueda semántica.
+                El índice es persistente y el chat responde solo con los fragmentos relevantes.
               </div>
+            }
+          >
+            <div className="inline-flex items-center gap-1.5 mb-4 px-2.5 py-1 bg-blue-50 border border-blue-200 rounded-lg cursor-help">
+              <Icon name="Info" size={14} color="#265197" />
+              <span className="text-xs font-medium text-[#265197]">Gemini File Search + Vector Stores</span>
             </div>
-          </div>
+          </Tooltip>
 
           {/* Barra de búsqueda y botón Crear Storage */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <Input
               type="text"
               placeholder="Buscar storages..."
@@ -408,7 +465,7 @@ export default function DatabasesRAGPage() {
             />
           </div>
           {/* Grid de Storage Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Skeleton Loader */}
             {isLoading ? (
               <>
@@ -452,7 +509,7 @@ export default function DatabasesRAGPage() {
                   onPress={() => setSelectedStorageForFiles(storage)}
                   className="w-full hover:scale-[1.02] transition-transform cursor-pointer"
                 >
-                  <CardHeader className="p-4 flex-col items-start">
+                  <CardHeader className="p-3 flex-col items-start">
                     <div className="flex items-start justify-between w-full">
                       <div className="flex items-center gap-2">
                         <Icon name="Database" size={16} color="#16305A" />
@@ -485,67 +542,37 @@ export default function DatabasesRAGPage() {
 
                   <Divider />
 
-                  <CardBody className="p-4">
-                    {/* Stats */}
-                    <div className="grid grid-cols-2 gap-3 mb-3">
-                      <div className="bg-gray-50 p-3 rounded-lg">
-                        <div className="text-xs text-gray-500 mb-1">
-                          <Text isAdmin={true} variant="label" color="#4B5563">Archivos</Text>
-                        </div>
-                        <div className="text-xl font-bold text-[#265197]">
-                          <Text isAdmin={true} variant="body" color="#265197">{storage.fileCount}</Text>
-                        </div>
+                  <CardBody className="p-3">
+                    {/* Stats compactas en una línea */}
+                    <div className="flex items-center flex-wrap gap-1.5 mb-2 text-xs">
+                      <div className="flex items-center gap-1 bg-gray-50 border border-gray-200 rounded-lg px-2 py-1" title="Archivos y tamaño">
+                        <Icon name="FileText" size={12} color="#4B5563" />
+                        <span className="font-semibold text-[#265197]">{storage.fileCount}</span>
+                        <span className="text-gray-500">· {formatFileSize(storage.totalSize)}</span>
                       </div>
-                      <div className="bg-gray-50 p-3 rounded-lg">
-                        <div className="text-xs text-gray-500 mb-1">
-                          <Text isAdmin={true} variant="label" color="#4B5563">Tamaño</Text>
-                        </div>
-                        <div className="text-xl font-bold text-[#265197]">
-                          <Text isAdmin={true} variant="body" color="#265197">{formatFileSize(storage.totalSize)}</Text>
-                        </div>
+                      <div className="flex items-center gap-1 bg-blue-50 border border-blue-200 rounded-lg px-2 py-1" title="Tokens usados">
+                        <Icon name="Zap" size={12} color="#2563eb" />
+                        <span className="font-semibold text-blue-600">{storage.total_tokens_used?.toLocaleString() || 0}</span>
+                      </div>
+                      <div className="flex items-center gap-1 bg-green-50 border border-green-200 rounded-lg px-2 py-1" title="Costo acumulado (USD)">
+                        <Icon name="DollarSign" size={12} color="#16a34a" />
+                        <span className="font-semibold text-green-600">${(storage.total_cost_usd || 0).toFixed(4)}</span>
                       </div>
                     </div>
 
-                    {/* Tokens y Costo */}
-                    <div className="grid grid-cols-2 gap-3 mb-4">
-                      <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                        <div className="text-xs text-gray-600 mb-1 flex items-center gap-1">
-                          <Icon name="Zap" size={12} color="#2563eb" />
-                          <Text isAdmin={true} variant="label" color="#4B5563">Tokens</Text>
-                        </div>
-                        <div className="text-lg font-bold text-blue-600">
-                          {storage.total_tokens_used?.toLocaleString() || 0}
-                        </div>
+                    {/* Estado + fecha */}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-1">
+                        {getStatusIcon(storage.status)}
+                        <Text isAdmin={true} variant="label" color="#265197">{getStatusText(storage.status)}</Text>
                       </div>
-                      <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-                        <div className="text-xs text-gray-600 mb-1 flex items-center gap-1">
-                          <Icon name="DollarSign" size={12} color="#16a34a" />
-                          <Text isAdmin={true} variant="label" color="#4B5563">Costo</Text>
-                        </div>
-                        <div className="text-lg font-bold text-green-600">
-                          ${(storage.total_cost_usd || 0).toFixed(4)}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Estado */}
-                    <div className="grid grid-cols-2 gap-3 items-center mb-3">
-                      <div className="flex items-center gap-2">
-                        <Text isAdmin={true} variant="label" color="#4B5563">Estado:</Text>
-                        <div className="flex items-center gap-1">
-                          {getStatusIcon(storage.status)}
-                          <Text isAdmin={true} variant="label" color="#265197">{getStatusText(storage.status)}</Text>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-end">
-                        <Text isAdmin={true} variant="label" color="#4B5563">Creado: {new Date(storage.createdAt).toLocaleDateString("es-ES")}</Text>
-                      </div>
+                      <Text isAdmin={true} variant="label" color="#4B5563">{new Date(storage.createdAt).toLocaleDateString("es-ES")}</Text>
                     </div>
 
                     {/* Modo estricto */}
                     <div
                       onClick={(e) => e.stopPropagation()}
-                      className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg px-3 py-2"
+                      className="flex items-center justify-between bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5"
                     >
                       <div className="flex items-center gap-2">
                         <Icon name="Lock" size={14} color="#b45309" />
@@ -558,24 +585,49 @@ export default function DatabasesRAGPage() {
                         aria-label="Modo estricto"
                       />
                     </div>
+
+                    {/* Prompt personalizado */}
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openPromptModal(storage);
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.stopPropagation();
+                          openPromptModal(storage);
+                        }
+                      }}
+                      className="flex items-center justify-between bg-indigo-50 border border-indigo-200 rounded-lg px-2 py-1.5 mt-2 cursor-pointer hover:bg-indigo-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Icon name="PenLine" size={14} color="#4338ca" />
+                        <Text isAdmin={true} variant="label" color="#3730A3">Prompt del chat</Text>
+                      </div>
+                      <Chip size="sm" variant="flat" color={storage.custom_prompt ? "secondary" : "default"}>
+                        {storage.custom_prompt ? "Personalizado" : "Default"}
+                      </Chip>
+                    </div>
                   </CardBody>
 
-                  <CardFooter className="p-4 pt-0 flex-col gap-1">
+                  <CardFooter className="p-3 pt-0 flex-col gap-1">
                     <div className="flex gap-2 w-full">
                     {/* Upload Button */}
                     <label
                       onClick={(e) => e.stopPropagation()}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-[#265197] text-[#265197] rounded-lg hover:bg-blue-50 transition-colors cursor-pointer ${uploadingFiles[storage.id] ? "opacity-50 cursor-not-allowed" : ""
+                      className={`flex-1 flex items-center justify-center gap-2 px-3 py-1.5 border-2 border-dashed border-[#265197] text-[#265197] rounded-lg hover:bg-blue-50 transition-colors cursor-pointer ${uploadingFiles[storage.id] ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                     >
                       {uploadingFiles[storage.id] ? (
                         <>
-                          <Icon name="Loader2" size={20} className="animate-spin" />
+                          <Icon name="Loader2" size={16} className="animate-spin" />
                           <span className="text-sm font-medium">Subiendo...</span>
                         </>
                       ) : (
                         <>
-                          <Icon name="Upload" size={20} />
+                          <Icon name="Upload" size={16} />
                           <span className="text-sm font-medium">
                             Subir Archivos
                           </span>
@@ -608,12 +660,12 @@ export default function DatabasesRAGPage() {
                         }
                       }}
                       title="Reindexar archivos pendientes desde el respaldo"
-                      className={`flex items-center justify-center px-3 py-2 border-2 border-[#265197] text-[#265197] rounded-lg hover:bg-blue-50 transition-colors cursor-pointer ${reprocessingStorages[storage.id] ? "opacity-50 cursor-not-allowed" : ""
+                      className={`flex items-center justify-center px-3 py-1.5 border-2 border-[#265197] text-[#265197] rounded-lg hover:bg-blue-50 transition-colors cursor-pointer ${reprocessingStorages[storage.id] ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                     >
                       <Icon
                         name="RefreshCw"
-                        size={20}
+                        size={16}
                         className={reprocessingStorages[storage.id] ? "animate-spin" : ""}
                       />
                     </div>
@@ -698,6 +750,68 @@ export default function DatabasesRAGPage() {
               aria-label="Modo estricto"
             />
           </div>
+        </div>
+      </Modal>
+
+      {/* Modal Prompt Personalizado */}
+      <Modal
+        isOpen={!!promptModalStorage}
+        onClose={() => setPromptModalStorage(null)}
+        title={`Prompt del chat — ${promptModalStorage?.name || ""}`}
+        size="md"
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button
+              isAdmin
+              variant="secondary"
+              onClick={() => setPromptModalStorage(null)}
+              disabled={isSavingPrompt}
+            >
+              Cancelar
+            </Button>
+            {promptModalStorage?.custom_prompt && (
+              <Button
+                isAdmin
+                variant="secondary"
+                onClick={() => promptModalStorage && patchStoragePrompt(promptModalStorage, null)}
+                disabled={isSavingPrompt}
+              >
+                Volver al default
+              </Button>
+            )}
+            <Button
+              isAdmin
+              variant="primary"
+              onClick={() => promptModalStorage && patchStoragePrompt(promptModalStorage, promptDraft.trim())}
+              disabled={isSavingPrompt || !promptDraft.trim()}
+            >
+              {isSavingPrompt ? "Guardando..." : "Guardar"}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            Este prompt define cómo responde el chat de esta base. Al guardarlo, la base deja
+            de usar el prompt default global ({promptModalStorage?.strict_mode ? "modo estricto" : "modo normal"})
+            y los cambios futuros a ese default ya no le aplicarán.
+          </p>
+          <textarea
+            value={promptDraft}
+            onChange={(e) => setPromptDraft(e.target.value)}
+            rows={8}
+            placeholder="Escribe el prompt del sistema para esta base..."
+            className="text-black w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#265197] resize-y"
+          />
+          {promptModalStorage?.strict_mode && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+              <p className="text-xs text-amber-800">
+                Esta base tiene modo estricto activado: la temperature seguirá limitada a 0.3
+                aunque uses un prompt personalizado. Mantén la instrucción de responder solo
+                con el documento si quieres conservar ese comportamiento.
+              </p>
+            </div>
+          )}
         </div>
       </Modal>
 

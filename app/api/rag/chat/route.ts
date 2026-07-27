@@ -12,38 +12,22 @@ import {
   type ResponseProfile,
 } from "@/lib/ai/gemini-service";
 import { getGeminiApiKey } from "@/lib/ai/gemini-api-key";
-
-// Límite defensivo de stores por request para "todas las bases"
-// (el máximo real por request no está documentado)
-const MAX_STORES = 10;
-
-// Instrucción base: prioriza documentos, permite conocimiento general
-// siempre que se distinga la fuente (anti-atribución falsa)
-const BASE_RAG_INSTRUCTION =
-  "Prioriza la información de los documentos recuperados como fuente principal. " +
-  "Puedes complementar con tu conocimiento general cuando aporte valor, pero " +
-  "distingue con claridad qué proviene de los documentos y qué es conocimiento general. " +
-  "Nunca atribuyas a los documentos información que no contienen; si algo no está en ellos, dilo.";
-
-// Instrucción cuando el storage tiene strict_mode activado (reemplaza a la base:
-// combinarlas se contradice — la base permite conocimiento general)
-const STRICT_RAG_INSTRUCTION =
-  "MODO ESTRICTO: El documento es tu única fuente y tu guion. " +
-  "Sigue su estructura y sus secciones en el orden exacto en que aparecen, al pie de la letra. " +
-  "No agregues preguntas, temas ni contenido que no estén escritos en el documento. " +
-  "Si el usuario pide algo fuera del documento, responde que no está contemplado en el documento.";
-
-// Temperature baja en modo estricto para minimizar improvisación
-const STRICT_TEMPERATURE = 0.3;
+import {
+  getRagPromptDefaults,
+  resolveRagSystemPrompt,
+  STRICT_TEMPERATURE,
+} from "@/lib/ai/rag-prompts";
 
 /**
  * POST - Chat RAG con Gemini File Search (retrieval administrado por Gemini)
  * Flujo:
- * 1. Resolver File Search stores del storage seleccionado (o de todos)
- * 2. Si hay stores: generateContentStream con tool fileSearch — Gemini hace
+ * 1. Resolver el File Search store del storage seleccionado (uno por chat)
+ * 2. Si hay store: generateContentStream con tool fileSearch — Gemini hace
  *    retrieval de los chunks relevantes (embeddings gemini-embedding-001)
- * 3. Si no hay stores: chat simple vía AI SDK
+ * 3. Si no hay store (storage sin archivos activos): chat simple vía AI SDK
  * 4. Guardar conversación + fuentes (groundingMetadata) al finalizar
+ * System prompt: custom_prompt del storage > default (base/estricto) en DB
+ * (rag_prompt_defaults) > fallback hardcodeado en lib/ai/rag-prompts.ts
  */
 export async function POST(request: Request) {
   try {
@@ -60,6 +44,14 @@ export async function POST(request: Request) {
     if (!messages || messages.length === 0) {
       return new Response(
         JSON.stringify({ error: "Messages are required" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Cada chat pertenece a un storage concreto (el modo "all" se eliminó)
+    if (!storageId || storageId === "all") {
+      return new Response(
+        JSON.stringify({ error: "storageId is required" }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
@@ -92,7 +84,7 @@ export async function POST(request: Request) {
     }
 
     console.log("💬 Procesando chat request con streaming...");
-    console.log("📦 Storage ID:", storageId || "TODOS");
+    console.log("📦 Storage ID:", storageId);
     console.log("🔍 Mensajes:", messages.length);
     console.log("🤖 Modelo:", selectedModel);
 
@@ -100,51 +92,54 @@ export async function POST(request: Request) {
     const lastUserMessage = messages[messages.length - 1]?.content || "";
 
     // ================================================================
-    // 1. RESOLVER FILE SEARCH STORES DEL STORAGE SELECCIONADO
+    // 1. RESOLVER EL STORAGE Y SU FILE SEARCH STORE
     // ================================================================
 
-    let storeNames: string[] = [];
-    let sources: any[] = [];
-
-    const storageQuery = supabase
+    const { data: storage, error: storageError } = await supabase
       .from("document_storages")
-      .select("id, name, gemini_vector_store_id, strict_mode, storage_files!inner(file_name, gemini_file_state)")
-      .like("gemini_vector_store_id", "fileSearchStores/%")
-      .eq("storage_files.gemini_file_state", "ACTIVE");
+      .select("id, name, gemini_vector_store_id, strict_mode, custom_prompt")
+      .eq("id", storageId)
+      .single();
 
-    const { data: storagesWithFiles, error: storagesError } =
-      storageId && storageId !== "all"
-        ? await storageQuery.eq("id", storageId)
-        : await storageQuery;
-
-    if (storagesError) {
-      console.error("Error resolviendo stores:", storagesError);
-      throw storagesError;
+    if (storageError || !storage) {
+      return new Response(
+        JSON.stringify({ error: "Storage no encontrado" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
     }
 
-    let strictMode = false;
-    const strictFlags: boolean[] = [];
+    const { data: activeFiles, error: filesError } = await supabase
+      .from("storage_files")
+      .select("file_name")
+      .eq("storage_id", storageId)
+      .eq("gemini_file_state", "ACTIVE");
 
-    for (const storage of storagesWithFiles || []) {
-      if (isRealStoreName(storage.gemini_vector_store_id)) {
-        storeNames.push(storage.gemini_vector_store_id);
-        strictFlags.push(!!(storage as any).strict_mode);
-        for (const f of (storage as any).storage_files || []) {
-          sources.push({ document: f.file_name, storage: storage.name });
-        }
-      }
+    if (filesError) {
+      console.error("Error resolviendo archivos del storage:", filesError);
+      throw filesError;
     }
 
-    // Estricto solo si TODAS las bases consultadas lo son (en "todas las bases"
-    // no se fuerza el guion de una sobre las demás)
-    strictMode = strictFlags.length > 0 && strictFlags.every(Boolean);
+    // Sin store real o sin archivos ACTIVE → rama sin retrieval (rama B)
+    const storeNames: string[] =
+      isRealStoreName(storage.gemini_vector_store_id) && (activeFiles?.length || 0) > 0
+        ? [storage.gemini_vector_store_id]
+        : [];
 
-    if (storeNames.length > MAX_STORES) {
-      console.warn(`⚠️ ${storeNames.length} stores; se usan solo los primeros ${MAX_STORES}`);
-      storeNames = storeNames.slice(0, MAX_STORES);
-    }
+    const sources: any[] = storeNames.length
+      ? (activeFiles || []).map((f) => ({ document: f.file_name, storage: storage.name }))
+      : [];
 
-    console.log(`📚 File Search stores activos: ${storeNames.length}`);
+    const strictMode = !!storage.strict_mode;
+
+    // System prompt: custom del storage > default en DB según strict_mode
+    const promptDefaults = await getRagPromptDefaults(supabase);
+    const systemInstruction = resolveRagSystemPrompt(promptDefaults, storage);
+    const temperature = strictMode
+      ? Math.min(profileConfig.temperature, STRICT_TEMPERATURE)
+      : profileConfig.temperature;
+
+    console.log(`📚 File Search store activo: ${storeNames.length ? "sí" : "no"}`);
+    console.log(`🎯 Modo estricto: ${strictMode ? "ON" : "OFF"} | Prompt custom: ${storage.custom_prompt?.trim() ? "sí" : "no"}`);
 
     // Guardar conversación (usado por ambas ramas)
     const persistConversation = async (params: {
@@ -154,12 +149,11 @@ export async function POST(request: Request) {
       usedModel: string;
       usedSources: any[];
     }) => {
-      const targetStorageId = !storageId || storageId === "all" ? null : storageId;
       const totalTokens = params.promptTokens + params.completionTokens;
       const estimatedCost = calculateCost(params.promptTokens, params.completionTokens);
 
       await supabase.from("chat_conversations").insert({
-        storage_id: targetStorageId,
+        storage_id: storageId,
         user_message: lastUserMessage,
         assistant_response: params.text,
         prompt_tokens: params.promptTokens,
@@ -170,13 +164,11 @@ export async function POST(request: Request) {
         sources_used: params.usedSources,
       });
 
-      if (targetStorageId) {
-        await supabase.rpc("increment_storage_usage", {
-          p_storage_id: targetStorageId,
-          p_tokens: totalTokens,
-          p_cost: estimatedCost,
-        });
-      }
+      await supabase.rpc("increment_storage_usage", {
+        p_storage_id: storageId,
+        p_tokens: totalTokens,
+        p_cost: estimatedCost,
+      });
 
       console.log(`💬 Chat completado (${params.usedModel})`);
       console.log(`📊 Tokens: ${totalTokens} | Costo: $${estimatedCost.toFixed(6)}`);
@@ -195,16 +187,6 @@ export async function POST(request: Request) {
         role: msg.role === "assistant" ? "model" : "user",
         parts: [{ text: msg.content }],
       }));
-
-      const systemInstruction = strictMode
-        ? STRICT_RAG_INSTRUCTION
-        : BASE_RAG_INSTRUCTION;
-
-      const temperature = strictMode
-        ? Math.min(profileConfig.temperature, STRICT_TEMPERATURE)
-        : profileConfig.temperature;
-
-      console.log(`🎯 Modo estricto: ${strictMode ? "ON" : "OFF"}`);
 
       const generate = (model: string) =>
         ai.models.generateContentStream({
@@ -301,7 +283,7 @@ export async function POST(request: Request) {
           "Content-Type": "text/plain; charset=utf-8",
           "X-Sources": JSON.stringify(sources),
           "X-Has-Context": "true",
-          "X-Storage-Id": storageId || "all",
+          "X-Storage-Id": storageId,
         },
       });
     }
@@ -322,11 +304,12 @@ export async function POST(request: Request) {
         streamText({
           model: googleProvider(modelId),
           onError: ({ error }: { error: any }) => onError(error),
+          system: systemInstruction,
           messages: messages.map((msg: any) => ({
             role: msg.role,
             content: msg.content,
           })),
-          temperature: profileConfig.temperature,
+          temperature,
           maxOutputTokens: profileConfig.maxOutputTokens,
 
           onFinish: async ({ text, usage }: { text: string; usage: any }) => {
@@ -393,7 +376,7 @@ export async function POST(request: Request) {
           "Content-Type": "text/plain; charset=utf-8",
           "X-Sources": JSON.stringify(sources),
           "X-Has-Context": "false",
-          "X-Storage-Id": storageId || "all",
+          "X-Storage-Id": storageId,
         },
       });
     }
