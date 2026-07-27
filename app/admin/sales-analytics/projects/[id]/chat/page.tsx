@@ -22,6 +22,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useSalesChat } from '@/hooks/sales-analytics/use-sales-chat';
+import MarkdownMessage from '@/shared/components/citrica-ui/molecules/markdown-message';
 
 export default function ProjectChatPage() {
   const router = useRouter();
@@ -208,7 +209,7 @@ export default function ProjectChatPage() {
                         <Bot className="w-5 h-5 text-primary" />
                       </div>
                       <div className="max-w-[70%] rounded-lg p-4 bg-gray-100 text-gray-900">
-                        <p className="text-sm whitespace-pre-wrap">{exchange.assistant_response}</p>
+                        <MarkdownMessage content={exchange.assistant_response} />
                         <div className="mt-2 pt-2 border-t border-gray-300">
                           <p className="text-xs text-gray-600">
                             {exchange.total_tokens} tokens · ${Number(exchange.cost_usd || 0).toFixed(6)}

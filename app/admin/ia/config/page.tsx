@@ -52,11 +52,65 @@ export default function ConfigPage() {
   } | null>(null);
   const [showAllModels, setShowAllModels] = useState(false);
   const [allAvailableModels, setAllAvailableModels] = useState<any[]>([]);
+  const [ragPrompts, setRagPrompts] = useState<{ base: string; strict: string }>({ base: "", strict: "" });
+  const [ragPromptDrafts, setRagPromptDrafts] = useState<{ base: string; strict: string }>({ base: "", strict: "" });
+  const [ragPromptFallbacks, setRagPromptFallbacks] = useState<{ base: string; strict: string }>({ base: "", strict: "" });
+  const [savingPromptKey, setSavingPromptKey] = useState<"base" | "strict" | null>(null);
 
   useEffect(() => {
     fetchModels();
     fetchApiConfig();
+    fetchRagPrompts();
   }, []);
+
+  const fetchRagPrompts = async () => {
+    try {
+      const response = await fetch("/api/rag/prompts");
+      const data = await response.json();
+      if (data.defaults) {
+        setRagPrompts(data.defaults);
+        setRagPromptDrafts(data.defaults);
+        setRagPromptFallbacks(data.fallbacks || data.defaults);
+      }
+    } catch (error) {
+      console.error("Error fetching RAG prompts:", error);
+    }
+  };
+
+  const handleSaveRagPrompt = async (key: "base" | "strict") => {
+    const prompt = ragPromptDrafts[key].trim();
+    if (!prompt) return;
+
+    setSavingPromptKey(key);
+    try {
+      const response = await fetch("/api/rag/prompts", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, prompt }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo guardar el prompt");
+      }
+
+      setRagPrompts((prev) => ({ ...prev, [key]: prompt }));
+      setRagPromptDrafts((prev) => ({ ...prev, [key]: prompt }));
+      addToast({
+        title: "Prompt guardado",
+        description: key === "strict" ? "Default de modo estricto actualizado" : "Default de modo normal actualizado",
+        color: "success",
+      });
+    } catch (error: any) {
+      addToast({
+        title: "Error",
+        description: error.message || "Error al guardar el prompt",
+        color: "danger",
+      });
+    } finally {
+      setSavingPromptKey(null);
+    }
+  };
 
   const fetchModels = async () => {
     try {
@@ -503,6 +557,80 @@ export default function ConfigPage() {
                   💡 "En catálogo" = todos los modelos que Google lista para esa key (incluye imagen, voz y modelos de pago).
                   "Usables" = los que pasaron una prueba real de chat con tu tier — son los que aparecen abajo y en el chat.
                   Al cambiar de key se vuelven a probar.
+                </div>
+              </div>
+            </CardBody>
+          </Card>
+
+          {/* Prompts del Chat RAG */}
+          <Card className="mb-6">
+            <CardHeader className="flex flex-col items-start p-4">
+              <div className="flex items-center gap-2">
+                <Icon name="MessageSquareText" size={20} color="#265197" />
+                <Text isAdmin={true} variant="body" weight="bold" color="#16305A">
+                  Prompts del Chat RAG
+                </Text>
+              </div>
+            </CardHeader>
+            <Divider />
+            <CardBody className="p-4">
+              <div className="space-y-5">
+                {([
+                  { key: "base" as const, label: "Prompt por defecto — modo normal", hint: "Se usa en bases sin modo estricto y sin prompt personalizado." },
+                  { key: "strict" as const, label: "Prompt por defecto — modo estricto (solo documento)", hint: "Se usa en bases con modo estricto activado y sin prompt personalizado." },
+                ]).map(({ key, label, hint }) => (
+                  <div key={key}>
+                    <Text isAdmin={true} variant="label" weight="bold" color="#16305A">
+                      {label}
+                    </Text>
+                    <p className="text-xs text-gray-500 mb-2">{hint}</p>
+                    <textarea
+                      value={ragPromptDrafts[key]}
+                      onChange={(e) =>
+                        setRagPromptDrafts((prev) => ({ ...prev, [key]: e.target.value }))
+                      }
+                      rows={5}
+                      className="w-full px-3 py-2 border border-[#D4DEED] rounded-[12px] text-sm text-[#265197] focus:outline-none focus:ring-2 focus:ring-[#265197] resize-y"
+                      placeholder="Escribe el prompt del sistema..."
+                    />
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        isAdmin
+                        variant="primary"
+                        size="sm"
+                        onClick={() => handleSaveRagPrompt(key)}
+                        disabled={
+                          savingPromptKey !== null ||
+                          !ragPromptDrafts[key].trim() ||
+                          ragPromptDrafts[key].trim() === ragPrompts[key]
+                        }
+                      >
+                        {savingPromptKey === key ? (
+                          <Icon name="Loader2" size={14} className="animate-spin" />
+                        ) : (
+                          "Guardar"
+                        )}
+                      </Button>
+                      <Button
+                        isAdmin
+                        variant="secondary"
+                        size="sm"
+                        onClick={() =>
+                          setRagPromptDrafts((prev) => ({ ...prev, [key]: ragPromptFallbacks[key] }))
+                        }
+                        disabled={savingPromptKey !== null || !ragPromptFallbacks[key]}
+                      >
+                        Restaurar texto original
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="text-xs text-gray-500">
+                  💡 Estos prompts aplican a todas las bases RAG que no tengan un prompt personalizado
+                  (se configura en cada base, en IA {'>'} Bases de Datos RAG). El modo estricto además
+                  limita la temperature a 0.3. "Restaurar texto original" rellena el texto de fábrica;
+                  hay que Guardar para aplicarlo.
                 </div>
               </div>
             </CardBody>
