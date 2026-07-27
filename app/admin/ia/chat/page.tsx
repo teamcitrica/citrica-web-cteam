@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Button, Select, Col, Container, Text, Icon } from "citrica-ui-toolkit";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
+import MarkdownMessage from "@/shared/components/citrica-ui/molecules/markdown-message";
 
 interface Message {
   id: string;
@@ -11,7 +12,7 @@ interface Message {
 }
 
 const INITIAL_MESSAGE_CONTENT =
-  "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en tus documentos usando búsqueda vectorial avanzada. Selecciona una base de datos o usa 'Todas las bases' para buscar en todos los documentos. ¿En qué puedo ayudarte?";
+  "¡Hola! Soy tu asistente potenciado con Gemini File Search. Puedo buscar información en los documentos de esta base de datos usando búsqueda vectorial avanzada. ¿En qué puedo ayudarte?";
 
 const makeInitialMessages = (): Message[] => [
   {
@@ -23,8 +24,9 @@ const makeInitialMessages = (): Message[] => [
 ];
 
 export default function ChatPage() {
-  const [selectedDatabase, setSelectedDatabase] = useState<string>("all");
+  const [selectedDatabase, setSelectedDatabase] = useState<string>("");
   const [storages, setStorages] = useState<any[]>([]);
+  const [storagesLoaded, setStoragesLoaded] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [responseProfile, setResponseProfile] = useState<string>("balanced");
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
@@ -47,23 +49,19 @@ export default function ChatPage() {
       if (data.storages) {
         setStorages(data.storages);
 
-        // Si hay un storage seleccionado, actualizar sus tokens/costo
-        if (selectedDatabase && selectedDatabase !== "all") {
+        // Actualizar tokens/costo del storage seleccionado
+        if (selectedDatabase) {
           const currentStorage = data.storages.find((s: any) => s.id === selectedDatabase);
           if (currentStorage) {
             setTokensUsed(currentStorage.total_tokens_used || 0);
             setCostUsed(currentStorage.total_cost_usd || 0);
           }
-        } else {
-          // Si es "all", sumar todos los tokens
-          const totalTokens = data.storages.reduce((sum: number, s: any) => sum + (s.total_tokens_used || 0), 0);
-          const totalCost = data.storages.reduce((sum: number, s: any) => sum + (s.total_cost_usd || 0), 0);
-          setTokensUsed(totalTokens);
-          setCostUsed(totalCost);
         }
       }
     } catch (error) {
       console.error("Error fetching storages:", error);
+    } finally {
+      setStoragesLoaded(true);
     }
   }, [selectedDatabase]);
 
@@ -125,23 +123,24 @@ export default function ChatPage() {
 
   // Cambiar historial cuando se selecciona otra base de datos
   const handleDatabaseChange = useCallback((dbId: string) => {
+    if (!dbId) return;
     setSelectedDatabase(dbId);
+    fetchChatHistory(dbId);
+  }, [fetchChatHistory]);
 
-    // Si es "all", no cargar historial, empezar limpio
-    if (dbId === "all") {
-      setMessages(makeInitialMessages());
-    } else {
-      // Para bases de datos específicas, cargar su historial
-      fetchChatHistory(dbId);
+  // Auto-seleccionar la primera base cuando cargan los storages
+  useEffect(() => {
+    if (!selectedDatabase && storages.length > 0) {
+      handleDatabaseChange(storages[0].id);
     }
-  }, [fetchChatHistory, setMessages]);
+  }, [storages, selectedDatabase, handleDatabaseChange]);
 
   // Limpiar historial del chat actual
   const handleClearHistory = useCallback(async () => {
+    if (!selectedDatabase) return;
     try {
       // Llamar al endpoint para eliminar conversaciones
-      const storageParam = selectedDatabase === "all" ? "all" : selectedDatabase;
-      const response = await fetch(`/api/rag/chat/history?storageId=${storageParam}`, {
+      const response = await fetch(`/api/rag/chat/history?storageId=${selectedDatabase}`, {
         method: "DELETE",
       });
 
@@ -161,7 +160,7 @@ export default function ChatPage() {
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!input.trim() || isLoading) {
+    if (!input.trim() || isLoading || !selectedDatabase) {
       return;
     }
 
@@ -324,9 +323,7 @@ export default function ChatPage() {
   }, [messages, handleSubmit]);
 
   const selectedDatabaseName =
-    selectedDatabase === "all"
-      ? "Todas las bases"
-      : storages.find((s) => s.id === selectedDatabase)?.name || "";
+    storages.find((s) => s.id === selectedDatabase)?.name || "";
   const selectedModelName =
     availableModels.find((m) => m.model_id === selectedModel)?.display_name || selectedModel;
   const messagesSent = Math.max(1, Math.floor(messages.length / 2));
@@ -400,7 +397,7 @@ export default function ChatPage() {
               {/* Selector de Base de Datos */}
               <Select
                 label="Base de Datos"
-                selectedKeys={[selectedDatabase]}
+                selectedKeys={selectedDatabase ? [selectedDatabase] : []}
                 onSelectionChange={(keys: any) => {
                   const selected = Array.from(keys)[0] as string;
                   handleDatabaseChange(selected);
@@ -413,13 +410,10 @@ export default function ChatPage() {
                   value: "!text-[#265197]",
                   selectorIcon: "text-[#678CC5]",
                 }}
-                options={[
-                  { value: "all", label: "Todas las bases de datos" },
-                  ...storages.map((storage) => ({
-                    value: storage.id,
-                    label: storage.name,
-                  }))
-                ]}
+                options={storages.map((storage) => ({
+                  value: storage.id,
+                  label: storage.name,
+                }))}
               />
 
               {/* Selector de Modelo IA */}
@@ -514,7 +508,11 @@ export default function ChatPage() {
                           : "bg-gray-100 text-gray-800"
                       }`}
                     >
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      {message.role === "assistant" ? (
+                        <MarkdownMessage content={message.content} />
+                      ) : (
+                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      )}
 
                       {/* Mostrar error si existe */}
                       {error && index === messages.length - 1 && message.role === "assistant" && (
@@ -569,6 +567,15 @@ export default function ChatPage() {
             )}
           </div>
 
+          {/* Aviso cuando no hay bases RAG */}
+          {storagesLoaded && storages.length === 0 && (
+            <div className="mb-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
+              <p className="text-sm text-amber-800">
+                No hay bases de datos RAG. Crea una en IA {'>'} Bases de Datos RAG para poder chatear.
+              </p>
+            </div>
+          )}
+
           {/* Input de Mensaje */}
           <form onSubmit={handleSubmit} className="flex gap-2 items-center">
             <div className="flex-1 relative">
@@ -578,7 +585,7 @@ export default function ChatPage() {
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
                 placeholder="Escribe tu pregunta aquí..."
-                disabled={isLoading}
+                disabled={isLoading || !selectedDatabase}
                 className="w-full text-black px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#265197] disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
               <Icon name="MessageSquare" size={16} color="#9ca3af" className="absolute right-3 top-1/2 transform -translate-y-1/2" />
@@ -587,7 +594,7 @@ export default function ChatPage() {
               isAdmin
               variant="primary"
               type="submit"
-              disabled={!input.trim() || isLoading}
+              disabled={!input.trim() || isLoading || !selectedDatabase}
               onClick={(e) => {
                 // Llamar explícitamente a handleSubmit porque citrica-ui-toolkit Button no propaga bien el submit
                 handleSubmit(e as any);
@@ -633,17 +640,10 @@ export default function ChatPage() {
       >
         <div className="space-y-4">
           <p className="text-gray-700">
-            ¿Estás seguro de que deseas eliminar el historial de conversaciones
-            {selectedDatabase === "all" ? (
-              <strong className="text-[#265197]"> de todas las bases de datos</strong>
-            ) : (
-              <>
-                {" "}de{" "}
-                <strong className="text-[#265197]">
-                  {storages.find(s => s.id === selectedDatabase)?.name || "esta base de datos"}
-                </strong>
-              </>
-            )}
+            ¿Estás seguro de que deseas eliminar el historial de conversaciones de{" "}
+            <strong className="text-[#265197]">
+              {storages.find(s => s.id === selectedDatabase)?.name || "esta base de datos"}
+            </strong>
             ?
           </p>
           <div className="bg-red-50 border border-red-200 rounded-lg p-3">

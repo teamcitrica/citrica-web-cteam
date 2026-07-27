@@ -11,21 +11,17 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const storageId = searchParams.get("storageId");
 
-    console.log("📜 Obteniendo historial para storage:", storageId || "TODOS");
-
-    let query = supabase
-      .from("chat_conversations")
-      .select("*")
-      .order("created_at", { ascending: true });
-
-    // Filtrar por storage si se especifica
-    if (storageId && storageId !== "all") {
-      query = query.eq("storage_id", storageId);
-    } else if (storageId === "all") {
-      query = query.is("storage_id", null);
+    if (!storageId) {
+      return NextResponse.json({ error: "storageId is required" }, { status: 400 });
     }
 
-    const { data: conversations, error } = await query;
+    console.log("📜 Obteniendo historial para storage:", storageId);
+
+    const { data: conversations, error } = await supabase
+      .from("chat_conversations")
+      .select("*")
+      .eq("storage_id", storageId)
+      .order("created_at", { ascending: true });
 
     if (error) {
       console.error("Error obteniendo historial:", error);
@@ -82,18 +78,16 @@ export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
     const storageId = searchParams.get("storageId");
 
-    console.log("🗑️ Eliminando historial para storage:", storageId || "TODOS");
-
-    let query = supabase.from("chat_conversations").delete();
-
-    // Filtrar por storage si se especifica
-    if (storageId && storageId !== "all") {
-      query = query.eq("storage_id", storageId);
-    } else if (storageId === "all") {
-      query = query.is("storage_id", null);
+    if (!storageId) {
+      return NextResponse.json({ error: "storageId is required" }, { status: 400 });
     }
 
-    const { error, count } = await query;
+    console.log("🗑️ Eliminando historial para storage:", storageId);
+
+    const { error } = await supabase
+      .from("chat_conversations")
+      .delete()
+      .eq("storage_id", storageId);
 
     if (error) {
       console.error("Error eliminando historial:", error);

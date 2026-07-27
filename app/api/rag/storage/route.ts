@@ -92,12 +92,12 @@ export async function POST(request: Request) {
   }
 }
 
-// PATCH - Actualizar storage (nombre, descripción, modo estricto)
+// PATCH - Actualizar storage (nombre, descripción, modo estricto, prompt custom)
 export async function PATCH(request: Request) {
   try {
     const supabase = createRouteHandlerClient({ cookies });
     const body = await request.json();
-    const { id, name, description, strict_mode } = body;
+    const { id, name, description, strict_mode, custom_prompt } = body;
 
     if (!id) {
       return NextResponse.json({ error: "Storage ID is required" }, { status: 400 });
@@ -107,6 +107,13 @@ export async function PATCH(request: Request) {
     if (name !== undefined) updates.name = name;
     if (description !== undefined) updates.description = description;
     if (strict_mode !== undefined) updates.strict_mode = !!strict_mode;
+    if (custom_prompt !== undefined) {
+      // null o vacío limpian el custom (vuelve al default global)
+      updates.custom_prompt =
+        typeof custom_prompt === "string" && custom_prompt.trim() !== ""
+          ? custom_prompt.trim()
+          : null;
+    }
 
     if (Object.keys(updates).length === 0) {
       return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
