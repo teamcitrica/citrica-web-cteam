@@ -188,6 +188,13 @@ export const siteConfig = {
 				},
 			],
 		},
+		{
+			title: "WHATSAPP",
+			icon: "MessageCircle",
+			href: "/admin/whatsapp",
+			allowedRoles: [ROL_ADMIN],
+			subItems: [],
+		},
 
 	],
 	links: {
