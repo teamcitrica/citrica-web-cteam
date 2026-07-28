@@ -80,6 +80,18 @@ export const useWaSettings = () => {
           return false;
         }
 
+        // Cambió el storage default: resetear la memoria de las conversaciones
+        // que lo usan (las que no tienen override propio)
+        if (
+          "default_storage_id" in updates &&
+          updates.default_storage_id !== settings?.default_storage_id
+        ) {
+          await supabase
+            .from("wa_conversations")
+            .update({ context_since: new Date().toISOString() })
+            .is("storage_id", null);
+        }
+
         setSettings(data);
         addToast({
           title: "Configuración guardada",
@@ -94,7 +106,7 @@ export const useWaSettings = () => {
         setIsLoading(false);
       }
     },
-    [supabase]
+    [supabase, settings?.default_storage_id]
   );
 
   return { settings, storages, isLoading, fetchSettings, updateSettings };
