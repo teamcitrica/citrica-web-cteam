@@ -26,8 +26,18 @@ import {
 // Cuántos mensajes previos se mandan como memoria conversacional
 const HISTORY_LIMIT = 20;
 
-// Tope de salida: WhatsApp corta en 4096 chars y las respuestas largas se leen mal
-const MAX_OUTPUT_TOKENS = 1024;
+// Tope de salida. OJO: en los modelos 2.5 los tokens de "thinking" descuentan de
+// este mismo límite — con 1024 el razonamiento dinámico podía comerse casi todo
+// y la respuesta llegaba cortada a media frase (finishReason MAX_TOKENS).
+const MAX_OUTPUT_TOKENS = 2048;
+
+// Thinking acotado, no apagado: con thinkingBudget 0 el modelo copia el documento
+// literal y el filtro anti-recitación de Gemini devuelve VACÍO (finishReason
+// RECITATION). 512 deja razonar lo justo sin poder comerse el tope de salida.
+// Solo flash lo acepta configurable tan bajo; en otros modelos se deja el default.
+function thinkingConfigFor(model: string): { thinkingBudget: number } | undefined {
+  return model.includes("flash") ? { thinkingBudget: 512 } : undefined;
+}
 
 // Instrucción fija del canal: WhatsApp no renderiza Markdown de encabezados/tablas
 const CHANNEL_INSTRUCTION =
@@ -173,8 +183,9 @@ export async function generateWhatsAppReply(
     // ================================================================
     // 4. GENERACIÓN (con store: File Search; sin store: chat simple)
     // ================================================================
-    const runWithStore = async (model: string) => {
+    const runWithStore = async (model: string, temp: number) => {
       const ai = new GoogleGenAI({ apiKey });
+      const thinkingConfig = thinkingConfigFor(model);
       const response = await retryWithBackoff(() =>
         ai.models.generateContent({
           model,
@@ -182,8 +193,9 @@ export async function generateWhatsAppReply(
           config: {
             systemInstruction,
             tools: [{ fileSearch: { fileSearchStoreNames: storeNames } }],
-            temperature,
+            temperature: temp,
             maxOutputTokens: MAX_OUTPUT_TOKENS,
+            ...(thinkingConfig ? { thinkingConfig } : {}),
           },
         })
       );
@@ -195,8 +207,9 @@ export async function generateWhatsAppReply(
       };
     };
 
-    const runWithoutStore = async (model: string) => {
+    const runWithoutStore = async (model: string, temp: number) => {
       const googleProvider = createGoogleGenerativeAI({ apiKey });
+      const thinkingConfig = thinkingConfigFor(model);
       const result = await generateText({
         model: googleProvider(model),
         system: systemInstruction,
@@ -204,8 +217,11 @@ export async function generateWhatsAppReply(
           role: c.role === "model" ? ("assistant" as const) : ("user" as const),
           content: c.parts[0].text,
         })),
-        temperature,
+        temperature: temp,
         maxOutputTokens: MAX_OUTPUT_TOKENS,
+        ...(thinkingConfig
+          ? { providerOptions: { google: { thinkingConfig } } }
+          : {}),
       });
 
       // AI SDK v5+ usa inputTokens/outputTokens; lectura dual por compatibilidad
@@ -223,7 +239,7 @@ export async function generateWhatsAppReply(
     let generated: { text: string; promptTokens: number; completionTokens: number };
 
     try {
-      generated = await run(selectedModel);
+      generated = await run(selectedModel, temperature);
     } catch (error: any) {
       // Cuota agotada (429): reintentar una vez con otro modelo activo
       if (!isQuotaError(error)) throw error;
@@ -241,12 +257,20 @@ export async function generateWhatsAppReply(
 
       console.log(`⚠️ ${selectedModel} sin cuota. Reintentando con ${fallbackModel.model_id}`);
       usedModel = fallbackModel.model_id;
-      generated = await run(usedModel);
+      generated = await run(usedModel, temperature);
+    }
+
+    // Vacío = casi siempre RECITATION (el modelo copió el documento literal y el
+    // filtro de Gemini lo bloqueó). Un reintento con más temperatura lo obliga a
+    // parafrasear y suele pasar.
+    if (!generated.text.trim()) {
+      console.warn("⚠️ Respuesta vacía (posible RECITATION); reintentando con más temperatura");
+      generated = await run(usedModel, Math.min(temperature + 0.4, 0.9));
     }
 
     const text = generated.text.trim();
     if (!text) {
-      return { ok: false, error: "El modelo devolvió una respuesta vacía" };
+      return { ok: false, error: "El modelo devolvió una respuesta vacía (dos intentos)" };
     }
 
     return {
