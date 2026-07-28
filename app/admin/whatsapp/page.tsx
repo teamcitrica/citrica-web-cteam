@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { Button, Select, Col, Container, Text, Icon } from "citrica-ui-toolkit";
 import { Switch } from "@heroui/switch";
+import { Select as HeroSelect, SelectItem } from "@heroui/select";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
 
 import {
@@ -66,7 +67,8 @@ const WindowChip = ({ info, compact = false }: { info: WaWindowInfo; compact?: b
 };
 
 export default function WhatsAppPage() {
-  const { conversations, isLoading, toggleAi, setStorage, markRead } = useWaConversations();
+  const { conversations, isLoading, toggleAi, setStorage, deleteConversation, markRead } =
+    useWaConversations();
   const { settings, storages, updateSettings } = useWaSettings();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -75,6 +77,8 @@ export default function WhatsAppPage() {
 
   const [input, setInput] = useState("");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [draftPrompt, setDraftPrompt] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -246,67 +250,81 @@ export default function WhatsAppPage() {
                 </div>
               ) : (
                 <>
-                  {/* Cabecera del chat */}
-                  <div className="bg-white border border-gray-200 rounded-lg p-3 mb-2">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-semibold text-[#16305A] truncate">
-                            {selected.contact_name || selected.wa_id}
-                          </p>
-                          <WindowChip info={selectedWindow} />
-                        </div>
-                        <p className="text-xs text-gray-500">+{selected.wa_id}</p>
+                  {/* Cabecera del chat — compacta, una sola fila */}
+                  <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 mb-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0 flex items-center gap-2">
+                        <p className="font-semibold text-sm text-[#16305A] truncate">
+                          {selected.contact_name || selected.wa_id}
+                        </p>
+                        <span className="text-[11px] text-gray-400 hidden sm:inline flex-shrink-0">
+                          +{selected.wa_id}
+                        </span>
+                        <WindowChip info={selectedWindow} compact />
                       </div>
 
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <HeroSelect
+                          aria-label="Base de conocimiento"
+                          size="sm"
+                          selectedKeys={[selected.storage_id || DEFAULT_STORAGE_KEY]}
+                          onSelectionChange={(keys: any) => {
+                            const value = Array.from(keys)[0] as string;
+                            setStorage(
+                              selected.id,
+                              value === DEFAULT_STORAGE_KEY ? null : value
+                            );
+                          }}
+                          className="w-44"
+                          classNames={{
+                            trigger:
+                              "h-8 min-h-8 bg-white border border-[#D4DEED] rounded-lg shadow-none",
+                            value: "!text-[#265197] text-xs",
+                            selectorIcon: "text-[#678CC5]",
+                          }}
+                        >
+                          {[
+                            {
+                              id: DEFAULT_STORAGE_KEY,
+                              name: `Default (${defaultStorageName || "sin asignar"})`,
+                            },
+                            ...storages,
+                          ].map((option) => (
+                            <SelectItem key={option.id} textValue={option.name}>
+                              <span className="text-xs">{option.name}</span>
+                            </SelectItem>
+                          ))}
+                        </HeroSelect>
+
+                        <div
+                          className="flex items-center gap-1"
+                          title={
+                            selected.ai_enabled
+                              ? "IA respondiendo automáticamente — apágala para responder tú"
+                              : "IA pausada: respondes tú (takeover)"
+                          }
+                        >
                           <Switch
                             size="sm"
                             isSelected={selected.ai_enabled}
                             onValueChange={(value) => toggleAi(selected.id, value)}
                           />
-                          <span className="text-xs text-gray-600">
-                            {selected.ai_enabled ? "IA respondiendo" : "Respondes tú"}
-                          </span>
+                          <span className="text-[11px] text-gray-600">IA</span>
                         </div>
 
-                        <div className="w-56">
-                          <Select
-                            label="Base de conocimiento"
-                            selectedKeys={[selected.storage_id || DEFAULT_STORAGE_KEY]}
-                            onSelectionChange={(keys: any) => {
-                              const value = Array.from(keys)[0] as string;
-                              setStorage(
-                                selected.id,
-                                value === DEFAULT_STORAGE_KEY ? null : value
-                              );
-                            }}
-                            className="w-full"
-                            variant="faded"
-                            classNames={{
-                              trigger: "bg-white !border-[#D4DEED] !rounded-[12px]",
-                              label: "!text-[#265197]",
-                              value: "!text-[#265197]",
-                              selectorIcon: "text-[#678CC5]",
-                            }}
-                            options={[
-                              {
-                                value: DEFAULT_STORAGE_KEY,
-                                label: `Por defecto (${defaultStorageName || "sin asignar"})`,
-                              },
-                              ...storages.map((storage) => ({
-                                value: storage.id,
-                                label: storage.name,
-                              })),
-                            ]}
-                          />
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setIsDeleteOpen(true)}
+                          className="flex items-center p-1.5 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                          title="Eliminar conversación"
+                        >
+                          <Icon name="Trash2" size={13} color="white" />
+                        </button>
                       </div>
                     </div>
 
                     {!settings?.default_storage_id && !selected.storage_id && (
-                      <p className="mt-2 text-xs text-amber-700">
+                      <p className="mt-1 text-[11px] text-amber-700">
                         ⚠️ Sin base de conocimiento asignada: el bot no responderá en este chat.
                       </p>
                     )}
@@ -381,26 +399,19 @@ export default function WhatsAppPage() {
                     <div ref={messagesEndRef} />
                   </div>
 
-                  {/* Ventana de 24h cerrada: el texto libre será rechazado */}
-                  {selectedWindow.state === "closed" && (
-                    <div className="mb-2 bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 flex items-center gap-2">
-                      <Icon name="Clock" size={14} color="#6b7280" />
-                      <p className="text-xs text-gray-600">
-                        Ventana de 24h cerrada: WhatsApp rechazará este mensaje. El cliente debe
-                        escribir primero para reabrirla.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Aviso de takeover */}
-                  {selected.ai_enabled && (
-                    <div className="mb-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
-                      <p className="text-xs text-blue-800">
-                        La IA está respondiendo este chat. Si escribes tú, considera apagarla
-                        primero para evitar respuestas duplicadas.
-                      </p>
-                    </div>
-                  )}
+                  {/* Avisos compactos: ventana cerrada / IA activa */}
+                  {selectedWindow.state === "closed" ? (
+                    <p className="mb-1 px-1 text-[11px] text-gray-500 flex items-center gap-1">
+                      <Icon name="Clock" size={11} color="#6b7280" />
+                      Ventana de 24h cerrada: WhatsApp rechazará el mensaje hasta que el cliente
+                      vuelva a escribir.
+                    </p>
+                  ) : selected.ai_enabled ? (
+                    <p className="mb-1 px-1 text-[11px] text-blue-700 flex items-center gap-1">
+                      <Icon name="Bot" size={11} color="#1d4ed8" />
+                      IA activa — apágala antes de escribir para evitar respuestas dobles.
+                    </p>
+                  ) : null}
 
                   {/* Input */}
                   <div className="flex gap-2 items-center">
@@ -440,6 +451,55 @@ export default function WhatsAppPage() {
           </div>
         </div>
       </Col>
+
+      {/* ============ Confirmar eliminación de conversación ============ */}
+      <Modal
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        title="Eliminar Conversación"
+        size="sm"
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button isAdmin variant="secondary" onClick={() => setIsDeleteOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              isAdmin
+              disabled={isDeleting}
+              style={{ backgroundColor: "#dc2626" }}
+              onClick={async () => {
+                if (!selected) return;
+                setIsDeleting(true);
+                const ok = await deleteConversation(selected.id);
+                setIsDeleting(false);
+                if (ok) {
+                  setIsDeleteOpen(false);
+                  setSelectedId(null);
+                }
+              }}
+            >
+              {isDeleting ? "Eliminando..." : "Eliminar"}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            ¿Eliminar la conversación con{" "}
+            <strong className="text-[#265197]">
+              {selected?.contact_name || selected?.wa_id}
+            </strong>{" "}
+            y todos sus mensajes?
+          </p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+            <p className="text-sm text-red-800">
+              ⚠️ Esta acción no se puede deshacer. Solo se borra del admin — el chat en el
+              teléfono del cliente no se ve afectado; si vuelve a escribir, se creará una
+              conversación nueva.
+            </p>
+          </div>
+        </div>
+      </Modal>
 
       {/* ============ Configuración del canal ============ */}
       <Modal
