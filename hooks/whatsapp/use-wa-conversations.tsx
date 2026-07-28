@@ -12,9 +12,48 @@ export interface WaConversation {
   ai_enabled: boolean;
   unread_count: number;
   last_message_at: string | null;
+  last_user_message_at: string | null;
   last_message_preview: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// ================================================================
+// Ventana de servicio de 24h de WhatsApp
+// Solo los mensajes DEL CLIENTE la abren/renuevan; expira 24h después
+// del último. Cerrada = solo se pueden enviar plantillas aprobadas.
+// ================================================================
+
+const WA_WINDOW_MS = 24 * 60 * 60 * 1000;
+const WA_WINDOW_WARN_MS = 3 * 60 * 60 * 1000; // aviso cuando quedan < 3h
+
+export type WaWindowState = "open" | "closing" | "closed" | "none";
+
+export interface WaWindowInfo {
+  state: WaWindowState;
+  remainingMs: number;
+  /** "5h 23m" / "45m" — vacío si no aplica */
+  remainingLabel: string;
+}
+
+export function getWaWindowInfo(
+  lastUserMessageAt: string | null,
+  now: number = Date.now()
+): WaWindowInfo {
+  if (!lastUserMessageAt) return { state: "none", remainingMs: 0, remainingLabel: "" };
+
+  const remainingMs = new Date(lastUserMessageAt).getTime() + WA_WINDOW_MS - now;
+  if (remainingMs <= 0) return { state: "closed", remainingMs: 0, remainingLabel: "" };
+
+  const hours = Math.floor(remainingMs / 3_600_000);
+  const minutes = Math.floor((remainingMs % 3_600_000) / 60_000);
+  const remainingLabel = hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+
+  return {
+    state: remainingMs <= WA_WINDOW_WARN_MS ? "closing" : "open",
+    remainingMs,
+    remainingLabel,
+  };
 }
 
 export const useWaConversations = () => {

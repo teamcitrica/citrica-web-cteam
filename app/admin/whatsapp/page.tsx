@@ -4,7 +4,12 @@ import { Button, Select, Col, Container, Text, Icon } from "citrica-ui-toolkit";
 import { Switch } from "@heroui/switch";
 import Modal from "@/shared/components/citrica-ui/molecules/modal";
 
-import { useWaConversations, type WaConversation } from "@/hooks/whatsapp/use-wa-conversations";
+import {
+  useWaConversations,
+  getWaWindowInfo,
+  type WaConversation,
+  type WaWindowInfo,
+} from "@/hooks/whatsapp/use-wa-conversations";
 import { useWaMessages, type WaMessage } from "@/hooks/whatsapp/use-wa-messages";
 import { useWaSettings } from "@/hooks/whatsapp/use-wa-settings";
 
@@ -28,6 +33,38 @@ const formatDay = (value: string | null) => {
     : date.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
 };
 
+// Chip de la ventana de 24h (verde abierta / ámbar por cerrar / gris cerrada)
+const WindowChip = ({ info, compact = false }: { info: WaWindowInfo; compact?: boolean }) => {
+  if (info.state === "none") return null;
+
+  const styles = {
+    open: "bg-green-50 border-green-200 text-green-700",
+    closing: "bg-amber-50 border-amber-200 text-amber-700",
+    closed: "bg-gray-100 border-gray-200 text-gray-500",
+  }[info.state];
+  const iconColor = { open: "#16a34a", closing: "#b45309", closed: "#6b7280" }[info.state];
+  const label =
+    info.state === "closed"
+      ? compact ? "cerrada" : "Ventana cerrada"
+      : compact ? info.remainingLabel : `Ventana abierta · ${info.remainingLabel}`;
+  const title =
+    info.state === "closed"
+      ? "Pasaron más de 24h del último mensaje del cliente: WhatsApp rechaza texto libre hasta que vuelva a escribir"
+      : `La ventana de 24h expira en ${info.remainingLabel} (se renueva con cada mensaje del cliente)`;
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 border rounded-full font-semibold ${styles} ${
+        compact ? "px-1.5 py-0 text-[10px]" : "px-2 py-1 text-xs"
+      }`}
+      title={title}
+    >
+      <Icon name="Clock" size={compact ? 10 : 14} color={iconColor} />
+      {label}
+    </span>
+  );
+};
+
 export default function WhatsAppPage() {
   const { conversations, isLoading, toggleAi, setStorage, markRead } = useWaConversations();
   const { settings, storages, updateSettings } = useWaSettings();
@@ -41,9 +78,21 @@ export default function WhatsAppPage() {
   const [draftPrompt, setDraftPrompt] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Tick por minuto: refresca los contadores de la ventana de 24h sin refetch
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(timer);
+  }, []);
+
   const selected: WaConversation | undefined = useMemo(
     () => conversations.find((c) => c.id === selectedId),
     [conversations, selectedId]
+  );
+
+  const selectedWindow = useMemo(
+    () => getWaWindowInfo(selected?.last_user_message_at ?? null, now),
+    [selected?.last_user_message_at, now]
   );
 
   const defaultStorageName = useMemo(
@@ -167,12 +216,18 @@ export default function WhatsAppPage() {
                       )}
                     </div>
 
-                    {!conversation.ai_enabled && (
-                      <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-amber-700">
-                        <Icon name="UserCheck" size={10} color="#b45309" />
-                        Atención humana
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2 mt-1">
+                      <WindowChip
+                        info={getWaWindowInfo(conversation.last_user_message_at, now)}
+                        compact
+                      />
+                      {!conversation.ai_enabled && (
+                        <span className="inline-flex items-center gap-1 text-[10px] text-amber-700">
+                          <Icon name="UserCheck" size={10} color="#b45309" />
+                          Atención humana
+                        </span>
+                      )}
+                    </div>
                   </button>
                 ))
               )}
@@ -195,9 +250,12 @@ export default function WhatsAppPage() {
                   <div className="bg-white border border-gray-200 rounded-lg p-3 mb-2">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="font-semibold text-[#16305A] truncate">
-                          {selected.contact_name || selected.wa_id}
-                        </p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-semibold text-[#16305A] truncate">
+                            {selected.contact_name || selected.wa_id}
+                          </p>
+                          <WindowChip info={selectedWindow} />
+                        </div>
                         <p className="text-xs text-gray-500">+{selected.wa_id}</p>
                       </div>
 
@@ -322,6 +380,17 @@ export default function WhatsAppPage() {
                     )}
                     <div ref={messagesEndRef} />
                   </div>
+
+                  {/* Ventana de 24h cerrada: el texto libre será rechazado */}
+                  {selectedWindow.state === "closed" && (
+                    <div className="mb-2 bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 flex items-center gap-2">
+                      <Icon name="Clock" size={14} color="#6b7280" />
+                      <p className="text-xs text-gray-600">
+                        Ventana de 24h cerrada: WhatsApp rechazará este mensaje. El cliente debe
+                        escribir primero para reabrirla.
+                      </p>
+                    </div>
+                  )}
 
                   {/* Aviso de takeover */}
                   {selected.ai_enabled && (
