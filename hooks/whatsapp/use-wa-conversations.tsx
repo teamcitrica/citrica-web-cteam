@@ -14,6 +14,7 @@ export interface WaConversation {
   last_message_at: string | null;
   last_user_message_at: string | null;
   last_message_preview: string | null;
+  context_since: string;
   created_at: string;
   updated_at: string;
 }
@@ -144,12 +145,14 @@ export const useWaConversations = () => {
     [supabase, fetchConversations]
   );
 
-  // storageId null = volver al storage por defecto del canal
+  // storageId null = volver al storage por defecto del canal.
+  // context_since se resetea: la memoria del documento anterior contaminaría
+  // las respuestas del nuevo (la IA seguiría el guion viejo).
   const setStorage = useCallback(
     async (id: string, storageId: string | null) => {
       const { error } = await supabase
         .from("wa_conversations")
-        .update({ storage_id: storageId })
+        .update({ storage_id: storageId, context_since: new Date().toISOString() })
         .eq("id", id);
 
       if (error) {
@@ -165,6 +168,11 @@ export const useWaConversations = () => {
       setConversations((prev) =>
         prev.map((c) => (c.id === id ? { ...c, storage_id: storageId } : c))
       );
+      addToast({
+        title: "Base de conocimiento cambiada",
+        description: "La memoria del chat se reinició para el nuevo documento",
+        color: "success",
+      });
       return true;
     },
     [supabase]
