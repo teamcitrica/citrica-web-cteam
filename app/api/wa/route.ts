@@ -118,6 +118,7 @@ async function processMessage(message: IncomingWaMessage) {
         wa_id: message.from,
         ...(message.contactName ? { contact_name: message.contactName } : {}),
         last_message_at: now,
+        last_user_message_at: now, // abre/renueva la ventana de 24h
         last_message_preview: content.slice(0, 120),
       },
       { onConflict: "wa_id" }
