@@ -63,17 +63,29 @@ interface HistoryRow {
  * El mensaje entrante actual ya está insertado en la tabla, así que queda al final.
  * Los mensajes del agente humano entran como "model" para que la IA tenga contexto
  * del takeover y no repita lo que ya dijo una persona.
+ * Solo se incluyen mensajes desde context_since: cambiar la base de conocimiento
+ * resetea ese marcador para que el guion del documento anterior no contamine.
  */
 async function buildContents(
   supabase: SupabaseClient,
   conversationId: string
 ): Promise<{ role: string; parts: { text: string }[] }[]> {
-  const { data } = await supabase
+  const { data: conv } = await supabase
+    .from("wa_conversations")
+    .select("context_since")
+    .eq("id", conversationId)
+    .single();
+
+  let query = supabase
     .from("wa_messages")
     .select("sender_type, content")
     .eq("conversation_id", conversationId)
     .order("created_at", { ascending: false })
     .limit(HISTORY_LIMIT);
+
+  if (conv?.context_since) query = query.gte("created_at", conv.context_since);
+
+  const { data } = await query;
 
   const rows = ((data || []) as HistoryRow[]).reverse();
 
