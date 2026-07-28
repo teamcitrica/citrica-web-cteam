@@ -105,6 +105,97 @@ async function buildContents(
   }));
 }
 
+// ================================================================
+// MODO GUION (strict_mode): texto del documento inline en el prompt
+// El retrieval de File Search es una decisión del modelo y con system
+// prompt suele NO ejecutarse (verificado: 0 chunks con toda variante de
+// prompt) — además los turnos intermedios de un guion ("sí", "listo")
+// jamás dispararían búsqueda. Se inyecta el texto completo, extraído
+// una vez por archivo y cacheado en storage_files.extracted_text.
+// ================================================================
+
+// Por encima de esto el prompt se encarece demasiado: cae a File Search
+const SCRIPT_MAX_CHARS = 30_000;
+
+interface ScriptFile {
+  id: string;
+  file_name: string;
+  file_type: string | null;
+  file_url: string | null;
+  extracted_text: string | null;
+}
+
+function bucketPathFromUrl(url: string): string {
+  return url.split("/rag-documents/")[1] || "";
+}
+
+async function extractFileText(
+  supabase: SupabaseClient,
+  apiKey: string,
+  file: ScriptFile
+): Promise<string | null> {
+  if (file.extracted_text?.trim()) return file.extracted_text;
+  if (!file.file_url) return null;
+
+  const path = bucketPathFromUrl(file.file_url);
+  if (!path) return null;
+
+  const { data: blob, error } = await supabase.storage.from("rag-documents").download(path);
+  if (error || !blob) {
+    console.error(`❌ No se pudo descargar ${file.file_name} del bucket:`, error?.message);
+    return null;
+  }
+
+  try {
+    const base64 = Buffer.from(await blob.arrayBuffer()).toString("base64");
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            { inlineData: { mimeType: file.file_type || "application/pdf", data: base64 } },
+            {
+              text:
+                "Transcribe fielmente TODO el texto de este documento, completo y en orden, " +
+                "sin resumir, sin comentarios y sin añadir nada.",
+            },
+          ],
+        },
+      ],
+      config: { temperature: 0, maxOutputTokens: 8192, thinkingConfig: { thinkingBudget: 0 } },
+    });
+
+    const text = response.text?.trim();
+    if (!text) return null;
+
+    await supabase.from("storage_files").update({ extracted_text: text }).eq("id", file.id);
+    console.log(`📝 Texto extraído y cacheado: ${file.file_name} (${text.length} chars)`);
+    return text;
+  } catch (e: any) {
+    console.error(`❌ Extracción falló para ${file.file_name}:`, e?.message);
+    return null;
+  }
+}
+
+/** Texto completo del guion (todos los archivos activos), o null si no se pudo. */
+async function getScriptText(
+  supabase: SupabaseClient,
+  apiKey: string,
+  files: ScriptFile[]
+): Promise<string | null> {
+  const texts: string[] = [];
+  for (const file of files) {
+    const text = await extractFileText(supabase, apiKey, file);
+    if (text) texts.push(text);
+  }
+
+  if (texts.length === 0) return null;
+  const full = texts.join("\n\n---\n\n");
+  return full.length <= SCRIPT_MAX_CHARS ? full : null;
+}
+
 export async function generateWhatsAppReply(
   supabase: SupabaseClient,
   params: GenerateReplyParams
@@ -145,17 +236,26 @@ export async function generateWhatsAppReply(
 
     const { data: activeFiles } = await supabase
       .from("storage_files")
-      .select("file_name")
+      .select("id, file_name, file_type, file_url, extracted_text")
       .eq("storage_id", storageId)
       .eq("gemini_file_state", "ACTIVE");
 
-    const storeNames: string[] =
+    let storeNames: string[] =
       isRealStoreName(storage.gemini_vector_store_id) && (activeFiles?.length || 0) > 0
         ? [storage.gemini_vector_store_id]
         : [];
 
+    // Modo guion: en strict_mode el documento va inline en el prompt y se
+    // apaga File Search (retrieval no confiable con system prompt)
+    let scriptText: string | null = null;
+    if (storage.strict_mode && (activeFiles?.length || 0) > 0) {
+      scriptText = await getScriptText(supabase, apiKey, activeFiles as ScriptFile[]);
+      if (scriptText) storeNames = [];
+      else console.warn("⚠️ Modo guion sin texto extraíble; se usa File Search como fallback");
+    }
+
     // ================================================================
-    // 3. PROMPT: RAG resuelto + prompt de canal + instrucción fija
+    // 3. PROMPT: RAG resuelto + guion inline (strict) + canal
     // ================================================================
     const promptDefaults = await getRagPromptDefaults(supabase);
     const ragPrompt = resolveRagSystemPrompt(promptDefaults, storage);
@@ -166,7 +266,14 @@ export async function generateWhatsAppReply(
       .eq("id", 1)
       .single();
 
-    const systemInstruction = [ragPrompt, settings?.system_prompt?.trim(), CHANNEL_INSTRUCTION]
+    const systemInstruction = [
+      ragPrompt,
+      scriptText
+        ? `EL DOCUMENTO (contenido completo, tu única fuente y guion):\n---\n${scriptText}\n---`
+        : null,
+      settings?.system_prompt?.trim(),
+      CHANNEL_INSTRUCTION,
+    ]
       .filter(Boolean)
       .join("\n\n");
 

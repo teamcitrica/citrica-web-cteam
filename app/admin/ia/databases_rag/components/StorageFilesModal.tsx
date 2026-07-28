@@ -84,6 +84,17 @@ export default function StorageFilesModal({
     return () => clearInterval(interval);
   }, [isOpen, storageId, fetchFiles]);
 
+  // Formatos que el navegador renderiza inline; docx/xlsx no tienen visor nativo
+  const isPreviewable = (fileName: string): boolean => {
+    const ext = fileName.split(".").pop()?.toLowerCase() || "";
+    return ["pdf", "txt", "md", "csv", "json"].includes(ext);
+  };
+
+  const handlePreview = useCallback((file: StorageFile) => {
+    // inline=1 → Content-Disposition inline: se abre en pestaña nueva sin descargar
+    window.open(`/api/rag/files/download?fileId=${file.id}&inline=1`, "_blank");
+  }, []);
+
   const handleDownload = useCallback(async (file: StorageFile) => {
     try {
       setIsDownloading(file.id);
@@ -315,6 +326,20 @@ export default function StorageFilesModal({
                       </td>
                       <td className="py-3 px-2">
                         <div className="flex items-center justify-center gap-2">
+                          {/* Botón Ver (vista previa sin descargar) */}
+                          <button
+                            onClick={() => handlePreview(file)}
+                            disabled={!isPreviewable(file.file_name)}
+                            className="p-2 text-[#265197] hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                            title={
+                              isPreviewable(file.file_name)
+                                ? "Ver documento"
+                                : "Vista previa no disponible para este formato (descárgalo)"
+                            }
+                          >
+                            <Icon name="Eye" size={18} />
+                          </button>
+
                           {/* Botón Descargar */}
                           <button
                             onClick={() => handleDownload(file)}
