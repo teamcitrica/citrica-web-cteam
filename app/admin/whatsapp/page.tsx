@@ -66,7 +66,8 @@ const WindowChip = ({ info, compact = false }: { info: WaWindowInfo; compact?: b
 };
 
 export default function WhatsAppPage() {
-  const { conversations, isLoading, toggleAi, setStorage, markRead } = useWaConversations();
+  const { conversations, isLoading, toggleAi, setStorage, deleteConversation, markRead } =
+    useWaConversations();
   const { settings, storages, updateSettings } = useWaSettings();
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -75,6 +76,8 @@ export default function WhatsAppPage() {
 
   const [input, setInput] = useState("");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [draftPrompt, setDraftPrompt] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -271,6 +274,15 @@ export default function WhatsAppPage() {
                           </span>
                         </div>
 
+                        <button
+                          type="button"
+                          onClick={() => setIsDeleteOpen(true)}
+                          className="flex items-center px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                          title="Eliminar conversación"
+                        >
+                          <Icon name="Trash2" size={14} color="white" />
+                        </button>
+
                         <div className="w-56">
                           <Select
                             label="Base de conocimiento"
@@ -440,6 +452,55 @@ export default function WhatsAppPage() {
           </div>
         </div>
       </Col>
+
+      {/* ============ Confirmar eliminación de conversación ============ */}
+      <Modal
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        title="Eliminar Conversación"
+        size="sm"
+        footer={
+          <div className="flex gap-3 w-full">
+            <Button isAdmin variant="secondary" onClick={() => setIsDeleteOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              isAdmin
+              disabled={isDeleting}
+              style={{ backgroundColor: "#dc2626" }}
+              onClick={async () => {
+                if (!selected) return;
+                setIsDeleting(true);
+                const ok = await deleteConversation(selected.id);
+                setIsDeleting(false);
+                if (ok) {
+                  setIsDeleteOpen(false);
+                  setSelectedId(null);
+                }
+              }}
+            >
+              {isDeleting ? "Eliminando..." : "Eliminar"}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            ¿Eliminar la conversación con{" "}
+            <strong className="text-[#265197]">
+              {selected?.contact_name || selected?.wa_id}
+            </strong>{" "}
+            y todos sus mensajes?
+          </p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+            <p className="text-sm text-red-800">
+              ⚠️ Esta acción no se puede deshacer. Solo se borra del admin — el chat en el
+              teléfono del cliente no se ve afectado; si vuelve a escribir, se creará una
+              conversación nueva.
+            </p>
+          </div>
+        </div>
+      </Modal>
 
       {/* ============ Configuración del canal ============ */}
       <Modal

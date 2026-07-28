@@ -178,6 +178,33 @@ export const useWaConversations = () => {
     [supabase]
   );
 
+  // Borra la conversación y sus mensajes (FK ON DELETE CASCADE en wa_messages).
+  // Si el cliente vuelve a escribir, el webhook crea una conversación nueva limpia.
+  const deleteConversation = useCallback(
+    async (id: string) => {
+      const { error } = await supabase.from("wa_conversations").delete().eq("id", id);
+
+      if (error) {
+        console.error("Error al borrar conversación:", error);
+        addToast({
+          title: "Error",
+          description: "No se pudo borrar la conversación",
+          color: "danger",
+        });
+        return false;
+      }
+
+      setConversations((prev) => prev.filter((c) => c.id !== id));
+      addToast({
+        title: "Conversación eliminada",
+        description: "Se borraron todos sus mensajes",
+        color: "success",
+      });
+      return true;
+    },
+    [supabase]
+  );
+
   const markRead = useCallback(
     async (id: string) => {
       setConversations((prev) =>
@@ -200,6 +227,7 @@ export const useWaConversations = () => {
     fetchConversations,
     toggleAi,
     setStorage,
+    deleteConversation,
     markRead,
   };
 };
