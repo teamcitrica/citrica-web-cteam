@@ -24,6 +24,8 @@ export async function GET(request: Request) {
     const supabase = createRouteHandlerClient({ cookies });
     const { searchParams } = new URL(request.url);
     const fileId = searchParams.get("fileId");
+    // inline=1: el navegador renderiza el archivo (vista previa) en vez de descargarlo
+    const inline = searchParams.get("inline") === "1";
 
     if (!fileId) {
       return NextResponse.json(
@@ -100,7 +102,7 @@ export async function GET(request: Request) {
     return new Response(arrayBuffer, {
       headers: {
         "Content-Type": file.file_type || "application/octet-stream",
-        "Content-Disposition": `attachment; filename="${encodeURIComponent(file.file_name)}"`,
+        "Content-Disposition": `${inline ? "inline" : "attachment"}; filename="${encodeURIComponent(file.file_name)}"`,
         "Cache-Control": "no-cache",
       },
     });
