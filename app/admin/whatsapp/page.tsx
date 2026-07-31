@@ -126,6 +126,43 @@ export default function WhatsAppPage() {
     if (!ok) setInput(text); // devolver el texto para que no se pierda
   };
 
+  // Exporta la conversación abierta como .txt (IA etiquetada "Bot Citrica")
+  const handleDownload = () => {
+    if (!selected || messages.length === 0) return;
+
+    const contactLabel = selected.contact_name || selected.wa_id;
+    const senderLabel = (message: WaMessage) => {
+      if (message.sender_type === "user") return contactLabel;
+      if (message.sender_type === "ai") return "Bot Citrica";
+      return "Agente Citrica";
+    };
+
+    const lines = messages.map((message) => {
+      const stamp = message.created_at
+        ? new Date(message.created_at).toLocaleString("es-ES", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : "";
+      const failed = message.status === "failed" ? " [NO ENVIADO]" : "";
+      return `[${stamp}] ${senderLabel(message)}${failed}: ${message.content}`;
+    });
+
+    const header = `Conversación WhatsApp — ${contactLabel} (+${selected.wa_id})\n\n`;
+    const blob = new Blob([header + lines.join("\n")], {
+      type: "text/plain;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `whatsapp-${contactLabel.replace(/[^\w-]+/g, "_")}.txt`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
   const bubbleStyles = (message: WaMessage) => {
     if (message.sender_type === "user") return "bg-gray-100 text-gray-800";
     if (message.sender_type === "ai") return "bg-[#265197] text-white";
@@ -311,6 +348,16 @@ export default function WhatsAppPage() {
                           />
                           <span className="text-[11px] text-gray-600">IA</span>
                         </div>
+
+                        <button
+                          type="button"
+                          onClick={handleDownload}
+                          disabled={messages.length === 0}
+                          className="flex items-center p-1.5 bg-white border border-[#D4DEED] hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+                          title="Descargar conversación en texto plano"
+                        >
+                          <Icon name="Download" size={13} color="#265197" />
+                        </button>
 
                         <button
                           type="button"
