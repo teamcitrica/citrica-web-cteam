@@ -57,6 +57,10 @@ export const siteConfig = {
 					title: "Configuración",
 					href: "/admin/ia/config",
 				},
+				{
+					title: "WhatsApp",
+					href: "/admin/whatsapp",
+				},
 
 			],
 		},
@@ -188,15 +192,6 @@ export const siteConfig = {
 				},
 			],
 		},
-		{
-			// Sin subItems: el sidebar solo navega directo cuando la propiedad no existe
-			// (un array vacío es truthy y lo renderiza como acordeón sin destino)
-			title: "WHATSAPP",
-			icon: "MessageCircle",
-			href: "/admin/whatsapp",
-			allowedRoles: [ROL_ADMIN],
-		},
-
 	],
 	links: {
 		github: "https://github.com/nextui-org/nextui",
